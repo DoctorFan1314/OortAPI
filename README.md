@@ -267,3 +267,9 @@ ChatGPT（OpenAI）、Claude（Anthropic）、Grok（xAI）、DeepSeek、Qwen / 
 ---
 
 > 如果本项目对你有帮助，欢迎 Star ⭐ 支持。仅此而已，不构成任何明示或暗示的担保。
+
+###  致谢
+
+本项目由 **MiMo 2.5-pro** 模型通过 **Claude Code** 辅助生成。
+
+特别感谢 **Xiaomi MiMo Orbit-百万亿 Token 创作者激励计划** 对本项目的支持与认可。MiMo 模型强大的推理能力与代码生成效率为本项目的快速构建提供了核心动力。期待未来能继续探索 AI 驱动的开发新范式。
