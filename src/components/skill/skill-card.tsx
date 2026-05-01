@@ -26,7 +26,16 @@ export function SkillCard({ skill }: { skill: Skill }) {
         <h3 className="text-base font-semibold text-white mb-2 line-clamp-2 group-hover:text-[#00d4ff] transition-colors">
           {skill.title}
         </h3>
-        <p className="text-sm text-[#8b949e] mb-4 line-clamp-2 flex-1">{skill.subtitle}</p>
+        <p className="text-sm text-[#8b949e] mb-3 line-clamp-2 flex-1">{skill.subtitle}</p>
+        {skill.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mb-4">
+            {skill.tags.slice(0, 3).map((tag) => (
+              <span key={tag} className="text-[10px] px-2 py-0.5 rounded-full bg-white/5 text-[#8b949e]/80 border border-white/5">
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3 text-xs text-[#8b949e]">
             <span className="flex items-center gap-1">

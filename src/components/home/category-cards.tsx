@@ -39,7 +39,7 @@ export function CategoryCards() {
         {cards.map((card) => (
           <Link key={card.href} href={card.href}>
             <div className="glass-card glass-card-hover p-6 h-full cursor-pointer group">
-              <div className="text-4xl mb-4">{card.icon}</div>
+              <div className="text-4xl mb-4 transition-transform group-hover:scale-110">{card.icon}</div>
               <h3 className="text-lg font-semibold text-white mb-2">{card.title}</h3>
               <p className="text-sm text-[#8b949e] mb-1">{card.subtitle}</p>
               <p className="text-sm text-[#8b949e]/70 mb-5">{card.description}</p>

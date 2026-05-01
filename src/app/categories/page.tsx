@@ -1,8 +1,14 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { categories } from "@/lib/categories";
 import { getSkillsByCategory } from "@/lib/mock-data";
 import { SkillCard } from "@/components/skill/skill-card";
 import { ArrowRight } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "分类浏览 — AI Skills Hub",
+  description: "按领域探索最适合你的 AI 技能模板，覆盖内容创作、编程开发、职场工作",
+};
 
 export default function CategoriesPage() {
   return (

@@ -15,5 +15,35 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
 export default async function SkillDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  return <SkillDetailClient id={id} />;
+  const skill = getSkillById(id);
+
+  const jsonLd = skill
+    ? {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        headline: skill.title,
+        description: skill.subtitle,
+        author: { "@type": "Organization", name: "AI Skills Hub" },
+        datePublished: `${skill.lastUpdated.replace(".", "-")}-01`,
+        dateModified: `${skill.lastUpdated.replace(".", "-")}-01`,
+        aggregateRating: {
+          "@type": "AggregateRating",
+          ratingValue: skill.rating,
+          bestRating: 5,
+          ratingCount: skill.usageCount,
+        },
+      }
+    : null;
+
+  return (
+    <>
+      {jsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      )}
+      <SkillDetailClient id={id} />
+    </>
+  );
 }

@@ -51,7 +51,7 @@ export default function SkillsClient() {
           />
         </div>
 
-        <div className="flex flex-wrap gap-4">
+        <div className="space-y-3 md:space-y-0 md:flex md:flex-wrap md:gap-4 md:items-center">
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-sm text-[#8b949e]" id="category-label">分类：</span>
             <button onClick={() => setCategory("全部")} role="radio" aria-checked={category === "全部"} aria-labelledby="category-label" className={`px-3 py-1 text-sm rounded-md transition-colors ${category === "全部" ? "bg-[#00d4ff]/10 text-[#00d4ff] border border-[#00d4ff]/30" : "text-[#8b949e] hover:text-white hover:bg-white/5"}`}>
@@ -63,7 +63,7 @@ export default function SkillsClient() {
               </button>
             ))}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="text-sm text-[#8b949e]" id="difficulty-label">难度：</span>
             {difficulties.map((d) => (
               <button key={d} onClick={() => setDifficulty(d)} role="radio" aria-checked={difficulty === d} aria-labelledby="difficulty-label" className={`px-3 py-1 text-sm rounded-md transition-colors ${difficulty === d ? "bg-[#00d4ff]/10 text-[#00d4ff] border border-[#00d4ff]/30" : "text-[#8b949e] hover:text-white hover:bg-white/5"}`}>
@@ -71,7 +71,7 @@ export default function SkillsClient() {
               </button>
             ))}
           </div>
-          <div className="flex items-center gap-2 ml-auto">
+          <div className="flex flex-wrap items-center gap-2 md:ml-auto">
             <span className="text-sm text-[#8b949e]" id="sort-label">排序：</span>
             {([{ key: "trending" as const, label: "最热" }, { key: "rating" as const, label: "评分" }, { key: "newest" as const, label: "最新" }]).map((s) => (
               <button key={s.key} onClick={() => setSortBy(s.key)} role="radio" aria-checked={sortBy === s.key} aria-labelledby="sort-label" className={`px-3 py-1 text-sm rounded-md transition-colors ${sortBy === s.key ? "bg-[#00d4ff]/10 text-[#00d4ff] border border-[#00d4ff]/30" : "text-[#8b949e] hover:text-white hover:bg-white/5"}`}>

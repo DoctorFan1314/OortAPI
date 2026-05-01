@@ -136,13 +136,13 @@ export default function SkillDetailClient({ id }: { id: string }) {
       {/* Before/After */}
       <div className="glass-card p-6 mb-8">
         <h2 className="text-lg font-semibold text-white mb-4">📝 实测效果展示</h2>
-        <div className="mb-4">
-          <p className="text-sm text-[#8b949e] mb-1">输入：</p>
-          <div className="bg-black/40 border border-white/10 rounded-lg p-3 text-sm text-white">{skill.beforeAfter.input}</div>
+        <div className="mb-5">
+          <p className="text-xs text-[#8b949e] uppercase tracking-wider mb-2 font-medium">输入</p>
+          <div className="bg-black/40 border border-white/10 rounded-lg p-4 text-sm text-white">{skill.beforeAfter.input}</div>
         </div>
         {skill.beforeAfter.outputs.length > 0 && (
           <div>
-            <p className="text-sm text-[#8b949e] mb-3">输出：</p>
+            <p className="text-xs text-[#8b949e] uppercase tracking-wider mb-3 font-medium">输出对比</p>
             {skill.beforeAfter.outputs.length > 1 ? (
               <Tabs defaultValue="0">
                 <TabsList className="bg-white/5 border border-white/10 mb-3">
@@ -152,15 +152,15 @@ export default function SkillDetailClient({ id }: { id: string }) {
                 </TabsList>
                 {skill.beforeAfter.outputs.map((o, i) => (
                   <TabsContent key={i} value={String(i)}>
-                    <div className="bg-black/40 border border-white/10 rounded-lg p-4 max-h-96 overflow-y-auto scrollbar-hide">
-                      <pre className="text-sm text-[#8b949e] whitespace-pre-wrap leading-relaxed">{o.text}</pre>
+                    <div className="bg-gradient-to-b from-[#00d4ff]/5 to-transparent border border-[#00d4ff]/20 rounded-lg p-4 max-h-96 overflow-y-auto scrollbar-hide">
+                      <pre className="text-sm text-[#e6edf3] whitespace-pre-wrap leading-relaxed">{o.text}</pre>
                     </div>
                   </TabsContent>
                 ))}
               </Tabs>
             ) : (
-              <div className="bg-black/40 border border-white/10 rounded-lg p-4 max-h-96 overflow-y-auto scrollbar-hide">
-                <pre className="text-sm text-[#8b949e] whitespace-pre-wrap leading-relaxed">{skill.beforeAfter.outputs[0].text}</pre>
+              <div className="bg-gradient-to-b from-[#00d4ff]/5 to-transparent border border-[#00d4ff]/20 rounded-lg p-4 max-h-96 overflow-y-auto scrollbar-hide">
+                <pre className="text-sm text-[#e6edf3] whitespace-pre-wrap leading-relaxed">{skill.beforeAfter.outputs[0].text}</pre>
               </div>
             )}
           </div>
@@ -203,7 +203,7 @@ export default function SkillDetailClient({ id }: { id: string }) {
       <div className="glass-card p-6 mb-8">
         <h2 className="text-lg font-semibold text-white mb-4">🤖 推荐模型（2026年最新适配）</h2>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm" aria-label="推荐模型列表">
+          <table className="w-full text-sm min-w-[600px]" aria-label="推荐模型列表">
             <caption className="sr-only">推荐使用的 AI 模型及其适用场景</caption>
             <thead>
               <tr className="border-b border-white/10">
