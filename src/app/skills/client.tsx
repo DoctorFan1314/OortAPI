@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useCallback, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -9,9 +10,10 @@ import { agentSkills, getPublishedSkills } from "@/lib/mock-agent-skills";
 import { agentSkillCategories } from "@/lib/agent-skill-categories";
 import { AgentSkillCard } from "@/components/agent-skill/agent-skill-card";
 import { CreateDropdown } from "@/components/skills/create-dropdown";
-import { CreateFromGithub } from "@/components/skills/create-from-github";
-import { CreateFromUpload } from "@/components/skills/create-from-upload";
 import { useI18n } from "@/contexts/i18n-context";
+
+const CreateFromGithub = dynamic(() => import("@/components/skills/create-from-github").then(m => ({ default: m.CreateFromGithub })), { ssr: false });
+const CreateFromUpload = dynamic(() => import("@/components/skills/create-from-upload").then(m => ({ default: m.CreateFromUpload })), { ssr: false });
 
 const PAGE_SIZE = 12;
 

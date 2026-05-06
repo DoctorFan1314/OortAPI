@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect, useRef, useMemo } from "react";
+import dynamic from "next/dynamic";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Search, Zap, Plus } from "lucide-react";
@@ -8,7 +9,8 @@ import { skills, getPublishedPrompts } from "@/lib/mock-data";
 import { SkillCard } from "@/components/skill/skill-card";
 import { categories } from "@/lib/categories";
 import { useI18n } from "@/contexts/i18n-context";
-import { CreateFromUploadPrompt } from "@/components/skills/create-from-upload-prompt";
+
+const CreateFromUploadPrompt = dynamic(() => import("@/components/skills/create-from-upload-prompt").then(m => ({ default: m.CreateFromUploadPrompt })), { ssr: false });
 
 const PAGE_SIZE = 12;
 
