@@ -13,20 +13,19 @@ import { CreateFromGithub } from "@/components/skills/create-from-github";
 import { CreateFromUpload } from "@/components/skills/create-from-upload";
 import { useI18n } from "@/contexts/i18n-context";
 
-const collections = ["全部", "Vercel Agent Toolkit", "Anthropic Agent Suite", "Inference.sh Toolkit", "社区精选", "开发者工具", "效率工具", "数据工具"];
-const categories = ["全部", ...agentSkillCategories.map((c) => c.name)];
-
 const PAGE_SIZE = 12;
 
 export default function SkillsClient() {
   const { t } = useI18n();
+  const collections = [t.agentSkills.collectionAll, "Vercel Agent Toolkit", "Anthropic Agent Suite", "Inference.sh Toolkit", t.agentSkills.collectionCommunity, t.agentSkills.collectionDevTools, t.agentSkills.collectionProductivity, t.agentSkills.collectionDataTools];
+  const categories = [t.agentSkills.collectionAll, ...agentSkillCategories.map((c) => c.name)];
   const searchParams = useSearchParams();
   const urlCategory = searchParams.get("category");
   const [query, setQuery] = useState("");
   const [sortBy, setSortBy] = useState<"downloads" | "stars" | "newest">("downloads");
-  const [selectedCollection, setSelectedCollection] = useState("全部");
+  const [selectedCollection, setSelectedCollection] = useState(t.agentSkills.collectionAll);
   const [selectedCategory, setSelectedCategory] = useState(
-    urlCategory && categories.includes(urlCategory) ? urlCategory : "全部"
+    urlCategory && categories.includes(urlCategory) ? urlCategory : t.agentSkills.collectionAll
   );
   const [showFilters, setShowFilters] = useState(false);
   const [showGithub, setShowGithub] = useState(false);
@@ -51,10 +50,10 @@ export default function SkillsClient() {
       )
     : [...allSkills];
 
-  if (selectedCollection !== "全部") {
+  if (selectedCollection !== t.agentSkills.collectionAll) {
     filtered = filtered.filter((s) => s.collection === selectedCollection);
   }
-  if (selectedCategory !== "全部") {
+  if (selectedCategory !== t.agentSkills.collectionAll) {
     filtered = filtered.filter((s) => s.category === selectedCategory);
   }
 

@@ -7,7 +7,7 @@ export interface Dictionary {
     copy: string; copied: string; share: string; like: string; bookmark: string;
     more: string; all: string; viewAll: string;
     or: string; closeSearch: string; toggleTheme: string; switchLanguage: string;
-    openNavigation: string; navigationMenu: string;
+    openNavigation: string; navigationMenu: string; close: string;
   };
   home: {
     featuredTitle: string; featuredSubtitle: string;
@@ -27,6 +27,7 @@ export interface Dictionary {
     usageCount: string; viewDetail: string; difficulty: string; version: string;
     notFound: string; backToList: string; searchPlaceholder: string;
     emptySearch: string;
+    difficultyEasy: string; difficultyMedium: string; difficultyHard: string;
   };
   promptDetail: {
     backToList: string; copyPrompt: string; copyFailed: string;
@@ -55,6 +56,9 @@ export interface Dictionary {
     developer: string; downloadAll: string; downloadFile: string;
     feedback: string; writeComment: string; metadata: string;
     skillIntro: string; skillFiles: string;
+    collectionAll: string; collectionCommunity: string;
+    collectionDevTools: string; collectionProductivity: string;
+    collectionDataTools: string;
   };
   categories: { title: string; subtitle: string; viewAll: string; exploreSkill: string; };
   trending: {
@@ -66,6 +70,7 @@ export interface Dictionary {
     title: string; writeComment: string; placeholder: string; submitComment: string;
     loginToComment: string; noComments: string; rating: string; likes: string;
     reply: string; cancelReply: string; replyingTo: string;
+    commentPublished: string; commentRequired: string; commentCount: string;
   };
   profile: {
     title: string; overview: string; favorites: string; likes: string;
@@ -78,6 +83,8 @@ export interface Dictionary {
     copiedPrompt: string; viewedSkill: string;
     adminRole: string; userRole: string;
     stats: { submissions: string; likes: string; bookmarks: string; comments: string; };
+    noCommentsDesc: string; noLikesDesc: string; noFavoritesDesc: string;
+    noSubmissionsDesc: string; noHistoryDesc: string;
   };
   settings: {
     editProfile: string; username: string; bio: string; bioPlaceholder: string;
@@ -90,6 +97,7 @@ export interface Dictionary {
     dangerDesc: string; confirmDelete: string;
     usernameRequired: string; passwordMinLength: string; fillAllFields: string;
     dataExported: string; dataCleared: string; accountDeleted: string;
+    passwordPlaceholder: string;
   };
   submit: {
     title: string; subtitle: string; basicInfo: string; templateName: string;
@@ -98,6 +106,13 @@ export interface Dictionary {
     localPrompt: string; localPlaceholder: string; usage: string; usagePlaceholder: string;
     submitBtn: string; successTitle: string; successDesc: string; continueSubmit: string;
     viewHistory: string; mySubmissions: string;
+    nameRequired: string; nameMinLength: string; shortDescRequired: string;
+    categoryRequired: string; promptRequired: string; promptMinLength: string;
+    usageRequired: string; savedLocally: string;
+    statusPending: string; statusApproved: string; statusRejected: string;
+    recordDeleted: string; loginToView: string; backToSubmit: string;
+    viewHistoryDesc: string; noSubmissionsYet: string; goToSubmit: string;
+    reviewNoteLabel: string;
   };
   guide: {
     title: string; subtitle: string;
@@ -164,6 +179,7 @@ export interface Dictionary {
     blog: string; changelog: string; api: string; github: string; discord: string;
     twitter: string; newsletter: string; newsletterPlaceholder: string; subscribe: string;
     unsubscribe: string; unsubscribeDesc: string; managePreferences: string;
+    trademarkDisclaimer: string;
     copyright: string; platforms: string;
     emailRequired: string; emailInvalid: string; alreadySubscribed: string; subscribeSuccess: string;
   };

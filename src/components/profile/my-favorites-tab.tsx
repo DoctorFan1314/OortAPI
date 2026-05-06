@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@/contexts/auth-context";
+import { useI18n } from "@/contexts/i18n-context";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { STORAGE_KEYS } from "@/lib/storage-keys";
 import { getSkillById } from "@/lib/mock-data";
@@ -9,6 +10,7 @@ import { Bookmark } from "lucide-react";
 
 export function MyFavoritesTab() {
   const { user } = useAuth();
+  const { t } = useI18n();
   const key = user ? STORAGE_KEYS.bookmarks(user.email) : "ai-skills-hub-guest";
   const [bookmarkedIds] = useLocalStorage<string[]>(key, []);
   const skills = bookmarkedIds.map((id) => getSkillById(id)).filter(Boolean);
@@ -17,8 +19,8 @@ export function MyFavoritesTab() {
     return (
       <div className="glass-card p-12 text-center">
         <Bookmark className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-        <p className="text-foreground font-medium mb-1">暂无收藏</p>
-        <p className="text-sm text-muted-foreground">浏览技能市场，点击收藏按钮添加到这里</p>
+        <p className="text-foreground font-medium mb-1">{t.profile.noFavorites}</p>
+        <p className="text-sm text-muted-foreground">{t.profile.noFavoritesDesc}</p>
       </div>
     );
   }

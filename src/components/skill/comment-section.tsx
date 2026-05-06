@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { useToast } from "@/contexts/toast-context";
+import { useI18n } from "@/contexts/i18n-context";
 import { STORAGE_KEYS } from "@/lib/storage-keys";
 import type { Comment } from "@/lib/types";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ import { Star, ThumbsUp, MessageSquare } from "lucide-react";
 export function CommentSection({ skillId, skillTitle }: { skillId: string; skillTitle: string }) {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { t } = useI18n();
   const [comments, setComments] = useState<Comment[]>([]);
   const [content, setContent] = useState("");
   const [rating, setRating] = useState(0);
@@ -28,8 +30,8 @@ export function CommentSection({ skillId, skillTitle }: { skillId: string; skill
   }, [skillId]);
 
   function handleSubmit() {
-    if (!user) { toast("请先登录后再评论", "error"); return; }
-    if (!content.trim()) { toast("请输入评论内容", "error"); return; }
+    if (!user) { toast(t.comments.loginToComment, "error"); return; }
+    if (!content.trim()) { toast(t.comments.commentRequired, "error"); return; }
 
     const comment: Comment = {
       id: Date.now().toString(36),
@@ -78,11 +80,11 @@ export function CommentSection({ skillId, skillTitle }: { skillId: string; skill
     setComments((prev) => [comment, ...prev]);
     setContent("");
     setRating(0);
-    toast("评论已发布", "success");
+    toast(t.comments.commentPublished, "success");
   }
 
   function handleLike(commentId: string) {
-    if (!user) { toast("请先登录", "error"); return; }
+    if (!user) { toast(t.comments.loginToComment, "error"); return; }
     try {
       const raw = localStorage.getItem(STORAGE_KEYS.allComments);
       const all: Comment[] = raw ? JSON.parse(raw) : [];
@@ -105,13 +107,13 @@ export function CommentSection({ skillId, skillTitle }: { skillId: string; skill
   return (
     <div className="glass-card p-6 mb-8">
       <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-        <MessageSquare className="h-5 w-5" />评论 ({comments.length})
+        <MessageSquare className="h-5 w-5" />{t.comments.commentCount.replace("{count}", String(comments.length))}
       </h2>
 
       {/* Comment form */}
       <div className="mb-6 space-y-3">
         <div className="flex items-center gap-1">
-          <span className="text-sm text-muted-foreground mr-2">评分：</span>
+          <span className="text-sm text-muted-foreground mr-2">{t.comments.rating}：</span>
           {[1, 2, 3, 4, 5].map((star) => (
             <button
               key={star}
@@ -127,7 +129,7 @@ export function CommentSection({ skillId, skillTitle }: { skillId: string; skill
           {rating > 0 && <span className="text-xs text-muted-foreground ml-1">{rating}/5</span>}
         </div>
         <Textarea
-          placeholder={user ? "分享你的使用体验..." : "请先登录后再评论"}
+          placeholder={user ? t.comments.placeholder : t.comments.loginToComment}
           value={content}
           onChange={(e) => setContent(e.target.value)}
           rows={3}
@@ -136,14 +138,14 @@ export function CommentSection({ skillId, skillTitle }: { skillId: string; skill
         />
         <div className="flex justify-end">
           <Button onClick={handleSubmit} disabled={!user || !content.trim()} className="bg-primary text-primary-foreground hover:bg-primary/90">
-            发布评论
+            {t.comments.submitComment}
           </Button>
         </div>
       </div>
 
       {/* Comments list */}
       {comments.length === 0 ? (
-        <p className="text-sm text-muted-foreground text-center py-6">暂无评论，来抢沙发吧！</p>
+        <p className="text-sm text-muted-foreground text-center py-6">{t.comments.noComments}</p>
       ) : (
         <div className="space-y-4">
           {comments.map((c) => (

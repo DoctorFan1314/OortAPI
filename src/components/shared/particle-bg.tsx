@@ -13,6 +13,8 @@ export function ParticleBackground() {
 
     let animationId: number;
     let paused = false;
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReduced) return;
     const isMobile = window.innerWidth < 768;
     const particles: { x: number; y: number; vx: number; vy: number; size: number; opacity: number }[] = [];
     const count = isMobile ? 15 : 30;

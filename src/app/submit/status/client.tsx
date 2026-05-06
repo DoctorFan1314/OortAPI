@@ -8,31 +8,33 @@ import { useAuth } from "@/contexts/auth-context";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { STORAGE_KEYS } from "@/lib/storage-keys";
 import { useToast } from "@/contexts/toast-context";
+import { useI18n } from "@/contexts/i18n-context";
 import type { Submission } from "@/lib/types";
-
-const STATUS_MAP: Record<Submission["status"], { label: string; icon: React.ReactNode; color: string }> = {
-  pending: { label: "待审核", icon: <Clock className="h-4 w-4" />, color: "text-yellow-400 bg-yellow-400/10 border-yellow-400/20" },
-  approved: { label: "已通过", icon: <CheckCircle className="h-4 w-4" />, color: "text-green-400 bg-green-400/10 border-green-400/20" },
-  rejected: { label: "已拒绝", icon: <XCircle className="h-4 w-4" />, color: "text-red-400 bg-red-400/10 border-red-400/20" },
-};
 
 export default function SubmitStatusClient() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { t } = useI18n();
   const key = user ? STORAGE_KEYS.submissions(user.email) : "ai-skills-hub-submissions-guest";
   const [submissions, setSubmissions] = useLocalStorage<Submission[]>(key, []);
 
+  const STATUS_MAP: Record<Submission["status"], { label: string; icon: React.ReactNode; color: string }> = {
+    pending: { label: t.submit.statusPending, icon: <Clock className="h-4 w-4" />, color: "text-yellow-400 bg-yellow-400/10 border-yellow-400/20" },
+    approved: { label: t.submit.statusApproved, icon: <CheckCircle className="h-4 w-4" />, color: "text-green-400 bg-green-400/10 border-green-400/20" },
+    rejected: { label: t.submit.statusRejected, icon: <XCircle className="h-4 w-4" />, color: "text-red-400 bg-red-400/10 border-red-400/20" },
+  };
+
   function handleDelete(id: string) {
     setSubmissions((prev) => prev.filter((s) => s.id !== id));
-    toast("已删除提交记录");
+    toast(t.submit.recordDeleted);
   }
 
   if (!user) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-20 text-center">
-        <p className="text-muted-foreground text-lg mb-4">请先登录查看提交状态</p>
+        <p className="text-muted-foreground text-lg mb-4">{t.submit.loginToView}</p>
         <Link href="/login">
-          <Button className="bg-primary text-primary-foreground hover:bg-primary/90">登录</Button>
+          <Button className="bg-primary text-primary-foreground hover:bg-primary/90">{t.common.login}</Button>
         </Link>
       </div>
     );
@@ -41,20 +43,20 @@ export default function SubmitStatusClient() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 lg:px-8">
       <Link href="/submit" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors">
-        <ArrowLeft className="h-4 w-4" />返回提交模板
+        <ArrowLeft className="h-4 w-4" />{t.submit.backToSubmit}
       </Link>
 
       <div className="mb-10">
-        <h1 className="text-3xl font-bold text-foreground mb-2">提交历史</h1>
-        <p className="text-muted-foreground">查看你提交的模板及审核状态</p>
+        <h1 className="text-3xl font-bold text-foreground mb-2">{t.submit.viewHistory}</h1>
+        <p className="text-muted-foreground">{t.submit.viewHistoryDesc}</p>
       </div>
 
       {submissions.length === 0 ? (
         <div className="glass-card p-12 text-center">
           <Send className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-          <p className="text-muted-foreground text-lg mb-4">还没有提交记录</p>
+          <p className="text-muted-foreground text-lg mb-4">{t.submit.noSubmissionsYet}</p>
           <Link href="/submit">
-            <Button className="bg-primary text-primary-foreground hover:bg-primary/90">去提交模板</Button>
+            <Button className="bg-primary text-primary-foreground hover:bg-primary/90">{t.submit.goToSubmit}</Button>
           </Link>
         </div>
       ) : (
@@ -78,12 +80,12 @@ export default function SubmitStatusClient() {
                     onClick={() => handleDelete(s.id)}
                     className="flex items-center gap-1 text-muted-foreground hover:text-red-400 transition-colors"
                   >
-                    <Trash2 className="h-3.5 w-3.5" />删除
+                    <Trash2 className="h-3.5 w-3.5" />{t.common.delete}
                   </button>
                 </div>
                 {s.reviewNote && (
                   <div className="mt-3 p-3 rounded-lg bg-secondary border border-border text-sm text-muted-foreground">
-                    <span className="text-foreground font-medium">审核备注：</span>{s.reviewNote}
+                    <span className="text-foreground font-medium">{t.submit.reviewNoteLabel}</span>{s.reviewNote}
                   </div>
                 )}
               </div>

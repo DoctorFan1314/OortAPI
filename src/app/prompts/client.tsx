@@ -17,12 +17,16 @@ export default function PromptsClient() {
   const searchParams = useSearchParams();
   const { t } = useI18n();
 
-  const difficulties = [t.prompts.filterAll, "新手友好", "进阶", "高级"];
-  const difficultyAll = difficulties[0];
+  const difficultyOptions = [
+    { key: "__all__", label: t.prompts.filterAll },
+    { key: "新手友好", label: t.prompts.difficultyEasy },
+    { key: "进阶", label: t.prompts.difficultyMedium },
+    { key: "高级", label: t.prompts.difficultyHard },
+  ];
 
   const [query, setQuery] = useState(searchParams.get("q") || "");
   const [category, setCategory] = useState(searchParams.get("cat") || t.common.all);
-  const [difficulty, setDifficulty] = useState(searchParams.get("diff") || difficultyAll);
+  const [difficulty, setDifficulty] = useState(searchParams.get("diff") || "__all__");
   const [sortBy, setSortBy] = useState<"trending" | "rating" | "newest">(
     (["trending", "rating", "newest"].includes(searchParams.get("sort") || "")
       ? searchParams.get("sort")
@@ -46,13 +50,13 @@ export default function PromptsClient() {
 
       if (q) params.set("q", q);
       if (cat && cat !== t.common.all) params.set("cat", cat);
-      if (diff && diff !== difficultyAll) params.set("diff", diff);
+      if (diff && diff !== "__all__") params.set("diff", diff);
       if (sort && sort !== "trending") params.set("sort", sort);
 
       const url = params.toString() ? `/prompts?${params.toString()}` : "/prompts";
       router.replace(url, { scroll: false });
     },
-    [query, category, difficulty, sortBy, router, t.common.all, difficultyAll],
+    [query, category, difficulty, sortBy, router, t.common.all],
   );
 
   const handleQueryChange = useCallback(
@@ -78,7 +82,7 @@ export default function PromptsClient() {
       );
     }
     if (category !== t.common.all) result = result.filter((s) => s.categorySlug === category);
-    if (difficulty !== difficultyAll) result = result.filter((s) => s.difficulty === difficulty);
+    if (difficulty !== "__all__") result = result.filter((s) => s.difficulty === difficulty);
     if (sortBy === "rating") result.sort((a, b) => b.rating - a.rating);
     else if (sortBy === "newest") result.sort((a, b) => b.lastUpdated.localeCompare(a.lastUpdated));
     else result.sort((a, b) => b.usageCount - a.usageCount);
@@ -130,9 +134,9 @@ export default function PromptsClient() {
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-sm text-muted-foreground">{t.prompts.difficulty}：</span>
-            {difficulties.map((d) => (
-              <button key={d} onClick={() => { setDifficulty(d); updateURL({ diff: d }); }} className={`px-3 py-1 text-sm rounded-md transition-colors ${difficulty === d ? "bg-primary/10 text-primary border border-primary/30" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}>
-                {d}
+            {difficultyOptions.map((d) => (
+              <button key={d.key} onClick={() => { setDifficulty(d.key); updateURL({ diff: d.key }); }} className={`px-3 py-1 text-sm rounded-md transition-colors ${difficulty === d.key ? "bg-primary/10 text-primary border border-primary/30" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}>
+                {d.label}
               </button>
             ))}
           </div>

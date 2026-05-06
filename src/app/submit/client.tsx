@@ -8,6 +8,7 @@ import { Send, CheckCircle } from "lucide-react";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { useAuth } from "@/contexts/auth-context";
 import { useToast } from "@/contexts/toast-context";
+import { useI18n } from "@/contexts/i18n-context";
 import { STORAGE_KEYS } from "@/lib/storage-keys";
 import type { Submission } from "@/lib/types";
 import { categories } from "@/lib/categories";
@@ -23,6 +24,7 @@ export default function SubmitClient() {
   const key = user ? STORAGE_KEYS.submissions(user.email) : "ai-skills-hub-submissions-guest";
   const [submissions, setSubmissions] = useLocalStorage<Submission[]>(key, []);
   const { toast } = useToast();
+  const { t } = useI18n();
 
   function validate(fd: FormData): Record<string, string> {
     const errs: Record<string, string> = {};
@@ -31,13 +33,13 @@ export default function SubmitClient() {
     const prompt = (fd.get("prompt-online") as string)?.trim();
     const usage = (fd.get("usage") as string)?.trim();
 
-    if (!name) errs.name = "请输入模板名称";
-    else if (name.length < 2) errs.name = "模板名称至少 2 个字符";
-    if (!shortDesc) errs.shortDesc = "请输入一句话描述";
-    if (!selectedCategory) errs.category = "请选择分类";
-    if (!prompt) errs.promptOnline = "请输入在线版 Prompt";
-    else if (prompt.length < 20) errs.promptOnline = "Prompt 内容至少 20 个字符";
-    if (!usage) errs.usage = "请输入使用说明";
+    if (!name) errs.name = t.submit.nameRequired;
+    else if (name.length < 2) errs.name = t.submit.nameMinLength;
+    if (!shortDesc) errs.shortDesc = t.submit.shortDescRequired;
+    if (!selectedCategory) errs.category = t.submit.categoryRequired;
+    if (!prompt) errs.promptOnline = t.submit.promptRequired;
+    else if (prompt.length < 20) errs.promptOnline = t.submit.promptMinLength;
+    if (!usage) errs.usage = t.submit.usageRequired;
     return errs;
   }
 
@@ -66,20 +68,20 @@ export default function SubmitClient() {
 
     setSubmissions((prev) => [...prev, submission]);
     setSubmitted(true);
-    toast("模板已保存到本地！", "success");
+    toast(t.submit.savedLocally, "success");
   }
 
   if (submitted) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-20 text-center">
         <CheckCircle className="h-16 w-16 text-primary mx-auto mb-6" />
-        <h1 className="text-2xl font-bold text-foreground mb-3">提交成功！</h1>
-        <p className="text-muted-foreground mb-6">感谢你的贡献！我们的团队将在 3-5 个工作日内审核你的模板。</p>
-        <Button onClick={() => setSubmitted(false)} variant="outline" className="border-border text-foreground hover:bg-secondary">继续提交</Button>
+        <h1 className="text-2xl font-bold text-foreground mb-3">{t.submit.successTitle}</h1>
+        <p className="text-muted-foreground mb-6">{t.submit.successDesc}</p>
+        <Button onClick={() => setSubmitted(false)} variant="outline" className="border-border text-foreground hover:bg-secondary">{t.submit.continueSubmit}</Button>
 
         {submissions.length > 0 && (
           <div className="mt-10 text-left">
-            <h2 className="text-lg font-semibold text-foreground mb-4">我的提交 ({submissions.length})</h2>
+            <h2 className="text-lg font-semibold text-foreground mb-4">{t.submit.mySubmissions} ({submissions.length})</h2>
             <div className="space-y-3">
               {submissions.map((s) => (
                 <div key={s.id} className="glass-card p-4 text-left">
@@ -97,24 +99,24 @@ export default function SubmitClient() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 lg:px-8">
       <div className="mb-10">
-        <h1 className="text-3xl font-bold text-foreground mb-2">提交模板</h1>
-        <p className="text-muted-foreground">分享你的优质 Prompt 模板，帮助更多人高效使用 AI</p>
+        <h1 className="text-3xl font-bold text-foreground mb-2">{t.submit.title}</h1>
+        <p className="text-muted-foreground">{t.submit.subtitle}</p>
       </div>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="glass-card p-6 space-y-5">
-          <h2 className="text-lg font-semibold text-foreground">基本信息</h2>
+          <h2 className="text-lg font-semibold text-foreground">{t.submit.basicInfo}</h2>
           <div>
-            <label htmlFor="name" className="text-sm text-foreground mb-1.5 block">模板名称 <span className="text-red-400">*</span></label>
-            <Input id="name" name="name" required placeholder="例如：小红书爆款笔记生成器 v2.0" className="bg-secondary border-border text-foreground placeholder:text-muted-foreground/50" />
+            <label htmlFor="name" className="text-sm text-foreground mb-1.5 block">{t.submit.templateName} <span className="text-red-400">*</span></label>
+            <Input id="name" name="name" required placeholder={t.submit.templateNamePlaceholder} className="bg-secondary border-border text-foreground placeholder:text-muted-foreground/50" />
             {errors.name && <p className="text-xs text-red-400 mt-1">{errors.name}</p>}
           </div>
           <div>
-            <label htmlFor="short-desc" className="text-sm text-foreground mb-1.5 block">一句话描述 <span className="text-red-400">*</span></label>
-            <Input id="short-desc" name="short-desc" required placeholder="简要说明这个模板能做什么" className="bg-secondary border-border text-foreground placeholder:text-muted-foreground/50" />
+            <label htmlFor="short-desc" className="text-sm text-foreground mb-1.5 block">{t.submit.shortDesc} <span className="text-red-400">*</span></label>
+            <Input id="short-desc" name="short-desc" required placeholder={t.submit.shortDescPlaceholder} className="bg-secondary border-border text-foreground placeholder:text-muted-foreground/50" />
             {errors.shortDesc && <p className="text-xs text-red-400 mt-1">{errors.shortDesc}</p>}
           </div>
           <div>
-            <span className="text-sm text-foreground mb-2 block">分类 <span className="text-red-400">*</span></span>
+            <span className="text-sm text-foreground mb-2 block">{t.submit.category} <span className="text-red-400">*</span></span>
             <div className="flex flex-wrap gap-2">
               {categoryOptions.map((cat) => (
                 <button
@@ -135,24 +137,24 @@ export default function SubmitClient() {
           </div>
         </div>
         <div className="glass-card p-6 space-y-5">
-          <h2 className="text-lg font-semibold text-foreground">Prompt 内容</h2>
+          <h2 className="text-lg font-semibold text-foreground">{t.submit.promptContent}</h2>
           <div>
-            <label htmlFor="prompt-online" className="text-sm text-foreground mb-1.5 block">在线版 Prompt <span className="text-red-400">*</span></label>
-            <Textarea id="prompt-online" name="prompt-online" required rows={8} placeholder="粘贴你的在线版 Prompt..." className="bg-secondary border-border text-foreground placeholder:text-muted-foreground/50 font-mono text-sm" />
+            <label htmlFor="prompt-online" className="text-sm text-foreground mb-1.5 block">{t.submit.onlinePrompt} <span className="text-red-400">*</span></label>
+            <Textarea id="prompt-online" name="prompt-online" required rows={8} placeholder={t.submit.onlinePlaceholder} className="bg-secondary border-border text-foreground placeholder:text-muted-foreground/50 font-mono text-sm" />
             {errors.promptOnline && <p className="text-xs text-red-400 mt-1">{errors.promptOnline}</p>}
           </div>
           <div>
-            <label htmlFor="prompt-local" className="text-sm text-foreground mb-1.5 block">本地版 Prompt</label>
-            <Textarea id="prompt-local" name="prompt-local" rows={6} placeholder="粘贴本地版 Prompt（可选）..." className="bg-secondary border-border text-foreground placeholder:text-muted-foreground/50 font-mono text-sm" />
+            <label htmlFor="prompt-local" className="text-sm text-foreground mb-1.5 block">{t.submit.localPrompt}</label>
+            <Textarea id="prompt-local" name="prompt-local" rows={6} placeholder={t.submit.localPlaceholder} className="bg-secondary border-border text-foreground placeholder:text-muted-foreground/50 font-mono text-sm" />
           </div>
           <div>
-            <label htmlFor="usage" className="text-sm text-foreground mb-1.5 block">使用说明 <span className="text-red-400">*</span></label>
-            <Textarea id="usage" name="usage" required rows={4} placeholder="详细说明如何使用这个模板..." className="bg-secondary border-border text-foreground placeholder:text-muted-foreground/50 text-sm" />
+            <label htmlFor="usage" className="text-sm text-foreground mb-1.5 block">{t.submit.usage} <span className="text-red-400">*</span></label>
+            <Textarea id="usage" name="usage" required rows={4} placeholder={t.submit.usagePlaceholder} className="bg-secondary border-border text-foreground placeholder:text-muted-foreground/50 text-sm" />
             {errors.usage && <p className="text-xs text-red-400 mt-1">{errors.usage}</p>}
           </div>
         </div>
         <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-medium h-12 text-base">
-          <Send className="h-4 w-4 mr-2" />提交模板
+          <Send className="h-4 w-4 mr-2" />{t.submit.submitBtn}
         </Button>
       </form>
     </div>

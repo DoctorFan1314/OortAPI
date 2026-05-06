@@ -1,22 +1,30 @@
 "use client";
 
 import { useAuth } from "@/contexts/auth-context";
+import { useI18n } from "@/contexts/i18n-context";
 import { STORAGE_KEYS } from "@/lib/storage-keys";
 import type { UserActivity } from "@/lib/types";
 import { ThumbsUp, Bookmark, MessageSquare, Send, Eye, Copy } from "lucide-react";
 
-const typeConfig = {
-  like: { icon: ThumbsUp, color: "text-red-400", bg: "bg-red-400/10", label: "点赞了" },
-  bookmark: { icon: Bookmark, color: "text-yellow-400", bg: "bg-yellow-400/10", label: "收藏了" },
-  comment: { icon: MessageSquare, color: "text-purple-400", bg: "bg-purple-400/10", label: "评论了" },
-  submit: { icon: Send, color: "text-primary", bg: "bg-primary/10", label: "提交了模板" },
-  view: { icon: Eye, color: "text-muted-foreground", bg: "bg-secondary", label: "浏览了" },
-  copy: { icon: Copy, color: "text-green-400", bg: "bg-green-400/10", label: "复制了 Prompt" },
-} as const;
+import type { Dictionary } from "@/lib/i18n/types";
+
+function getTypeConfig(t: Dictionary) {
+  return {
+    like: { icon: ThumbsUp, color: "text-red-400", bg: "bg-red-400/10", label: t.profile.likedLabel },
+    bookmark: { icon: Bookmark, color: "text-yellow-400", bg: "bg-yellow-400/10", label: t.profile.bookmarkedLabel },
+    comment: { icon: MessageSquare, color: "text-purple-400", bg: "bg-purple-400/10", label: t.profile.commentedLabel },
+    submit: { icon: Send, color: "text-primary", bg: "bg-primary/10", label: t.profile.submittedLabel },
+    view: { icon: Eye, color: "text-muted-foreground", bg: "bg-secondary", label: t.profile.viewedLabel },
+    copy: { icon: Copy, color: "text-green-400", bg: "bg-green-400/10", label: t.profile.copiedPrompt },
+  } as const;
+}
 
 export function ActivityTimeline() {
   const { user } = useAuth();
+  const { t } = useI18n();
   if (!user) return null;
+
+  const typeConfig = getTypeConfig(t);
 
   let activities: UserActivity[] = [];
   try {
@@ -28,15 +36,15 @@ export function ActivityTimeline() {
     return (
       <div className="glass-card p-8 text-center">
         <Eye className="h-10 w-10 text-muted-foreground/30 mx-auto mb-3" />
-        <p className="text-muted-foreground">暂无活动记录</p>
-        <p className="text-sm text-muted-foreground/60">浏览技能、点赞、收藏等操作会自动记录在这里</p>
+        <p className="text-muted-foreground">{t.profile.noActivity}</p>
+        <p className="text-sm text-muted-foreground/60">{t.profile.noActivityDesc}</p>
       </div>
     );
   }
 
   return (
     <div>
-      <h2 className="text-lg font-semibold text-foreground mb-4">最近活动</h2>
+      <h2 className="text-lg font-semibold text-foreground mb-4">{t.profile.recentActivity}</h2>
       <div className="space-y-3">
         {activities.slice(0, 20).map((activity) => {
           const config = typeConfig[activity.type] || typeConfig.view;

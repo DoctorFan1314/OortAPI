@@ -6,6 +6,44 @@
 
 ---
 
+## [v1.6.4] — 2026-05-06
+
+### 变更
+- **扩展 i18n 覆盖** — 新增 12 个组件改用 `useI18n()`：提交页面、提交状态页、活动时间线、评论/点赞/收藏/提交/使用历史标签页、Toast 组件、页脚商标声明
+- **i18n 键扩展** — 在 `submit`、`profile`、`footer`、`common`、`settings`、`comments`、`prompts`、`agentSkills` 部分新增约 50 个翻译键，实现完整双语支持
+- **技能卡片徽章重叠修复** — `AgentSkillCard`：名称行新增 `pr-20` 右侧内边距，防止 `Official` 徽章与右上角 `Popular` 徽章重叠
+- **评论区全面 i18n** — `CommentSection` 所有硬编码字符串替换为 `t.comments.*` 键（Toast 消息、标题、占位符、按钮、空状态）
+- **技能页合集 i18n** — 合集名称（"全部"、"社区精选"、"开发者工具"等）改用 `t.agentSkills.collection*` 键
+- **模板页难度 i18n** — 难度筛选标签（"新手友好"、"进阶"、"高级"）改用 `t.prompts.difficultyEasy/Medium/Hard` 键，使用稳定的 `__all__` 哨兵值
+- **死代码清理** — 移除未使用的 `agent-skill-section.tsx` 和 `trust-bar.tsx` 文件
+- **粒子背景无障碍** — `ParticleBackground` 检测 `prefers-reduced-motion: reduce` 并跳过动画
+
+### 修改文件
+- `src/app/submit/client.tsx` — 表单、验证消息、成功状态全面 i18n
+- `src/app/submit/status/client.tsx` — 状态标签、按钮、空状态 i18n
+- `src/components/profile/activity-timeline.tsx` — 活动类型标签通过 `getTypeConfig(t)` 工厂函数
+- `src/components/profile/my-comments-tab.tsx` — 空状态文本
+- `src/components/profile/my-likes-tab.tsx` — 空状态文本
+- `src/components/profile/my-favorites-tab.tsx` — 空状态文本
+- `src/components/profile/my-submissions-tab.tsx` — 状态标签通过 `getStatusConfig(t)` 工厂函数
+- `src/components/profile/usage-history-tab.tsx` — 活动标签、空状态
+- `src/components/ui/toast.tsx` — 关闭按钮本地化 aria-label
+- `src/components/layout/footer.tsx` — 商标声明改用 i18n
+- `src/components/agent-skill/agent-skill-card.tsx` — 徽章重叠修复
+- `src/components/skill/comment-section.tsx` — 全部 UI 字符串 i18n
+- `src/components/shared/particle-bg.tsx` — prefers-reduced-motion 检测
+- `src/app/skills/client.tsx` — 合集筛选标签 i18n
+- `src/app/prompts/client.tsx` — 难度筛选标签 i18n，稳定哨兵键
+- `src/lib/i18n/types.ts` — 新增约 50 个键
+- `src/lib/i18n/zh.ts` — 新增约 50 个键
+- `src/lib/i18n/en.ts` — 新增约 50 个键
+
+### 移除
+- `src/components/home/trust-bar.tsx` — 未使用的死代码
+- `src/components/home/agent-skill-section.tsx` — 未使用的死代码
+
+---
+
 ## [v1.6.3] — 2026-05-06
 
 ### 变更

@@ -13,7 +13,7 @@ export function AgentSkillCard({ skill }: { skill: AgentSkill }) {
   return (
     <div className="glass-card glass-card-hover p-5 h-full cursor-pointer group flex flex-col relative overflow-hidden">
       {skill.trending && (
-        <div className="absolute top-3 right-3">
+        <div className="absolute top-3 right-3 z-10">
           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-orange-500/10 text-orange-400 border border-orange-500/20">
             Popular
           </span>
@@ -24,9 +24,9 @@ export function AgentSkillCard({ skill }: { skill: AgentSkill }) {
         <div className="h-10 w-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0 text-lg">
           {skill.avatar || skill.name.charAt(0).toUpperCase()}
         </div>
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2 mb-0.5">
-            <h3 className="text-sm font-semibold text-foreground truncate group-hover:text-primary transition-colors">
+        <div className="min-w-0 flex-1 overflow-hidden">
+          <div className="flex items-center gap-2 mb-0.5 pr-20">
+            <h3 className="text-sm font-semibold text-foreground truncate group-hover:text-primary transition-colors min-w-0">
               {skill.name}
             </h3>
             {skill.authorBadge && (

@@ -6,6 +6,44 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [v1.6.4] — 2026-05-06
+
+### Changed
+- **Extended i18n coverage** — Additional 12 components now use `useI18n()`: submit page, submit/status page, activity timeline, my-comments/likes/favorites/submissions/usage-history tabs, toast component, footer trademark disclaimer
+- **i18n keys expanded** — Added ~50 new translation keys across `submit`, `profile`, `footer`, `common`, `settings`, `comments`, `prompts`, `agentSkills` sections for complete bilingual support
+- **Skill card badge overlap fix** — `AgentSkillCard`: name row now reserves `pr-20` right padding to prevent `Official` badge from overlapping with the `Popular` badge in the top-right corner
+- **Comment section full i18n** — All hardcoded strings in `CommentSection` replaced with `t.comments.*` keys (toast messages, section header, placeholder, button, empty state)
+- **Skills page collection i18n** — Collection names ("全部", "社区精选", "开发者工具", etc.) now use `t.agentSkills.collection*` keys
+- **Prompts page difficulty i18n** — Difficulty filter labels ("新手友好", "进阶", "高级") now use `t.prompts.difficultyEasy/Medium/Hard` keys with stable `__all__` sentinel
+- **Dead code removal** — Removed unused `agent-skill-section.tsx` and `trust-bar.tsx` files
+- **Particle background accessibility** — `ParticleBackground` now detects `prefers-reduced-motion: reduce` and skips animation
+
+### Files Modified
+- `src/app/submit/client.tsx` — Full i18n for form, validation messages, success state
+- `src/app/submit/status/client.tsx` — i18n for status labels, buttons, empty states
+- `src/components/profile/activity-timeline.tsx` — Activity type labels via `getTypeConfig(t)` factory
+- `src/components/profile/my-comments-tab.tsx` — Empty state text
+- `src/components/profile/my-likes-tab.tsx` — Empty state text
+- `src/components/profile/my-favorites-tab.tsx` — Empty state text
+- `src/components/profile/my-submissions-tab.tsx` — Status labels via `getStatusConfig(t)` factory
+- `src/components/profile/usage-history-tab.tsx` — Activity labels, empty state
+- `src/components/ui/toast.tsx` — Localized `aria-label` for close button
+- `src/components/layout/footer.tsx` — Trademark disclaimer via i18n
+- `src/components/agent-skill/agent-skill-card.tsx` — Badge overlap fix
+- `src/components/skill/comment-section.tsx` — Full i18n for all UI strings
+- `src/components/shared/particle-bg.tsx` — prefers-reduced-motion detection
+- `src/app/skills/client.tsx` — Collection filter labels i18n
+- `src/app/prompts/client.tsx` — Difficulty filter labels i18n, stable key sentinel
+- `src/lib/i18n/types.ts` — Added ~50 new keys across multiple sections
+- `src/lib/i18n/zh.ts` — Added ~50 new keys
+- `src/lib/i18n/en.ts` — Added ~50 new keys
+
+### Removed
+- `src/components/home/trust-bar.tsx` — Unused dead code
+- `src/components/home/agent-skill-section.tsx` — Unused dead code
+
+---
+
 ## [v1.6.3] — 2026-05-06
 
 ### Changed

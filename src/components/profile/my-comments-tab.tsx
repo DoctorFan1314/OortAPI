@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@/contexts/auth-context";
+import { useI18n } from "@/contexts/i18n-context";
 import { STORAGE_KEYS } from "@/lib/storage-keys";
 import { getSkillById } from "@/lib/mock-data";
 import type { Comment } from "@/lib/types";
@@ -11,6 +12,7 @@ import Link from "next/link";
 
 export function MyCommentsTab() {
   const { user } = useAuth();
+  const { t } = useI18n();
   const [, setTick] = useState(0);
 
   if (!user) return null;
@@ -37,8 +39,8 @@ export function MyCommentsTab() {
     return (
       <div className="glass-card p-12 text-center">
         <MessageSquare className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-        <p className="text-foreground font-medium mb-1">暂无评论</p>
-        <p className="text-sm text-muted-foreground">浏览技能详情页，发表你的评论</p>
+        <p className="text-foreground font-medium mb-1">{t.profile.noComments}</p>
+        <p className="text-sm text-muted-foreground">{t.profile.noCommentsDesc}</p>
       </div>
     );
   }

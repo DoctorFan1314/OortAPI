@@ -86,7 +86,7 @@ export function Footer() {
           </div>
         </div>
         <p className="mt-4 text-[10px] text-muted-foreground/40 text-center leading-relaxed">
-          ChatGPT、Claude、Grok、DeepSeek、Qwen 等为各自公司的注册商标，本平台与其无隶属关系。
+          {t.footer.trademarkDisclaimer}
         </p>
       </div>
     </footer>

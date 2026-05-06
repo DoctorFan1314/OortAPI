@@ -143,7 +143,7 @@ export function SettingsTab() {
           </div>
           <div>
             <label className="text-sm text-foreground mb-1.5 block">{t.settings.newPassword}</label>
-            <Input type="password" value={newPw} onChange={(e) => setNewPw(e.target.value)} placeholder="至少 8 位字符" className="bg-secondary border-border text-foreground" />
+            <Input type="password" value={newPw} onChange={(e) => setNewPw(e.target.value)} placeholder={t.settings.passwordPlaceholder} className="bg-secondary border-border text-foreground" />
           </div>
           <div>
             <label className="text-sm text-foreground mb-1.5 block">{t.settings.confirmPassword}</label>
