@@ -11,6 +11,7 @@ import { ThemeProvider } from "@/contexts/theme-context";
 import { I18nProvider } from "@/contexts/i18n-context";
 import { Toaster } from "@/components/ui/toast";
 import { CommandPalette } from "@/components/shared/command-palette";
+import { ScrollToTop } from "@/components/shared/scroll-to-top";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -58,6 +59,7 @@ export default function RootLayout({
                 <Footer />
                 <Toaster />
                 <CommandPalette />
+                <ScrollToTop />
               </AuthProvider>
             </I18nProvider>
           </ThemeProvider>

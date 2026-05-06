@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
 import { Search, Menu, X, Sun, Moon, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,7 @@ export function Navbar() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sheetOpen, setSheetOpen] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
   const { user, loaded, logout } = useAuth();
   const { toast } = useToast();
   const { resolvedTheme, setTheme } = useTheme();
@@ -32,7 +33,8 @@ export function Navbar() {
     if (e && e.key !== "Enter") return;
     const q = searchQuery.trim();
     if (q) {
-      router.push(`/prompts?q=${encodeURIComponent(q)}`);
+      const basePath = pathname.startsWith("/skills") ? "/skills" : "/prompts";
+      router.push(`${basePath}?q=${encodeURIComponent(q)}`);
       setSearchOpen(false);
       setSearchQuery("");
     }
