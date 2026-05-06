@@ -281,27 +281,61 @@ Licensed under the [Apache License, Version 2.0](LICENSE).
 
 ## Disclaimer
 
+**AI Skills Hub is a learning and educational project for studying modern web development technologies. It is not a production service, does not provide real commercial functionality, and should not be relied upon for any professional, commercial, or mission-critical use.**
+
 ### No Warranty
 
-This software is provided "AS IS", WITHOUT WARRANTY OF ANY KIND, express or implied. See the [Apache License 2.0](LICENSE) for full details.
+This software is provided "AS IS", WITHOUT WARRANTY OF ANY KIND, express or implied. See the [Apache License 2.0](LICENSE) for full details including Sections 7 (Disclaimer of Warranty) and 8 (Limitation of Liability).
+
+### Project Nature
+
+This is a **frontend learning project** built to demonstrate how to construct full-stack applications with Next.js, Tailwind CSS, shadcn/ui, and other modern web technologies. All functionality is for demonstration purposes only.
+
+### Mock Data Disclaimer
+
+**All data displayed in this project is entirely fictional and auto-generated.** This includes but is not limited to:
+
+- Prompt templates, agent skills, and their descriptions
+- User reviews, testimonials, comments, and ratings
+- Download counts, star counts, usage statistics
+- Author names, developer names, and avatars
+- Collection names and category descriptions
+- Demo input/output examples
+
+**None of the above data represents real users, real products, real reviews, or real business metrics.** Any resemblance to actual persons, products, or events is purely coincidental.
+
+### Third-Party Trademarks
+
+The following are registered trademarks of their respective companies. This project has no affiliation, authorization, sponsorship, endorsement, or partnership with any of them. References are for identification and educational purposes only:
+
+- ChatGPT, OpenAI — OpenAI, Inc.
+- Claude, Anthropic — Anthropic, PBC
+- Grok, xAI — xAI Corp.
+- DeepSeek — DeepSeek
+- Qwen, Alibaba — Alibaba Group
+- Llama, Meta — Meta Platforms, Inc.
+- Vercel, Next.js — Vercel Inc.
+- GitHub, npm — GitHub, Inc. (Microsoft)
+
+Any brand names, product names, or company names used in mock data (including but not limited to author fields, collection names, install commands, and demo output) are **entirely fictional and do not represent real endorsements or associations**. Mock install commands (e.g., `npx skills add @...`) are non-functional and should not be executed.
 
 ### AI Output Disclaimer
 
-- The prompt templates and agent skills provided are examples only and do not guarantee accuracy, safety, or suitability of AI model outputs
+- The prompt templates and agent skills provided are **examples for learning purposes only** and do not guarantee accuracy, safety, or suitability of AI model outputs
 - AI-generated content may contain errors, bias, or inappropriate information — users should judge independently
 - Users bear full responsibility for any consequences from using prompt templates or agent skills
 
-### Mock Data Notice
-
-All data in this project (including prompt templates, example outputs, user reviews, download counts, and ratings) is fictional mock data for demonstration purposes. It does not represent real users, real reviews, or real business metrics.
-
-### Trademark Notice
-
-ChatGPT (OpenAI), Claude (Anthropic), Grok (xAI), DeepSeek, Qwen (Alibaba), Llama (Meta) are registered trademarks of their respective companies. This project has no affiliation, authorization, sponsorship, or partnership with any of them.
-
 ### Third-Party Services
 
-This project may involve third-party API or service calls. Users should comply with the relevant terms of service. This project is not responsible for the behavior or availability of any third-party services.
+This project may reference or interact with third-party APIs or services. Users should comply with the relevant terms of service. This project is not responsible for the behavior, availability, or accuracy of any third-party services.
+
+### No Data Collection
+
+This project does not collect, transmit, or store any user data on external servers. All user interactions (including login, bookmarks, likes, and newsletter subscriptions) are stored locally in the browser's `localStorage` only and are never sent to any server.
+
+### Limitation of Liability
+
+In no event shall the authors, contributors, or copyright holders be liable for any direct, indirect, incidental, special, exemplary, or consequential damages arising out of the use of this software.
 
 ---
 

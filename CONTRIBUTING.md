@@ -136,4 +136,4 @@ docs: update README with deployment instructions
 
 ## License
 
-This project uses the [MIT License](./LICENSE). By submitting a contribution, you agree that your code will be open-sourced under the MIT license.
+This project uses the [Apache License 2.0](./LICENSE). By submitting a contribution, you agree that your code will be open-sourced under the Apache 2.0 license.
