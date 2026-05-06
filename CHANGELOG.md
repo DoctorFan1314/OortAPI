@@ -6,6 +6,27 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [v1.6.2] — 2026-05-06
+
+### Changed
+- **MarkdownRenderer rewrite** — Skill detail page README now renders properly: table separator rows (`|---|`) are skipped, tables render as `<table>` with header distinction, inline `**bold**` and `` `code` `` formatting processed in bullet points and numbered lists, not just in paragraphs
+- **Agent Skill category system** — New `agent-skill-categories.ts` with 8 independent categories (Skills管理, Web开发, Web搜索, 多平台交互, 代码执行, 文件处理, 通讯协作, 数据分析); `skills/client.tsx` now uses the centralized category definitions instead of a hardcoded array
+- **Homepage dual-category** — `CategoryCards` now dynamically shows Agent Skill categories or Prompt categories based on the active Tab; grid adapts to 4 columns for Agent (8 categories) vs 3 for Prompt (6 categories)
+- **Tab state lifted** — `FeaturedSection` and `CategoryCards` now share tab state via `page.tsx`, so switching tabs updates both the card grid and the category section simultaneously
+- **URL category filter** — `/skills?category=Web开发` now auto-selects the matching category filter on page load
+
+### Files Modified
+- `src/app/skills/[id]/client.tsx` — Full MarkdownRenderer rewrite: `InlineMarkdown` helper, `isTableSeparator` detection, table flush/render with `<table>` element
+- `src/app/skills/client.tsx` — Uses `agentSkillCategories` from shared file, reads `category` query param via `useSearchParams()`
+- `src/app/page.tsx` — Lifts `tab` state, passes to `FeaturedSection` and `CategoryCards`
+- `src/components/home/featured-section.tsx` — Accepts `tab`/`onTabChange` props instead of managing own state
+- `src/components/home/category-cards.tsx` — Accepts `tab` prop, renders `agentSkillCategories` or `categories` accordingly, uses 4-col grid on lg for Agent
+
+### New Files
+- `src/lib/agent-skill-categories.ts` — Centralized Agent Skill category definitions (8 categories)
+
+---
+
 ## [v1.6.1] — 2026-05-06
 
 ### Changed

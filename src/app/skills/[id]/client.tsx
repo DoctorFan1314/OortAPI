@@ -82,17 +82,69 @@ function downloadAll(skill: NonNullable<ReturnType<typeof getAgentSkillById>>) {
   });
 }
 
+function InlineMarkdown({ text }: { text: string }) {
+  const parts = text.split(/(\*\*.*?\*\*|`[^`]+`)/g);
+  return (
+    <>
+      {parts.map((part, i) => {
+        if (part.startsWith("**") && part.endsWith("**")) {
+          return <strong key={i} className="text-foreground">{part.slice(2, -2)}</strong>;
+        }
+        if (part.startsWith("`") && part.endsWith("`")) {
+          return <code key={i} className="px-1.5 py-0.5 bg-secondary rounded text-xs font-mono text-foreground">{part.slice(1, -1)}</code>;
+        }
+        return part;
+      })}
+    </>
+  );
+}
+
+function isTableSeparator(line: string): boolean {
+  return /^\|[\s\-:|]+\|$/.test(line.trim());
+}
+
 function MarkdownRenderer({ content }: { content: string }) {
   const lines = content.split("\n");
   const elements: React.ReactNode[] = [];
   let inCodeBlock = false;
   let codeLines: string[] = [];
   let codeLang = "";
+  let tableRows: string[][] = [];
+  let isHeaderRow = true;
+
+  function flushTable() {
+    if (tableRows.length === 0) return;
+    const colCount = tableRows[0].length;
+    elements.push(
+      <div key={`table-${elements.length}`} className="my-4 overflow-x-auto rounded-lg border border-border">
+        <table className="w-full text-sm">
+          {tableRows.map((row, ri) => (
+            <tr key={ri} className={ri === 0 ? "bg-secondary/50" : "border-t border-border"}>
+              {row.map((cell, ci) => {
+                const Tag = ri === 0 ? "th" : "td";
+                return (
+                  <Tag key={ci} className="px-3 py-2 text-left text-muted-foreground">
+                    <InlineMarkdown text={cell} />
+                  </Tag>
+                );
+              })}
+              {row.length < colCount && Array.from({ length: colCount - row.length }).map((_, ci) => (
+                <td key={`pad-${ci}`} className="px-3 py-2" />
+              ))}
+            </tr>
+          ))}
+        </table>
+      </div>
+    );
+    tableRows = [];
+    isHeaderRow = true;
+  }
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
 
     if (line.startsWith("```")) {
+      flushTable();
       if (inCodeBlock) {
         elements.push(
           <div key={`code-${i}`} className="relative my-4">
@@ -120,46 +172,56 @@ function MarkdownRenderer({ content }: { content: string }) {
     }
 
     if (line.startsWith("# ")) {
+      flushTable();
       elements.push(<h1 key={i} className="text-2xl font-bold text-foreground mt-6 mb-3">{line.slice(2)}</h1>);
     } else if (line.startsWith("## ")) {
+      flushTable();
       elements.push(<h2 key={i} className="text-lg font-semibold text-foreground mt-6 mb-3">{line.slice(3)}</h2>);
     } else if (line.startsWith("### ")) {
+      flushTable();
       elements.push(<h3 key={i} className="text-base font-semibold text-foreground mt-4 mb-2">{line.slice(4)}</h3>);
-    } else if (line.startsWith("| ")) {
-      // Simple table rendering
-      const cells = line.split("|").filter(c => c.trim()).map(c => c.trim());
+    } else if (line.startsWith("| ") || line.startsWith("|")) {
+      if (isTableSeparator(line)) {
+        isHeaderRow = false;
+        continue;
+      }
+      const cells = line.split("|").slice(1, -1).map(c => c.trim());
       if (cells.length > 0) {
-        elements.push(
-          <div key={i} className="grid gap-2 py-1.5 text-sm" style={{ gridTemplateColumns: `repeat(${cells.length}, 1fr)` }}>
-            {cells.map((cell, ci) => (
-              <span key={ci} className="text-muted-foreground">{cell}</span>
-            ))}
-          </div>
-        );
+        tableRows.push(cells);
       }
     } else if (line.startsWith("- ")) {
-      elements.push(<div key={i} className="flex gap-2 py-1 text-sm text-muted-foreground"><span className="text-primary shrink-0">•</span>{line.slice(2)}</div>);
+      flushTable();
+      elements.push(
+        <div key={i} className="flex gap-2 py-1 text-sm text-muted-foreground">
+          <span className="text-primary shrink-0 mt-0.5">•</span>
+          <span><InlineMarkdown text={line.slice(2)} /></span>
+        </div>
+      );
     } else if (line.match(/^\d+\.\s/)) {
-      elements.push(<div key={i} className="py-1 text-sm text-muted-foreground">{line}</div>);
+      flushTable();
+      const num = line.match(/^(\d+)\.\s/)?.[1] || "1";
+      elements.push(
+        <div key={i} className="flex gap-2 py-1 text-sm text-muted-foreground">
+          <span className="text-primary shrink-0 font-mono text-xs mt-0.5">{num}.</span>
+          <span><InlineMarkdown text={line.replace(/^\d+\.\s/, "")} /></span>
+        </div>
+      );
     } else if (line.startsWith("`") && line.endsWith("`")) {
+      flushTable();
       elements.push(<code key={i} className="block my-1 px-3 py-1.5 bg-secondary rounded text-sm font-mono text-foreground">{line.slice(1, -1)}</code>);
     } else if (line.trim() === "") {
+      flushTable();
       elements.push(<div key={i} className="h-2" />);
     } else {
-      // Inline bold
-      const parts = line.split(/(\*\*.*?\*\*)/g);
+      flushTable();
       elements.push(
         <p key={i} className="text-sm text-muted-foreground leading-relaxed">
-          {parts.map((part, pi) => {
-            if (part.startsWith("**") && part.endsWith("**")) {
-              return <strong key={pi} className="text-foreground">{part.slice(2, -2)}</strong>;
-            }
-            return part;
-          })}
+          <InlineMarkdown text={line} />
         </p>
       );
     }
   }
+  flushTable();
 
   return <div>{elements}</div>;
 }

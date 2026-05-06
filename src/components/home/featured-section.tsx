@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { Zap, FileText, ArrowRight } from "lucide-react";
 import { agentSkills } from "@/lib/mock-agent-skills";
@@ -9,9 +8,8 @@ import { AgentSkillCard } from "@/components/agent-skill/agent-skill-card";
 import { SkillCard } from "@/components/skill/skill-card";
 import { useI18n } from "@/contexts/i18n-context";
 
-export function FeaturedSection() {
+export function FeaturedSection({ tab, onTabChange }: { tab: "agent" | "prompt"; onTabChange: (tab: "agent" | "prompt") => void }) {
   const { t } = useI18n();
-  const [tab, setTab] = useState<"agent" | "prompt">("agent");
 
   const trendingAgents = agentSkills.filter((s) => s.trending).slice(0, 6);
   const trendingPrompts = getTrendingSkills().slice(0, 6);
@@ -32,7 +30,7 @@ export function FeaturedSection() {
       <div className="flex justify-center mb-8">
         <div className="inline-flex rounded-xl bg-secondary p-1 gap-1">
           <button
-            onClick={() => setTab("agent")}
+            onClick={() => onTabChange("agent")}
             className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${
               tab === "agent"
                 ? "bg-primary text-primary-foreground shadow-sm"
@@ -43,7 +41,7 @@ export function FeaturedSection() {
             {t.home.tabAgent}
           </button>
           <button
-            onClick={() => setTab("prompt")}
+            onClick={() => onTabChange("prompt")}
             className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${
               tab === "prompt"
                 ? "bg-primary text-primary-foreground shadow-sm"

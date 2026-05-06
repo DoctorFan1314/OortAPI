@@ -6,6 +6,27 @@
 
 ---
 
+## [v1.6.2] — 2026-05-06
+
+### 变更
+- **MarkdownRenderer 重写** — 技能详情页 README 渲染修复：表格分隔行（`|---|`）跳过、表格用 `<table>` 渲染带表头区分、列表和表格单元格内支持 `**粗体**` 和 `` `代码` `` 内联格式化
+- **Agent 技能分类系统** — 新建 `agent-skill-categories.ts`，8 个独立分类（Skills管理、Web开发、Web搜索、多平台交互、代码执行、文件处理、通讯协作、数据分析）；`skills/client.tsx` 改用集中定义的分类
+- **首页双分类** — `CategoryCards` 根据当前 Tab 动态显示 Agent 技能分类或 Prompt 分类；Agent 8 个分类使用 4 列网格
+- **Tab 状态提升** — `FeaturedSection` 和 `CategoryCards` 通过 `page.tsx` 共享 tab 状态，切换 Tab 时卡片和分类同步更新
+- **URL 分类筛选** — `/skills?category=Web开发` 自动选中对应分类
+
+### 修改文件
+- `src/app/skills/[id]/client.tsx` — MarkdownRenderer 全面重写：`InlineMarkdown` 辅助函数、表格检测和渲染
+- `src/app/skills/client.tsx` — 使用 `agentSkillCategories`，支持 URL `category` 参数
+- `src/app/page.tsx` — 提升 tab 状态，传递给子组件
+- `src/components/home/featured-section.tsx` — 改为接收 `tab`/`onTabChange` props
+- `src/components/home/category-cards.tsx` — 根据 tab 动态渲染不同分类
+
+### 新文件
+- `src/lib/agent-skill-categories.ts` — Agent 技能分类定义（8 个分类）
+
+---
+
 ## [v1.6.1] — 2026-05-06
 
 ### 变更

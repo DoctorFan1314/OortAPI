@@ -118,7 +118,8 @@ ai-skills-hub/
 │       ├── types.ts                  # TypeScript 类型定义
 │       ├── mock-data.ts              # Prompt 模板数据（28个模板 + 10条评价）
 │       ├── mock-agent-skills.ts      # Agent 技能数据（8个技能）
-│       ├── categories.ts             # 分类定义（6个分类）
+│       ├── categories.ts             # Prompt 分类定义（6个分类）
+│       ├── agent-skill-categories.ts  # Agent 技能分类定义（8个分类）
 │       ├── i18n/
 │       │   ├── types.ts              # Dictionary 类型
 │       │   ├── zh.ts                 # 中文翻译

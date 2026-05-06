@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useMemo, useCallback, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, Zap, SlidersHorizontal } from "lucide-react";
 import { agentSkills, getPublishedSkills } from "@/lib/mock-agent-skills";
+import { agentSkillCategories } from "@/lib/agent-skill-categories";
 import { AgentSkillCard } from "@/components/agent-skill/agent-skill-card";
 import { CreateDropdown } from "@/components/skills/create-dropdown";
 import { CreateFromGithub } from "@/components/skills/create-from-github";
@@ -12,16 +14,20 @@ import { CreateFromUpload } from "@/components/skills/create-from-upload";
 import { useI18n } from "@/contexts/i18n-context";
 
 const collections = ["全部", "Vercel Agent Toolkit", "Anthropic Agent Suite", "Inference.sh Toolkit", "社区精选", "开发者工具", "效率工具", "数据工具"];
-const categories = ["全部", "Skills 管理", "Web 开发", "Web 搜索", "多平台交互", "代码执行", "文件处理", "通讯协作", "数据分析"];
+const categories = ["全部", ...agentSkillCategories.map((c) => c.name)];
 
 const PAGE_SIZE = 12;
 
 export default function SkillsClient() {
   const { t } = useI18n();
+  const searchParams = useSearchParams();
+  const urlCategory = searchParams.get("category");
   const [query, setQuery] = useState("");
   const [sortBy, setSortBy] = useState<"downloads" | "stars" | "newest">("downloads");
   const [selectedCollection, setSelectedCollection] = useState("全部");
-  const [selectedCategory, setSelectedCategory] = useState("全部");
+  const [selectedCategory, setSelectedCategory] = useState(
+    urlCategory && categories.includes(urlCategory) ? urlCategory : "全部"
+  );
   const [showFilters, setShowFilters] = useState(false);
   const [showGithub, setShowGithub] = useState(false);
   const [showUpload, setShowUpload] = useState(false);
