@@ -91,10 +91,8 @@ ai-skills-hub/
 │   │   │   └── footer.tsx            # 页脚
 │   │   ├── home/
 │   │   │   ├── hero.tsx              # Hero 区域
-│   │   │   ├── trust-bar.tsx         # 信任条
-│   │   │   ├── category-cards.tsx    # 六大入口卡片
-│   │   │   ├── skill-section.tsx     # Prompt 技能区块
-│   │   │   ├── agent-skill-section.tsx # Agent 技能区块
+│   │   │   ├── category-cards.tsx    # 六大入口卡片（i18n）
+│   │   │   ├── featured-section.tsx  # Tab 切换区（Agent/Prompt）
 │   │   │   └── testimonials.tsx      # 用户评价
 │   │   ├── agent-skill/
 │   │   │   └── agent-skill-card.tsx  # Agent 技能卡片
@@ -202,6 +200,12 @@ ai-skills-hub/
 | 标签云搜索 | ✅ | 按名称实时过滤标签，显示计数 |
 | Newsletter 取消订阅 | ✅ | 页脚 Newsletter 管理偏好 / 取消订阅 |
 | 命令面板 | ✅ | 键盘快捷键，焦点恢复 + 动画 |
+| 动态导入 | ✅ | 创建模态框通过 next/dynamic 延迟加载 |
+| 404 页面增强 | ✅ | 搜索框 + 热门链接 + 浏览按钮 |
+| 删除账号确认 | ✅ | 需输入 DELETE 确认删除 |
+| 完整无障碍 | ✅ | ARIA 角色、标签、键盘支持、动画减弱 |
+| 完整国际化 | ✅ | 100% 中英文，300+ 翻译键 |
+| 分类数据 i18n | ✅ | 14 个分类名称/描述完全本地化 |
 
 ---
 

@@ -91,10 +91,8 @@ ai-skills-hub/
 │   │   │   └── footer.tsx            # Footer
 │   │   ├── home/
 │   │   │   ├── hero.tsx              # Hero section
-│   │   │   ├── trust-bar.tsx         # Trust bar
-│   │   │   ├── category-cards.tsx    # Six category entry cards
-│   │   │   ├── skill-section.tsx     # Prompt skill section
-│   │   │   ├── agent-skill-section.tsx # Agent skill section
+│   │   │   ├── category-cards.tsx    # Six category entry cards (i18n-aware)
+│   │   │   ├── featured-section.tsx  # Tab switcher (Agent/Prompt)
 │   │   │   └── testimonials.tsx      # User testimonials
 │   │   ├── agent-skill/
 │   │   │   └── agent-skill-card.tsx  # Agent skill marketplace card
@@ -203,6 +201,12 @@ ai-skills-hub/
 | Tag cloud search | ✅ | Real-time tag filtering by name with count display |
 | Newsletter unsubscribe | ✅ | Manage preferences / unsubscribe from footer newsletter |
 | Command palette | ✅ | Keyboard shortcuts with focus restore + animation |
+| Dynamic imports | ✅ | Create modals lazy-loaded via next/dynamic |
+| 404 page enhanced | ✅ | Search box + hot links + browse buttons |
+| Delete confirmation | ✅ | Type DELETE to confirm account deletion |
+| Full a11y | ✅ | ARIA roles, labels, keyboard support, reduced-motion |
+| Full i18n | ✅ | 100% bilingual (zh/en), ~300+ translation keys |
+| Category i18n | ✅ | Category names/descriptions in 14 categories fully localized |
 
 ---
 
