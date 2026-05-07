@@ -66,7 +66,24 @@ export function AvatarCropDialog({ open, onOpenChange, imageSrc, onCropComplete 
     setLoading(true);
     try {
       const dataUrl = await getCroppedImg(imageSrc, croppedAreaPixels);
-      onCropComplete(dataUrl);
+      // Check base64 size (roughly 4/3 of binary size); warn if over 500KB
+      const approxBytes = Math.round((dataUrl.length * 3) / 4);
+      if (approxBytes > 500 * 1024) {
+        // Re-encode at lower quality
+        const blob = await fetch(dataUrl).then(r => r.blob());
+        const lower = await new Promise<string>((resolve) => {
+          const canvas = document.createElement("canvas");
+          canvas.width = 128;
+          canvas.height = 128;
+          const ctx = canvas.getContext("2d")!;
+          const img = new Image();
+          img.onload = () => { ctx.drawImage(img, 0, 0, 128, 128); resolve(canvas.toDataURL("image/jpeg", 0.6)); };
+          img.src = URL.createObjectURL(blob);
+        });
+        onCropComplete(lower);
+      } else {
+        onCropComplete(dataUrl);
+      }
       onOpenChange(false);
     } catch {
       // silently fail

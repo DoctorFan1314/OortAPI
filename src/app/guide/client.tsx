@@ -8,6 +8,16 @@ import { useI18n } from "@/contexts/i18n-context";
 export default function GuideClient() {
   const { t } = useI18n();
 
+  const sections = [
+    { id: "what-is-hub", label: t.guide.whatIsHub },
+    { id: "what-is-prompt", label: t.guide.whatIsPrompt },
+    { id: "what-is-agent-skill", label: t.guide.whatIsAgentSkill },
+    { id: "online-vs-local", label: t.guide.onlineVsLocal },
+    { id: "quick-start", label: t.guide.quickStart },
+    { id: "engineering-tips", label: t.guide.engineeringTips },
+    { id: "better-results", label: t.guide.betterResults },
+  ];
+
   return (
     <div className="mx-auto max-w-4xl px-4 py-12 lg:px-8">
       <div className="text-center mb-16">
@@ -18,7 +28,21 @@ export default function GuideClient() {
         <p className="text-muted-foreground text-lg max-w-2xl mx-auto">{t.guide.subtitle}</p>
       </div>
 
-      <section className="glass-card p-8 mb-8">
+      {/* Table of Contents */}
+      <nav className="glass-card p-6 mb-8">
+        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">{t.guide.quickStart}</h2>
+        <ol className="space-y-1.5">
+          {sections.map((s, i) => (
+            <li key={s.id}>
+              <a href={`#${s.id}`} className="text-sm text-primary hover:underline">
+                {i + 1}. {s.label}
+              </a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+
+      <section id="what-is-hub" className="glass-card p-8 mb-8 scroll-mt-20">
         <h2 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
           <Sparkles className="h-5 w-5 text-primary" />{t.guide.whatIsHub}
         </h2>
@@ -38,7 +62,7 @@ export default function GuideClient() {
         </div>
       </section>
 
-      <section className="glass-card p-8 mb-8">
+      <section id="what-is-prompt" className="glass-card p-8 mb-8 scroll-mt-20">
         <h2 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
           <Copy className="h-5 w-5 text-primary" />{t.guide.whatIsPrompt}
         </h2>
@@ -53,7 +77,7 @@ export default function GuideClient() {
         </div>
       </section>
 
-      <section className="glass-card p-8 mb-8">
+      <section id="what-is-agent-skill" className="glass-card p-8 mb-8 scroll-mt-20">
         <h2 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
           <Terminal className="h-5 w-5 text-primary" />{t.guide.whatIsAgentSkill}
         </h2>
@@ -68,7 +92,7 @@ export default function GuideClient() {
         </div>
       </section>
 
-      <section className="glass-card p-8 mb-8">
+      <section id="online-vs-local" className="glass-card p-8 mb-8 scroll-mt-20">
         <h2 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
           <Zap className="h-5 w-5 text-primary" />{t.guide.onlineVsLocal}
         </h2>
@@ -93,7 +117,7 @@ export default function GuideClient() {
         </div>
       </section>
 
-      <section className="glass-card p-8 mb-8">
+      <section id="quick-start" className="glass-card p-8 mb-8 scroll-mt-20">
         <h2 className="text-xl font-bold text-foreground mb-6">{t.guide.quickStart}</h2>
         <div className="grid md:grid-cols-2 gap-8">
           <div>
@@ -135,7 +159,7 @@ export default function GuideClient() {
         </div>
       </section>
 
-      <section className="glass-card p-8 mb-8">
+      <section id="engineering-tips" className="glass-card p-8 mb-8 scroll-mt-20">
         <h2 className="text-xl font-bold text-foreground mb-6">{t.guide.engineeringTips}</h2>
         <p className="text-muted-foreground mb-6">{t.guide.engineeringTipsDesc}</p>
         <div className="space-y-6">
@@ -182,7 +206,7 @@ export default function GuideClient() {
         </div>
       </section>
 
-      <section className="glass-card p-8 mb-8">
+      <section id="better-results" className="glass-card p-8 mb-8 scroll-mt-20">
         <h2 className="text-xl font-bold text-foreground mb-6">{t.guide.betterResults}</h2>
         <div className="grid sm:grid-cols-2 gap-5">
           <div className="bg-secondary/30 border border-border rounded-lg p-5">

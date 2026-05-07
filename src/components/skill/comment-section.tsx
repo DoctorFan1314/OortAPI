@@ -9,7 +9,7 @@ import { STORAGE_KEYS } from "@/lib/storage-keys";
 import type { Comment } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Star, ThumbsUp, MessageSquare } from "lucide-react";
+import { Star, ThumbsUp, MessageSquare, Pencil, Trash2, X, Check } from "lucide-react";
 
 export function CommentSection({ skillId, skillTitle }: { skillId: string; skillTitle: string }) {
   const { user } = useAuth();
@@ -21,6 +21,8 @@ export function CommentSection({ skillId, skillTitle }: { skillId: string; skill
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [, setTick] = useState(0);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editContent, setEditContent] = useState("");
 
   // Load comments from global store
   useEffect(() => {
@@ -106,6 +108,66 @@ export function CommentSection({ skillId, skillTitle }: { skillId: string; skill
     } catch { /* ignore */ }
   }
 
+  function handleEdit(commentId: string) {
+    const c = comments.find((x) => x.id === commentId);
+    if (!c) return;
+    setEditingId(commentId);
+    setEditContent(c.content);
+  }
+
+  function handleSaveEdit(commentId: string) {
+    if (!editContent.trim()) return;
+    try {
+      const raw = localStorage.getItem(STORAGE_KEYS.allComments);
+      const all: Comment[] = raw ? JSON.parse(raw) : [];
+      const idx = all.findIndex((c) => c.id === commentId);
+      if (idx !== -1) {
+        all[idx].content = editContent.trim();
+        localStorage.setItem(STORAGE_KEYS.allComments, JSON.stringify(all));
+        setComments(all.filter((c) => c.skillId === skillId));
+      }
+      // Sync user-scoped
+      if (user) {
+        const key = STORAGE_KEYS.comments(user.email);
+        const uRaw = localStorage.getItem(key);
+        const userComments: Comment[] = uRaw ? JSON.parse(uRaw) : [];
+        const uIdx = userComments.findIndex((c) => c.id === commentId);
+        if (uIdx !== -1) {
+          userComments[uIdx].content = editContent.trim();
+          localStorage.setItem(key, JSON.stringify(userComments));
+        }
+      }
+    } catch { /* ignore */ }
+    setEditingId(null);
+    setEditContent("");
+    setTick((t) => t + 1);
+  }
+
+  function handleDelete(commentId: string) {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEYS.allComments);
+      const all: Comment[] = raw ? JSON.parse(raw) : [];
+      const updated = all.filter((c) => c.id !== commentId);
+      localStorage.setItem(STORAGE_KEYS.allComments, JSON.stringify(updated));
+      setComments(updated.filter((c) => c.skillId === skillId));
+      // Sync user-scoped
+      if (user) {
+        const key = STORAGE_KEYS.comments(user.email);
+        const uRaw = localStorage.getItem(key);
+        const userComments: Comment[] = uRaw ? JSON.parse(uRaw) : [];
+        localStorage.setItem(key, JSON.stringify(userComments.filter((c) => c.id !== commentId)));
+      }
+      // Sync skill-scoped
+      try {
+        const skKey = STORAGE_KEYS.skillComments(skillId);
+        const skRaw = localStorage.getItem(skKey);
+        const skComments: Comment[] = skRaw ? JSON.parse(skRaw) : [];
+        localStorage.setItem(skKey, JSON.stringify(skComments.filter((c) => c.id !== commentId)));
+      } catch { /* ignore */ }
+    } catch { /* ignore */ }
+    setTick((t) => t + 1);
+  }
+
   return (
     <div className="glass-card p-6 mb-8">
       <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
@@ -173,8 +235,23 @@ export function CommentSection({ skillId, skillTitle }: { skillId: string; skill
                   </div>
                 </div>
               </div>
-              <p className="text-sm text-foreground mb-2 ml-11">{c.content}</p>
-              <div className="ml-11">
+              {editingId === c.id ? (
+                <div className="ml-11 space-y-2">
+                  <Textarea
+                    value={editContent}
+                    onChange={(e) => setEditContent(e.target.value)}
+                    rows={2}
+                    className="bg-secondary border-border text-foreground text-sm"
+                  />
+                  <div className="flex gap-2">
+                    <button onClick={() => handleSaveEdit(c.id)} className="flex items-center gap-1 text-xs text-primary hover:underline"><Check className="h-3 w-3" />{t.common.save}</button>
+                    <button onClick={() => setEditingId(null)} className="flex items-center gap-1 text-xs text-muted-foreground hover:underline"><X className="h-3 w-3" />{t.common.cancel}</button>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-sm text-foreground mb-2 ml-11">{c.content}</p>
+              )}
+              <div className="ml-11 flex items-center gap-3">
                 <button
                   onClick={() => handleLike(c.id)}
                   className={`flex items-center gap-1 text-xs transition-colors ${
@@ -184,6 +261,22 @@ export function CommentSection({ skillId, skillTitle }: { skillId: string; skill
                   <ThumbsUp className="h-3 w-3" />
                   {c.likes > 0 && c.likes}
                 </button>
+                {user && c.userEmail === user.email && (
+                  <>
+                    <button
+                      onClick={() => handleEdit(c.id)}
+                      className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <Pencil className="h-3 w-3" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(c.id)}
+                      className="flex items-center gap-1 text-xs text-muted-foreground hover:text-red-400 transition-colors"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           ))}

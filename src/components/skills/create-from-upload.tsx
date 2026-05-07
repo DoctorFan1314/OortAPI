@@ -89,7 +89,7 @@ export function CreateFromUpload({ open, onClose, onCreated }: Props) {
 
     const tagsList = tags ? tags.split(",").map((s) => s.trim()).filter(Boolean) : [];
     const skill: AgentSkill = {
-      id: `custom-${Date.now()}`,
+      id: `custom-${crypto.randomUUID()}`,
       name: name.trim(),
       title: displayName.trim(),
       description: description.trim(),

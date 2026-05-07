@@ -108,7 +108,7 @@ export default function SkillsClient() {
             <SlidersHorizontal className="h-4 w-4 mr-1.5" />
             {t.agentSkills.sortBy}
           </Button>
-          <div className="hidden sm:flex items-center gap-1">
+          <div className="hidden sm:flex items-center gap-1" role="radiogroup" aria-label={t.agentSkills.sortBy}>
             {(["downloads", "stars", "newest"] as const).map((s) => (
               <Button
                 key={s}

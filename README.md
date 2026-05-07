@@ -233,6 +233,9 @@ ai-skills-hub/
 | UUID generation | ✅ | `crypto.randomUUID()` for comments, submissions, toasts |
 | Category detail i18n | ✅ | Agent category matching uses English slugs, not hardcoded Chinese |
 | Consistent parentheses | ✅ | ASCII `()` in "load more" buttons across all list pages |
+| Comment edit/delete | ✅ | Authors can edit and delete their own comments on skill pages |
+| Avatar auto-compression | ✅ | Auto-compresses images >500KB to 128×128 at 60% JPEG in crop dialog |
+| Guide TOC | ✅ | Table of contents with anchor links to all guide sections |
 
 ---
 
