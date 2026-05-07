@@ -8,7 +8,7 @@ import { SkillCard } from "@/components/skill/skill-card";
 import { AgentSkillCard } from "@/components/agent-skill/agent-skill-card";
 import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { useI18n } from "@/contexts/i18n-context";
-import type { Dictionary } from "@/lib/i18n/types";
+import { getCategoryI18n, getAgentCategoryI18n } from "@/lib/categories";
 
 const categoryToAgentCategory: Record<string, string[]> = {
   content: ["通讯协作", "文件处理"],
@@ -36,15 +36,19 @@ export default function CategoryDetailClient({ slug }: { slug: string }) {
     );
   }
 
+  const catI18n = getCategoryI18n(slug, t);
+  const displayName = catI18n.name || category.name;
+  const displayDesc = catI18n.description || category.description;
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 lg:px-8">
-      <Breadcrumb items={[{ label: t.common.categories, href: "/categories" }, { label: category.name }]} />
+      <Breadcrumb items={[{ label: t.common.categories, href: "/categories" }, { label: displayName }]} />
       <div className="mb-10">
         <div className="flex items-center gap-3 mb-3">
           <span className="text-4xl">{category.icon}</span>
           <div>
-            <h1 className="text-3xl font-bold text-foreground">{category.name}</h1>
-            <p className="text-muted-foreground">{category.description}</p>
+            <h1 className="text-3xl font-bold text-foreground">{displayName}</h1>
+            <p className="text-muted-foreground">{displayDesc}</p>
           </div>
         </div>
         <p className="text-sm text-muted-foreground/60">{catSkills.length} {t.categories.catPromptTemplates} · {catAgentSkills.length} {t.categories.catAgentSkills}</p>

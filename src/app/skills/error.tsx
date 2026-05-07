@@ -2,11 +2,11 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import { AlertTriangle, RefreshCw, Home } from "lucide-react";
+import { AlertTriangle, RefreshCw, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/contexts/i18n-context";
 
-export default function Error({
+export default function SkillsError({
   error,
   unstable_retry,
 }: {
@@ -32,10 +32,10 @@ export default function Error({
             <RefreshCw className="h-4 w-4" />
             {t.error.retry}
           </Button>
-          <Link href="/">
+          <Link href="/skills">
             <Button variant="outline" className="gap-2">
-              <Home className="h-4 w-4" />
-              {t.notFound.backHome}
+              <ArrowLeft className="h-4 w-4" />
+              {t.agentSkills.title}
             </Button>
           </Link>
         </div>

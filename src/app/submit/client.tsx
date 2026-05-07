@@ -9,6 +9,7 @@ import { useLocalStorage } from "@/hooks/use-local-storage";
 import { useAuth } from "@/contexts/auth-context";
 import { useToast } from "@/contexts/toast-context";
 import { useI18n } from "@/contexts/i18n-context";
+import { useLocale } from "@/hooks/use-locale";
 import { STORAGE_KEYS } from "@/lib/storage-keys";
 import type { Submission } from "@/lib/types";
 import { categories } from "@/lib/categories";
@@ -25,6 +26,7 @@ export default function SubmitClient() {
   const [submissions, setSubmissions] = useLocalStorage<Submission[]>(key, []);
   const { toast } = useToast();
   const { t } = useI18n();
+  const locale = useLocale();
 
   function validate(fd: FormData): Record<string, string> {
     const errs: Record<string, string> = {};
@@ -86,7 +88,7 @@ export default function SubmitClient() {
               {submissions.map((s) => (
                 <div key={s.id} className="glass-card p-4 text-left">
                   <p className="text-foreground font-medium">{s.name}</p>
-                  <p className="text-sm text-muted-foreground">{s.category} · {new Date(s.submittedAt).toLocaleDateString("zh-CN")}</p>
+                  <p className="text-sm text-muted-foreground">{s.category} · {new Date(s.submittedAt).toLocaleDateString(locale)}</p>
                 </div>
               ))}
             </div>

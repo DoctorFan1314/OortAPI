@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { useToast } from "@/contexts/toast-context";
 import { useI18n } from "@/contexts/i18n-context";
+import { useLocale } from "@/hooks/use-locale";
 import { STORAGE_KEYS } from "@/lib/storage-keys";
 import type { Comment } from "@/lib/types";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ export function CommentSection({ skillId, skillTitle }: { skillId: string; skill
   const { user } = useAuth();
   const { toast } = useToast();
   const { t } = useI18n();
+  const locale = useLocale();
   const [comments, setComments] = useState<Comment[]>([]);
   const [content, setContent] = useState("");
   const [rating, setRating] = useState(0);
@@ -164,7 +166,7 @@ export function CommentSection({ skillId, skillTitle }: { skillId: string; skill
                         ))}
                       </div>
                     )}
-                    <time className="text-xs text-muted-foreground">{new Date(c.createdAt).toLocaleDateString("zh-CN")}</time>
+                    <time className="text-xs text-muted-foreground">{new Date(c.createdAt).toLocaleDateString(locale)}</time>
                   </div>
                 </div>
               </div>

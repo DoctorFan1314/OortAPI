@@ -28,8 +28,12 @@ export function FeaturedSection({ tab, onTabChange }: { tab: "agent" | "prompt";
 
       {/* Tab buttons */}
       <div className="flex justify-center mb-8">
-        <div className="inline-flex rounded-xl bg-secondary p-1 gap-1">
+        <div className="inline-flex rounded-xl bg-secondary p-1 gap-1" role="tablist">
           <button
+            role="tab"
+            aria-selected={tab === "agent"}
+            id="tab-agent"
+            aria-controls="tabpanel-agent"
             onClick={() => onTabChange("agent")}
             className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${
               tab === "agent"
@@ -41,6 +45,10 @@ export function FeaturedSection({ tab, onTabChange }: { tab: "agent" | "prompt";
             {t.home.tabAgent}
           </button>
           <button
+            role="tab"
+            aria-selected={tab === "prompt"}
+            id="tab-prompt"
+            aria-controls="tabpanel-prompt"
             onClick={() => onTabChange("prompt")}
             className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${
               tab === "prompt"
@@ -55,7 +63,12 @@ export function FeaturedSection({ tab, onTabChange }: { tab: "agent" | "prompt";
       </div>
 
       {/* Tab content */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <div
+        role="tabpanel"
+        id={tab === "agent" ? "tabpanel-agent" : "tabpanel-prompt"}
+        aria-labelledby={tab === "agent" ? "tab-agent" : "tab-prompt"}
+        className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+      >
         {tab === "agent"
           ? trendingAgents.map((s) => <AgentSkillCard key={s.id} skill={s} />)
           : trendingPrompts.map((s) => <SkillCard key={s.id} skill={s} />)}

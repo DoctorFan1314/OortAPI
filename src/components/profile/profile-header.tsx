@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { useI18n } from "@/contexts/i18n-context";
+import { useLocale } from "@/hooks/use-locale";
 import { useToast } from "@/contexts/toast-context";
 import { Calendar, Mail, User, Camera } from "lucide-react";
 import Image from "next/image";
@@ -13,6 +14,7 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 export function ProfileHeader() {
   const { user, updateProfile } = useAuth();
   const { t } = useI18n();
+  const locale = useLocale();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [cropImage, setCropImage] = useState<string | null>(null);
@@ -71,7 +73,7 @@ export function ProfileHeader() {
             {user.bio && <p className="text-sm text-muted-foreground mb-2">{user.bio}</p>}
             <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
               <span className="flex items-center gap-1"><Mail className="h-3 w-3" />{user.email}</span>
-              <span className="flex items-center gap-1"><Calendar className="h-3 w-3" />{t.profile.joinedAt} {new Date(user.joinDate).toLocaleDateString("zh-CN")}</span>
+              <span className="flex items-center gap-1"><Calendar className="h-3 w-3" />{t.profile.joinedAt} {new Date(user.joinDate).toLocaleDateString(locale)}</span>
               <span className="flex items-center gap-1"><User className="h-3 w-3" />{user.role === "admin" ? t.profile.adminRole : t.profile.userRole}</span>
             </div>
           </div>

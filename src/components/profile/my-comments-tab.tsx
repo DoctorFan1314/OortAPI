@@ -2,6 +2,7 @@
 
 import { useAuth } from "@/contexts/auth-context";
 import { useI18n } from "@/contexts/i18n-context";
+import { useLocale } from "@/hooks/use-locale";
 import { STORAGE_KEYS } from "@/lib/storage-keys";
 import { getSkillById } from "@/lib/mock-data";
 import { getAgentSkillById } from "@/lib/mock-agent-skills";
@@ -14,6 +15,7 @@ import Link from "next/link";
 export function MyCommentsTab() {
   const { user } = useAuth();
   const { t } = useI18n();
+  const locale = useLocale();
   const [, setTick] = useState(0);
 
   if (!user) return null;
@@ -64,7 +66,7 @@ export function MyCommentsTab() {
               </Button>
             </div>
             <p className="text-sm text-foreground mb-1">{c.content}</p>
-            <time className="text-xs text-muted-foreground">{new Date(c.createdAt).toLocaleDateString("zh-CN")}</time>
+            <time className="text-xs text-muted-foreground">{new Date(c.createdAt).toLocaleDateString(locale)}</time>
           </div>
         );
       })}

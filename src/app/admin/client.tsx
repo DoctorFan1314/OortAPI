@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { useI18n } from "@/contexts/i18n-context";
+import { useLocale } from "@/hooks/use-locale";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { STORAGE_KEYS } from "@/lib/storage-keys";
@@ -15,6 +16,7 @@ const ADMIN_EMAILS = ["admin@aiskillshub.com"];
 export default function AdminClient() {
   const { user } = useAuth();
   const { t } = useI18n();
+  const locale = useLocale();
   const [tab, setTab] = useState<"pending" | "users" | "analytics" | "comments">("pending");
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
@@ -136,7 +138,7 @@ export default function AdminClient() {
                   <div>
                     <h3 className="text-foreground font-semibold">{s.name}</h3>
                     <p className="text-sm text-muted-foreground mt-1">{s.shortDesc}</p>
-                    <p className="text-xs text-muted-foreground mt-2">{s.category} · {s.authorName} ({s.authorEmail}) · {new Date(s.submittedAt).toLocaleDateString("zh-CN")}</p>
+                    <p className="text-xs text-muted-foreground mt-2">{s.category} · {s.authorName} ({s.authorEmail}) · {new Date(s.submittedAt).toLocaleDateString(locale)}</p>
                   </div>
                   <Badge variant="secondary" className="bg-yellow-400/10 text-yellow-400 border-yellow-400/20">{t.admin.pendingSubmissions}</Badge>
                 </div>
@@ -170,7 +172,7 @@ export default function AdminClient() {
                   <div key={s.id} className="glass-card p-4 flex items-center justify-between">
                     <div>
                       <p className="text-foreground font-medium">{s.name}</p>
-                      <p className="text-xs text-muted-foreground">{s.authorName} · {new Date(s.submittedAt).toLocaleDateString("zh-CN")}</p>
+                      <p className="text-xs text-muted-foreground">{s.authorName} · {new Date(s.submittedAt).toLocaleDateString(locale)}</p>
                     </div>
                     <Badge variant="secondary" className={s.status === "approved" ? "bg-green-400/10 text-green-400 border-green-400/20" : "bg-red-400/10 text-red-400 border-red-400/20"}>
                       {s.status === "approved" ? t.admin.approved : t.admin.rejected}
@@ -243,7 +245,7 @@ export default function AdminClient() {
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="text-foreground font-medium text-sm">{c.username}</p>
-                    <p className="text-xs text-muted-foreground">{t.admin.skillPrefix}{c.skillId} · {new Date(c.createdAt).toLocaleDateString("zh-CN")}</p>
+                    <p className="text-xs text-muted-foreground">{t.admin.skillPrefix}{c.skillId} · {new Date(c.createdAt).toLocaleDateString(locale)}</p>
                   </div>
                   <button onClick={() => handleDeleteComment(c.id)} className="text-muted-foreground hover:text-red-400 transition-colors">
                     <Trash2 className="h-4 w-4" />

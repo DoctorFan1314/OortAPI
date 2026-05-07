@@ -2,6 +2,7 @@
 
 import { useAuth } from "@/contexts/auth-context";
 import { useI18n } from "@/contexts/i18n-context";
+import { useLocale } from "@/hooks/use-locale";
 import { STORAGE_KEYS } from "@/lib/storage-keys";
 import type { UserActivity } from "@/lib/types";
 import { ThumbsUp, Bookmark, MessageSquare, Send, Eye, Copy } from "lucide-react";
@@ -22,6 +23,7 @@ function getTypeConfig(t: Dictionary) {
 export function ActivityTimeline() {
   const { user } = useAuth();
   const { t } = useI18n();
+  const locale = useLocale();
   if (!user) return null;
 
   const typeConfig = getTypeConfig(t);
@@ -61,7 +63,7 @@ export function ActivityTimeline() {
                 </p>
               </div>
               <time className="text-xs text-muted-foreground shrink-0">
-                {new Date(activity.timestamp).toLocaleDateString("zh-CN")}
+                {new Date(activity.timestamp).toLocaleDateString(locale)}
               </time>
             </div>
           );

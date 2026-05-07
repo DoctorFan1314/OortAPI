@@ -6,6 +6,75 @@
 
 ---
 
+## [v1.8.0] — 2026-05-07
+
+### 新增
+- **根级 Error Boundary** — `src/app/error.tsx` 使用 `unstable_retry`（Next.js 16 API）重写，玻璃卡片 UI、重试 + 回首页按钮、i18n 支持
+- **根级 Loading 骨架屏** — `src/app/loading.tsx` 使用 `animate-pulse` 模拟 Hero + Tab 区 + 6 卡片骨架
+- **嵌套路由 Error Boundary** — `src/app/skills/error.tsx` 和 `src/app/prompts/error.tsx`，带路由专属"返回列表"链接
+- **`useLocale()` 钩子** — `src/hooks/use-locale.ts` 从 `useI18n().lang` 派生 `"zh-CN"` / `"en-US"`
+- **`formatDate()` 工具函数** — `src/lib/utils.ts` 导出 `formatDate(dateStr, locale)` 统一日期格式化
+- **导航栏"更多"下拉菜单** — "模板"链接后新增下拉菜单，包含分类、排行榜、标签、指南；点击外部和路由切换自动关闭
+- **导航栏 `aria-expanded`** — 搜索切换和移动端 Sheet 触发按钮添加 `aria-expanded` 属性
+
+### 变更
+- **日期 locale 修复** — 9 个文件中 11 处硬编码 `"zh-CN"` 替换为 `useLocale()`，支持中英文日期格式
+- **Toast 无障碍** — 容器添加 `aria-live="polite"` + `role="status"`；每个 toast 项添加 `role="alert"`
+- **精选区 ARIA Tab** — Tab 容器使用 `role="tablist"`，按钮使用 `role="tab"` + `aria-selected` + `aria-controls`，内容区使用 `role="tabpanel"` + `aria-labelledby`
+- **命令面板无障碍** — 添加 `role="dialog"`、`aria-modal="true"`、`aria-label`、背景遮罩 `aria-hidden`、Tab 焦点陷阱
+- **页脚禁用链接** — 5 个禁用链接（Changelog、API、GitHub、Discord、Twitter）添加 `title="Coming soon"` 提示
+- **页脚冒号修复** — 全角 `：` 替换为半角 `:`
+- **MarkdownRenderer 提取** — 从 `skills/[id]/client.tsx` 移至 `src/components/shared/markdown-renderer.tsx` 作为可复用组件；标题添加 `id` 属性支持锚点链接，添加 `scroll-mt-20` 滚动偏移
+- **分类 i18n 集中化** — `getCategoryI18n()` 和 `getAgentCategoryI18n()` 从 `category-cards.tsx` 移至 `src/lib/categories.ts`，供多组件复用
+- **react-easy-crop 动态导入** — `avatar-crop-dialog.tsx` 使用 `React.lazy` + `Suspense` 实现代码分割
+- **`@types/react-syntax-highlighter`** — 从 `dependencies` 移至 `devDependencies`
+
+### 修改文件
+- `src/app/admin/client.tsx` — 3 处 `toLocaleDateString` 使用 `useLocale()`
+- `src/app/submit/client.tsx` — `toLocaleDateString` 使用 `useLocale()`
+- `src/app/submit/status/client.tsx` — `toLocaleDateString` 使用 `useLocale()`
+- `src/components/skill/comment-section.tsx` — `toLocaleDateString` 使用 `useLocale()`
+- `src/components/profile/my-comments-tab.tsx` — `toLocaleDateString` 使用 `useLocale()`
+- `src/components/profile/my-submissions-tab.tsx` — `toLocaleDateString` 使用 `useLocale()`
+- `src/components/profile/usage-history-tab.tsx` — `toLocaleDateString` 使用 `useLocale()`
+- `src/components/profile/activity-timeline.tsx` — `toLocaleDateString` 使用 `useLocale()`
+- `src/components/profile/profile-header.tsx` — `toLocaleDateString` 使用 `useLocale()`
+- `src/components/ui/toast.tsx` — `aria-live`、`role="status"`、`role="alert"`
+- `src/components/home/featured-section.tsx` — 完整 ARIA Tab 模式
+- `src/components/shared/command-palette.tsx` — Dialog ARIA + 焦点陷阱
+- `src/components/layout/navbar.tsx` — "更多"下拉菜单、`aria-expanded` 属性
+- `src/components/layout/footer.tsx` — 禁用链接 title、冒号修复
+- `src/components/home/category-cards.tsx` — 导入集中化 i18n 函数
+- `src/app/categories/[slug]/client.tsx` — 使用集中化 i18n 函数，移除未使用的 `Dictionary` 导入
+- `src/app/skills/[id]/client.tsx` — 从共享组件导入 `MarkdownRenderer`、`CopyButton`、`codeTheme`
+- `src/components/profile/avatar-crop-dialog.tsx` — `React.lazy` + `Suspense` 加载 Cropper
+- `src/lib/categories.ts` — 新增 `getCategoryI18n()` 和 `getAgentCategoryI18n()`
+- `src/lib/utils.ts` — 新增 `formatDate()` 导出
+- `package.json` — `@types/react-syntax-highlighter` 移至 devDependencies
+
+### 新文件
+- `src/app/error.tsx` — 根级 Error Boundary，使用 `unstable_retry`
+- `src/app/loading.tsx` — 根级 Loading 骨架屏
+- `src/app/skills/error.tsx` — 技能路由 Error Boundary
+- `src/app/prompts/error.tsx` — 模板路由 Error Boundary
+- `src/hooks/use-locale.ts` — Locale 派生钩子
+- `src/components/shared/markdown-renderer.tsx` — 提取的 MarkdownRenderer 组件
+
+### 移除
+- `src/components/ui/card.tsx` — 未使用组件（0 imports）
+- `src/components/ui/select.tsx` — 未使用组件（0 imports）
+- `src/components/ui/separator.tsx` — 未使用组件（0 imports）
+- `src/components/shared/premium-gate.tsx` — 未使用组件（0 imports）
+- `src/components/home/skill-section.tsx` — 未使用组件（0 imports）
+- `src/components/skills/create-from-github-prompt.tsx` — 未使用组件（0 imports）
+- `public/file.svg` — Next.js 模板残留（0 引用）
+- `public/globe.svg` — Next.js 模板残留（0 引用）
+- `public/next.svg` — Next.js 模板残留（0 引用）
+- `public/vercel.svg` — Next.js 模板残留（0 引用）
+- `public/window.svg` — Next.js 模板残留（0 引用）
+
+---
+
 ## [v1.7.0] — 2026-05-07
 
 ### 新增

@@ -210,6 +210,11 @@ ai-skills-hub/
 | Full i18n | ✅ | 100% bilingual (zh/en), ~300+ translation keys |
 | Category i18n | ✅ | Category names/descriptions in 14 categories fully localized |
 | Custom avatar | ✅ | Upload, crop (react-easy-crop), set custom avatar; persists as base64 in localStorage |
+| Error boundaries | ✅ | Root + nested route error boundaries with retry, i18n, glass-card UI |
+| Loading skeleton (root) | ✅ | Root-level skeleton screen on initial navigation |
+| Date locale | ✅ | `useLocale()` hook for proper zh-CN/en-US date formatting across all components |
+| MarkdownRenderer (shared) | ✅ | Extracted reusable component with heading anchors and scroll offset |
+| Navbar "More" dropdown | ✅ | Quick access to Categories, Trending, Tags, Guide from navbar |
 
 ---
 

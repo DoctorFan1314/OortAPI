@@ -9,12 +9,14 @@ import { useLocalStorage } from "@/hooks/use-local-storage";
 import { STORAGE_KEYS } from "@/lib/storage-keys";
 import { useToast } from "@/contexts/toast-context";
 import { useI18n } from "@/contexts/i18n-context";
+import { useLocale } from "@/hooks/use-locale";
 import type { Submission } from "@/lib/types";
 
 export default function SubmitStatusClient() {
   const { user } = useAuth();
   const { toast } = useToast();
   const { t } = useI18n();
+  const locale = useLocale();
   const key = user ? STORAGE_KEYS.submissions(user.email) : "ai-skills-hub-submissions-guest";
   const [submissions, setSubmissions] = useLocalStorage<Submission[]>(key, []);
 
@@ -75,7 +77,7 @@ export default function SubmitStatusClient() {
                   </div>
                 </div>
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span>{s.category} · {s.version} · {new Date(s.submittedAt).toLocaleDateString("zh-CN")}</span>
+                  <span>{s.category} · {s.version} · {new Date(s.submittedAt).toLocaleDateString(locale)}</span>
                   <button
                     onClick={() => handleDelete(s.id)}
                     className="flex items-center gap-1 text-muted-foreground hover:text-red-400 transition-colors"

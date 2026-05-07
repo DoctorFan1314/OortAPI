@@ -2,6 +2,7 @@
 
 import { useAuth } from "@/contexts/auth-context";
 import { useI18n } from "@/contexts/i18n-context";
+import { useLocale } from "@/hooks/use-locale";
 import { STORAGE_KEYS } from "@/lib/storage-keys";
 import { getSkillById } from "@/lib/mock-data";
 import type { UserActivity } from "@/lib/types";
@@ -11,6 +12,7 @@ import Link from "next/link";
 export function UsageHistoryTab() {
   const { user } = useAuth();
   const { t } = useI18n();
+  const locale = useLocale();
   if (!user) return null;
 
   let activities: UserActivity[] = [];
@@ -53,7 +55,7 @@ export function UsageHistoryTab() {
               </p>
             </div>
             <time className="text-xs text-muted-foreground shrink-0">
-              {new Date(a.timestamp).toLocaleDateString("zh-CN")}
+              {new Date(a.timestamp).toLocaleDateString(locale)}
             </time>
           </div>
         );

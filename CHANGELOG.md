@@ -6,6 +6,75 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [v1.8.0] — 2026-05-07
+
+### Added
+- **Root error boundary** — `src/app/error.tsx` rewritten with `unstable_retry` (Next.js 16 API), glass-card UI, retry + home buttons, i18n support
+- **Root loading skeleton** — `src/app/loading.tsx` with `animate-pulse` skeleton mimicking hero + tab section + 6 cards
+- **Nested error boundaries** — `src/app/skills/error.tsx` and `src/app/prompts/error.tsx` with route-specific "back to list" links
+- **`useLocale()` hook** — `src/hooks/use-locale.ts` derives `"zh-CN"` / `"en-US"` from `useI18n().lang`
+- **`formatDate()` utility** — `src/lib/utils.ts` now exports `formatDate(dateStr, locale)` for consistent date formatting
+- **Navbar "More" dropdown** — New dropdown menu after "Templates" link with Categories, Trending, Tags, Guide; closes on outside click and route change
+- **Navbar `aria-expanded`** — Search toggle and mobile Sheet trigger buttons now have `aria-expanded` attributes
+
+### Changed
+- **Date locale fix** — 11 occurrences of hardcoded `"zh-CN"` across 9 files replaced with `useLocale()` for proper English/Chinese date formatting
+- **Toast a11y** — Container now has `aria-live="polite"` + `role="status"`; each toast item has `role="alert"`
+- **Featured section ARIA tabs** — Tab container uses `role="tablist"`, buttons use `role="tab"` + `aria-selected` + `aria-controls`, content uses `role="tabpanel"` + `aria-labelledby`
+- **Command palette a11y** — Added `role="dialog"`, `aria-modal="true"`, `aria-label`, `aria-hidden` on backdrop, basic Tab focus trap
+- **Footer disabled links** — Added `title="Coming soon"` tooltip to 5 disabled links (Changelog, API, GitHub, Discord, Twitter)
+- **Footer colon fix** — Full-width `：` replaced with ASCII `:` on platform list
+- **MarkdownRenderer extracted** — Moved from `skills/[id]/client.tsx` to `src/components/shared/markdown-renderer.tsx` as a reusable component; headings now have `id` attributes for anchor links and `scroll-mt-20` for scroll offset
+- **Category i18n centralized** — `getCategoryI18n()` and `getAgentCategoryI18n()` moved from `category-cards.tsx` to `src/lib/categories.ts` for reuse across components
+- **react-easy-crop dynamic import** — `avatar-crop-dialog.tsx` now uses `React.lazy` + `Suspense` for code splitting
+- **`@types/react-syntax-highlighter`** — Moved from `dependencies` to `devDependencies`
+
+### Files Modified
+- `src/app/admin/client.tsx` — 3 `toLocaleDateString` calls use `useLocale()`
+- `src/app/submit/client.tsx` — `toLocaleDateString` uses `useLocale()`
+- `src/app/submit/status/client.tsx` — `toLocaleDateString` uses `useLocale()`
+- `src/components/skill/comment-section.tsx` — `toLocaleDateString` uses `useLocale()`
+- `src/components/profile/my-comments-tab.tsx` — `toLocaleDateString` uses `useLocale()`
+- `src/components/profile/my-submissions-tab.tsx` — `toLocaleDateString` uses `useLocale()`
+- `src/components/profile/usage-history-tab.tsx` — `toLocaleDateString` uses `useLocale()`
+- `src/components/profile/activity-timeline.tsx` — `toLocaleDateString` uses `useLocale()`
+- `src/components/profile/profile-header.tsx` — `toLocaleDateString` uses `useLocale()`
+- `src/components/ui/toast.tsx` — `aria-live`, `role="status"`, `role="alert"`
+- `src/components/home/featured-section.tsx` — Full ARIA tab pattern
+- `src/components/shared/command-palette.tsx` — Dialog ARIA + focus trap
+- `src/components/layout/navbar.tsx` — "More" dropdown, `aria-expanded` on toggle buttons
+- `src/components/layout/footer.tsx` — Disabled link titles, colon fix
+- `src/components/home/category-cards.tsx` — Imports centralized i18n functions
+- `src/app/categories/[slug]/client.tsx` — Uses centralized i18n functions, removed unused `Dictionary` import
+- `src/app/skills/[id]/client.tsx` — Imports `MarkdownRenderer`, `CopyButton`, `codeTheme` from shared component
+- `src/components/profile/avatar-crop-dialog.tsx` — `React.lazy` + `Suspense` for Cropper
+- `src/lib/categories.ts` — Added `getCategoryI18n()` and `getAgentCategoryI18n()` with Dictionary import
+- `src/lib/utils.ts` — Added `formatDate()` export
+- `package.json` — `@types/react-syntax-highlighter` moved to devDependencies
+
+### New Files
+- `src/app/error.tsx` — Root error boundary with `unstable_retry`
+- `src/app/loading.tsx` — Root loading skeleton
+- `src/app/skills/error.tsx` — Skills route error boundary
+- `src/app/prompts/error.tsx` — Prompts route error boundary
+- `src/hooks/use-locale.ts` — Locale derivation hook
+- `src/components/shared/markdown-renderer.tsx` — Extracted MarkdownRenderer component
+
+### Removed
+- `src/components/ui/card.tsx` — Unused component (0 imports)
+- `src/components/ui/select.tsx` — Unused component (0 imports)
+- `src/components/ui/separator.tsx` — Unused component (0 imports)
+- `src/components/shared/premium-gate.tsx` — Unused component (0 imports)
+- `src/components/home/skill-section.tsx` — Unused component (0 imports)
+- `src/components/skills/create-from-github-prompt.tsx` — Unused component (0 imports)
+- `public/file.svg` — Next.js template leftover (0 references)
+- `public/globe.svg` — Next.js template leftover (0 references)
+- `public/next.svg` — Next.js template leftover (0 references)
+- `public/vercel.svg` — Next.js template leftover (0 references)
+- `public/window.svg` — Next.js template leftover (0 references)
+
+---
+
 ## [v1.7.0] — 2026-05-07
 
 ### Added

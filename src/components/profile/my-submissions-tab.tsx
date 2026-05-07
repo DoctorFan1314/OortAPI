@@ -2,6 +2,7 @@
 
 import { useAuth } from "@/contexts/auth-context";
 import { useI18n } from "@/contexts/i18n-context";
+import { useLocale } from "@/hooks/use-locale";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { STORAGE_KEYS } from "@/lib/storage-keys";
 import type { Submission } from "@/lib/types";
@@ -19,6 +20,7 @@ function getStatusConfig(t: Dictionary) {
 export function MySubmissionsTab() {
   const { user } = useAuth();
   const { t } = useI18n();
+  const locale = useLocale();
   const statusConfig = getStatusConfig(t);
   const key = user ? STORAGE_KEYS.submissions(user.email) : "ai-skills-hub-guest";
   const [submissions] = useLocalStorage<Submission[]>(key, []);
@@ -41,7 +43,7 @@ export function MySubmissionsTab() {
           <div key={s.id} className="glass-card p-4 flex items-center gap-4">
             <div className="flex-1 min-w-0">
               <p className="text-foreground font-medium truncate">{s.name}</p>
-              <p className="text-sm text-muted-foreground">{s.category} · {new Date(s.submittedAt).toLocaleDateString("zh-CN")}</p>
+              <p className="text-sm text-muted-foreground">{s.category} · {new Date(s.submittedAt).toLocaleDateString(locale)}</p>
             </div>
             <span className={`text-xs px-2.5 py-1 rounded-full border ${status.bg} ${status.color} shrink-0`}>
               {status.label}

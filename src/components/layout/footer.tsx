@@ -62,7 +62,7 @@ export function Footer() {
                 {links.map((link) => (
                   <li key={link.label}>
                     {link.disabled ? (
-                      <span className="text-sm text-muted-foreground/40 cursor-default">{link.label}</span>
+                      <span className="text-sm text-muted-foreground/40 cursor-default" title="Coming soon">{link.label}</span>
                     ) : (
                       <Link href={link.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                         {link.label}
@@ -77,7 +77,7 @@ export function Footer() {
         <div className="mt-10 pt-6 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs text-muted-foreground">{t.footer.copyright}</p>
           <div className="flex items-center gap-4 text-xs text-muted-foreground">
-            <span>{t.footer.platforms}：</span>
+            <span>{t.footer.platforms}:</span>
             <span>ChatGPT</span><span>·</span>
             <span>Claude</span><span>·</span>
             <span>Grok</span><span>·</span>

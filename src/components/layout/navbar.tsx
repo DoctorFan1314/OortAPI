@@ -3,8 +3,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
-import { useState } from "react";
-import { Search, Menu, X, Sun, Moon, Languages } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Search, Menu, X, Sun, Moon, Languages, ChevronDown, TrendingUp, Tags, BookOpen, LayoutGrid } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
@@ -17,6 +17,8 @@ export function Navbar() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
+  const moreRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const pathname = usePathname();
   const { user, loaded, logout } = useAuth();
@@ -29,6 +31,28 @@ export function Navbar() {
     { href: "/skills", label: t.common.skills, highlight: true },
     { href: "/prompts", label: t.common.prompts },
   ];
+
+  const moreLinks = [
+    { href: "/categories", label: t.common.categories, icon: LayoutGrid },
+    { href: "/trending", label: t.common.trending, icon: TrendingUp },
+    { href: "/tags", label: t.common.tags, icon: Tags },
+    { href: "/guide", label: t.common.guide, icon: BookOpen },
+  ];
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    if (!moreOpen) return;
+    function handleClick(e: MouseEvent) {
+      if (moreRef.current && !moreRef.current.contains(e.target as Node)) {
+        setMoreOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [moreOpen]);
+
+  // Close dropdown on route change
+  useEffect(() => { setMoreOpen(false); }, [pathname]);
 
   function handleSearch(e?: React.KeyboardEvent<HTMLInputElement>) {
     if (e && e.key !== "Enter") return;
@@ -67,6 +91,32 @@ export function Navbar() {
               {link.label}
             </Link>
           ))}
+          <div className="relative" ref={moreRef}>
+            <button
+              onClick={() => setMoreOpen(!moreOpen)}
+              className={`flex items-center gap-1 px-3 py-2 text-sm transition-colors rounded-md hover:bg-secondary ${moreOpen ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+              aria-expanded={moreOpen}
+              aria-haspopup="true"
+            >
+              {t.common.more}
+              <ChevronDown className={`h-3.5 w-3.5 transition-transform ${moreOpen ? "rotate-180" : ""}`} />
+            </button>
+            {moreOpen && (
+              <div className="absolute top-full left-0 mt-1 w-48 bg-card border border-border rounded-xl shadow-xl overflow-hidden animate-[fadeIn_0.1s_ease-out] z-50">
+                {moreLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setMoreOpen(false)}
+                    className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                  >
+                    <link.icon className="h-4 w-4" />
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
         </nav>
 
         <div className="flex items-center gap-2">
@@ -80,12 +130,12 @@ export function Navbar() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={handleSearch}
               />
-              <Button variant="ghost" size="icon-sm" onClick={() => { setSearchOpen(false); setSearchQuery(""); }} className="text-muted-foreground hover:text-foreground" aria-label={t.common.closeSearch}>
+              <Button variant="ghost" size="icon-sm" onClick={() => { setSearchOpen(false); setSearchQuery(""); }} className="text-muted-foreground hover:text-foreground" aria-label={t.common.closeSearch} aria-expanded={true}>
                 <X className="h-4 w-4" />
               </Button>
             </div>
           ) : (
-            <Button variant="ghost" size="icon-sm" onClick={() => setSearchOpen(true)} className="text-muted-foreground hover:text-foreground" aria-label={t.common.search}>
+            <Button variant="ghost" size="icon-sm" onClick={() => setSearchOpen(true)} className="text-muted-foreground hover:text-foreground" aria-label={t.common.search} aria-expanded={false}>
               <Search className="h-4 w-4" />
             </Button>
           )}
@@ -146,6 +196,14 @@ export function Navbar() {
               <nav className="flex flex-col gap-1 mt-8">
                 {navLinks.map((link) => (
                   <Link key={link.href} href={link.href} onClick={() => setSheetOpen(false)} className="px-4 py-3 text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-secondary">
+                    {link.label}
+                  </Link>
+                ))}
+                <div className="border-t border-border my-2" />
+                <p className="px-4 py-1 text-xs text-muted-foreground/60 uppercase tracking-wider">{t.common.more}</p>
+                {moreLinks.map((link) => (
+                  <Link key={link.href} href={link.href} onClick={() => setSheetOpen(false)} className="flex items-center gap-2.5 px-4 py-3 text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-secondary">
+                    <link.icon className="h-4 w-4" />
                     {link.label}
                   </Link>
                 ))}

@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import Cropper from "react-easy-crop";
+import { useState, useCallback, lazy, Suspense } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+
+const Cropper = lazy(() => import("react-easy-crop"));
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/contexts/i18n-context";
 
@@ -82,16 +83,18 @@ export function AvatarCropDialog({ open, onOpenChange, imageSrc, onCropComplete 
         </DialogHeader>
 
         <div className="relative w-full aspect-square rounded-lg overflow-hidden bg-black/20">
-          <Cropper
-            image={imageSrc}
-            crop={crop}
-            zoom={zoom}
-            aspect={1}
-            cropShape="round"
-            onCropChange={setCrop}
-            onZoomChange={setZoom}
-            onCropComplete={onCropCompleteCallback}
-          />
+          <Suspense fallback={<div className="w-full h-full flex items-center justify-center text-muted-foreground text-sm">...</div>}>
+            <Cropper
+              image={imageSrc}
+              crop={crop}
+              zoom={zoom}
+              aspect={1}
+              cropShape="round"
+              onCropChange={setCrop}
+              onZoomChange={setZoom}
+              onCropComplete={onCropCompleteCallback}
+            />
+          </Suspense>
         </div>
 
         <div className="flex items-center gap-3">
