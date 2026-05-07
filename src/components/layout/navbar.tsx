@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
-import { Search, Menu, X, Sun, Moon, Languages, ChevronDown, TrendingUp, Tags, BookOpen, LayoutGrid } from "lucide-react";
+import { Search, Menu, X, Sun, Moon, Languages, ChevronDown, TrendingUp, Tags, BookOpen, LayoutGrid, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
@@ -12,6 +12,8 @@ import { useAuth } from "@/contexts/auth-context";
 import { useToast } from "@/contexts/toast-context";
 import { useTheme } from "@/contexts/theme-context";
 import { useI18n } from "@/contexts/i18n-context";
+
+import { useNotifications } from "@/hooks/use-notifications";
 
 export function Navbar() {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -25,6 +27,7 @@ export function Navbar() {
   const { toast } = useToast();
   const { resolvedTheme, setTheme } = useTheme();
   const { lang, setLang, t } = useI18n();
+  const { unreadCount } = useNotifications();
 
   const navLinks = [
     { href: "/", label: t.common.home },
@@ -59,14 +62,7 @@ export function Navbar() {
     const q = searchQuery.trim();
     if (q) {
       const encoded = encodeURIComponent(q);
-      if (pathname.startsWith("/skills")) {
-        router.push(`/skills?q=${encoded}`);
-      } else if (pathname.startsWith("/prompts")) {
-        router.push(`/prompts?q=${encoded}`);
-      } else {
-        // Default: go to skills for general search
-        router.push(`/skills?q=${encoded}`);
-      }
+      router.push(`/search?q=${encoded}`);
       setSearchOpen(false);
       setSearchQuery("");
     }
@@ -103,19 +99,30 @@ export function Navbar() {
               onClick={() => setMoreOpen(!moreOpen)}
               className={`flex items-center gap-1 px-3 py-2 text-sm transition-colors rounded-md hover:bg-secondary ${moreOpen ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground"}`}
               aria-expanded={moreOpen}
-              aria-haspopup="true"
+              aria-haspopup="menu"
             >
               {t.common.more}
               <ChevronDown className={`h-3.5 w-3.5 transition-transform ${moreOpen ? "rotate-180" : ""}`} />
             </button>
             {moreOpen && (
-              <div className="absolute top-full left-0 mt-1 w-48 bg-card border border-border rounded-xl shadow-xl overflow-hidden animate-[fadeIn_0.1s_ease-out] z-50">
+              <div
+                role="menu"
+                className="absolute top-full left-0 mt-1 w-48 bg-card border border-border rounded-xl shadow-xl overflow-hidden animate-[fadeIn_0.1s_ease-out] z-50"
+                onKeyDown={(e) => {
+                  const items = Array.from(e.currentTarget.querySelectorAll('[role="menuitem"]')) as HTMLElement[];
+                  const idx = items.indexOf(document.activeElement as HTMLElement);
+                  if (e.key === "ArrowDown") { e.preventDefault(); items[(idx + 1) % items.length]?.focus(); }
+                  if (e.key === "ArrowUp") { e.preventDefault(); items[(idx - 1 + items.length) % items.length]?.focus(); }
+                  if (e.key === "Escape") { setMoreOpen(false); }
+                }}
+              >
                 {moreLinks.map((link) => (
                   <Link
                     key={link.href}
                     href={link.href}
+                    role="menuitem"
                     onClick={() => setMoreOpen(false)}
-                    className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                    className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors focus:bg-secondary focus:text-foreground outline-none"
                   >
                     <link.icon className="h-4 w-4" />
                     {link.label}
@@ -142,7 +149,7 @@ export function Navbar() {
               </Button>
             </div>
           ) : (
-            <Button variant="ghost" size="icon-sm" onClick={() => setSearchOpen(true)} className="text-muted-foreground hover:text-foreground" aria-label={t.common.search} aria-expanded={false}>
+            <Button variant="ghost" size="icon-sm" onClick={() => setSearchOpen(true)} className="text-muted-foreground hover:text-foreground" aria-label={t.common.search} aria-expanded={false} id="search-trigger">
               <Search className="h-4 w-4" />
             </Button>
           )}
@@ -166,6 +173,19 @@ export function Navbar() {
           >
             <Languages className="h-4 w-4" />
           </Button>
+
+          {user && (
+            <Link href="/profile?tab=notifications">
+              <Button variant="ghost" size="icon-sm" className="relative text-muted-foreground hover:text-foreground" aria-label={t.common.notifications}>
+                <Bell className="h-4 w-4" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-red-500 text-[10px] text-white flex items-center justify-center font-medium">
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </span>
+                )}
+              </Button>
+            </Link>
+          )}
 
           <div className="hidden md:flex items-center gap-2">
             {!loaded ? null : user ? (

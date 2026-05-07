@@ -6,6 +6,68 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [v2.0.7] — 2026-05-08
+
+### Features
+- **Unified Search Page** (`/search`) — Cross-marketplace search across Agent Skills and Prompt Templates; autocomplete dropdown with 6 suggestions (skills, prompts, tags) with type icons; recent search history persisted to localStorage (max 8); keyboard navigation (ArrowUp/Down, Enter, Escape); ARIA combobox pattern
+- **Notification System** — Bell icon in navbar with unread count badge (9+ overflow); notification dropdown with type icons; mark-as-read, mark-all-read, clear-all actions; per-user localStorage persistence via `useNotifications` hook
+- **Public User Profiles** (`/users/[username]`) — Public profile page showing avatar, bio, join date, published skills, download/star stats; breadcrumb navigation
+- **JSON-LD Structured Data** — SoftwareApplication schema on skill pages, CreativeWork on prompt pages, BreadcrumbList on detail pages, Organization + WebSite on homepage
+- **Skill Detail Enhancements** — Share button with `navigator.share()` + clipboard fallback; screenshots gallery with lightbox zoom; dependencies section in sidebar; verified badge (BadgeCheck icon); report modal with radio button reasons; follow author button; "Add to Collection" dropdown; 4th tab "Version History" with vertical timeline; enhanced 404 with trending suggestions
+- **Skills Page URL-Synced Filters** — All filters (q, collection, category, license, sort) synced to URL query params; debounced query (300ms); license filter with radio buttons; cross-filter result counts; active filters summary bar with removable chips
+- **Navbar "More" Dropdown** — Quick access to Categories, Trending, Tags, Guide from navbar; ArrowDown/ArrowUp/Escape keyboard navigation; `role="menu"` / `role="menuitem"` ARIA
+- **CSS Enhancements** — `prefers-reduced-motion` guard on glass-card-hover; light mode glass-card with `backdrop-filter: blur(16px)`; print styles; global `focus-visible` styles; light mode gradient background
+- **Hero Stagger Animation** — `@keyframes heroSlideUp` with `.hero-animate-1` through `.hero-animate-4` classes; decorative elements marked `aria-hidden="true"`
+- **Tab Fade Animation** — `@keyframes tabFadeIn` with `.tab-panel-enter` class on featured section tabpanel
+- **Comment Markdown Rendering** — Comment content now renders via lazy-loaded `MarkdownRenderer`; helper text shows supported syntax
+- **Footer Accessibility** — Disabled links marked `aria-disabled="true"` with `line-through`; each footer section wrapped in `<nav>` with `aria-label`
+- **Collections System** — `useCollections` hook for creating/managing skill collections with localStorage persistence
+- **Follow System** — `useFollows` hook for following/unfollowing skill authors with localStorage persistence
+
+### Internationalization
+- **30+ new i18n keys** — `report`, `reportSubmitted`, `reportReason`, `reportSpam`, `reportAbuse`, `reportCopyright`, `reportOther`, `following`, `follow`, `unfollow`, `collections`, `myCollections`, `newCollection`, `collectionName`, `collectionDesc`, `addToCollection`, `noResults`, `tryDifferent`, `notifications`, `markAllRead`, `noNotifications`, `clearAll`, `viewMore`, `ago`, `filters`, `clearFilters`, `activeFilters`, `verified`, `official`, `screenshots`, `versionHistory`, `changelog`, `dependencies`, `noDependencies`
+- **`userProfile` section** — `userNotFound`, `goBack`, `publishedSkills`, `noPublishedSkills`, `noPublishedSkillsDesc`, `totalDownloads`, `totalStars`, `publishedCount`, `joinedAt`
+- **`search` section** — `title`, `subtitle`, `placeholder`, `recentSearches`, `clearRecent`, `noResults`, `noResultsDesc`, `agentSkills`, `promptTemplates`, `viewAllSkills`, `viewAllPrompts`, `suggestions`, `removeRecent`
+
+### New Files
+- `src/app/search/page.tsx` — Server component with Suspense boundary
+- `src/app/search/client.tsx` — Unified search with autocomplete
+- `src/app/users/[username]/page.tsx` — Public profile server component
+- `src/app/users/[username]/client.tsx` — Public profile client component
+- `src/components/shared/json-ld.tsx` — JSON-LD generator component
+- `src/components/shared/notification-bell.tsx` — Notification bell dropdown
+- `src/components/shared/onboarding-tooltip.tsx` — 3-step guided tour for new visitors
+- `src/hooks/use-notifications.ts` — Notification CRUD hook
+- `src/hooks/use-collections.ts` — Collection management hook
+- `src/hooks/use-follows.ts` — Follow management hook
+- `src/app/skills/[id]/loading.tsx` — Skill detail skeleton
+
+---
+
+## [v2.0.6] — 2026-05-08
+
+### Features
+- **Onboarding Tour** — First-time visitors see a 3-step guided tour (Welcome → Browse Skills → Search) with overlay mask, highlighted target areas, and tooltip cards; progress tracked via `localStorage`
+- **Improved Empty States** — `/prompts`, `/trending`, and `/tags` pages now show friendly empty states with icons, descriptive text, and action buttons when no results match filters
+
+### Internationalization
+- **New i18n keys** — `onboarding.skip`, `onboarding.next`, `onboarding.finish`, `onboarding.step1Title`, `onboarding.step1Desc`, `onboarding.step2Title`, `onboarding.step2Desc`, `onboarding.step3Title`, `onboarding.step3Desc`
+
+---
+
+## [v2.0.5] — 2026-05-08
+
+### Features
+- **Interactive Prompt Playground** — Prompt detail page now has a "Detail / Playground" tab system; the Playground tab lets users fill in `{{variable}}` placeholders inline and preview the fully-assembled prompt in the browser (client-side only, no API calls)
+- **Variable auto-detection** — Playground parses both `{{var}}` and `{var}` syntax from the prompt template, deduplicates, and generates labeled textarea inputs
+- **Online/Local switch in Playground** — Users can switch between online and local prompt versions with separate variable inputs
+- **Reset & Copy actions** — Playground includes Reset (clear all inputs), Copy Result, and Generate Preview buttons
+
+### Internationalization
+- **New i18n keys** — `common.detail`, `common.reset`, `common.generatePreview`, `common.previewPrompt`; `common.runPrompt` updated to "Run Prompt" / "运行 Prompt"
+
+---
+
 ## [v2.0.4] — 2026-05-07
 
 ### Accessibility

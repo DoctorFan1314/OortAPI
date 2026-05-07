@@ -136,8 +136,22 @@ export default function TrendingClient() {
       </div>
 
       {/* List */}
-      <div className="space-y-3">
-        {list.slice(0, visibleCount).map((item, i) => {
+      {list.length === 0 ? (
+        <div className="text-center py-20">
+          <TrendingUp className="h-12 w-12 text-muted-foreground/40 mx-auto mb-4" />
+          <p className="text-muted-foreground text-lg mb-1">{t.common.noResults}</p>
+          <p className="text-muted-foreground text-sm mb-6">{t.common.tryDifferent}</p>
+          <Link
+            href="/skills"
+            className="inline-block px-5 py-2 text-sm rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-secondary hover:border-primary/30 transition-colors"
+          >
+            {t.agentSkills.heroCta}
+          </Link>
+        </div>
+      ) : (
+        <>
+          <div className="space-y-3">
+            {list.slice(0, visibleCount).map((item, i) => {
           const rank = i + 1;
           return (
             <Link
@@ -171,16 +185,18 @@ export default function TrendingClient() {
             </Link>
           );
         })}
-      </div>
-      {list.length > visibleCount && (
-        <div className="text-center mt-10">
-          <button
-            onClick={() => setVisibleCount((prev) => prev + PAGE_SIZE)}
-            className="px-6 py-2.5 text-sm rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-secondary hover:border-primary/30 transition-colors"
-          >
-            {t.common.more} ({list.length - visibleCount})
-          </button>
-        </div>
+          </div>
+          {list.length > visibleCount && (
+            <div className="text-center mt-10">
+              <button
+                onClick={() => setVisibleCount((prev) => prev + PAGE_SIZE)}
+                className="px-6 py-2.5 text-sm rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-secondary hover:border-primary/30 transition-colors"
+              >
+                {t.common.more} ({list.length - visibleCount})
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

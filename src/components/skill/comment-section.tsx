@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { useToast } from "@/contexts/toast-context";
 import { useI18n } from "@/contexts/i18n-context";
@@ -9,7 +9,11 @@ import { STORAGE_KEYS } from "@/lib/storage-keys";
 import type { Comment } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Star, ThumbsUp, MessageSquare, Pencil, Trash2, X, Check } from "lucide-react";
+import { Star, ThumbsUp, MessageSquare, Pencil, Trash2, X, Check, Bold, Italic, Code, List } from "lucide-react";
+
+const MarkdownRenderer = lazy(() =>
+  import("@/components/shared/markdown-renderer").then((m) => ({ default: m.MarkdownRenderer }))
+);
 
 export function CommentSection({ skillId, skillTitle }: { skillId: string; skillTitle: string }) {
   const { user } = useAuth();
@@ -204,6 +208,7 @@ export function CommentSection({ skillId, skillTitle }: { skillId: string; skill
           className="bg-secondary border-border text-foreground placeholder:text-muted-foreground/50"
           disabled={!user}
         />
+        <p className="text-[10px] text-muted-foreground/50 mt-1">Markdown supported: **bold**, *italic*, `code`, - lists</p>
         <div className="flex justify-end">
           <Button onClick={handleSubmit} disabled={!user || !content.trim()} className="bg-primary text-primary-foreground hover:bg-primary/90">
             {t.comments.submitComment}
@@ -250,7 +255,11 @@ export function CommentSection({ skillId, skillTitle }: { skillId: string; skill
                   </div>
                 </div>
               ) : (
-                <p className="text-sm text-foreground mb-2 ml-11">{c.content}</p>
+                <div className="text-sm text-foreground mb-2 ml-11 prose prose-sm dark:prose-invert max-w-none">
+                  <Suspense fallback={<p>{c.content}</p>}>
+                    <MarkdownRenderer content={c.content} />
+                  </Suspense>
+                </div>
               )}
               <div className="ml-11 flex items-center gap-3">
                 <button

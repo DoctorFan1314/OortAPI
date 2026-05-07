@@ -156,7 +156,15 @@ export default function PromptsClient() {
 
       {filtered.length === 0 ? (
         <div className="text-center py-20">
-          <p className="text-muted-foreground text-lg mb-2">{t.prompts.emptySearch}</p>
+          <Search className="h-12 w-12 text-muted-foreground/40 mx-auto mb-4" />
+          <p className="text-muted-foreground text-lg mb-1">{t.prompts.emptySearch}</p>
+          <p className="text-muted-foreground text-sm mb-6">{t.common.tryDifferent}</p>
+          <button
+            onClick={() => { setQuery(""); setCategory(t.common.all); setDifficulty("__all__"); setSortBy("trending"); router.replace("/prompts", { scroll: false }); }}
+            className="px-5 py-2 text-sm rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-secondary hover:border-primary/30 transition-colors"
+          >
+            {t.common.clearFilters}
+          </button>
         </div>
       ) : (
         <>

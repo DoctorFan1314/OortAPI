@@ -9,6 +9,21 @@ export interface Dictionary {
     or: string; closeSearch: string; toggleTheme: string; switchLanguage: string;
     openNavigation: string; navigationMenu: string; close: string; backToTop: string;
     popular: string;
+    // New keys
+    report: string; reportSubmitted: string; reportReason: string; reportSpam: string;
+    reportAbuse: string; reportCopyright: string; reportOther: string;
+    following: string; follow: string; unfollow: string;
+    collections: string; myCollections: string; newCollection: string;
+    collectionName: string; collectionDesc: string; addToCollection: string;
+    noResults: string; tryDifferent: string;
+    notifications: string; markAllRead: string; noNotifications: string;
+    clearAll: string; viewMore: string; ago: string;
+    filters: string; clearFilters: string; activeFilters: string;
+    verified: string; official: string;
+    playground: string; runPrompt: string; running: string;
+    reset: string; detail: string; generatePreview: string; previewPrompt: string;
+    screenshots: string; versionHistory: string; changelog: string;
+    dependencies: string; noDependencies: string;
   };
   home: {
     featuredTitle: string; featuredSubtitle: string;
@@ -258,6 +273,12 @@ export interface Dictionary {
     zoomIn: string; zoomOut: string; confirm: string; cancel: string;
     dragToAdjust: string;
   };
+  userProfile: {
+    userNotFound: string; goBack: string; publishedSkills: string;
+    noPublishedSkills: string; noPublishedSkillsDesc: string;
+    totalDownloads: string; totalStars: string; publishedCount: string;
+    joinedAt: string;
+  };
   admin: {
     title: string; pendingSubmissions: string; userManage: string; skillAnalytics: string;
     commentManage: string; approve: string; reject: string; reviewNote: string;
@@ -267,5 +288,19 @@ export interface Dictionary {
     noAccess: string; noAccessDesc: string; backHome: string;
     reviewNotePlaceholder: string; adminSubtitle: string;
     noComments: string; skillPrefix: string;
+  };
+  search: {
+    title: string; subtitle: string; placeholder: string;
+    recentSearches: string; clearRecent: string;
+    noResults: string; noResultsDesc: string;
+    agentSkills: string; promptTemplates: string;
+    viewAllSkills: string; viewAllPrompts: string;
+    suggestions: string; removeRecent: string;
+  };
+  onboarding: {
+    skip: string; next: string; finish: string;
+    step1Title: string; step1Desc: string;
+    step2Title: string; step2Desc: string;
+    step3Title: string; step3Desc: string;
   };
 }

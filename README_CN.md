@@ -186,6 +186,7 @@ ai-skills-hub/
 | Prompt 模板 | ✅ | 28个模板，搜索、筛选、排序 |
 | 一键复制 Prompt | ✅ | 在线/本地版本，剪贴板 API |
 | 变量填充 | ✅ | 实时 Prompt 模板更新 |
+| 交互式 Prompt 试用 | ✅ | 填写变量并在浏览器中预览组装后的完整 Prompt（纯客户端） |
 | 用户认证 | ✅ | 基于 localStorage 的登录/注册/登出 |
 | 点赞/收藏 | ✅ | localStorage 持久化 |
 | 国际化 | ✅ | 中文/英文，基于 Context |
@@ -255,6 +256,29 @@ ai-skills-hub/
 | glass-card-hover 优化 | ✅ | `transition: all` 改为仅过渡 `transform, border-color, box-shadow` |
 | 删除确认 i18n | ✅ | 支持输入 "DELETE"（英文）或 "删除"（中文）确认删除 |
 | Profile 页面 Suspense | ✅ | `ProfileClient` 包裹在 `<Suspense>` + 骨架屏 fallback 中 |
+| 统一搜索页面 | ✅ | `/search` 跨市场搜索，自动补全、最近搜索、键盘导航、ARIA combobox |
+| 通知系统 | ✅ | 铃铛图标带未读徽章、下拉框、标记已读、按用户 localStorage 持久化 |
+| 公开用户主页 | ✅ | `/users/[username]` 展示头像、简介、统计、已发布技能 |
+| JSON-LD 结构化数据 | ✅ | SoftwareApplication、CreativeWork、BreadcrumbList、Organization、WebSite |
+| 技能详情页：分享 | ✅ | 移动端 navigator.share()，桌面端剪贴板回退 |
+| 技能详情页：截图 | ✅ | 截图画廊带灯箱放大 |
+| 技能详情页：依赖项 | ✅ | 侧边栏依赖项列表 |
+| 技能详情页：认证徽章 | ✅ | BadgeCheck 图标标记已认证技能 |
+| 技能详情页：举报 | ✅ | 举报模态框带单选按钮原因 |
+| 技能详情页：关注作者 | ✅ | 关注/取消关注技能作者 |
+| 技能详情页：收藏集 | ✅ | 添加到用户自建收藏集 |
+| 技能详情页：版本历史 | ✅ | 第 4 个 Tab 带垂直时间线 |
+| URL 同步筛选 | ✅ | 技能页筛选条件同步到 URL 查询参数 |
+| Hero 交错入场动画 | ✅ | 带交错延迟的滑入入场动画 |
+| Tab 渐变动画 | ✅ | Tab 面板切换时渐入 |
+| 评论 Markdown | ✅ | 评论支持 Markdown 语法渲染 |
+| 收藏集系统 | ✅ | 创建、管理、浏览技能收藏集 |
+| 关注系统 | ✅ | 关注/取消关注作者，localStorage 持久化 |
+| 新用户引导 | ✅ | 首次访问 3 步引导流程 |
+| 打印样式 | ✅ | 打印优化 CSS，隐藏装饰元素 |
+| CSS focus-visible | ✅ | 全局键盘焦点环样式 |
+| reduced-motion 保护 | ✅ | 所有 CSS 动画尊重 prefers-reduced-motion |
+| 亮色模式毛玻璃 | ✅ | 背景模糊配合正确的亮色模式配色 |
 
 ---
 

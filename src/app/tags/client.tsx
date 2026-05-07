@@ -55,7 +55,16 @@ export default function TagsClient() {
             </Link>
           ))
         ) : (
-          <p className="text-sm text-muted-foreground py-8">{t.prompts.emptySearch}</p>
+          <div className="text-center py-8 w-full">
+            <Search className="h-10 w-10 text-muted-foreground/40 mx-auto mb-3" />
+            <p className="text-sm text-muted-foreground mb-3">{t.common.noResults}</p>
+            <button
+              onClick={() => setSearchQuery("")}
+              className="px-4 py-1.5 text-xs rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-secondary hover:border-primary/30 transition-colors"
+            >
+              {t.common.clearFilters}
+            </button>
+          </div>
         )}
       </div>
     </div>

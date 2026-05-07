@@ -56,13 +56,13 @@ export function Footer() {
             </div>
           </div>
           {footerSections.map((section) => (
-            <div key={section.id}>
+            <nav key={section.id} aria-label={`${t.footer.browse}: ${section.title}`}>
               <h3 className="text-sm font-medium text-foreground mb-4">{section.title}</h3>
               <ul className="space-y-2.5">
                 {section.links.map((link) => (
                   <li key={link.label}>
                     {link.disabled ? (
-                      <span className="text-sm text-muted-foreground/40 cursor-default" title={t.footer.comingSoon || "Coming soon"}>{link.label}</span>
+                      <span className="text-sm text-muted-foreground/40 cursor-default line-through" aria-disabled="true" title={t.footer.comingSoon || "Coming soon"}>{link.label}</span>
                     ) : (
                       <Link href={link.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                         {link.label}
@@ -71,7 +71,7 @@ export function Footer() {
                   </li>
                 ))}
               </ul>
-            </div>
+            </nav>
           ))}
         </div>
         <div className="mt-10 pt-6 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">

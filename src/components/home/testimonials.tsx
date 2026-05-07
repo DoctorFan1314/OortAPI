@@ -17,7 +17,7 @@ export function Testimonials() {
         {testimonials.slice(0, 6).map((item) => (
           <div key={item.id} className="glass-card p-5">
             <div className="flex items-center gap-3 mb-3">
-              <div className="h-10 w-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-sm font-bold text-primary">
+              <div className="h-10 w-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-sm font-bold text-primary" role="img" aria-label={item.name}>
                 {item.avatar}
               </div>
               <div>
@@ -26,9 +26,9 @@ export function Testimonials() {
               </div>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed mb-3">&ldquo;{item.content}&rdquo;</p>
-            <div className="flex gap-0.5">
+            <div className="flex gap-0.5" aria-label={`${t.comments.rating}: ${item.rating}/5`}>
               {Array.from({ length: item.rating }).map((_, i) => (
-                <Star key={i} className="h-3.5 w-3.5 fill-yellow-500 text-yellow-500" />
+                <Star key={i} className="h-3.5 w-3.5 fill-yellow-500 text-yellow-500" aria-hidden="true" />
               ))}
             </div>
           </div>

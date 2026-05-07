@@ -187,6 +187,7 @@ ai-skills-hub/
 | Prompt templates | ✅ | 28 templates, search, filter, sort |
 | One-click prompt copy | ✅ | Online/Local versions, clipboard API |
 | Variable fill | ✅ | Real-time prompt template update |
+| Interactive Prompt Playground | ✅ | Fill variables and preview assembled prompt in-browser (client-side) |
 | User auth | ✅ | localStorage-based login/register/logout |
 | Like/Bookmark | ✅ | Persisted via localStorage |
 | i18n | ✅ | Chinese/English, context-based |
@@ -256,6 +257,29 @@ ai-skills-hub/
 | Glass card hover optimization | ✅ | `transition: all` changed to specific `transform, border-color, box-shadow` properties |
 | Delete confirmation i18n | ✅ | Accepts both "DELETE" (English) and "删除" (Chinese) for account deletion |
 | Profile page Suspense | ✅ | `ProfileClient` wrapped in `<Suspense>` with skeleton fallback |
+| Unified search | ✅ | `/search` page with autocomplete, recent history, keyboard nav, ARIA combobox |
+| Notification system | ✅ | Bell icon with unread badge, dropdown, mark-as-read, per-user localStorage |
+| Public user profiles | ✅ | `/users/[username]` with avatar, bio, stats, published skills |
+| JSON-LD structured data | ✅ | SoftwareApplication, CreativeWork, BreadcrumbList, Organization, WebSite |
+| Skill detail: share | ✅ | navigator.share() on mobile, clipboard fallback on desktop |
+| Skill detail: screenshots | ✅ | Screenshot gallery with lightbox zoom |
+| Skill detail: dependencies | ✅ | Sidebar dependency list |
+| Skill detail: verified badge | ✅ | BadgeCheck icon for verified skills |
+| Skill detail: report | ✅ | Report modal with radio button reasons |
+| Skill detail: follow author | ✅ | Follow/unfollow skill authors |
+| Skill detail: collections | ✅ | Add to user-created collections |
+| Skill detail: version history | ✅ | 4th tab with vertical timeline of versions |
+| URL-synced filters | ✅ | Skills page filters synced to URL query params |
+| Hero stagger animation | ✅ | Slide-up entrance animation with staggered delays |
+| Tab crossfade animation | ✅ | Fade-in on tab panel switch |
+| Comment Markdown | ✅ | Comments render Markdown with syntax support |
+| Collections system | ✅ | Create, manage, and browse skill collections |
+| Follow system | ✅ | Follow/unfollow authors with localStorage persistence |
+| Onboarding tour | ✅ | 3-step guided tour for first-time visitors |
+| Print styles | ✅ | Print-optimized CSS with hidden decorative elements |
+| CSS focus-visible | ✅ | Global keyboard focus ring styles |
+| Reduced-motion guard | ✅ | All CSS animations respect prefers-reduced-motion |
+| Light mode glass-card | ✅ | Backdrop blur with proper light-mode colors |
 
 ---
 

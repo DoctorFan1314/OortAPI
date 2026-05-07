@@ -2,13 +2,15 @@
 
 import { useState, useEffect, lazy, Suspense } from "react";
 import Link from "next/link";
-import { getAgentSkillById } from "@/lib/mock-agent-skills";
+import { getAgentSkillById, agentSkills } from "@/lib/mock-agent-skills";
 import { STORAGE_KEYS } from "@/lib/storage-keys";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Download, Star, Copy, Check,
-  Terminal, FileCode, Clock, ThumbsUp, Reply, X
+  Terminal, FileCode, Clock, ThumbsUp, Reply, X,
+  Search, ArrowLeft,
+  Share2, BadgeCheck, UserPlus, UserCheck, AlertTriangle, ChevronDown, Image as ImageIcon,
 } from "lucide-react";
 import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { MarkdownRenderer, CopyButton, codeTheme } from "@/components/shared/markdown-renderer";
@@ -16,6 +18,8 @@ import { useI18n } from "@/contexts/i18n-context";
 import { useToast } from "@/contexts/toast-context";
 import { useAuth } from "@/contexts/auth-context";
 import { formatNumber } from "@/lib/utils";
+import { useFollows } from "@/hooks/use-follows";
+import { useCollections } from "@/hooks/use-collections";
 
 const SyntaxHighlighter = lazy(() =>
   Promise.all([
@@ -75,7 +79,9 @@ export default function AgentSkillDetailClient({ id }: { id: string }) {
   const { t } = useI18n();
   const { toast } = useToast();
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<"intro" | "files" | "feedback">("intro");
+  const { isFollowing, toggleFollow } = useFollows();
+  const { collections, addToCollection, createCollection } = useCollections();
+  const [activeTab, setActiveTab] = useState<"intro" | "files" | "feedback" | "versions">("intro");
   const [activeFile, setActiveFile] = useState<string>("");
   const [copiedInstall, setCopiedInstall] = useState(false);
   const [commentText, setCommentText] = useState("");
@@ -84,6 +90,13 @@ export default function AgentSkillDetailClient({ id }: { id: string }) {
   const [localComments, setLocalComments] = useState<LocalComment[]>(defaultComments);
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const [replyToUser, setReplyToUser] = useState<string | null>(null);
+  const [showReport, setShowReport] = useState(false);
+  const [reportReason, setReportReason] = useState<"spam" | "abuse" | "copyright" | "other">("spam");
+  const [reportDesc, setReportDesc] = useState("");
+  const [showCollections, setShowCollections] = useState(false);
+  const [newCollectionName, setNewCollectionName] = useState("");
+  const [showNewCollection, setShowNewCollection] = useState(false);
+  const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
 
   // Load persisted comments from localStorage
   useEffect(() => {
@@ -127,22 +140,120 @@ export default function AgentSkillDetailClient({ id }: { id: string }) {
     toast(t.comments.title, "success");
   }
 
+  function handleShare() {
+    const shareUrl = typeof window !== "undefined" ? window.location.href : "";
+    if (navigator.share) {
+      navigator.share({ title: skill?.name, url: shareUrl }).catch(() => {
+        navigator.clipboard.writeText(shareUrl).then(() => {
+          toast(t.common.copied, "success");
+        });
+      });
+    } else {
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        toast(t.common.copied, "success");
+      });
+    }
+  }
+
+  function handleSubmitReport() {
+    try {
+      const existing = localStorage.getItem(STORAGE_KEYS.reports);
+      const reports: unknown[] = existing ? JSON.parse(existing) : [];
+      reports.push({
+        id: `rpt-${Date.now()}`,
+        targetType: "skill",
+        targetId: skill?.id,
+        reason: reportReason,
+        description: reportDesc,
+        reporterEmail: user?.email || "anonymous",
+        timestamp: new Date().toISOString(),
+        status: "pending",
+      });
+      localStorage.setItem(STORAGE_KEYS.reports, JSON.stringify(reports));
+    } catch { /* ignore */ }
+    setShowReport(false);
+    setReportReason("spam");
+    setReportDesc("");
+    toast(t.common.reportSubmitted, "success");
+  }
+
   if (!skill) {
+    const trendingSkills = agentSkills.filter(s => s.trending).slice(0, 4);
     return (
-      <div className="mx-auto max-w-7xl px-4 py-20 text-center">
-        <p className="text-muted-foreground text-lg">{t.agentSkills.notFound}</p>
-        <Link href="/skills" className="text-primary mt-4 inline-block hover:underline">{t.agentSkills.backToList}</Link>
+      <div className="mx-auto max-w-7xl px-4 py-20">
+        <div className="text-center mb-12">
+          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-secondary/50">
+            <Search className="h-10 w-10 text-muted-foreground" />
+          </div>
+          <h2 className="text-2xl font-bold text-foreground mb-2">{t.agentSkills.notFound}</h2>
+          <p className="text-muted-foreground text-sm max-w-md mx-auto">
+            The skill you&apos;re looking for may have been removed or doesn&apos;t exist. Try searching or browse trending skills below.
+          </p>
+        </div>
+
+        {trendingSkills.length > 0 && (
+          <div className="mb-12">
+            <h3 className="text-lg font-semibold text-foreground mb-4 text-center">Trending Skills</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {trendingSkills.map((s) => (
+                <Link
+                  key={s.id}
+                  href={`/skills/${s.id}`}
+                  className="glass-card p-5 group hover:border-primary/40 transition-all"
+                >
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center text-sm font-bold text-primary shrink-0">
+                      {s.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate group-hover:text-primary transition-colors">{s.name}</p>
+                      <p className="text-xs text-muted-foreground">{s.author}</p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground line-clamp-2 mb-3">{s.description}</p>
+                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                    <span className="flex items-center gap-1"><Download className="h-3 w-3" />{formatNumber(s.downloads)}</span>
+                    <span className="flex items-center gap-1"><Star className="h-3 w-3" />{formatNumber(s.stars)}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="flex items-center justify-center gap-3">
+          <Link href="/skills">
+            <Button variant="outline" className="border-border text-foreground hover:bg-secondary">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              {t.agentSkills.backToList}
+            </Button>
+          </Link>
+          <Link href="/search">
+            <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
+              <Search className="h-4 w-4 mr-2" />
+              Search
+            </Button>
+          </Link>
+        </div>
       </div>
     );
   }
 
   const fileNames = Object.keys(skill.files);
   const currentFile = activeFile || fileNames[0] || "";
+  const followingAuthor = isFollowing(skill.developer);
+
+  const mockVersions = [
+    { version: skill.version, date: skill.lastUpdated, changelog: "Current version", author: skill.developer },
+    { version: "1.0.0", date: "2026-01-15", changelog: "Initial release", author: skill.developer },
+  ];
+  const versions = skill.versions && skill.versions.length > 0 ? skill.versions : mockVersions;
 
   const tabs = [
     { key: "intro" as const, label: t.agentSkills.skillIntro },
     { key: "files" as const, label: t.agentSkills.skillFiles },
     { key: "feedback" as const, label: t.agentSkills.feedback },
+    { key: "versions" as const, label: t.common.versionHistory },
   ];
 
   return (
@@ -151,13 +262,33 @@ export default function AgentSkillDetailClient({ id }: { id: string }) {
 
       {/* Header section */}
       <div className="mb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-3">{skill.name}</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-3 flex items-center gap-2">
+          {skill.name}
+          {skill.verified && (
+            <span title={t.common.verified} className="inline-flex items-center">
+              <BadgeCheck className="h-6 w-6 text-blue-500" />
+            </span>
+          )}
+        </h1>
 
         {/* Stats row */}
         <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground mb-4">
           <span className="flex items-center gap-1.5"><Download className="h-4 w-4" />{formatNumber(skill.downloads)}</span>
           <span className="flex items-center gap-1.5"><Star className="h-4 w-4" />{formatNumber(skill.stars)}</span>
           <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" />{skill.lastUpdated}</span>
+        </div>
+
+        {/* Share button */}
+        <div className="mb-4">
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-border text-muted-foreground hover:text-foreground hover:bg-secondary"
+            onClick={handleShare}
+          >
+            <Share2 className="h-4 w-4 mr-2" />
+            {t.common.share}
+          </Button>
         </div>
 
         {/* Collection */}
@@ -206,9 +337,34 @@ export default function AgentSkillDetailClient({ id }: { id: string }) {
       {/* Tab: Skill Intro */}
       {activeTab === "intro" && (
         <div role="tabpanel" id="detail-tabpanel-intro" aria-labelledby="detail-tab-intro" className="grid lg:grid-cols-[1fr_280px] gap-6">
-          {/* README content */}
-          <div className="glass-card p-6">
-            <MarkdownRenderer content={skill.readme} />
+          {/* Main content */}
+          <div className="space-y-6">
+            {/* Screenshots gallery */}
+            {skill.screenshots && skill.screenshots.length > 0 && (
+              <div className="glass-card p-5">
+                <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <ImageIcon className="h-4 w-4" />
+                  {t.common.screenshots}
+                </h3>
+                <div className="flex gap-3 overflow-x-auto pb-2">
+                  {skill.screenshots.map((src, i) => (
+                    <img
+                      key={i}
+                      src={src}
+                      alt={`${skill.name} screenshot ${i + 1}`}
+                      loading="lazy"
+                      className="h-48 rounded-lg border border-border cursor-pointer hover:border-primary/50 transition-colors shrink-0 object-cover"
+                      onClick={() => setLightboxSrc(src)}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* README content */}
+            <div className="glass-card p-6">
+              <MarkdownRenderer content={skill.readme} />
+            </div>
           </div>
 
           {/* Sidebar: source + metadata */}
@@ -272,17 +428,146 @@ export default function AgentSkillDetailClient({ id }: { id: string }) {
                     ["name", skill.name],
                     ["description", skill.description.slice(0, 60) + "..."],
                     ["category", skill.category],
-                    [t.agentSkills.developer, skill.developer],
+                    [t.agentSkills.developer, (
+                      <span key="dev" className="flex items-center gap-2">
+                        {skill.developer}
+                        <button
+                          onClick={() => toggleFollow(skill.developer)}
+                          className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full border transition-colors ${
+                            followingAuthor
+                              ? "bg-primary/10 border-primary/30 text-primary"
+                              : "border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"
+                          }`}
+                        >
+                          {followingAuthor ? (
+                            <><UserCheck className="h-3 w-3" />{t.common.following}</>
+                          ) : (
+                            <><UserPlus className="h-3 w-3" />{t.common.follow}</>
+                          )}
+                        </button>
+                      </span>
+                    )],
                     [t.agentSkills.version, skill.version],
                     [t.agentSkills.license, skill.license],
                   ].map(([key, val]) => (
-                    <tr key={key} className="border-b border-border last:border-0">
+                    <tr key={String(key)} className="border-b border-border last:border-0">
                       <td className="py-2.5 pr-3 text-muted-foreground align-top whitespace-nowrap">{key}</td>
                       <td className="py-2.5 text-foreground break-all">{val}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+
+              {/* Dependencies section */}
+              <div className="mt-4 pt-4 border-t border-border">
+                <h4 className="text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wide">{t.common.dependencies}</h4>
+                {skill.dependencies && skill.dependencies.length > 0 ? (
+                  <ul className="space-y-1.5">
+                    {skill.dependencies.map((dep) => (
+                      <li key={dep.name} className="flex items-center justify-between text-sm">
+                        <Link
+                          href={`/skills?search=${encodeURIComponent(dep.name)}`}
+                          className="text-primary hover:underline truncate"
+                        >
+                          {dep.name}
+                        </Link>
+                        <span className="text-xs text-muted-foreground ml-2 shrink-0">{dep.version}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-xs text-muted-foreground">{t.common.noDependencies}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Add to Collection */}
+            <div className="glass-card p-5">
+              <div className="relative">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full border-border text-foreground hover:bg-secondary"
+                  onClick={() => setShowCollections(!showCollections)}
+                >
+                  {t.common.addToCollection}
+                  <ChevronDown className="h-3.5 w-3.5 ml-auto" />
+                </Button>
+                {showCollections && (
+                  <div className="absolute z-20 bottom-full mb-1 left-0 w-full glass-card border border-border rounded-lg shadow-lg overflow-hidden">
+                    <div className="max-h-48 overflow-y-auto">
+                      {collections.length > 0 ? (
+                        collections.map((col) => (
+                          <button
+                            key={col.id}
+                            className="w-full text-left px-3 py-2 text-sm hover:bg-secondary transition-colors text-foreground"
+                            onClick={() => {
+                              addToCollection(col.id, skill.id);
+                              setShowCollections(false);
+                              toast(`${skill.name} → ${col.name}`, "success");
+                            }}
+                          >
+                            {col.name}
+                          </button>
+                        ))
+                      ) : (
+                        <p className="px-3 py-2 text-xs text-muted-foreground">{t.common.noData}</p>
+                      )}
+                    </div>
+                    <div className="border-t border-border">
+                      {showNewCollection ? (
+                        <div className="p-2 flex gap-1">
+                          <input
+                            type="text"
+                            value={newCollectionName}
+                            onChange={(e) => setNewCollectionName(e.target.value)}
+                            placeholder={t.common.collectionName}
+                            className="flex-1 px-2 py-1 text-xs bg-secondary border border-border rounded text-foreground placeholder:text-muted-foreground focus:outline-none"
+                            autoFocus
+                          />
+                          <Button
+                            size="sm"
+                            className="h-6 px-2 text-xs"
+                            onClick={() => {
+                              if (newCollectionName.trim()) {
+                                const col = createCollection(newCollectionName.trim(), "");
+                                if (!col) return;
+                                addToCollection(col.id, skill.id);
+                                setNewCollectionName("");
+                                setShowNewCollection(false);
+                                setShowCollections(false);
+                                toast(`${skill.name} → ${col.name}`, "success");
+                              }
+                            }}
+                          >
+                            {t.common.confirm}
+                          </Button>
+                        </div>
+                      ) : (
+                        <button
+                          className="w-full text-left px-3 py-2 text-xs text-primary hover:bg-secondary transition-colors"
+                          onClick={() => setShowNewCollection(true)}
+                        >
+                          + {t.common.newCollection}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Report button */}
+            <div className="glass-card p-5">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full text-muted-foreground hover:text-red-400 hover:bg-red-500/5"
+                onClick={() => setShowReport(true)}
+              >
+                <AlertTriangle className="h-4 w-4 mr-2" />
+                {t.common.report}
+              </Button>
             </div>
           </div>
         </div>
@@ -484,6 +769,130 @@ export default function AgentSkillDetailClient({ id }: { id: string }) {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Tab: Version History */}
+      {activeTab === "versions" && (
+        <div role="tabpanel" id="detail-tabpanel-versions" aria-labelledby="detail-tab-versions" className="max-w-2xl">
+          <div className="glass-card p-6">
+            <div className="relative">
+              {/* Vertical timeline line */}
+              <div className="absolute left-[11px] top-3 bottom-3 w-px bg-border" />
+
+              <div className="space-y-6">
+                {versions.map((v, i) => (
+                  <div key={`${v.version}-${i}`} className="relative flex gap-4">
+                    {/* Timeline dot */}
+                    <div className={`relative z-10 mt-1 h-[22px] w-[22px] rounded-full border-2 shrink-0 ${
+                      i === 0
+                        ? "bg-primary border-primary"
+                        : "bg-background border-border"
+                    }`}>
+                      {i === 0 && (
+                        <div className="absolute inset-1 rounded-full bg-primary-foreground" />
+                      )}
+                    </div>
+
+                    {/* Version content */}
+                    <div className="flex-1 pb-2">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className={`text-sm font-semibold ${i === 0 ? "text-foreground" : "text-muted-foreground"}`}>
+                          v{v.version}
+                        </span>
+                        {i === 0 && (
+                          <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-primary/10 text-primary border-primary/20">
+                            Latest
+                          </Badge>
+                        )}
+                        <span className="text-xs text-muted-foreground ml-auto">{v.date}</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{v.changelog}</p>
+                      <p className="text-xs text-muted-foreground/60 mt-1">by {v.author}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Report modal overlay */}
+      {showReport && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+          onClick={() => setShowReport(false)}
+        >
+          <div
+            className="glass-card w-full max-w-md mx-4 p-6 border border-border"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-foreground">{t.common.report}</h3>
+              <button onClick={() => setShowReport(false)} className="text-muted-foreground hover:text-foreground">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <p className="text-sm text-muted-foreground mb-4">{t.common.reportReason}</p>
+
+            <div className="space-y-2 mb-4">
+              {(["spam", "abuse", "copyright", "other"] as const).map((reason) => (
+                <label key={reason} className="flex items-center gap-3 cursor-pointer group">
+                  <input
+                    type="radio"
+                    name="report-reason"
+                    value={reason}
+                    checked={reportReason === reason}
+                    onChange={() => setReportReason(reason)}
+                    className="accent-primary"
+                  />
+                  <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">
+                    {t.common[`report${reason.charAt(0).toUpperCase() + reason.slice(1)}` as keyof typeof t.common]}
+                  </span>
+                </label>
+              ))}
+            </div>
+
+            <textarea
+              value={reportDesc}
+              onChange={(e) => setReportDesc(e.target.value)}
+              placeholder={t.common.reportReason}
+              className="w-full px-3 py-2 rounded-lg bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 resize-none min-h-[60px] mb-4"
+            />
+
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" size="sm" onClick={() => setShowReport(false)}>
+                {t.common.cancel}
+              </Button>
+              <Button size="sm" className="bg-red-600 hover:bg-red-700 text-white" onClick={handleSubmitReport}>
+                {t.common.report}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Lightbox overlay for screenshots */}
+      {lightboxSrc && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+          onClick={() => setLightboxSrc(null)}
+        >
+          <div className="relative max-w-[90vw] max-h-[90vh]">
+            <button
+              onClick={() => setLightboxSrc(null)}
+              className="absolute -top-10 right-0 text-white/70 hover:text-white"
+            >
+              <X className="h-6 w-6" />
+            </button>
+            <img
+              src={lightboxSrc}
+              alt="Screenshot"
+              className="max-w-full max-h-[90vh] rounded-lg object-contain"
+            />
           </div>
         </div>
       )}

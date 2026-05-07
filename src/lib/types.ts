@@ -156,4 +156,55 @@ export interface AgentSkill {
   tags: string[];
   featured: boolean;
   trending: boolean;
+  // New fields
+  screenshots?: string[];
+  dependencies?: { name: string; version: string }[];
+  verified?: boolean;
+  platform?: string[];
+  versions?: AgentSkillVersion[];
+}
+
+export interface AgentSkillVersion {
+  version: string;
+  date: string;
+  changelog: string;
+  author: string;
+}
+
+export interface Notification {
+  id: string;
+  type: "comment_reply" | "skill_update" | "submission_status" | "like" | "follow" | "system";
+  title: string;
+  message: string;
+  timestamp: string;
+  read: boolean;
+  link?: string;
+  userId: string;
+}
+
+export interface UserCollection {
+  id: string;
+  name: string;
+  description: string;
+  skillIds: string[];
+  createdAt: string;
+  userId: string;
+  isPublic: boolean;
+}
+
+export interface UserFollow {
+  followerEmail: string;
+  followingAuthor: string;
+  timestamp: string;
+}
+
+export interface Report {
+  id: string;
+  targetType: "skill" | "comment" | "prompt";
+  targetId: string;
+  reason: "spam" | "abuse" | "copyright" | "other";
+  description: string;
+  reporterEmail: string;
+  timestamp: string;
+  status: "pending" | "reviewed" | "resolved";
 }

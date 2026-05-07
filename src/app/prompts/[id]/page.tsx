@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getSkillById } from "@/lib/mock-data";
 import SkillDetailClient from "./client";
+import { JsonLd, generatePromptJsonLd, generateBreadcrumbJsonLd } from "@/components/shared/json-ld";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
@@ -26,28 +27,27 @@ export default async function PromptDetailPage({ params }: { params: Promise<{ i
   const skill = getSkillById(id);
   if (!skill) notFound();
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: skill.title,
-    description: skill.subtitle,
-    author: { "@type": "Organization", name: "AI Skills Hub" },
-    datePublished: `${skill.lastUpdated.replace(".", "-")}-01`,
-    dateModified: `${skill.lastUpdated.replace(".", "-")}-01`,
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: skill.rating,
-      bestRating: 5,
-      ratingCount: skill.usageCount,
-    },
-  };
+  const promptJsonLd = generatePromptJsonLd({
+    id: skill.id,
+    title: skill.title,
+    subtitle: skill.subtitle,
+    category: skill.category,
+    rating: skill.rating,
+    usageCount: skill.usageCount,
+    difficulty: skill.difficulty,
+    tags: skill.tags,
+  });
+
+  const breadcrumbJsonLd = generateBreadcrumbJsonLd([
+    { name: "Home", url: "https://ai-skills-hub.vercel.app" },
+    { name: "Prompts", url: "https://ai-skills-hub.vercel.app/prompts" },
+    { name: skill.title },
+  ]);
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={promptJsonLd} />
+      <JsonLd data={breadcrumbJsonLd} />
       <SkillDetailClient id={id} />
     </>
   );

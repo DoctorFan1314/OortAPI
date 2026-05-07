@@ -20,6 +20,14 @@ export function FeaturedSection({ tab, onTabChange }: { tab: "agent" | "prompt";
       e.preventDefault();
       onTabChange(tab === "agent" ? "prompt" : "agent");
     }
+    if (e.key === "Home") {
+      e.preventDefault();
+      onTabChange("agent");
+    }
+    if (e.key === "End") {
+      e.preventDefault();
+      onTabChange("prompt");
+    }
   }, [tab, onTabChange]);
 
   return (
@@ -75,7 +83,8 @@ export function FeaturedSection({ tab, onTabChange }: { tab: "agent" | "prompt";
         role="tabpanel"
         id={tab === "agent" ? "tabpanel-agent" : "tabpanel-prompt"}
         aria-labelledby={tab === "agent" ? "tab-agent" : "tab-prompt"}
-        className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+        className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 tab-panel-enter"
+        key={tab}
       >
         {tab === "agent"
           ? trendingAgents.map((s) => <AgentSkillCard key={s.id} skill={s} />)

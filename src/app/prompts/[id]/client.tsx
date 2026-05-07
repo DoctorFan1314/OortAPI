@@ -8,7 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { Star, Users, Clock, Copy, Check, ThumbsUp, Bookmark, Share2, ArrowLeft, ChevronDown, ChevronUp, History } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Star, Users, Clock, Copy, Check, ThumbsUp, Bookmark, Share2, ArrowLeft, ChevronDown, ChevronUp, History, RotateCcw, Play } from "lucide-react";
 import { useUserStorage } from "@/hooks/use-user-storage";
 import { STORAGE_KEYS } from "@/lib/storage-keys";
 import { useAuth } from "@/contexts/auth-context";
@@ -51,6 +52,12 @@ export default function SkillDetailClient({ id }: { id: string }) {
   const [showVersions, setShowVersions] = useState(false);
   const { user } = useAuth();
   const { t } = useI18n();
+
+  // Playground state
+  const [playgroundVars, setPlaygroundVars] = useState<Record<string, string>>({});
+  const [playgroundPreview, setPlaygroundPreview] = useState("");
+  const [playgroundCopied, setPlaygroundCopied] = useState(false);
+  const [playgroundTab, setPlaygroundTab] = useState<"online" | "local">("online");
 
   const liked = likedIds.includes(id);
   const bookmarked = bookmarkedIds.includes(id);
@@ -108,6 +115,49 @@ export default function SkillDetailClient({ id }: { id: string }) {
   const promptOnline = buildPrompt(skill.promptOnline);
   const promptLocal = buildPrompt(skill.promptLocal);
 
+  // Parse {{var}} and {var} variables from prompt text, deduplicated
+  const parseVariables = (template: string): string[] => {
+    const regex = /\{\{(.+?)\}\}|\{(.+?)\}/g;
+    const vars: string[] = [];
+    const seen = new Set<string>();
+    let match;
+    while ((match = regex.exec(template)) !== null) {
+      const name = match[1] || match[2];
+      if (!seen.has(name)) {
+        seen.add(name);
+        vars.push(name);
+      }
+    }
+    return vars;
+  };
+
+  const playgroundTemplate = playgroundTab === "online" ? skill.promptOnline : skill.promptLocal;
+  const playgroundVariables = parseVariables(playgroundTemplate);
+
+  const generatePlaygroundPreview = () => {
+    let result = playgroundTemplate;
+    for (const [key, value] of Object.entries(playgroundVars)) {
+      if (value) {
+        result = result.replaceAll(`{{${key}}}`, value);
+        result = result.replaceAll(`{${key}}`, value);
+      }
+    }
+    setPlaygroundPreview(result);
+  };
+
+  const resetPlayground = () => {
+    setPlaygroundVars({});
+    setPlaygroundPreview("");
+  };
+
+  const handlePlaygroundCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(playgroundPreview);
+      setPlaygroundCopied(true);
+      setTimeout(() => setPlaygroundCopied(false), 2000);
+    } catch { /* ignore */ }
+  };
+
   async function handleShare() {
     const url = window.location.href;
     if (navigator.share) {
@@ -145,6 +195,17 @@ export default function SkillDetailClient({ id }: { id: string }) {
         </div>
       </div>
 
+      {/* Main content tabs: Detail / Playground */}
+      <Tabs defaultValue="detail">
+        <TabsList className="bg-secondary border border-border mb-6">
+          <TabsTrigger value="detail" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary text-muted-foreground">{t.common.detail}</TabsTrigger>
+          <TabsTrigger value="playground" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary text-muted-foreground">
+            <Play className="h-3.5 w-3.5 mr-1" />{t.common.playground}
+          </TabsTrigger>
+        </TabsList>
+
+        {/* Detail Tab */}
+        <TabsContent value="detail">
       {/* Prompt copy */}
       <div className="glass-card p-6 mb-8 glow-border">
         <h2 className="text-lg font-semibold text-foreground mb-4">{t.promptDetail.copyPrompt}</h2>
@@ -319,6 +380,90 @@ export default function SkillDetailClient({ id }: { id: string }) {
           )}
         </div>
       )}
+
+        </TabsContent>
+
+        {/* Playground Tab */}
+        <TabsContent value="playground">
+          <div className="glass-card p-6 mb-8 glow-border">
+            <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+              <Play className="h-5 w-5" />{t.common.playground}
+            </h2>
+            <p className="text-sm text-muted-foreground mb-5">
+              {t.promptDetail.variablesDesc}
+            </p>
+
+            {/* Online/Local sub-tabs */}
+            <div className="flex gap-2 mb-5">
+              <button
+                onClick={() => { setPlaygroundTab("online"); setPlaygroundPreview(""); }}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  playgroundTab === "online"
+                    ? "bg-primary/10 text-primary border border-primary/30"
+                    : "bg-secondary text-muted-foreground border border-border hover:text-foreground"
+                }`}
+              >
+                {t.promptDetail.onlineVersion}
+              </button>
+              <button
+                onClick={() => { setPlaygroundTab("local"); setPlaygroundPreview(""); }}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  playgroundTab === "local"
+                    ? "bg-primary/10 text-primary border border-primary/30"
+                    : "bg-secondary text-muted-foreground border border-border hover:text-foreground"
+                }`}
+              >
+                {t.promptDetail.localVersion}
+              </button>
+            </div>
+
+            {/* Variable inputs */}
+            {playgroundVariables.length > 0 && (
+              <div className="grid sm:grid-cols-2 gap-4 mb-5">
+                {playgroundVariables.map((varName) => (
+                  <div key={varName}>
+                    <label className="text-sm text-foreground mb-1.5 block font-medium">
+                      <span className="text-primary font-mono text-xs mr-1.5">{"{{" + varName + "}}"}</span>
+                      {varName}
+                    </label>
+                    <Textarea
+                      placeholder={`${varName}...`}
+                      value={playgroundVars[varName] || ""}
+                      onChange={(e) => setPlaygroundVars((prev) => ({ ...prev, [varName]: e.target.value }))}
+                      className="bg-secondary border-border text-foreground placeholder:text-muted-foreground/50 min-h-[80px] resize-y"
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Action buttons */}
+            <div className="flex flex-wrap gap-3 mb-5">
+              <Button onClick={generatePlaygroundPreview} className="bg-primary text-primary-foreground hover:bg-primary/90 font-medium">
+                <Play className="h-4 w-4 mr-2" />{t.common.runPrompt}
+              </Button>
+              <Button variant="outline" onClick={resetPlayground} className="border-border text-muted-foreground hover:bg-secondary">
+                <RotateCcw className="h-4 w-4 mr-2" />{t.common.reset}
+              </Button>
+              {playgroundPreview && (
+                <Button variant="outline" onClick={handlePlaygroundCopy} className="border-border text-muted-foreground hover:bg-secondary">
+                  {playgroundCopied ? <><Check className="h-4 w-4 mr-2" />{t.common.copied}</> : <><Copy className="h-4 w-4 mr-2" />{t.common.copy}</>}
+                </Button>
+              )}
+            </div>
+
+            {/* Preview area */}
+            {playgroundPreview && (
+              <div>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2 font-medium">{t.common.previewPrompt}</p>
+                <div className="bg-gradient-to-b from-primary/5 to-transparent border border-primary/20 rounded-lg p-5 max-h-[500px] overflow-y-auto scrollbar-hide">
+                  <pre className="text-sm text-foreground whitespace-pre-wrap leading-relaxed font-mono">{playgroundPreview}</pre>
+                </div>
+              </div>
+            )}
+          </div>
+        </TabsContent>
+      </Tabs>
 
       {/* Comments */}
       <CommentSection skillId={id} skillTitle={skill.title} />

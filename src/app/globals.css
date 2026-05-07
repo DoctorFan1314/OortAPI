@@ -142,8 +142,9 @@
     border-radius: 1rem;
   }
   :root .glass-card {
-    background: rgba(255, 255, 255, 0.6);
+    background: rgba(248, 250, 252, 0.8);
     border: 1px solid rgba(0, 0, 0, 0.06);
+    backdrop-filter: blur(16px);
   }
   .dark .glass-card {
     background: rgba(255, 255, 255, 0.03);
@@ -162,6 +163,10 @@
   :root .glass-card-hover:hover {
     border-color: rgba(8, 145, 178, 0.3);
     box-shadow: 0 8px 32px rgba(8, 145, 178, 0.1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .glass-card-hover { transition: none; }
+    .glass-card-hover:hover { transform: none; }
   }
   .glow-text {
     text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
@@ -195,4 +200,62 @@
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+/* Focus visible global styles */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+}
+
+/* Light mode subtle gradient */
+:root body {
+  background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+}
+
+/* Print styles */
+@media print {
+  .glass-card, .glass-card-hover {
+    background: white !important;
+    backdrop-filter: none !important;
+    border: 1px solid #ccc !important;
+    box-shadow: none !important;
+  }
+  header, footer, .fixed, [data-no-print] {
+    display: none !important;
+  }
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  a { text-decoration: underline; }
+}
+
+/* Hero stagger animation */
+@keyframes heroSlideUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.hero-animate-1 { animation: heroSlideUp 0.6s ease-out 0.1s both; }
+.hero-animate-2 { animation: heroSlideUp 0.6s ease-out 0.25s both; }
+.hero-animate-3 { animation: heroSlideUp 0.6s ease-out 0.4s both; }
+.hero-animate-4 { animation: heroSlideUp 0.6s ease-out 0.55s both; }
+@media (prefers-reduced-motion: reduce) {
+  .hero-animate-1, .hero-animate-2, .hero-animate-3, .hero-animate-4 {
+    animation: none;
+  }
+}
+
+/* Tab crossfade */
+@keyframes tabFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.tab-panel-enter {
+  animation: tabFadeIn 0.25s ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tab-panel-enter { animation: none; }
 }

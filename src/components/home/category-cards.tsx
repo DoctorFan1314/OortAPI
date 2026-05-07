@@ -25,8 +25,8 @@ export function CategoryCards({ tab }: { tab: "agent" | "prompt" }) {
           const displayDesc = i18n.description || card.description;
           return (
             <Link key={card.slug} href={tab === "agent" ? `/skills?category=${encodeURIComponent(card.name)}` : `/categories/${card.slug}`}>
-              <div className="glass-card glass-card-hover p-5 lg:p-6 h-full cursor-pointer group">
-                <div className="text-3xl lg:text-4xl mb-3 lg:mb-4 transition-transform group-hover:scale-110">{card.icon}</div>
+              <div className="glass-card glass-card-hover p-5 lg:p-6 h-full cursor-pointer group focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                <div className="text-3xl lg:text-4xl mb-3 lg:mb-4 transition-transform group-hover:scale-110" role="img" aria-label={displayName}>{card.icon}</div>
                 <h3 className="text-base lg:text-lg font-semibold text-foreground mb-1.5 lg:mb-2">{displayName}</h3>
                 <p className="text-xs lg:text-sm text-muted-foreground mb-4 lg:mb-5 line-clamp-2">{displayDesc}</p>
                 <div className="inline-flex items-center gap-1.5 text-xs lg:text-sm font-medium transition-colors group-hover:gap-2.5" style={{ color: card.color }}>

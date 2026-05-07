@@ -6,6 +6,68 @@
 
 ---
 
+## [v2.0.7] — 2026-05-08
+
+### 新功能
+- **统一搜索页面** (`/search`) — 跨市场搜索 Agent 技能和 Prompt 模板；自动补全下拉框最多显示 6 个建议（技能、模板、标签）带类型图标；最近搜索历史持久化到 localStorage（最多 8 条）；键盘导航（ArrowUp/Down、Enter、Escape）；ARIA combobox 模式
+- **通知系统** — 导航栏铃铛图标带未读计数徽章（9+ 溢出）；通知下拉框带类型图标；标记已读、全部已读、清空操作；通过 `useNotifications` hook 按用户 localStorage 持久化
+- **公开用户主页** (`/users/[username]`) — 公开个人主页，展示头像、简介、加入日期、已发布技能、下载/星标统计；面包屑导航
+- **JSON-LD 结构化数据** — 技能页 SoftwareApplication schema，模板页 CreativeWork，详情页 BreadcrumbList，首页 Organization + WebSite
+- **技能详情页增强** — 分享按钮（`navigator.share()` + 剪贴板回退）；截图画廊带灯箱放大；侧边栏依赖项区域；认证徽章（BadgeCheck 图标）；举报模态框（单选按钮原因）；关注作者按钮；"添加到收藏集"下拉框；第 4 个 Tab"版本历史"带垂直时间线；增强 404 带热门推荐
+- **技能页 URL 同步筛选** — 所有筛选条件（q、collection、category、license、sort）同步到 URL 查询参数；防抖查询（300ms）；许可证单选筛选；交叉筛选结果计数；活跃筛选条件摘要栏带可移除标签
+- **导航栏"更多"下拉菜单** — 快速访问分类、排行榜、标签、指南；ArrowDown/ArrowUp/Escape 键盘导航；`role="menu"` / `role="menuitem"` ARIA
+- **CSS 增强** — glass-card-hover 添加 `prefers-reduced-motion` 保护；亮色模式毛玻璃 `backdrop-filter: blur(16px)`；打印样式；全局 `focus-visible` 样式；亮色模式渐变背景
+- **Hero 交错入场动画** — `@keyframes heroSlideUp` 配合 `.hero-animate-1` 到 `.hero-animate-4` 类；装饰元素标记 `aria-hidden="true"`
+- **Tab 渐变动画** — `@keyframes tabFadeIn` 配合精选区 tabpanel 的 `.tab-panel-enter` 类
+- **评论 Markdown 渲染** — 评论内容通过延迟加载的 `MarkdownRenderer` 渲染；辅助文字显示支持的语法
+- **Footer 无障碍** — 禁用链接标记 `aria-disabled="true"` 带删除线；每个区块用 `<nav>` 包裹带 `aria-label`
+- **收藏集系统** — `useCollections` hook 用于创建/管理技能收藏集，localStorage 持久化
+- **关注系统** — `useFollows` hook 用于关注/取消关注技能作者，localStorage 持久化
+
+### 国际化
+- **30+ 新 i18n 键** — `report`、`reportSubmitted`、`reportReason`、`reportSpam`、`reportAbuse`、`reportCopyright`、`reportOther`、`following`、`follow`、`unfollow`、`collections`、`myCollections`、`newCollection`、`collectionName`、`collectionDesc`、`addToCollection`、`noResults`、`tryDifferent`、`notifications`、`markAllRead`、`noNotifications`、`clearAll`、`viewMore`、`ago`、`filters`、`clearFilters`、`activeFilters`、`verified`、`official`、`screenshots`、`versionHistory`、`changelog`、`dependencies`、`noDependencies`
+- **`userProfile` 区块** — `userNotFound`、`goBack`、`publishedSkills`、`noPublishedSkills`、`noPublishedSkillsDesc`、`totalDownloads`、`totalStars`、`publishedCount`、`joinedAt`
+- **`search` 区块** — `title`、`subtitle`、`placeholder`、`recentSearches`、`clearRecent`、`noResults`、`noResultsDesc`、`agentSkills`、`promptTemplates`、`viewAllSkills`、`viewAllPrompts`、`suggestions`、`removeRecent`
+
+### 新文件
+- `src/app/search/page.tsx` — 服务器组件含 Suspense 边界
+- `src/app/search/client.tsx` — 统一搜索带自动补全
+- `src/app/users/[username]/page.tsx` — 公开主页服务器组件
+- `src/app/users/[username]/client.tsx` — 公开主页客户端组件
+- `src/components/shared/json-ld.tsx` — JSON-LD 生成器组件
+- `src/components/shared/notification-bell.tsx` — 通知铃铛下拉框
+- `src/components/shared/onboarding-tooltip.tsx` — 新用户 3 步引导
+- `src/hooks/use-notifications.ts` — 通知 CRUD hook
+- `src/hooks/use-collections.ts` — 收藏集管理 hook
+- `src/hooks/use-follows.ts` — 关注管理 hook
+- `src/app/skills/[id]/loading.tsx` — 技能详情骨架屏
+
+---
+
+## [v2.0.6] — 2026-05-08
+
+### 新功能
+- **新用户引导** — 首次访问的用户会看到 3 步引导流程（欢迎 → 浏览技能 → 搜索功能），包含半透明遮罩、高亮目标区域和提示卡片；通过 `localStorage` 记录完成状态
+- **空状态优化** — `/prompts`、`/trending`、`/tags` 页面在筛选无结果时显示友好的空状态提示，包含图标、文案和操作按钮
+
+### 国际化
+- **新增 i18n 键** — `onboarding.skip`、`onboarding.next`、`onboarding.finish`、`onboarding.step1Title`、`onboarding.step1Desc`、`onboarding.step2Title`、`onboarding.step2Desc`、`onboarding.step3Title`、`onboarding.step3Desc`
+
+---
+
+## [v2.0.5] — 2026-05-08
+
+### 新功能
+- **交互式 Prompt 试用 Playground** — Prompt 详情页新增"详情 / 试用"双 Tab 架构；试用 Tab 让用户直接在浏览器中填写 `{{variable}}` 占位符并预览组装后的完整 Prompt（纯客户端，无 API 调用）
+- **变量自动识别** — Playground 解析 Prompt 模板中的 `{{var}}` 和 `{var}` 两种语法，去重后生成带标签的 Textarea 输入框
+- **在线版/本地版切换** — Playground 内可切换在线版和本地版 Prompt，各自独立管理变量输入
+- **重置与复制操作** — Playground 包含重置（清空所有输入）、复制结果和生成预览按钮
+
+### 国际化
+- **新增 i18n 键** — `common.detail`、`common.reset`、`common.generatePreview`、`common.previewPrompt`；`common.runPrompt` 更新为 "运行 Prompt" / "Run Prompt"
+
+---
+
 ## [v2.0.4] — 2026-05-07
 
 ### 无障碍
