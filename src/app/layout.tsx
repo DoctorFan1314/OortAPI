@@ -25,8 +25,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://ai-skills-hub.vercel.app"),
-  title: "AI Skills Hub — 高质量LLM技能模板库",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://ai-skills-hub.vercel.app"),
+  title: {
+    default: "AI Skills Hub — 高质量LLM技能模板库",
+    template: "%s | AI Skills Hub",
+  },
   description: "高质量LLM技能模板，覆盖内容创作、编程开发、数据分析、效率工具、创意写作、思考工作流六大领域。复制即用，去AI味。完美适配 ChatGPT · Claude · Grok · DeepSeek · Qwen 等主流平台。",
   icons: { icon: "/icon", apple: "/apple-icon" },
   openGraph: {
@@ -36,14 +39,19 @@ export const metadata: Metadata = {
     siteName: "AI Skills Hub",
     type: "website",
     locale: "zh_CN",
+    alternateLocale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "AI Skills Hub — 高质量LLM技能模板库",
-    description: "高质量LLM技能模板，覆盖内容创作、编程开发、数据分析、效率工具、创意写作、思考工作流六大领域。",
+    title: "AI Skills Hub — Agent Skills Marketplace + Prompt Templates",
+    description: "Discover executable Agent Skills and high-quality Prompt Templates. One-click install, works with ChatGPT, Claude, Grok, DeepSeek, Qwen.",
   },
   alternates: {
     canonical: "https://ai-skills-hub.vercel.app",
+    languages: {
+      "zh-CN": "https://ai-skills-hub.vercel.app",
+      "en-US": "https://ai-skills-hub.vercel.app",
+    },
   },
 };
 

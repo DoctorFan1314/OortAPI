@@ -6,6 +6,26 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [v2.0.2] — 2026-05-07
+
+### Accessibility
+- **prefers-reduced-motion now reactive** — Particle background listens for runtime `prefers-reduced-motion` changes via `matchMedia.addEventListener("change")`; toggling the OS setting pauses/resumes the animation immediately
+
+### Internationalization
+- **OG metadata bilingual fallback** — Twitter card description now in English; `openGraph.alternateLocale` set to `en_US`; `alternates.languages` declares both `zh-CN` and `en-US`; `metadataBase` reads from `NEXT_PUBLIC_SITE_URL` env var
+
+### UX
+- **Delete comment confirmation** — Clicking the delete button now shows a "确定要删除？/ Delete this comment?" inline confirmation before actually deleting
+- **New i18n keys** — `comments.deleteConfirm`, `comments.commentEdited` added to both zh/en dictionaries
+
+### Files Modified
+- `src/components/shared/particle-bg.tsx` — Reactive `prefers-reduced-motion` listener
+- `src/app/layout.tsx` — OG/Twitter metadata bilingual, `metadataBase` from env var
+- `src/components/skill/comment-section.tsx` — Delete confirmation UI
+- `src/lib/i18n/types.ts` — New keys: `comments.deleteConfirm`, `comments.commentEdited`
+- `src/lib/i18n/zh.ts` — Chinese translations for new keys
+- `src/lib/i18n/en.ts` — English translations for new keys
+
 ## [v2.0.1] — 2026-05-07
 
 ### Performance

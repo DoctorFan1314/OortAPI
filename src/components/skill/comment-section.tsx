@@ -23,6 +23,7 @@ export function CommentSection({ skillId, skillTitle }: { skillId: string; skill
   const [, setTick] = useState(0);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState("");
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   // Load comments from global store
   useEffect(() => {
@@ -270,7 +271,7 @@ export function CommentSection({ skillId, skillTitle }: { skillId: string; skill
                       <Pencil className="h-3 w-3" />
                     </button>
                     <button
-                      onClick={() => handleDelete(c.id)}
+                      onClick={() => setDeleteConfirmId(c.id)}
                       className="flex items-center gap-1 text-xs text-muted-foreground hover:text-red-400 transition-colors"
                     >
                       <Trash2 className="h-3 w-3" />
@@ -278,6 +279,13 @@ export function CommentSection({ skillId, skillTitle }: { skillId: string; skill
                   </>
                 )}
               </div>
+              {deleteConfirmId === c.id && (
+                <div className="ml-11 mt-2 flex items-center gap-2 text-xs">
+                  <span className="text-muted-foreground">{t.comments.deleteConfirm}</span>
+                  <button onClick={() => { handleDelete(c.id); setDeleteConfirmId(null); }} className="text-red-400 hover:underline">{t.common.confirm}</button>
+                  <button onClick={() => setDeleteConfirmId(null)} className="text-muted-foreground hover:underline">{t.common.cancel}</button>
+                </div>
+              )}
             </div>
           ))}
         </div>

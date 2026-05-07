@@ -248,6 +248,8 @@ export const en: Dictionary = {
     commentPublished: "Comment published",
     commentRequired: "Please enter a comment",
     commentCount: "Comments ({count})",
+    deleteConfirm: "Delete this comment?",
+    commentEdited: "Comment edited",
   },
   profile: {
     title: "Profile",

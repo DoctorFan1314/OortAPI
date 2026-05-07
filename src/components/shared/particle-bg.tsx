@@ -13,8 +13,18 @@ export function ParticleBackground() {
 
     let animationId: number;
     let paused = false;
-    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReduced) return;
+    const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (motionQuery.matches) return;
+    function onMotionChange(e: MediaQueryListEvent) {
+      if (e.matches) {
+        paused = true;
+        cancelAnimationFrame(animationId);
+      } else {
+        paused = false;
+        animate();
+      }
+    }
+    motionQuery.addEventListener("change", onMotionChange);
     const isMobile = window.innerWidth < 768;
     const particles: { x: number; y: number; vx: number; vy: number; size: number; opacity: number }[] = [];
     const count = isMobile ? 15 : 30;
@@ -115,6 +125,7 @@ export function ParticleBackground() {
       cancelAnimationFrame(animationId);
       window.removeEventListener("resize", onResize);
       document.removeEventListener("visibilitychange", onVisibilityChange);
+      motionQuery.removeEventListener("change", onMotionChange);
       themeObserver.disconnect();
     };
   }, []);

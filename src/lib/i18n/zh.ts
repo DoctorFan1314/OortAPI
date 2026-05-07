@@ -248,6 +248,8 @@ export const zh: Dictionary = {
     commentPublished: "评论已发布",
     commentRequired: "请输入评论内容",
     commentCount: "评论 ({count})",
+    deleteConfirm: "确定要删除这条评论吗？",
+    commentEdited: "评论已编辑",
   },
   profile: {
     title: "个人中心",

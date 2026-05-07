@@ -6,6 +6,26 @@
 
 ---
 
+## [v2.0.2] — 2026-05-07
+
+### 无障碍
+- **prefers-reduced-motion 现在响应式** — 粒子背景通过 `matchMedia.addEventListener("change")` 监听运行时 `prefers-reduced-motion` 变化；切换系统设置可立即暂停/恢复动画
+
+### 国际化
+- **OG 元数据双语回退** — Twitter 卡片描述改为英文；`openGraph.alternateLocale` 设为 `en_US`；`alternates.languages` 声明 `zh-CN` 和 `en-US`；`metadataBase` 读取 `NEXT_PUBLIC_SITE_URL` 环境变量
+
+### 用户体验
+- **删除评论确认** — 点击删除按钮后显示"确定要删除？"行内确认，确认后才实际删除
+- **新增 i18n 键** — `comments.deleteConfirm`、`comments.commentEdited` 添加到中英文字典
+
+### 修改文件
+- `src/components/shared/particle-bg.tsx` — 响应式 `prefers-reduced-motion` 监听器
+- `src/app/layout.tsx` — OG/Twitter 元数据双语，`metadataBase` 读取环境变量
+- `src/components/skill/comment-section.tsx` — 删除确认 UI
+- `src/lib/i18n/types.ts` — 新增 `comments.deleteConfirm`、`comments.commentEdited`
+- `src/lib/i18n/zh.ts` — 新增键中文翻译
+- `src/lib/i18n/en.ts` — 新增键英文翻译
+
 ## [v2.0.1] — 2026-05-07
 
 ### 性能优化

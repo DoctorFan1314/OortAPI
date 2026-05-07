@@ -89,6 +89,7 @@ export interface Dictionary {
     loginToComment: string; noComments: string; rating: string; likes: string;
     reply: string; cancelReply: string; replyingTo: string;
     commentPublished: string; commentRequired: string; commentCount: string;
+    deleteConfirm: string; commentEdited: string;
   };
   profile: {
     title: string; overview: string; favorites: string; likes: string;
