@@ -6,6 +6,26 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [v1.6.5] — 2026-05-07
+
+### Changed
+- **Accessibility: filter buttons** — Added `role="radio"` + `aria-checked` to all filter buttons in skills page (collection, category, sort) and prompts page (category, difficulty, sort)
+- **Accessibility: agent skill card** — Install command button now has `role="button"`, `tabIndex={0}`, `aria-label` (dynamic: shows "Copied" or "Copy install command for {name}"), and keyboard support (`Enter`/`Space`)
+- **404 page enhanced** — Added search box (routes to `/skills?q=`), hot skills (3 AgentSkills), hot prompts (3 Templates), and browse buttons for skills/prompts
+- **Delete account confirmation** — Danger zone now requires typing "DELETE" in an input field before the delete button activates; mismatch shows error toast
+
+### Files Modified
+- `src/app/skills/client.tsx` — `role="radio"` + `aria-checked` on collection, category, sort buttons
+- `src/app/prompts/client.tsx` — `role="radio"` + `aria-checked` on category, difficulty, sort buttons
+- `src/components/agent-skill/agent-skill-card.tsx` — Install command button a11y: `role`, `tabIndex`, `aria-label`, `onKeyDown`
+- `src/app/not-found.tsx` — Full rewrite: search box, hot skills/prompts, browse buttons
+- `src/components/profile/settings-tab.tsx` — DELETE confirmation input before account deletion
+- `src/lib/i18n/types.ts` — `notFound.*` (5 new keys), `settings.deleteConfirmPrompt`, `settings.deleteConfirmMismatch`
+- `src/lib/i18n/zh.ts` — 7 new translation keys
+- `src/lib/i18n/en.ts` — 7 new translation keys
+
+---
+
 ## [v1.6.4] — 2026-05-06
 
 ### Changed

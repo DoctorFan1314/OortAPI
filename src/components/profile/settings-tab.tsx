@@ -24,6 +24,7 @@ export function SettingsTab() {
   const [confirmPw, setConfirmPw] = useState("");
   const [pwError, setPwError] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
 
   if (!user) return null;
 
@@ -203,13 +204,32 @@ export function SettingsTab() {
         </h3>
         <p className="text-sm text-muted-foreground mb-4">{t.settings.dangerDesc}</p>
         {!showDeleteConfirm ? (
-          <Button variant="outline" onClick={() => setShowDeleteConfirm(true)} className="border-destructive/30 text-destructive hover:bg-destructive/10">
+          <Button variant="outline" onClick={() => { setShowDeleteConfirm(true); setDeleteConfirmText(""); }} className="border-destructive/30 text-destructive hover:bg-destructive/10">
             {t.settings.deleteAccount}
           </Button>
         ) : (
-          <div className="flex items-center gap-3">
-            <Button onClick={handleDeleteAccount} className="bg-destructive text-white hover:bg-destructive/90">{t.settings.confirmDelete}</Button>
-            <Button variant="ghost" onClick={() => setShowDeleteConfirm(false)} className="text-muted-foreground">{t.common.cancel}</Button>
+          <div className="space-y-3">
+            <Input
+              value={deleteConfirmText}
+              onChange={(e) => setDeleteConfirmText(e.target.value)}
+              placeholder={t.settings.deleteConfirmPrompt}
+              className="max-w-xs bg-secondary border-destructive/30 text-foreground placeholder:text-muted-foreground/50"
+            />
+            <div className="flex items-center gap-3">
+              <Button
+                onClick={() => {
+                  if (deleteConfirmText !== "DELETE") {
+                    toast(t.settings.deleteConfirmMismatch, "error");
+                    return;
+                  }
+                  handleDeleteAccount();
+                }}
+                className="bg-destructive text-white hover:bg-destructive/90"
+              >
+                {t.settings.confirmDelete}
+              </Button>
+              <Button variant="ghost" onClick={() => setShowDeleteConfirm(false)} className="text-muted-foreground">{t.common.cancel}</Button>
+            </div>
           </div>
         )}
       </div>

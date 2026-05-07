@@ -67,12 +67,23 @@ export function AgentSkillCard({ skill }: { skill: AgentSkill }) {
       </div>
 
       <div
+        role="button"
+        tabIndex={0}
+        aria-label={copied ? "Copied" : `Copy install command for ${skill.name}`}
         className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary/80 border border-border group/install cursor-pointer hover:border-primary/30 transition-colors"
         onClick={(e) => {
           e.preventDefault();
           navigator.clipboard.writeText(skill.installCommand);
           setCopied(true);
           setTimeout(() => setCopied(false), 2000);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            navigator.clipboard.writeText(skill.installCommand);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+          }
         }}
       >
         <Terminal className="h-3 w-3 text-muted-foreground shrink-0" />

@@ -98,6 +98,7 @@ export interface Dictionary {
     usernameRequired: string; passwordMinLength: string; fillAllFields: string;
     dataExported: string; dataCleared: string; accountDeleted: string;
     passwordPlaceholder: string;
+    deleteConfirmPrompt: string; deleteConfirmMismatch: string;
   };
   submit: {
     title: string; subtitle: string; basicInfo: string; templateName: string;
@@ -166,6 +167,8 @@ export interface Dictionary {
   };
   notFound: {
     title: string; description: string; backHome: string;
+    searchPlaceholder: string; popularSkills: string; popularPrompts: string;
+    browseSkills: string; browsePrompts: string;
   };
   error: {
     title: string; description: string; retry: string;

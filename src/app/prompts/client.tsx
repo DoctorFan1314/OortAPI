@@ -125,11 +125,11 @@ export default function PromptsClient() {
         <div className="space-y-3 md:space-y-0 md:flex md:flex-wrap md:gap-4 md:items-center">
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-sm text-muted-foreground">{t.common.categories}：</span>
-            <button onClick={() => { setCategory(t.common.all); updateURL({ cat: t.common.all }); }} className={`px-3 py-1 text-sm rounded-md transition-colors ${category === t.common.all ? "bg-primary/10 text-primary border border-primary/30" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}>
+            <button role="radio" aria-checked={category === t.common.all} onClick={() => { setCategory(t.common.all); updateURL({ cat: t.common.all }); }} className={`px-3 py-1 text-sm rounded-md transition-colors ${category === t.common.all ? "bg-primary/10 text-primary border border-primary/30" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}>
               {t.common.all}
             </button>
             {categories.map((c) => (
-              <button key={c.slug} onClick={() => { setCategory(c.slug); updateURL({ cat: c.slug }); }} className={`px-3 py-1 text-sm rounded-md transition-colors ${category === c.slug ? "bg-primary/10 text-primary border border-primary/30" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}>
+              <button key={c.slug} role="radio" aria-checked={category === c.slug} onClick={() => { setCategory(c.slug); updateURL({ cat: c.slug }); }} className={`px-3 py-1 text-sm rounded-md transition-colors ${category === c.slug ? "bg-primary/10 text-primary border border-primary/30" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}>
                 {c.icon} {c.name}
               </button>
             ))}
@@ -137,7 +137,7 @@ export default function PromptsClient() {
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-sm text-muted-foreground">{t.prompts.difficulty}：</span>
             {difficultyOptions.map((d) => (
-              <button key={d.key} onClick={() => { setDifficulty(d.key); updateURL({ diff: d.key }); }} className={`px-3 py-1 text-sm rounded-md transition-colors ${difficulty === d.key ? "bg-primary/10 text-primary border border-primary/30" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}>
+              <button key={d.key} role="radio" aria-checked={difficulty === d.key} onClick={() => { setDifficulty(d.key); updateURL({ diff: d.key }); }} className={`px-3 py-1 text-sm rounded-md transition-colors ${difficulty === d.key ? "bg-primary/10 text-primary border border-primary/30" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}>
                 {d.label}
               </button>
             ))}
@@ -145,7 +145,7 @@ export default function PromptsClient() {
           <div className="flex flex-wrap items-center gap-2 md:ml-auto">
             <span className="text-sm text-muted-foreground">{t.prompts.sortBy}：</span>
             {([{ key: "trending" as const, label: t.prompts.sortPopular }, { key: "rating" as const, label: t.prompts.sortRating }, { key: "newest" as const, label: t.prompts.sortNewest }]).map((s) => (
-              <button key={s.key} onClick={() => { setSortBy(s.key); updateURL({ sort: s.key }); }} className={`px-3 py-1 text-sm rounded-md transition-colors ${sortBy === s.key ? "bg-primary/10 text-primary border border-primary/30" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}>
+              <button key={s.key} role="radio" aria-checked={sortBy === s.key} onClick={() => { setSortBy(s.key); updateURL({ sort: s.key }); }} className={`px-3 py-1 text-sm rounded-md transition-colors ${sortBy === s.key ? "bg-primary/10 text-primary border border-primary/30" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}>
                 {s.label}
               </button>
             ))}

@@ -6,6 +6,26 @@
 
 ---
 
+## [v1.6.5] — 2026-05-07
+
+### 变更
+- **无障碍：筛选按钮** — 技能页（合集、分类、排序）和模板页（分类、难度、排序）的所有筛选按钮添加 `role="radio"` + `aria-checked`
+- **无障碍：Agent 技能卡片** — 安装命令按钮新增 `role="button"`、`tabIndex={0}`、动态 `aria-label`（显示"已复制"或"复制 {name} 的安装命令"），支持键盘操作（`Enter`/`Space`）
+- **404 页面增强** — 新增搜索框（路由到 `/skills?q=`）、热门技能（3 个 AgentSkill）、热门模板（3 个 Prompt）、浏览按钮
+- **删除账号二次确认** — 危险区域要求输入 "DELETE" 才能激活删除按钮，输入不匹配时显示错误 Toast
+
+### 修改文件
+- `src/app/skills/client.tsx` — 合集、分类、排序按钮添加 `role="radio"` + `aria-checked`
+- `src/app/prompts/client.tsx` — 分类、难度、排序按钮添加 `role="radio"` + `aria-checked`
+- `src/components/agent-skill/agent-skill-card.tsx` — 安装命令按钮无障碍：`role`、`tabIndex`、`aria-label`、`onKeyDown`
+- `src/app/not-found.tsx` — 全面重写：搜索框、热门技能/模板、浏览按钮
+- `src/components/profile/settings-tab.tsx` — 删除账号前需输入 DELETE 确认
+- `src/lib/i18n/types.ts` — `notFound.*`（5 个新键）、`settings.deleteConfirmPrompt`、`settings.deleteConfirmMismatch`
+- `src/lib/i18n/zh.ts` — 新增 7 个翻译键
+- `src/lib/i18n/en.ts` — 新增 7 个翻译键
+
+---
+
 ## [v1.6.4] — 2026-05-06
 
 ### 变更

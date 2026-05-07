@@ -284,6 +284,8 @@ export const zh: Dictionary = {
     dataCleared: "个人数据已清除",
     accountDeleted: "账号已删除",
     passwordPlaceholder: "至少 8 位字符",
+    deleteConfirmPrompt: "请输入 DELETE 确认删除",
+    deleteConfirmMismatch: "请输入 DELETE 确认",
   },
   submit: {
     title: "提交模板",
@@ -446,6 +448,11 @@ export const zh: Dictionary = {
     title: "页面未找到",
     description: "你访问的页面不存在或已被移除",
     backHome: "返回首页",
+    searchPlaceholder: "搜索技能或模板...",
+    popularSkills: "热门技能",
+    popularPrompts: "热门模板",
+    browseSkills: "浏览技能市场",
+    browsePrompts: "浏览 Prompt 模板",
   },
   error: {
     title: "出了点问题",

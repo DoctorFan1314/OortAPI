@@ -108,6 +108,8 @@ export default function SkillsClient() {
             {(["downloads", "stars", "newest"] as const).map((s) => (
               <Button
                 key={s}
+                role="radio"
+                aria-checked={sortBy === s}
                 variant={sortBy === s ? "secondary" : "ghost"}
                 size="sm"
                 onClick={() => setSortBy(s)}
@@ -127,6 +129,8 @@ export default function SkillsClient() {
                 {collections.map((c) => (
                   <button
                     key={c}
+                    role="radio"
+                    aria-checked={selectedCollection === c}
                     onClick={() => setSelectedCollection(c)}
                     className={`px-3 py-1.5 text-xs rounded-lg border transition-colors ${
                       selectedCollection === c
@@ -145,6 +149,8 @@ export default function SkillsClient() {
                 {categories.map((c) => (
                   <button
                     key={c}
+                    role="radio"
+                    aria-checked={selectedCategory === c}
                     onClick={() => setSelectedCategory(c)}
                     className={`px-3 py-1.5 text-xs rounded-lg border transition-colors ${
                       selectedCategory === c

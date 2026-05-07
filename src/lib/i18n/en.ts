@@ -284,6 +284,8 @@ export const en: Dictionary = {
     dataCleared: "Personal data cleared",
     accountDeleted: "Account deleted",
     passwordPlaceholder: "At least 8 characters",
+    deleteConfirmPrompt: "Type DELETE to confirm",
+    deleteConfirmMismatch: "Please type DELETE to confirm",
   },
   submit: {
     title: "Submit Template",
@@ -446,6 +448,11 @@ export const en: Dictionary = {
     title: "Page Not Found",
     description: "The page you're looking for doesn't exist or has been removed",
     backHome: "Return Home",
+    searchPlaceholder: "Search skills or templates...",
+    popularSkills: "Popular Skills",
+    popularPrompts: "Popular Templates",
+    browseSkills: "Browse Agent Skills",
+    browsePrompts: "Browse Prompt Templates",
   },
   error: {
     title: "Something Went Wrong",
