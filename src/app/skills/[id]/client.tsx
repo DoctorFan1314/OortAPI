@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import Link from "next/link";
 import { getAgentSkillById } from "@/lib/mock-agent-skills";
 import { STORAGE_KEYS } from "@/lib/storage-keys";
@@ -15,17 +15,22 @@ import { MarkdownRenderer, CopyButton, codeTheme } from "@/components/shared/mar
 import { useI18n } from "@/contexts/i18n-context";
 import { useToast } from "@/contexts/toast-context";
 import { useAuth } from "@/contexts/auth-context";
-import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
-import ts from "react-syntax-highlighter/dist/esm/languages/hljs/typescript";
-import json from "react-syntax-highlighter/dist/esm/languages/hljs/json";
-import md from "react-syntax-highlighter/dist/esm/languages/hljs/markdown";
-import JSZip from "jszip";
-import { saveAs } from "file-saver";
 import { formatNumber } from "@/lib/utils";
 
-SyntaxHighlighter.registerLanguage("typescript", ts);
-SyntaxHighlighter.registerLanguage("json", json);
-SyntaxHighlighter.registerLanguage("markdown", md);
+const SyntaxHighlighter = lazy(() =>
+  Promise.all([
+    import("react-syntax-highlighter"),
+    import("react-syntax-highlighter/dist/esm/languages/hljs/typescript"),
+    import("react-syntax-highlighter/dist/esm/languages/hljs/json"),
+    import("react-syntax-highlighter/dist/esm/languages/hljs/markdown"),
+  ]).then(([mod, ts, json, md]) => {
+    const SH = mod.Light;
+    SH.registerLanguage("typescript", ts.default);
+    SH.registerLanguage("json", json.default);
+    SH.registerLanguage("markdown", md.default);
+    return { default: SH };
+  })
+);
 
 function getLang(filename: string): string {
   if (filename.endsWith(".ts") || filename.endsWith(".tsx")) return "typescript";
@@ -44,7 +49,8 @@ function downloadFile(filename: string, content: string) {
   URL.revokeObjectURL(url);
 }
 
-function downloadAll(skill: NonNullable<ReturnType<typeof getAgentSkillById>>) {
+async function downloadAll(skill: NonNullable<ReturnType<typeof getAgentSkillById>>) {
+  const [{ default: JSZip }, { saveAs }] = await Promise.all([import("jszip"), import("file-saver")]);
   const zip = new JSZip();
   const folder = zip.folder(skill.name)!;
   for (const [name, content] of Object.entries(skill.files)) {
@@ -349,13 +355,15 @@ export default function AgentSkillDetailClient({ id }: { id: string }) {
                   </div>
                 </div>
                 {currentFile && skill.files[currentFile] && (
-                  <SyntaxHighlighter
-                    language={getLang(currentFile)}
-                    style={codeTheme}
-                    customStyle={{ margin: 0, fontSize: "0.875rem", borderRadius: 0, maxHeight: "500px" }}
-                  >
-                    {skill.files[currentFile]}
-                  </SyntaxHighlighter>
+                  <Suspense fallback={<div className="p-4 text-sm text-muted-foreground animate-pulse">Loading...</div>}>
+                    <SyntaxHighlighter
+                      language={getLang(currentFile)}
+                      style={codeTheme}
+                      customStyle={{ margin: 0, fontSize: "0.875rem", borderRadius: 0, maxHeight: "500px" }}
+                    >
+                      {skill.files[currentFile]}
+                    </SyntaxHighlighter>
+                  </Suspense>
                 )}
               </div>
             </div>

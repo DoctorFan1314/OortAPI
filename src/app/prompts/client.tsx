@@ -21,9 +21,9 @@ export default function PromptsClient() {
 
   const difficultyOptions = [
     { key: "__all__", label: t.prompts.filterAll },
-    { key: "新手友好", label: t.prompts.difficultyEasy },
-    { key: "进阶", label: t.prompts.difficultyMedium },
-    { key: "高级", label: t.prompts.difficultyHard },
+    { key: "beginner", label: t.prompts.difficultyEasy },
+    { key: "intermediate", label: t.prompts.difficultyMedium },
+    { key: "advanced", label: t.prompts.difficultyHard },
   ];
 
   const [query, setQuery] = useState(searchParams.get("q") || "");

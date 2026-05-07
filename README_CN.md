@@ -202,7 +202,7 @@ ai-skills-hub/
 | 标签云搜索 | ✅ | 按名称实时过滤标签，显示计数 |
 | Newsletter 取消订阅 | ✅ | 页脚 Newsletter 管理偏好 / 取消订阅 |
 | 命令面板 | ✅ | 键盘快捷键，焦点恢复 + 动画 |
-| 动态导入 | ✅ | 创建模态框通过 next/dynamic 延迟加载 |
+| 动态导入 | ✅ | 创建模态框通过 next/dynamic 延迟加载；SyntaxHighlighter、JSZip、file-saver 动态导入 |
 | 404 页面增强 | ✅ | 搜索框 + 热门链接 + 浏览按钮 |
 | 删除账号确认 | ✅ | 需输入 DELETE 确认删除 |
 | 完整无障碍 | ✅ | ARIA 角色、标签、键盘支持、动画减弱 |
@@ -278,7 +278,7 @@ interface Skill {
   title: string;           // 标题
   subtitle: string;        // 一句话描述
   category: string;        // 分类名称
-  difficulty: "新手友好" | "进阶" | "高级";
+  difficulty: "beginner" | "intermediate" | "advanced";
   rating: number;          // 评分 (0-5)
   usageCount: number;      // 使用次数
   promptOnline: string;    // 在线版 Prompt

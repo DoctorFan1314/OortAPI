@@ -21,15 +21,15 @@ export function CreateFromUploadPrompt({ open, onClose, onCreated }: Props) {
   const { t } = useI18n();
   const { toast } = useToast();
   const DIFFICULTIES = [
-    { key: "新手友好" as const, label: t.create.difficultyEasy },
-    { key: "进阶" as const, label: t.create.difficultyMedium },
-    { key: "高级" as const, label: t.create.difficultyHard },
+    { key: "beginner" as const, label: t.create.difficultyEasy },
+    { key: "intermediate" as const, label: t.create.difficultyMedium },
+    { key: "advanced" as const, label: t.create.difficultyHard },
   ];
   const [title, setTitle] = useState("");
   const [subtitle, setSubtitle] = useState("");
   const [description, setDescription] = useState("");
   const [categorySlug, setCategorySlug] = useState(categories[0].slug);
-  const [difficulty, setDifficulty] = useState<"新手友好" | "进阶" | "高级">("新手友好");
+  const [difficulty, setDifficulty] = useState<"beginner" | "intermediate" | "advanced">("beginner");
   const [promptOnline, setPromptOnline] = useState("");
   const [promptLocal, setPromptLocal] = useState("");
   const [version, setVersion] = useState("v1.0");
@@ -69,7 +69,7 @@ export function CreateFromUploadPrompt({ open, onClose, onCreated }: Props) {
       tags: tagsList,
       featured: false,
       trending: false,
-      beginner: difficulty === "新手友好",
+      beginner: difficulty === "beginner",
       promptOnline: promptOnline.trim(),
       promptLocal: promptLocal.trim(),
       variables: [],
@@ -92,7 +92,7 @@ export function CreateFromUploadPrompt({ open, onClose, onCreated }: Props) {
 
   function reset() {
     setTitle(""); setSubtitle(""); setDescription("");
-    setCategorySlug(categories[0].slug); setDifficulty("新手友好");
+    setCategorySlug(categories[0].slug); setDifficulty("beginner");
     setPromptOnline(""); setPromptLocal(""); setVersion("v1.0");
     setTags(""); setErrors({}); setDone(false);
     onClose();

@@ -16,3 +16,12 @@ export function formatDate(dateStr: string, locale: string): string {
   const normalized = dateStr.replace(/^(\d{4})\.(\d{2})(?:\.(\d{2}))?$/, (_, y, m, d) => d ? `${y}-${m}-${d}` : `${y}-${m}-01`);
   return new Date(normalized).toLocaleDateString(locale);
 }
+
+export function getDifficultyLabel(difficulty: string, t: { prompts: { difficultyEasy: string; difficultyMedium: string; difficultyHard: string } }): string {
+  switch (difficulty) {
+    case "beginner": return t.prompts.difficultyEasy;
+    case "intermediate": return t.prompts.difficultyMedium;
+    case "advanced": return t.prompts.difficultyHard;
+    default: return difficulty;
+  }
+}

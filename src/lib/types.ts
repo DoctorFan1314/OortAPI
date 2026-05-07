@@ -27,7 +27,7 @@ export interface Skill {
   description: string;
   category: string;
   categorySlug: string;
-  difficulty: "新手友好" | "进阶" | "高级";
+  difficulty: "beginner" | "intermediate" | "advanced";
   rating: number;
   usageCount: number;
   lastUpdated: string;

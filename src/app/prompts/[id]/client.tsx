@@ -18,6 +18,7 @@ import { getRelatedSkills } from "@/lib/related-skills";
 import { getVersions, initVersionForSkill } from "@/lib/prompt-versions";
 import type { PromptVersion } from "@/lib/prompt-versions";
 import { useI18n } from "@/contexts/i18n-context";
+import { getDifficultyLabel } from "@/lib/utils";
 
 function CopyButton({ text, label, copiedLabel, failedLabel }: { text: string; label: string; copiedLabel: string; failedLabel: string }) {
   const [copied, setCopied] = useState(false);
@@ -132,7 +133,7 @@ export default function SkillDetailClient({ id }: { id: string }) {
       <div className="mb-8">
         <div className="flex flex-wrap items-center gap-2 mb-3">
           <Badge variant="secondary" className="text-xs border" style={{ color, borderColor: `${color}30`, backgroundColor: `${color}10` }}>{skill.category}</Badge>
-          <Badge variant="secondary" className="text-xs bg-secondary border-border text-muted-foreground">{skill.difficulty}</Badge>
+          <Badge variant="secondary" className="text-xs bg-secondary border-border text-muted-foreground">{getDifficultyLabel(skill.difficulty, t)}</Badge>
           <span className="text-xs text-muted-foreground">{skill.version}</span>
         </div>
         <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-3">{skill.title}</h1>

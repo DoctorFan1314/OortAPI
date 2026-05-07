@@ -58,8 +58,15 @@ export function Navbar() {
     if (e && e.key !== "Enter") return;
     const q = searchQuery.trim();
     if (q) {
-      const basePath = pathname.startsWith("/skills") ? "/skills" : "/prompts";
-      router.push(`${basePath}?q=${encodeURIComponent(q)}`);
+      const encoded = encodeURIComponent(q);
+      if (pathname.startsWith("/skills")) {
+        router.push(`/skills?q=${encoded}`);
+      } else if (pathname.startsWith("/prompts")) {
+        router.push(`/prompts?q=${encoded}`);
+      } else {
+        // Default: go to skills for general search
+        router.push(`/skills?q=${encoded}`);
+      }
       setSearchOpen(false);
       setSearchQuery("");
     }

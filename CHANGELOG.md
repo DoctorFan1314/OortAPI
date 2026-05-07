@@ -6,6 +6,25 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [v2.0.3] — 2026-05-07
+
+### Internationalization
+- **Skill.difficulty enum → English values** — Changed `difficulty` from Chinese (`"新手友好" | "进阶" | "高级"`) to English (`"beginner" | "intermediate" | "advanced"`) in types, mock data, filter options, and create forms. Added `getDifficultyLabel()` helper for runtime i18n display
+
+### Performance
+- **Dynamic import heavy libraries** — `react-syntax-highlighter`, `JSZip`, and `file-saver` in skill detail page now use `lazy()` / dynamic `import()` to reduce initial bundle size
+- **Suspense wrapper** — SyntaxHighlighter rendering wrapped in `<Suspense>` with loading placeholder
+
+### Files Modified
+- `src/lib/types.ts` — `difficulty` type changed to English enum values
+- `src/lib/mock-data.ts` — All 28 skill difficulty values converted to English
+- `src/lib/utils.ts` — New `getDifficultyLabel()` helper function
+- `src/app/prompts/client.tsx` — Difficulty filter keys changed to English
+- `src/components/skills/create-from-upload-prompt.tsx` — Difficulty keys and state type changed to English
+- `src/components/skill/skill-card.tsx` — Uses `getDifficultyLabel()` for i18n display
+- `src/app/prompts/[id]/client.tsx` — Uses `getDifficultyLabel()` for badge display
+- `src/app/skills/[id]/client.tsx` — Dynamic import for SyntaxHighlighter, JSZip, file-saver
+
 ## [v2.0.2] — 2026-05-07
 
 ### Accessibility

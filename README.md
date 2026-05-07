@@ -203,7 +203,7 @@ ai-skills-hub/
 | Tag cloud search | ✅ | Real-time tag filtering by name with count display |
 | Newsletter unsubscribe | ✅ | Manage preferences / unsubscribe from footer newsletter |
 | Command palette | ✅ | Keyboard shortcuts with focus restore + animation |
-| Dynamic imports | ✅ | Create modals lazy-loaded via next/dynamic |
+| Dynamic imports | ✅ | Create modals lazy-loaded via next/dynamic; SyntaxHighlighter, JSZip, file-saver dynamic imported |
 | 404 page enhanced | ✅ | Search box + hot links + browse buttons |
 | Delete confirmation | ✅ | Type DELETE to confirm account deletion |
 | Full a11y | ✅ | ARIA roles, labels, keyboard support, reduced-motion |

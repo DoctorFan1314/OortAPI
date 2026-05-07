@@ -6,10 +6,13 @@ import { Badge } from "@/components/ui/badge";
 import { Star, Users, ArrowRight } from "lucide-react";
 import type { Skill } from "@/lib/types";
 import { COLORS } from "@/lib/theme";
+import { getDifficultyLabel } from "@/lib/utils";
+import { useI18n } from "@/contexts/i18n-context";
 
 export function SkillCard({ skill }: { skill: Skill }) {
   const color = COLORS.category[skill.categorySlug] || COLORS.primary;
   const router = useRouter();
+  const { t } = useI18n();
 
   return (
     <Link href={`/prompts/${skill.id}`}>
@@ -53,7 +56,7 @@ export function SkillCard({ skill }: { skill: Skill }) {
               <Users className="h-3 w-3" />
               {skill.usageCount}+
             </span>
-            <span>{skill.difficulty}</span>
+            <span>{getDifficultyLabel(skill.difficulty, t)}</span>
           </div>
           <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-all group-hover:translate-x-1" />
         </div>

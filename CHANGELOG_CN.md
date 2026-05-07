@@ -6,6 +6,25 @@
 
 ---
 
+## [v2.0.3] — 2026-05-07
+
+### 国际化
+- **Skill.difficulty 枚举改为英文值** — `difficulty` 从中文（`"新手友好" | "进阶" | "高级"`）改为英文（`"beginner" | "intermediate" | "advanced"`），涉及类型定义、模拟数据、筛选选项和创建表单。新增 `getDifficultyLabel()` 辅助函数用于运行时 i18n 显示
+
+### 性能优化
+- **动态导入重型库** — 技能详情页的 `react-syntax-highlighter`、`JSZip`、`file-saver` 现在使用 `lazy()` / 动态 `import()` 减少初始包体积
+- **Suspense 包裹** — SyntaxHighlighter 渲染用 `<Suspense>` 包裹并显示加载占位符
+
+### 修改文件
+- `src/lib/types.ts` — `difficulty` 类型改为英文枚举值
+- `src/lib/mock-data.ts` — 全部 28 个技能的 difficulty 值转换为英文
+- `src/lib/utils.ts` — 新增 `getDifficultyLabel()` 辅助函数
+- `src/app/prompts/client.tsx` — 难度筛选键改为英文
+- `src/components/skills/create-from-upload-prompt.tsx` — 难度键和状态类型改为英文
+- `src/components/skill/skill-card.tsx` — 使用 `getDifficultyLabel()` 做 i18n 显示
+- `src/app/prompts/[id]/client.tsx` — Badge 使用 `getDifficultyLabel()` 显示
+- `src/app/skills/[id]/client.tsx` — 动态导入 SyntaxHighlighter、JSZip、file-saver
+
 ## [v2.0.2] — 2026-05-07
 
 ### 无障碍
