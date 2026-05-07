@@ -38,6 +38,7 @@ export const en: Dictionary = {
     openNavigation: "Open navigation menu",
     navigationMenu: "Navigation Menu",
     close: "Close",
+    backToTop: "Back to top",
   },
   home: {
     heroTitle: "Discover Powerful Agent Skills",
@@ -484,6 +485,9 @@ export const en: Dictionary = {
     oauthRegisterComingSoon: "OAuth registration coming soon!",
     registerWithGoogle: "Sign up with Google",
     registerWithGithub: "Sign up with GitHub",
+    confirmPassword: "Confirm Password",
+    confirmPasswordPlaceholder: "Re-enter your password",
+    passwordMismatch: "Passwords do not match",
   },
   notFound: {
     title: "Page Not Found",

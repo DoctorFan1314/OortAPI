@@ -32,10 +32,10 @@ export default function SkillsClient() {
   const [showFilters, setShowFilters] = useState(false);
   const [showGithub, setShowGithub] = useState(false);
   const [showUpload, setShowUpload] = useState(false);
-  const [, setRefresh] = useState(0);
+  const [refresh, setRefresh] = useState(0);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
-  const allSkills = useMemo(() => [...agentSkills, ...getPublishedSkills()], []);
+  const allSkills = useMemo(() => [...agentSkills, ...getPublishedSkills()], [refresh]);
 
   const handleCreated = useCallback(() => setRefresh((r) => r + 1), []);
 

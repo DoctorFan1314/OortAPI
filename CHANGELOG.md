@@ -6,6 +6,60 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [v1.9.0] — 2026-05-07
+
+### Fixed
+- **My Likes/Favorites tab now shows Agent Skills** — Previously only Prompt skills were resolved; Agent skill IDs silently disappeared. Both tabs now render `AgentSkillCard` and `SkillCard` separately
+- **My Comments delete now syncs skillComments** — Deleting a comment from the profile now also removes it from the per-skill `skillComments` localStorage key, so the skill detail page no longer shows orphaned comments
+- **Usage History links now route correctly** — Agent skill view/copy history items now link to `/skills/[id]` instead of always linking to `/prompts/[id]`
+- **`formatNumber()` handles millions** — `1000000` now shows "1M" instead of "1000.0k"
+- **`formatDate()` parses dot-separated dates** — `"2026.04"` format (used in mock data) is now normalized to ISO before parsing, fixing "Invalid Date" errors
+- **Skills/Prompts `setRefresh` actually works** — `useMemo` dependency array now includes `refresh` counter, so newly created skills/prompts appear without manual page reload
+- **Agent skill card install command no longer triggers navigation** — Added `e.stopPropagation()` so clicking the install command copies to clipboard without also navigating to the detail page
+- **GitHub import modal no longer shows form + spinner simultaneously** — Parsing state now hides the form input, preventing visual overlap
+- **Sitemap uses real lastUpdated dates** — Agent skill pages now use `s.lastUpdated` instead of `new Date()` (always "today"); prompt date parsing is more robust
+- **Sitemap base URL from env var** — `NEXT_PUBLIC_SITE_URL` env var now overrides the hardcoded Vercel URL
+
+### Changed
+- **Profile tabs use URL search params** — `?tab=settings` deep-linking now works; refreshing the page preserves the active tab. Tabs use `useSearchParams` + `router.replace`
+- **Profile tabs have ARIA tab roles** — `role="tablist"`, `role="tab"`, `aria-selected`, `aria-controls`, `aria-labelledby`, `tabIndex` management
+- **Skill detail tabs have ARIA roles** — Same ARIA tab pattern applied to the 3-tab layout (intro/files/feedback)
+- **Breadcrumb i18n** — "Home" label now uses `t.common.home`; last item has `aria-current="page"`; decorative chevron has `aria-hidden="true"`
+- **Scroll-to-top button i18n** — `aria-label` now uses `t.common.backToTop` instead of hardcoded English
+- **Loading skeleton a11y** — Added `role="status"`, `aria-busy="true"`, `aria-label`
+- **Error boundary icons** — `AlertTriangle` decorative icons now have `aria-hidden="true"`
+- **Login page loading state** — Submit button shows "..." while authenticating; error message has `role="alert"`
+- **Register page confirm password** — New "Confirm Password" field with mismatch validation
+- **Register page loading state** — Submit button shows "..." while registering; error message has `role="alert"`
+- **i18n keys added** — `common.backToTop`, `auth.confirmPassword`, `auth.confirmPasswordPlaceholder`, `auth.passwordMismatch`
+
+### Files Modified
+- `src/components/profile/my-likes-tab.tsx` — Import `getAgentSkillById` + `AgentSkillCard`; render both agent and prompt skills
+- `src/components/profile/my-favorites-tab.tsx` — Same dual-render pattern
+- `src/components/profile/my-comments-tab.tsx` — `handleDelete` now accepts `skillId` and cleans up `skillComments` storage
+- `src/components/profile/usage-history-tab.tsx` — Import `getAgentSkillById`; link to `/skills/` for agent skills
+- `src/lib/utils.ts` — `formatNumber` handles M; `formatDate` normalizes dot-separated dates
+- `src/app/skills/client.tsx` — `useMemo` depends on `refresh` counter
+- `src/app/prompts/client.tsx` — Same `useMemo` fix
+- `src/components/agent-skill/agent-skill-card.tsx` — `e.stopPropagation()` + `.catch()` on clipboard
+- `src/components/skills/create-from-github.tsx` — Form hidden during parsing state
+- `src/app/sitemap.ts` — Real dates + env var base URL
+- `src/app/profile/client.tsx` — URL-based tab routing, ARIA tab roles
+- `src/components/shared/breadcrumb.tsx` — i18n, `aria-current`, `aria-hidden`
+- `src/components/shared/scroll-to-top.tsx` — i18n for `aria-label`
+- `src/app/loading.tsx` — `role="status"`, `aria-busy`, `aria-label`
+- `src/app/error.tsx` — `aria-hidden` on icon
+- `src/app/skills/error.tsx` — `aria-hidden` on icon
+- `src/app/prompts/error.tsx` — `aria-hidden` on icon
+- `src/app/skills/[id]/client.tsx` — ARIA tab roles on detail page tabs
+- `src/app/login/client.tsx` — Loading state, `role="alert"` on error
+- `src/app/register/client.tsx` — Confirm password field, loading state, `role="alert"`
+- `src/lib/i18n/types.ts` — New keys: `common.backToTop`, `auth.confirmPassword/confirmPasswordPlaceholder/passwordMismatch`
+- `src/lib/i18n/zh.ts` — Chinese translations for new keys
+- `src/lib/i18n/en.ts` — English translations for new keys
+
+---
+
 ## [v1.8.0] — 2026-05-07
 
 ### Added

@@ -5,6 +5,7 @@ import { useI18n } from "@/contexts/i18n-context";
 import { useLocale } from "@/hooks/use-locale";
 import { STORAGE_KEYS } from "@/lib/storage-keys";
 import { getSkillById } from "@/lib/mock-data";
+import { getAgentSkillById } from "@/lib/mock-agent-skills";
 import type { UserActivity } from "@/lib/types";
 import { Eye, Copy, Clock } from "lucide-react";
 import Link from "next/link";
@@ -49,7 +50,7 @@ export function UsageHistoryTab() {
                 {a.skillId && (
                   <>
                     {" — "}
-                    <Link href={`/prompts/${a.skillId}`} className="text-primary hover:underline">{a.targetTitle || a.skillId}</Link>
+                    <Link href={getAgentSkillById(a.skillId) ? `/skills/${a.skillId}` : `/prompts/${a.skillId}`} className="text-primary hover:underline">{a.targetTitle || a.skillId}</Link>
                   </>
                 )}
               </p>

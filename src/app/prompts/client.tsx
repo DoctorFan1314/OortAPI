@@ -36,11 +36,11 @@ export default function PromptsClient() {
   );
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [showUpload, setShowUpload] = useState(false);
-  const [, setRefresh] = useState(0);
+  const [refresh, setRefresh] = useState(0);
 
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
-  const allPrompts = useMemo(() => [...skills, ...getPublishedPrompts()], []);
+  const allPrompts = useMemo(() => [...skills, ...getPublishedPrompts()], [refresh]);
 
   const updateURL = useCallback(
     (overrides: Record<string, string>) => {

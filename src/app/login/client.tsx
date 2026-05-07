@@ -13,6 +13,7 @@ export default function LoginClient() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
@@ -25,7 +26,9 @@ export default function LoginClient() {
       setError(t.auth.fillAllFields);
       return;
     }
+    setLoading(true);
     const ok = await login(email, password);
+    setLoading(false);
     if (!ok) {
       setError(t.auth.emailOrPasswordError);
       return;
@@ -54,8 +57,8 @@ export default function LoginClient() {
               </div>
               <Input id="password" type="password" autoComplete="current-password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} className="bg-secondary border-border text-foreground placeholder:text-muted-foreground/50" />
             </div>
-            {error && <p className="text-sm text-red-400 text-center">{error}</p>}
-            <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-medium h-11">{t.auth.loginNow}</Button>
+            {error && <p role="alert" className="text-sm text-red-400 text-center">{error}</p>}
+            <Button type="submit" disabled={loading} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-medium h-11">{loading ? "..." : t.auth.loginNow}</Button>
           </form>
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border" /></div>

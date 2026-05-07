@@ -1,6 +1,6 @@
 export default function Loading() {
   return (
-    <div className="animate-pulse">
+    <div className="animate-pulse" role="status" aria-busy="true" aria-label="Loading">
       {/* Hero skeleton */}
       <div className="py-20 px-4">
         <div className="max-w-4xl mx-auto text-center space-y-6">

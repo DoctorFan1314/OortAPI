@@ -215,6 +215,14 @@ ai-skills-hub/
 | Date locale | ✅ | `useLocale()` hook for proper zh-CN/en-US date formatting across all components |
 | MarkdownRenderer (shared) | ✅ | Extracted reusable component with heading anchors and scroll offset |
 | Navbar "More" dropdown | ✅ | Quick access to Categories, Trending, Tags, Guide from navbar |
+| URL-based profile tabs | ✅ | Deep-linkable tabs via `?tab=settings`, preserved on refresh |
+| Register confirm password | ✅ | Password mismatch validation on registration |
+| Login/Register loading states | ✅ | Button shows loading indicator during auth |
+| My Likes/Favorites: Agent Skills | ✅ | Both Agent Skills and Prompts now visible in likes and favorites |
+| Comment delete sync | ✅ | Deleting comments syncs across user, global, and per-skill storage |
+| Usage history correct routing | ✅ | Agent skill history links to `/skills/[id]`, not `/prompts/[id]` |
+| formatNumber: millions | ✅ | `1000000` → "1M" instead of "1000.0k" |
+| Sitemap real dates | ✅ | Uses actual `lastUpdated` dates; base URL from env var |
 
 ---
 

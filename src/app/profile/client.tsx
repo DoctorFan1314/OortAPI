@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { AuthGuard } from "@/components/auth/auth-guard";
 import { ProfileHeader } from "@/components/profile/profile-header";
 import { StatsDashboard } from "@/components/profile/stats-dashboard";
@@ -12,11 +13,27 @@ import { MyCommentsTab } from "@/components/profile/my-comments-tab";
 import { UsageHistoryTab } from "@/components/profile/usage-history-tab";
 import { SettingsTab } from "@/components/profile/settings-tab";
 import { useI18n } from "@/contexts/i18n-context";
+import { useSearchParams, useRouter } from "next/navigation";
 import { User, Heart, Bookmark, FileText, MessageSquare, Clock, Settings } from "lucide-react";
 
+type TabId = "overview" | "favorites" | "likes" | "submissions" | "comments" | "history" | "settings";
+
 export default function ProfileClient() {
-  const [activeTab, setActiveTab] = useState<"overview" | "favorites" | "likes" | "submissions" | "comments" | "history" | "settings">("overview");
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const { t } = useI18n();
+  const tabFromUrl = searchParams.get("tab") as TabId | null;
+  const [activeTab, setActiveTab] = useState<TabId>(
+    tabFromUrl && ["overview", "favorites", "likes", "submissions", "comments", "history", "settings"].includes(tabFromUrl)
+      ? tabFromUrl
+      : "overview"
+  );
+
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", activeTab);
+    router.replace(`?${params.toString()}`, { scroll: false });
+  }, [activeTab]);
 
   const tabs = [
     { id: "overview" as const, label: t.profile.overview, icon: User },
@@ -33,12 +50,17 @@ export default function ProfileClient() {
       <div className="mx-auto max-w-5xl px-4 py-8 lg:px-8">
         <ProfileHeader />
 
-        <div className="flex gap-1 overflow-x-auto scrollbar-hide mb-8 border-b border-border pb-px">
+        <div role="tablist" className="flex gap-1 overflow-x-auto scrollbar-hide mb-8 border-b border-border pb-px">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             return (
               <button
                 key={tab.id}
+                role="tab"
+                aria-selected={activeTab === tab.id}
+                id={`tab-${tab.id}`}
+                aria-controls={`tabpanel-${tab.id}`}
+                tabIndex={activeTab === tab.id ? 0 : -1}
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-4 py-3 text-sm whitespace-nowrap transition-colors border-b-2 -mb-px ${
                   activeTab === tab.id
@@ -53,7 +75,7 @@ export default function ProfileClient() {
           })}
         </div>
 
-        <div>
+        <div role="tabpanel" id={`tabpanel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
           {activeTab === "overview" && (
             <div className="space-y-8">
               <StatsDashboard />

@@ -131,7 +131,7 @@ export function CreateFromGithub({ open, onClose, onCreated }: Props) {
         </div>
 
         {/* Step 1: Enter URL */}
-        {step === 1 && !done && (
+        {step === 1 && !done && !parsing && (
           <div className="px-6 py-6 space-y-4">
             <p className="text-sm text-muted-foreground">{t.create.githubUrlPlaceholder}</p>
             <div>

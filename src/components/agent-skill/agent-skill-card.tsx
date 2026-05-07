@@ -73,14 +73,16 @@ export function AgentSkillCard({ skill }: { skill: AgentSkill }) {
         className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary/80 border border-border group/install cursor-pointer hover:border-primary/30 transition-colors"
         onClick={(e) => {
           e.preventDefault();
-          navigator.clipboard.writeText(skill.installCommand);
+          e.stopPropagation();
+          navigator.clipboard.writeText(skill.installCommand).catch(() => {});
           setCopied(true);
           setTimeout(() => setCopied(false), 2000);
         }}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
-            navigator.clipboard.writeText(skill.installCommand);
+            e.stopPropagation();
+            navigator.clipboard.writeText(skill.installCommand).catch(() => {});
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
           }

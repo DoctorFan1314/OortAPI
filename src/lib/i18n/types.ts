@@ -7,7 +7,7 @@ export interface Dictionary {
     copy: string; copied: string; share: string; like: string; bookmark: string;
     more: string; all: string; viewAll: string;
     or: string; closeSearch: string; toggleTheme: string; switchLanguage: string;
-    openNavigation: string; navigationMenu: string; close: string;
+    openNavigation: string; navigationMenu: string; close: string; backToTop: string;
   };
   home: {
     featuredTitle: string; featuredSubtitle: string;
@@ -183,6 +183,7 @@ export interface Dictionary {
     registerSuccess: string; createAccountDesc: string;
     usernamePlaceholder: string; passwordPlaceholder: string;
     oauthRegisterComingSoon: string; registerWithGoogle: string; registerWithGithub: string;
+    confirmPassword: string; confirmPasswordPlaceholder: string; passwordMismatch: string;
   };
   notFound: {
     title: string; description: string; backHome: string;

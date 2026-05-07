@@ -26,7 +26,7 @@ export function MyCommentsTab() {
     comments = raw ? JSON.parse(raw) : [];
   } catch { /* ignore */ }
 
-  const handleDelete = (id: string) => {
+  const handleDelete = (id: string, skillId: string) => {
     const updated = comments.filter((c) => c.id !== id);
     localStorage.setItem(STORAGE_KEYS.comments(user.email), JSON.stringify(updated));
     // Also remove from global
@@ -34,6 +34,12 @@ export function MyCommentsTab() {
       const allRaw = localStorage.getItem(STORAGE_KEYS.allComments);
       const all: Comment[] = allRaw ? JSON.parse(allRaw) : [];
       localStorage.setItem(STORAGE_KEYS.allComments, JSON.stringify(all.filter((c) => c.id !== id)));
+    } catch { /* ignore */ }
+    // Also remove from per-skill comments
+    try {
+      const skillRaw = localStorage.getItem(STORAGE_KEYS.skillComments(skillId));
+      const skillComments: Comment[] = skillRaw ? JSON.parse(skillRaw) : [];
+      localStorage.setItem(STORAGE_KEYS.skillComments(skillId), JSON.stringify(skillComments.filter((c) => c.id !== id)));
     } catch { /* ignore */ }
     setTick((t) => t + 1);
   };
@@ -61,7 +67,7 @@ export function MyCommentsTab() {
               <Link href={href} className="text-sm text-primary hover:underline truncate">
                 {title}
               </Link>
-              <Button variant="ghost" size="icon-sm" onClick={() => handleDelete(c.id)} className="text-muted-foreground hover:text-destructive shrink-0">
+              <Button variant="ghost" size="icon-sm" onClick={() => handleDelete(c.id, c.skillId)} className="text-muted-foreground hover:text-destructive shrink-0">
                 <Trash2 className="h-4 w-4" />
               </Button>
             </div>

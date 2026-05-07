@@ -5,7 +5,7 @@ import { categories } from "@/lib/categories";
 import { getAllTags } from "@/lib/tag-utils";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = "https://ai-skills-hub.vercel.app";
+  const base = process.env.NEXT_PUBLIC_SITE_URL || "https://ai-skills-hub.vercel.app";
 
   const staticPages = [
     { url: base, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 1 },
@@ -20,14 +20,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const promptPages = skills.map((s) => ({
     url: `${base}/prompts/${s.id}`,
-    lastModified: new Date(s.lastUpdated.replace(/\./g, "-") + "-01"),
+    lastModified: new Date(s.lastUpdated.replace(/\./g, "-").replace(/^(\d{4})-(\d{2})$/, "$1-$2-01")),
     changeFrequency: "monthly" as const,
     priority: 0.8,
   }));
 
   const agentSkillPages = agentSkills.map((s) => ({
     url: `${base}/skills/${s.id}`,
-    lastModified: new Date(),
+    lastModified: new Date(s.lastUpdated),
     changeFrequency: "monthly" as const,
     priority: 0.8,
   }));

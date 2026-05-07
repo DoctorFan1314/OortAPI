@@ -38,6 +38,7 @@ export const zh: Dictionary = {
     openNavigation: "打开导航菜单",
     navigationMenu: "导航菜单",
     close: "关闭",
+    backToTop: "回到顶部",
   },
   home: {
     heroTitle: "探索强大的 Agent 技能",
@@ -484,6 +485,9 @@ export const zh: Dictionary = {
     oauthRegisterComingSoon: "OAuth 注册即将推出，敬请期待！",
     registerWithGoogle: "使用 Google 注册",
     registerWithGithub: "使用 GitHub 注册",
+    confirmPassword: "确认密码",
+    confirmPasswordPlaceholder: "再次输入密码",
+    passwordMismatch: "两次输入的密码不一致",
   },
   notFound: {
     title: "页面未找到",

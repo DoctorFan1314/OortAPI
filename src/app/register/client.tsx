@@ -13,7 +13,9 @@ export default function RegisterClient() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const { register } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
@@ -30,11 +32,17 @@ export default function RegisterClient() {
       setError(t.auth.passwordMinLength);
       return;
     }
+    if (password !== confirmPassword) {
+      setError(t.auth.passwordMismatch);
+      return;
+    }
     if (!email.includes("@")) {
       setError(t.auth.emailInvalid);
       return;
     }
+    setLoading(true);
     const ok = await register(username, email, password);
+    setLoading(false);
     if (!ok) {
       setError(t.auth.emailExists);
       return;
@@ -64,8 +72,12 @@ export default function RegisterClient() {
               <label htmlFor="password" className="text-sm text-foreground mb-1.5 block">{t.auth.password}</label>
               <Input id="password" type="password" autoComplete="new-password" placeholder={t.auth.passwordPlaceholder} value={password} onChange={(e) => setPassword(e.target.value)} className="bg-secondary border-border text-foreground placeholder:text-muted-foreground/50" />
             </div>
-            {error && <p className="text-sm text-red-400 text-center">{error}</p>}
-            <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-medium h-11">{t.auth.registerNow}</Button>
+            <div>
+              <label htmlFor="confirmPassword" className="text-sm text-foreground mb-1.5 block">{t.auth.confirmPassword}</label>
+              <Input id="confirmPassword" type="password" autoComplete="new-password" placeholder={t.auth.confirmPasswordPlaceholder} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="bg-secondary border-border text-foreground placeholder:text-muted-foreground/50" />
+            </div>
+            {error && <p role="alert" className="text-sm text-red-400 text-center">{error}</p>}
+            <Button type="submit" disabled={loading} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-medium h-11">{loading ? "..." : t.auth.registerNow}</Button>
           </form>
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border" /></div>

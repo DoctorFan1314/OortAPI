@@ -176,10 +176,15 @@ export default function AgentSkillDetailClient({ id }: { id: string }) {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-0 border-b border-border mb-6">
+      <div role="tablist" className="flex items-center gap-0 border-b border-border mb-6">
         {tabs.map(({ key, label }) => (
           <button
             key={key}
+            role="tab"
+            aria-selected={activeTab === key}
+            id={`detail-tab-${key}`}
+            aria-controls={`detail-tabpanel-${key}`}
+            tabIndex={activeTab === key ? 0 : -1}
             onClick={() => setActiveTab(key)}
             className={`px-5 py-3 text-sm border-b-2 transition-colors ${
               activeTab === key
@@ -194,7 +199,7 @@ export default function AgentSkillDetailClient({ id }: { id: string }) {
 
       {/* Tab: Skill Intro */}
       {activeTab === "intro" && (
-        <div className="grid lg:grid-cols-[1fr_280px] gap-6">
+        <div role="tabpanel" id="detail-tabpanel-intro" aria-labelledby="detail-tab-intro" className="grid lg:grid-cols-[1fr_280px] gap-6">
           {/* README content */}
           <div className="glass-card p-6">
             <MarkdownRenderer content={skill.readme} />
@@ -279,7 +284,7 @@ export default function AgentSkillDetailClient({ id }: { id: string }) {
 
       {/* Tab: Skill Files */}
       {activeTab === "files" && (
-        <div>
+        <div role="tabpanel" id="detail-tabpanel-files" aria-labelledby="detail-tab-files">
           <div className="glass-card overflow-hidden">
             {/* File header with developer info */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-secondary/30">
@@ -371,7 +376,7 @@ export default function AgentSkillDetailClient({ id }: { id: string }) {
 
       {/* Tab: Feedback */}
       {activeTab === "feedback" && (
-        <div className="space-y-6">
+        <div role="tabpanel" id="detail-tabpanel-feedback" aria-labelledby="detail-tab-feedback" className="space-y-6">
           {/* Comment input */}
           <div className="glass-card p-5">
             <div className="flex gap-3">

@@ -23,7 +23,7 @@ export default function SkillsError({
     <div className="min-h-[60vh] flex items-center justify-center px-4">
       <div className="glass-card p-10 max-w-md w-full text-center">
         <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10">
-          <AlertTriangle className="h-8 w-8 text-destructive" />
+          <AlertTriangle className="h-8 w-8 text-destructive" aria-hidden="true" />
         </div>
         <h1 className="text-xl font-bold text-foreground mb-2">{t.error.title}</h1>
         <p className="text-muted-foreground text-sm mb-8">{t.error.description}</p>

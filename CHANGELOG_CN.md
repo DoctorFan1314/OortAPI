@@ -6,6 +6,60 @@
 
 ---
 
+## [v1.9.0] — 2026-05-07
+
+### 修复
+- **我的点赞/收藏页现在显示 Agent 技能** — 之前只解析 Prompt 技能，Agent 技能 ID 被静默过滤；现在两个标签页分别渲染 `AgentSkillCard` 和 `SkillCard`
+- **我的评论删除同步 skillComments** — 从个人中心删除评论时同时清理 `skillComments` localStorage，技能详情页不再显示孤立评论
+- **使用历史链接路由修复** — Agent 技能的浏览/复制记录现在正确链接到 `/skills/[id]`，不再一律跳转到 `/prompts/[id]`
+- **`formatNumber()` 支持百万级** — `1000000` 现在显示 "1M" 而非 "1000.0k"
+- **`formatDate()` 解析点分隔日期** — Mock 数据中的 `"2026.04"` 格式现在先转为 ISO 格式再解析，修复 "Invalid Date" 错误
+- **技能/模板页 `setRefresh` 生效** — `useMemo` 依赖数组现在包含 `refresh` 计数器，新建技能/模板后无需手动刷新页面
+- **Agent 技能卡片安装命令不再触发跳转** — 添加 `e.stopPropagation()`，点击安装命令只复制不跳转
+- **GitHub 导入模态框不再同时显示表单和加载动画** — 解析状态下隐藏表单输入，避免视觉重叠
+- **Sitemap 使用真实 lastUpdated 日期** — Agent 技能页面使用 `s.lastUpdated` 而非始终为"今天"的 `new Date()`；Prompt 日期解析更健壮
+- **Sitemap 基础 URL 从环境变量读取** — `NEXT_PUBLIC_SITE_URL` 环境变量可覆盖硬编码的 Vercel URL
+
+### 变更
+- **Profile Tab 使用 URL 参数** — `?tab=settings` 深度链接生效；刷新页面保持当前 Tab；使用 `useSearchParams` + `router.replace`
+- **Profile Tab 添加 ARIA 角色** — `role="tablist"`、`role="tab"`、`aria-selected`、`aria-controls`、`aria-labelledby`、`tabIndex` 管理
+- **技能详情页 Tab 添加 ARIA 角色** — 三栏布局（介绍/文件/反馈）应用相同 ARIA Tab 模式
+- **面包屑 i18n** — "Home" 标签改用 `t.common.home`；最后一项添加 `aria-current="page"`；装饰箭头添加 `aria-hidden="true"`
+- **滚动到顶部按钮 i18n** — `aria-label` 改用 `t.common.backToTop`，不再硬编码英文
+- **Loading 骨架屏无障碍** — 添加 `role="status"`、`aria-busy="true"`、`aria-label`
+- **Error Boundary 装饰图标** — `AlertTriangle` 装饰图标添加 `aria-hidden="true"`
+- **登录页 loading 状态** — 提交按钮显示 "..."；错误消息添加 `role="alert"`
+- **注册页确认密码** — 新增"确认密码"字段，含密码不匹配验证
+- **注册页 loading 状态** — 提交按钮显示 "..."；错误消息添加 `role="alert"`
+- **新增 i18n 键** — `common.backToTop`、`auth.confirmPassword`、`auth.confirmPasswordPlaceholder`、`auth.passwordMismatch`
+
+### 修改文件
+- `src/components/profile/my-likes-tab.tsx` — 导入 `getAgentSkillById` + `AgentSkillCard`；同时渲染 Agent 和 Prompt 技能
+- `src/components/profile/my-favorites-tab.tsx` — 同上双渲染模式
+- `src/components/profile/my-comments-tab.tsx` — `handleDelete` 新增 `skillId` 参数，同步清理 `skillComments` 存储
+- `src/components/profile/usage-history-tab.tsx` — 导入 `getAgentSkillById`；Agent 技能链接到 `/skills/`
+- `src/lib/utils.ts` — `formatNumber` 支持 M；`formatDate` 规范化点分隔日期
+- `src/app/skills/client.tsx` — `useMemo` 依赖 `refresh` 计数器
+- `src/app/prompts/client.tsx` — 同上 `useMemo` 修复
+- `src/components/agent-skill/agent-skill-card.tsx` — `e.stopPropagation()` + clipboard `.catch()`
+- `src/components/skills/create-from-github.tsx` — 解析中隐藏表单
+- `src/app/sitemap.ts` — 真实日期 + 环境变量基础 URL
+- `src/app/profile/client.tsx` — URL 参数路由 Tab，ARIA Tab 角色
+- `src/components/shared/breadcrumb.tsx` — i18n、`aria-current`、`aria-hidden`
+- `src/components/shared/scroll-to-top.tsx` — `aria-label` i18n
+- `src/app/loading.tsx` — `role="status"`、`aria-busy`、`aria-label`
+- `src/app/error.tsx` — 图标 `aria-hidden`
+- `src/app/skills/error.tsx` — 图标 `aria-hidden`
+- `src/app/prompts/error.tsx` — 图标 `aria-hidden`
+- `src/app/skills/[id]/client.tsx` — 详情页 Tab ARIA 角色
+- `src/app/login/client.tsx` — Loading 状态、`role="alert"`
+- `src/app/register/client.tsx` — 确认密码字段、loading 状态、`role="alert"`
+- `src/lib/i18n/types.ts` — 新增 `common.backToTop`、`auth.confirmPassword/confirmPasswordPlaceholder/passwordMismatch`
+- `src/lib/i18n/zh.ts` — 新增键中文翻译
+- `src/lib/i18n/en.ts` — 新增键英文翻译
+
+---
+
 ## [v1.8.0] — 2026-05-07
 
 ### 新增
