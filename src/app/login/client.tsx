@@ -50,7 +50,7 @@ export default function LoginClient() {
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label htmlFor="password" className="text-sm text-foreground">{t.auth.password}</label>
-                <span className="text-xs text-muted-foreground/40 cursor-default">{t.auth.forgotPassword}</span>
+                <span className="text-xs text-muted-foreground/40 cursor-default" title="Coming soon">{t.auth.forgotPassword}</span>
               </div>
               <Input id="password" type="password" autoComplete="current-password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} className="bg-secondary border-border text-foreground placeholder:text-muted-foreground/50" />
             </div>

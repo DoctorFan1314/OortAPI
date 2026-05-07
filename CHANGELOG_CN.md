@@ -6,6 +6,39 @@
 
 ---
 
+## [v1.7.0] — 2026-05-07
+
+### 新增
+- **自定义头像** — 用户可在个人中心头部和设置页面上传、裁剪、设置自定义头像；使用 `react-easy-crop` 库，圆形裁剪、缩放滑块、256×256 JPEG 输出；头像以 base64 data URL 持久化到 localStorage
+- **导航栏头像** — 导航栏用户图标现在显示自定义头像（通过 `next/image`），无头像时回退为首字母
+- **头像 i18n** — 新增 8 个头像相关 i18n 键（`avatar.changeAvatar`、`avatar.uploadHint`、`avatar.fileTooLarge`、`avatar.zoomIn`、`avatar.zoomOut`、`avatar.confirm`、`avatar.cancel`、`avatar.dragToAdjust`）
+
+### 变更
+- **指南页示例 i18n** — 硬编码 "春季穿搭心得" 替换为 `t.guide.promptExampleTopic` 键
+- **Prompt 创建难度 i18n** — `create-from-upload-prompt.tsx` 难度下拉框改用 i18n 标签（`t.create.difficultyEasy/Medium/Hard`）
+- **登录页"忘记密码"** — 禁用链接添加 `title="Coming soon"` 提示
+- **分享错误处理** — `prompts/[id]/client.tsx` 空 catch 块添加注释说明为用户取消操作
+
+### 修改文件
+- `src/components/profile/profile-header.tsx` — Camera 图标遮罩、文件输入、AvatarCropDialog 集成
+- `src/components/profile/settings-tab.tsx` — 头像上传区块含预览、Camera 按钮和裁剪对话框
+- `src/components/layout/navbar.tsx` — 使用 `next/image` 显示自定义头像
+- `src/app/guide/client.tsx` — 示例主题文本改用 i18n 键
+- `src/components/skills/create-from-upload-prompt.tsx` — `DIFFICULTIES` 移入组件内部，使用 `{ key, label }` + i18n
+- `src/app/prompts/[id]/client.tsx` — 分享 catch 块添加注释
+- `src/app/login/client.tsx` — 忘记密码链接添加 title 属性
+- `src/lib/i18n/types.ts` — 新增 `avatar` 区块（8 个键）+ `guide.promptExampleTopic`
+- `src/lib/i18n/zh.ts` — 头像 + promptExampleTopic 中文翻译
+- `src/lib/i18n/en.ts` — 头像 + promptExampleTopic 英文翻译
+
+### 新文件
+- `src/components/profile/avatar-crop-dialog.tsx` — 可复用头像裁剪对话框，基于 react-easy-crop，Canvas 裁剪导出
+
+### 依赖
+- 新增 `react-easy-crop` — 轻量级图片裁剪组件，支持触摸操作
+
+---
+
 ## [v1.6.7] — 2026-05-07
 
 ### 变更

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
 import { Search, Menu, X, Sun, Moon, Languages } from "lucide-react";
@@ -112,8 +113,12 @@ export function Navbar() {
           <div className="hidden md:flex items-center gap-2">
             {!loaded ? null : user ? (
               <Link href="/profile">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-medium cursor-pointer hover:opacity-90 transition-opacity">
-                  {user.username.charAt(0).toUpperCase()}
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-medium cursor-pointer hover:opacity-90 transition-opacity overflow-hidden shrink-0">
+                  {user.avatar ? (
+                    <Image src={user.avatar} alt={user.username} width={32} height={32} className="h-8 w-8 rounded-full object-cover" unoptimized />
+                  ) : (
+                    user.username.charAt(0).toUpperCase()
+                  )}
                 </div>
               </Link>
             ) : (

@@ -6,7 +6,38 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [v1.6.7] — 2026-05-07
+## [v1.7.0] — 2026-05-07
+
+### Added
+- **Custom avatar upload** — Users can upload, crop, and set a custom avatar from the profile header and settings page; uses `react-easy-crop` with round crop shape, zoom slider, and 256×256 JPEG output; avatar persists to `localStorage` as base64 data URL
+- **Avatar in navbar** — Navbar user icon now displays the custom avatar (via `next/image`) when set, falling back to first-letter initial
+- **Avatar i18n** — 8 new i18n keys for the avatar feature (`avatar.changeAvatar`, `avatar.uploadHint`, `avatar.fileTooLarge`, `avatar.zoomIn`, `avatar.zoomOut`, `avatar.confirm`, `avatar.cancel`, `avatar.dragToAdjust`)
+
+### Changed
+- **Guide page prompt example i18n** — Hardcoded "春季穿搭心得" example text replaced with `t.guide.promptExampleTopic` key
+- **Prompt creation difficulty i18n** — `create-from-upload-prompt.tsx` difficulty dropdown now uses i18n labels (`t.create.difficultyEasy/Medium/Hard`) instead of hardcoded Chinese strings
+- **Login page "Forgot password"** — Added `title="Coming soon"` hint to the disabled link
+- **Share error handling** — `prompts/[id]/client.tsx` empty catch block on `navigator.share` now has a comment explaining it's an expected user cancellation
+
+### Files Modified
+- `src/components/profile/profile-header.tsx` — Camera icon overlay on hover, file input, AvatarCropDialog integration, `useToast` and `updateProfile` for avatar save
+- `src/components/profile/settings-tab.tsx` — Avatar upload section with preview, camera button, and AvatarCropDialog; imports `useRef`, `Camera`, `Image`, `AvatarCropDialog`
+- `src/components/layout/navbar.tsx` — Avatar display using `next/image` when user has custom avatar
+- `src/app/guide/client.tsx` — Example topic text now uses i18n key
+- `src/components/skills/create-from-upload-prompt.tsx` — `DIFFICULTIES` array moved inside component, uses `{ key, label }` pattern with i18n
+- `src/app/prompts/[id]/client.tsx` — Comment on share catch block
+- `src/app/login/client.tsx` — `title` attribute on forgot password link
+- `src/lib/i18n/types.ts` — New `avatar` section (8 keys) + `guide.promptExampleTopic`
+- `src/lib/i18n/zh.ts` — Chinese translations for avatar + promptExampleTopic
+- `src/lib/i18n/en.ts` — English translations for avatar + promptExampleTopic
+
+### New Files
+- `src/components/profile/avatar-crop-dialog.tsx` — Reusable avatar crop dialog with `react-easy-crop`, zoom slider, Canvas-based 256×256 JPEG export
+
+### Dependencies
+- Added `react-easy-crop` — Lightweight image cropping component with touch support
+
+---
 
 ### Changed
 - **Dynamic `allowedDevOrigins`** — Replaced hardcoded `192.168.31.125` with wildcard patterns (`http://192.168.*`, `http://10.*`, `http://172.*`) covering all RFC 1918 private IP ranges; any LAN IP works automatically

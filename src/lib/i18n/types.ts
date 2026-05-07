@@ -142,7 +142,7 @@ export interface Dictionary {
     promptTemplatesLabel: string; promptTemplatesDesc: string;
     noExpertise: string; noExpertiseDesc: string;
     whatIsPrompt: string; promptDesc: string; promptDesc2: string;
-    example: string; promptExample: string; variableNote: string;
+    example: string; promptExample: string; promptExampleTopic: string; variableNote: string;
     whatIsAgentSkill: string; agentSkillDesc1: string; agentSkillDesc2: string;
     installExample: string; installNote: string;
     onlineVsLocal: string;
@@ -246,6 +246,11 @@ export interface Dictionary {
     skillTypeCommunication: string; skillTypeOther: string;
     premiumSkill: string; premiumDesc: string; premiumUnlock: string;
     unlockView: string; loginUnlock: string; registerFree: string;
+  };
+  avatar: {
+    changeAvatar: string; uploadHint: string; fileTooLarge: string;
+    zoomIn: string; zoomOut: string; confirm: string; cancel: string;
+    dragToAdjust: string;
   };
   admin: {
     title: string; pendingSubmissions: string; userManage: string; skillAnalytics: string;

@@ -17,11 +17,14 @@ interface Props {
   onCreated: () => void;
 }
 
-const DIFFICULTIES = ["新手友好", "进阶", "高级"] as const;
-
 export function CreateFromUploadPrompt({ open, onClose, onCreated }: Props) {
   const { t } = useI18n();
   const { toast } = useToast();
+  const DIFFICULTIES = [
+    { key: "新手友好" as const, label: t.create.difficultyEasy },
+    { key: "进阶" as const, label: t.create.difficultyMedium },
+    { key: "高级" as const, label: t.create.difficultyHard },
+  ];
   const [title, setTitle] = useState("");
   const [subtitle, setSubtitle] = useState("");
   const [description, setDescription] = useState("");
@@ -143,7 +146,7 @@ export function CreateFromUploadPrompt({ open, onClose, onCreated }: Props) {
               <div>
                 <label className="text-sm text-foreground mb-1.5 block">{t.create.templateDifficulty}</label>
                 <select value={difficulty} onChange={(e) => setDifficulty(e.target.value as typeof difficulty)} className="w-full h-9 rounded-md border border-border bg-secondary px-3 text-sm text-foreground">
-                  {DIFFICULTIES.map((d) => <option key={d} value={d}>{d}</option>)}
+                  {DIFFICULTIES.map((d) => <option key={d.key} value={d.key}>{d.label}</option>)}
                 </select>
               </div>
               <div>

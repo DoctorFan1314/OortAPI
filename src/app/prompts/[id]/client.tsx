@@ -110,7 +110,7 @@ export default function SkillDetailClient({ id }: { id: string }) {
   async function handleShare() {
     const url = window.location.href;
     if (navigator.share) {
-      try { await navigator.share({ title: skill?.title, url }); } catch {}
+      try { await navigator.share({ title: skill?.title, url }); } catch { /* user cancelled share */ }
     } else {
       try {
         await navigator.clipboard.writeText(url);

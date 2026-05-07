@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { useTheme } from "@/contexts/theme-context";
 import { useToast } from "@/contexts/toast-context";
@@ -9,7 +9,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { STORAGE_KEYS } from "@/lib/storage-keys";
-import { Sun, Moon, Monitor, Download, Trash2, AlertTriangle } from "lucide-react";
+import { Sun, Moon, Monitor, Download, Trash2, AlertTriangle, Camera } from "lucide-react";
+import Image from "next/image";
+import { AvatarCropDialog } from "./avatar-crop-dialog";
+
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 export function SettingsTab() {
   const { user, updateProfile, changePassword, logout } = useAuth();
@@ -25,8 +29,28 @@ export function SettingsTab() {
   const [pwError, setPwError] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [cropImage, setCropImage] = useState<string | null>(null);
 
   if (!user) return null;
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > MAX_FILE_SIZE) {
+      toast(t.avatar.fileTooLarge, "error");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => { setCropImage(reader.result as string); };
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  }
+
+  function handleCropComplete(dataUrl: string) {
+    updateProfile({ avatar: dataUrl });
+    setCropImage(null);
+  }
 
   function handleSaveProfile() {
     if (!username.trim()) {
@@ -122,6 +146,40 @@ export function SettingsTab() {
       <div className="glass-card p-6">
         <h3 className="text-lg font-semibold text-foreground mb-4">{t.settings.editProfile}</h3>
         <div className="space-y-4 max-w-md">
+          {/* Avatar Upload */}
+          <div>
+            <label className="text-sm text-foreground mb-1.5 block">{t.avatar.changeAvatar}</label>
+            <div className="flex items-center gap-4">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="relative h-14 w-14 rounded-full bg-primary/10 border-2 border-primary/30 flex items-center justify-center text-xl font-bold text-primary shrink-0 group cursor-pointer overflow-hidden"
+                aria-label={t.avatar.changeAvatar}
+              >
+                {user.avatar ? (
+                  <Image src={user.avatar} alt={user.username} fill className="rounded-full object-cover" unoptimized />
+                ) : (
+                  user.username.charAt(0).toUpperCase()
+                )}
+                <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Camera className="h-4 w-4 text-white" />
+                </div>
+              </button>
+              <div>
+                <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} className="border-border text-foreground hover:bg-secondary">
+                  <Camera className="h-3.5 w-3.5 mr-1.5" />{t.avatar.changeAvatar}
+                </Button>
+                <p className="text-xs text-muted-foreground mt-1">{t.avatar.uploadHint}</p>
+              </div>
+            </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleFileChange}
+            />
+          </div>
           <div>
             <label className="text-sm text-foreground mb-1.5 block">{t.settings.username}</label>
             <Input value={username} onChange={(e) => setUsername(e.target.value)} className="bg-secondary border-border text-foreground" />
@@ -233,6 +291,14 @@ export function SettingsTab() {
           </div>
         )}
       </div>
+      {cropImage && (
+        <AvatarCropDialog
+          open={!!cropImage}
+          onOpenChange={(open) => { if (!open) setCropImage(null); }}
+          imageSrc={cropImage}
+          onCropComplete={handleCropComplete}
+        />
+      )}
     </div>
   );
 }

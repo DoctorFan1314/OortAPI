@@ -209,6 +209,7 @@ ai-skills-hub/
 | Full a11y | ✅ | ARIA roles, labels, keyboard support, reduced-motion |
 | Full i18n | ✅ | 100% bilingual (zh/en), ~300+ translation keys |
 | Category i18n | ✅ | Category names/descriptions in 14 categories fully localized |
+| Custom avatar | ✅ | Upload, crop (react-easy-crop), set custom avatar; persists as base64 in localStorage |
 
 ---
 

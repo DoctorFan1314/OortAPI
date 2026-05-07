@@ -47,7 +47,7 @@ export default function GuideClient() {
           <p>{t.guide.promptDesc2}</p>
           <div className="bg-secondary border border-border rounded-lg p-4 mt-4">
             <p className="text-xs text-muted-foreground/60 mb-2">{t.guide.example}</p>
-            <p className="text-sm text-foreground">{t.guide.promptExample}<strong className="text-primary">春季穿搭心得</strong>&rdquo;</p>
+            <p className="text-sm text-foreground">{t.guide.promptExample}<strong className="text-primary">{t.guide.promptExampleTopic}</strong>&rdquo;</p>
             <p className="text-xs text-muted-foreground/60 mt-2">{t.guide.variableNote}</p>
           </div>
         </div>
