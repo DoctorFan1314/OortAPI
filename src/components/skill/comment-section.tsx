@@ -36,7 +36,7 @@ export function CommentSection({ skillId, skillTitle }: { skillId: string; skill
     if (!content.trim()) { toast(t.comments.commentRequired, "error"); return; }
 
     const comment: Comment = {
-      id: Date.now().toString(36),
+      id: crypto.randomUUID(),
       skillId,
       userEmail: user.email,
       username: user.username,
@@ -70,7 +70,7 @@ export function CommentSection({ skillId, skillTitle }: { skillId: string; skill
       const raw = localStorage.getItem(actKey);
       const activities = raw ? JSON.parse(raw) : [];
       activities.unshift({
-        id: Date.now().toString(36),
+        id: crypto.randomUUID(),
         type: "comment",
         skillId,
         targetTitle: skillTitle,
@@ -114,12 +114,15 @@ export function CommentSection({ skillId, skillTitle }: { skillId: string; skill
 
       {/* Comment form */}
       <div className="mb-6 space-y-3">
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1" role="radiogroup" aria-label={t.comments.rating}>
           <span className="text-sm text-muted-foreground mr-2">{t.comments.rating}：</span>
           {[1, 2, 3, 4, 5].map((star) => (
             <button
               key={star}
               type="button"
+              role="radio"
+              aria-checked={rating === star}
+              aria-label={`${star} star${star > 1 ? "s" : ""}`}
               onMouseEnter={() => setHoverRating(star)}
               onMouseLeave={() => setHoverRating(0)}
               onClick={() => setRating(star)}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { skills } from "@/lib/mock-data";
 import { agentSkills } from "@/lib/mock-agent-skills";
@@ -55,7 +55,7 @@ export default function TrendingClient() {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const TABS = getTabs(t);
 
-  const allItems: UnifiedItem[] = [
+  const allItems: UnifiedItem[] = useMemo(() => [
     ...agentSkills.map((s) => ({
       id: s.id, title: s.title || s.name, subtitle: s.description,
       rating: s.stars / 20, usageCount: s.downloads, likes: s.stars,
@@ -66,18 +66,27 @@ export default function TrendingClient() {
       rating: s.rating, usageCount: s.usageCount, likes: s.likes,
       featured: s.featured, lastUpdated: s.lastUpdated, type: "prompt" as const,
     })),
-  ];
+  ], []);
 
-  const filtered = contentTab === "all" ? allItems : allItems.filter((s) => s.type === contentTab);
+  const filtered = useMemo(() =>
+    contentTab === "all" ? allItems : allItems.filter((s) => s.type === contentTab),
+    [contentTab, allItems]
+  );
 
-  const sorted = [...filtered].sort((a, b) => {
-    if (tab === "hot") return b.usageCount - a.usageCount;
-    if (tab === "new") return b.lastUpdated.localeCompare(a.lastUpdated);
-    if (tab === "featured") return (b.featured ? 1 : 0) - (a.featured ? 1 : 0) || b.rating - a.rating;
-    return b.likes - a.likes;
-  });
+  const sorted = useMemo(() => {
+    const s = [...filtered].sort((a, b) => {
+      if (tab === "hot") return b.usageCount - a.usageCount;
+      if (tab === "new") return b.lastUpdated.localeCompare(a.lastUpdated);
+      if (tab === "featured") return (b.featured ? 1 : 0) - (a.featured ? 1 : 0) || b.rating - a.rating;
+      return b.likes - a.likes;
+    });
+    return s;
+  }, [filtered, tab]);
 
-  const list = tab === "featured" ? sorted.filter((s) => s.featured) : sorted;
+  const list = useMemo(() =>
+    tab === "featured" ? sorted.filter((s) => s.featured) : sorted,
+    [tab, sorted]
+  );
 
   useEffect(() => { setVisibleCount(PAGE_SIZE); }, [tab, contentTab]);
 
@@ -169,7 +178,7 @@ export default function TrendingClient() {
             onClick={() => setVisibleCount((prev) => prev + PAGE_SIZE)}
             className="px-6 py-2.5 text-sm rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-secondary hover:border-primary/30 transition-colors"
           >
-            {t.common.more}（{list.length - visibleCount}）
+            {t.common.more} ({list.length - visibleCount})
           </button>
         </div>
       )}

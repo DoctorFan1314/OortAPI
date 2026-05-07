@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { GitFork, CheckCircle, Loader2, ArrowRight, ArrowLeft, Package } from "lucide-react";
@@ -39,6 +39,17 @@ export function CreateFromGithub({ open, onClose, onCreated }: Props) {
   const [done, setDone] = useState(false);
 
   if (!open) return null;
+
+  const handleEscape = useCallback((e: KeyboardEvent) => {
+    if (e.key === "Escape") reset();
+  }, []);
+
+  useEffect(() => {
+    if (open) {
+      document.addEventListener("keydown", handleEscape);
+      return () => document.removeEventListener("keydown", handleEscape);
+    }
+  }, [open, handleEscape]);
 
   function handleParse() {
     if (!githubUrl.trim()) {
@@ -117,7 +128,7 @@ export function CreateFromGithub({ open, onClose, onCreated }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={reset}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={reset} role="dialog" aria-modal="true" aria-label={t.create.importGithub}>
       <div className="w-full max-w-lg mx-4 rounded-2xl border border-border bg-card shadow-2xl" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="flex items-center gap-3 px-6 py-4 border-b border-border">

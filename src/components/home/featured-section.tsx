@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Zap, FileText, ArrowRight } from "lucide-react";
+import { useMemo, useCallback } from "react";
 import { agentSkills } from "@/lib/mock-agent-skills";
 import { getTrendingSkills } from "@/lib/mock-data";
 import { AgentSkillCard } from "@/components/agent-skill/agent-skill-card";
@@ -11,8 +12,15 @@ import { useI18n } from "@/contexts/i18n-context";
 export function FeaturedSection({ tab, onTabChange }: { tab: "agent" | "prompt"; onTabChange: (tab: "agent" | "prompt") => void }) {
   const { t } = useI18n();
 
-  const trendingAgents = agentSkills.filter((s) => s.trending).slice(0, 6);
-  const trendingPrompts = getTrendingSkills().slice(0, 6);
+  const trendingAgents = useMemo(() => agentSkills.filter((s) => s.trending).slice(0, 6), []);
+  const trendingPrompts = useMemo(() => getTrendingSkills().slice(0, 6), []);
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+      e.preventDefault();
+      onTabChange(tab === "agent" ? "prompt" : "agent");
+    }
+  }, [tab, onTabChange]);
 
   return (
     <section id="featured-section" className="mx-auto max-w-7xl px-4 py-16 lg:px-8">
@@ -28,7 +36,7 @@ export function FeaturedSection({ tab, onTabChange }: { tab: "agent" | "prompt";
 
       {/* Tab buttons */}
       <div className="flex justify-center mb-8">
-        <div className="inline-flex rounded-xl bg-secondary p-1 gap-1" role="tablist">
+        <div className="inline-flex rounded-xl bg-secondary p-1 gap-1" role="tablist" onKeyDown={handleKeyDown}>
           <button
             role="tab"
             aria-selected={tab === "agent"}

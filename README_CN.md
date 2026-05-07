@@ -222,6 +222,16 @@ ai-skills-hub/
 | 使用历史正确路由 | ✅ | Agent 技能历史链接到 `/skills/[id]` |
 | formatNumber 百万级 | ✅ | `1000000` → "1M" 而非 "1000.0k" |
 | Sitemap 真实日期 | ✅ | 使用真实 lastUpdated 日期；基础 URL 从环境变量读取 |
+| 粒子背景仅首页 | ✅ | Canvas 动画仅在首页运行，其他页面跳过，节省 CPU/GPU |
+| 过滤逻辑 Memoize | ✅ | 技能/模板/排行榜/精选区过滤数据全部 useMuse |
+| 动态 `<html lang>` | ✅ | 语言切换时自动更新 HTML lang 属性 |
+| 精选区键盘导航 | ✅ | ArrowLeft/ArrowRight 切换 Agent/Prompt Tab |
+| 评论星级评分 ARIA | ✅ | 评分按钮带 `role="radio"`、`aria-checked`、`aria-label` |
+| 创建模态框无障碍 | ✅ | `role="dialog"`、`aria-modal`、`aria-label`、Escape 关闭 |
+| 搜索输入框标签 | ✅ | 技能/模板搜索框带 `aria-label` |
+| UUID 生成 | ✅ | 评论、提交、Toast 使用 `crypto.randomUUID()` |
+| 分类详情 i18n | ✅ | Agent 分类匹配使用英文 slug 而非硬编码中文 |
+| 统一括号风格 | ✅ | "加载更多"按钮统一使用 ASCII `()` |
 
 ---
 

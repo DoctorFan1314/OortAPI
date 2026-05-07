@@ -6,6 +6,44 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [v2.0.0] — 2026-05-07
+
+### Performance
+- **Particle background scoped to homepage only** — `ParticleBackground` moved from root layout to `page.tsx`; other pages no longer run the canvas animation, saving CPU/GPU
+- **Skills/Prompts filtering fully memoized** — `filtered` results now wrapped in `useMemo` with proper dependency arrays; prevents re-filtering on every render
+- **Trending page data memoized** — `allItems`, `filtered`, `sorted`, `list` all wrapped in `useMemo`; eliminates redundant sorting on unrelated state changes
+- **Featured section data memoized** — `trendingAgents` and `trendingPrompts` now use `useMemo` to avoid re-computing on parent re-renders
+
+### Accessibility
+- **Featured section keyboard navigation** — ArrowLeft/ArrowRight keys now toggle between Agent/Prompt tabs
+- **Comment star rating ARIA** — Rating buttons now have `role="radio"`, `aria-checked`, and `aria-label` for screen readers
+- **Search input labels** — Skills and Prompts search inputs now have `aria-label` matching their placeholder text
+- **Create modals dialog pattern** — GitHub import and Upload modals now have `role="dialog"`, `aria-modal="true"`, `aria-label`
+- **Create modals Escape key** — Both modals now close on Escape key press via `useEffect` keydown listener
+
+### Internationalization
+- **Dynamic `<html lang>` attribute** — New `HtmlLangUpdater` component updates `document.documentElement.lang` when language switches; no longer stuck on `zh-CN`
+- **Category detail page i18n fix** — `categoryToAgentCategory` mapping now uses `categorySlug` (English) instead of hardcoded Chinese category names
+- **Trending "load more" parentheses** — Chinese `（）` replaced with ASCII `()` in all three list pages for consistent cross-locale display
+
+### Bug Fixes
+- **ID generation uses `crypto.randomUUID()`** — Comments, submissions, and toasts now use UUID instead of `Date.now().toString(36)`, eliminating collision risk
+
+### Files Modified
+- `src/app/layout.tsx` — Removed `ParticleBackground` import; added `HtmlLangUpdater`
+- `src/app/page.tsx` — Added `ParticleBackground` import; renders it on homepage only
+- `src/components/shared/html-lang-updater.tsx` — **New file**: updates `<html lang>` on language switch
+- `src/components/home/featured-section.tsx` — Added `useMemo` for `trendingAgents`/`trendingPrompts`; added `useCallback` for `handleKeyDown` with ArrowLeft/Right
+- `src/app/skills/client.tsx` — `filtered` now wrapped in `useMemo`; search input has `aria-label`; parentheses fix
+- `src/app/prompts/client.tsx` — `filtered` now wrapped in `useMemo`; search input has `aria-label`; parentheses fix
+- `src/app/trending/client.tsx` — Added `useMemo` for `allItems`, `filtered`, `sorted`, `list`; parentheses fix
+- `src/components/skill/comment-section.tsx` — Star rating has `role="radio"`, `aria-checked`, `aria-label`; ID uses `crypto.randomUUID()`
+- `src/components/skills/create-from-github.tsx` — Added `role="dialog"`, `aria-modal`, `aria-label`; Escape key closes modal
+- `src/components/skills/create-from-upload.tsx` — Escape key closes modal
+- `src/app/categories/[slug]/client.tsx` — `categoryToAgentCategory` now maps to English `categorySlug` values
+- `src/contexts/toast-context.tsx` — Toast ID uses `crypto.randomUUID()`
+- `src/app/submit/client.tsx` — Submission ID uses `crypto.randomUUID()`
+
 ## [v1.9.0] — 2026-05-07
 
 ### Fixed

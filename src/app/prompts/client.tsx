@@ -75,7 +75,7 @@ export default function PromptsClient() {
 
   const handleCreated = useCallback(() => setRefresh((r) => r + 1), []);
 
-  const filtered = (() => {
+  const filtered = useMemo(() => {
     let result = [...allPrompts];
     if (query) {
       const q = query.toLowerCase();
@@ -89,7 +89,7 @@ export default function PromptsClient() {
     else if (sortBy === "newest") result.sort((a, b) => b.lastUpdated.localeCompare(a.lastUpdated));
     else result.sort((a, b) => b.usageCount - a.usageCount);
     return result;
-  })();
+  }, [allPrompts, query, category, difficulty, sortBy, t.common.all]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 lg:px-8">
@@ -116,6 +116,7 @@ export default function PromptsClient() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder={t.prompts.searchPlaceholder}
+            aria-label={t.prompts.searchPlaceholder}
             value={query}
             onChange={(e) => handleQueryChange(e.target.value)}
             className="pl-10 bg-secondary border-border text-foreground placeholder:text-muted-foreground"
@@ -170,7 +171,7 @@ export default function PromptsClient() {
                 onClick={() => setVisibleCount((prev) => prev + PAGE_SIZE)}
                 className="px-6 py-2.5 text-sm rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-secondary hover:border-primary/30 transition-colors"
               >
-                {t.common.more}（{filtered.length - visibleCount}）
+                {t.common.more} ({filtered.length - visibleCount})
               </button>
             </div>
           )}

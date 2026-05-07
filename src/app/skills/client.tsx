@@ -41,29 +41,32 @@ export default function SkillsClient() {
 
   useEffect(() => { setVisibleCount(PAGE_SIZE); }, [selectedCollection, selectedCategory, sortBy]);
 
-  let filtered = query.trim()
-    ? allSkills.filter(
-        (s) =>
-          s.name.toLowerCase().includes(query.toLowerCase()) ||
-          s.title.toLowerCase().includes(query.toLowerCase()) ||
-          s.description.toLowerCase().includes(query.toLowerCase()) ||
-          s.triggers.some((tr) => tr.toLowerCase().includes(query.toLowerCase())) ||
-          s.tags.some((tag) => tag.toLowerCase().includes(query.toLowerCase()))
-      )
-    : [...allSkills];
+  const filtered = useMemo(() => {
+    let result = query.trim()
+      ? allSkills.filter(
+          (s) =>
+            s.name.toLowerCase().includes(query.toLowerCase()) ||
+            s.title.toLowerCase().includes(query.toLowerCase()) ||
+            s.description.toLowerCase().includes(query.toLowerCase()) ||
+            s.triggers.some((tr) => tr.toLowerCase().includes(query.toLowerCase())) ||
+            s.tags.some((tag) => tag.toLowerCase().includes(query.toLowerCase()))
+        )
+      : [...allSkills];
 
-  if (selectedCollection !== t.agentSkills.collectionAll) {
-    filtered = filtered.filter((s) => s.collection === selectedCollection);
-  }
-  if (selectedCategory !== t.agentSkills.collectionAll) {
-    filtered = filtered.filter((s) => s.category === selectedCategory);
-  }
+    if (selectedCollection !== t.agentSkills.collectionAll) {
+      result = result.filter((s) => s.collection === selectedCollection);
+    }
+    if (selectedCategory !== t.agentSkills.collectionAll) {
+      result = result.filter((s) => s.category === selectedCategory);
+    }
 
-  filtered.sort((a, b) => {
-    if (sortBy === "downloads") return b.downloads - a.downloads;
-    if (sortBy === "stars") return b.stars - a.stars;
-    return b.lastUpdated.localeCompare(a.lastUpdated);
-  });
+    result.sort((a, b) => {
+      if (sortBy === "downloads") return b.downloads - a.downloads;
+      if (sortBy === "stars") return b.stars - a.stars;
+      return b.lastUpdated.localeCompare(a.lastUpdated);
+    });
+    return result;
+  }, [allSkills, query, selectedCollection, selectedCategory, sortBy, t.agentSkills.collectionAll]);
 
   return (
     <div className="mx-auto max-w-[1440px] px-4 py-12 lg:px-8">
@@ -90,6 +93,7 @@ export default function SkillsClient() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder={t.agentSkills.searchPlaceholder}
+              aria-label={t.agentSkills.searchPlaceholder}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               className="pl-10 bg-secondary border-border text-foreground placeholder:text-muted-foreground"
@@ -189,7 +193,7 @@ export default function SkillsClient() {
                 onClick={() => setVisibleCount((prev) => prev + PAGE_SIZE)}
                 className="px-6 py-2.5 text-sm rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-secondary hover:border-primary/30 transition-colors"
               >
-                {t.common.more}（{filtered.length - visibleCount}）
+                {t.common.more} ({filtered.length - visibleCount})
               </button>
             </div>
           )}

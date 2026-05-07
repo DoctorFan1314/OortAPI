@@ -6,6 +6,44 @@
 
 ---
 
+## [v2.0.0] — 2026-05-07
+
+### 性能优化
+- **粒子背景仅在首页运行** — `ParticleBackground` 从根布局移至 `page.tsx`；其他页面不再运行 canvas 动画，节省 CPU/GPU
+- **技能/模板页过滤逻辑完全 memoize** — `filtered` 结果现在用 `useMemo` 包裹并带有正确的依赖数组；避免每次渲染都重新过滤
+- **排行榜页数据 memoize** — `allItems`、`filtered`、`sorted`、`list` 全部用 `useMemo`；消除无关状态变更时的重复排序
+- **精选区数据 memoize** — `trendingAgents` 和 `trendingPrompts` 现在用 `useMemo` 避免父组件重渲染时重复计算
+
+### 无障碍
+- **精选区键盘导航** — ArrowLeft/ArrowRight 键现在可切换 Agent/Prompt Tab
+- **评论星级评分 ARIA** — 评分按钮现在有 `role="radio"`、`aria-checked` 和 `aria-label`，屏幕阅读器可正确播报
+- **搜索输入框标签** — 技能和模板搜索输入框现在有 `aria-label` 匹配 placeholder 文本
+- **创建模态框 Dialog 模式** — GitHub 导入和上传模态框现在有 `role="dialog"`、`aria-modal="true"`、`aria-label`
+- **创建模态框 Escape 关闭** — 两个模态框现在都支持按 Escape 键关闭
+
+### 国际化
+- **动态 `<html lang>` 属性** — 新增 `HtmlLangUpdater` 组件，在语言切换时更新 `document.documentElement.lang`；不再固定为 `zh-CN`
+- **分类详情页 i18n 修复** — `categoryToAgentCategory` 映射现在使用英文 `categorySlug` 而非硬编码中文分类名
+- **排行榜"加载更多"括号修复** — 中文 `（）` 在三个列表页统一替换为 ASCII `()`，跨语言显示更一致
+
+### 修复
+- **ID 生成改用 `crypto.randomUUID()`** — 评论、提交和 Toast 现在使用 UUID 而非 `Date.now().toString(36)`，消除碰撞风险
+
+### 修改文件
+- `src/app/layout.tsx` — 移除 `ParticleBackground`；新增 `HtmlLangUpdater`
+- `src/app/page.tsx` — 新增 `ParticleBackground`；仅在首页渲染
+- `src/components/shared/html-lang-updater.tsx` — **新文件**：语言切换时更新 `<html lang>`
+- `src/components/home/featured-section.tsx` — `trendingAgents`/`trendingPrompts` 添加 `useMemo`；`handleKeyDown` 添加 ArrowLeft/Right
+- `src/app/skills/client.tsx` — `filtered` 用 `useMemo` 包裹；搜索框添加 `aria-label`；括号修复
+- `src/app/prompts/client.tsx` — `filtered` 用 `useMemo` 包裹；搜索框添加 `aria-label`；括号修复
+- `src/app/trending/client.tsx` — `allItems`、`filtered`、`sorted`、`list` 全部添加 `useMemo`；括号修复
+- `src/components/skill/comment-section.tsx` — 星级评分添加 `role="radio"`、`aria-checked`、`aria-label`；ID 改用 `crypto.randomUUID()`
+- `src/components/skills/create-from-github.tsx` — 添加 `role="dialog"`、`aria-modal`、`aria-label`；Escape 键关闭
+- `src/components/skills/create-from-upload.tsx` — Escape 键关闭
+- `src/app/categories/[slug]/client.tsx` — `categoryToAgentCategory` 映射改为英文 `categorySlug`
+- `src/contexts/toast-context.tsx` — Toast ID 改用 `crypto.randomUUID()`
+- `src/app/submit/client.tsx` — 提交 ID 改用 `crypto.randomUUID()`
+
 ## [v1.9.0] — 2026-05-07
 
 ### 修复

@@ -223,6 +223,16 @@ ai-skills-hub/
 | Usage history correct routing | ✅ | Agent skill history links to `/skills/[id]`, not `/prompts/[id]` |
 | formatNumber: millions | ✅ | `1000000` → "1M" instead of "1000.0k" |
 | Sitemap real dates | ✅ | Uses actual `lastUpdated` dates; base URL from env var |
+| Particle bg homepage-only | ✅ | Canvas animation scoped to homepage; other pages skip it for CPU savings |
+| Memoized filtering | ✅ | `useMemo` for skills/prompts/trending filtering, featured section data |
+| Dynamic `<html lang>` | ✅ | `<html lang>` updates on language switch via `HtmlLangUpdater` component |
+| Featured section keyboard nav | ✅ | ArrowLeft/ArrowRight toggles between Agent/Prompt tabs |
+| Comment star rating ARIA | ✅ | `role="radio"`, `aria-checked`, `aria-label` on rating buttons |
+| Create modal a11y | ✅ | `role="dialog"`, `aria-modal`, `aria-label`, Escape key to close |
+| Search input labels | ✅ | Skills/Prompts search inputs have `aria-label` |
+| UUID generation | ✅ | `crypto.randomUUID()` for comments, submissions, toasts |
+| Category detail i18n | ✅ | Agent category matching uses English slugs, not hardcoded Chinese |
+| Consistent parentheses | ✅ | ASCII `()` in "load more" buttons across all list pages |
 
 ---
 

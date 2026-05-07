@@ -4,13 +4,13 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
-import { ParticleBackground } from "@/components/shared/particle-bg";
 import { ToastProvider } from "@/contexts/toast-context";
 import { AuthProvider } from "@/contexts/auth-context";
 import { ThemeProvider } from "@/contexts/theme-context";
 import { I18nProvider } from "@/contexts/i18n-context";
 import { Toaster } from "@/components/ui/toast";
 import { ScrollToTop } from "@/components/shared/scroll-to-top";
+import { HtmlLangUpdater } from "@/components/shared/html-lang-updater";
 
 import { CommandPalette } from "@/components/shared/command-palette";
 
@@ -68,11 +68,11 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col">
-        <ParticleBackground />
         <ToastProvider>
           <ThemeProvider>
             <I18nProvider>
               <AuthProvider>
+                <HtmlLangUpdater />
                 <Navbar />
                 <main className="flex-1 relative z-10">{children}</main>
                 <Footer />

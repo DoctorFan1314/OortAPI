@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -48,6 +48,17 @@ export function CreateFromUpload({ open, onClose, onCreated }: Props) {
   const [done, setDone] = useState(false);
 
   if (!open) return null;
+
+  const handleEscape = useCallback((e: KeyboardEvent) => {
+    if (e.key === "Escape") reset();
+  }, []);
+
+  useEffect(() => {
+    if (open) {
+      document.addEventListener("keydown", handleEscape);
+      return () => document.removeEventListener("keydown", handleEscape);
+    }
+  }, [open, handleEscape]);
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];

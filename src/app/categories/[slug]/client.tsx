@@ -10,13 +10,13 @@ import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { useI18n } from "@/contexts/i18n-context";
 import { getCategoryI18n, getAgentCategoryI18n } from "@/lib/categories";
 
-const categoryToAgentCategory: Record<string, string[]> = {
-  content: ["通讯协作", "文件处理"],
-  coding: ["Web 开发", "代码执行"],
-  thinking: ["Skills 管理"],
-  data: ["数据分析"],
-  productivity: ["Web 搜索", "多平台交互"],
-  creative: ["文件处理"],
+const categoryToAgentCategorySlugs: Record<string, string[]> = {
+  content: ["communication", "file-processing"],
+  coding: ["web-development", "code-execution"],
+  thinking: ["skills-management"],
+  data: ["data-analysis"],
+  productivity: ["web-search", "multi-platform"],
+  creative: ["file-processing"],
 };
 
 export default function CategoryDetailClient({ slug }: { slug: string }) {
@@ -24,8 +24,8 @@ export default function CategoryDetailClient({ slug }: { slug: string }) {
   const category = categories.find((c) => c.slug === slug);
   const catSkills = getSkillsByCategory(slug);
 
-  const agentCats = categoryToAgentCategory[slug] || [];
-  const catAgentSkills = agentSkills.filter((s) => agentCats.includes(s.category));
+  const agentCatSlugs = categoryToAgentCategorySlugs[slug] || [];
+  const catAgentSkills = agentSkills.filter((s) => agentCatSlugs.includes(s.categorySlug));
 
   if (!category) {
     return (

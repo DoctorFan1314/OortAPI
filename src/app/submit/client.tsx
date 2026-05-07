@@ -53,7 +53,7 @@ export default function SubmitClient() {
     if (Object.keys(errs).length > 0) return;
 
     const submission: Submission = {
-      id: Date.now().toString(36),
+      id: crypto.randomUUID(),
       name: (fd.get("name") as string).trim(),
       shortDesc: (fd.get("short-desc") as string).trim(),
       category: selectedCategory!,
