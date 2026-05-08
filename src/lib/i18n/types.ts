@@ -312,12 +312,6 @@ export interface Dictionary {
     viewAllSkills: string; viewAllPrompts: string;
     suggestions: string; removeRecent: string;
   };
-  onboarding: {
-    skip: string; next: string; finish: string;
-    step1Title: string; step1Desc: string;
-    step2Title: string; step2Desc: string;
-    step3Title: string; step3Desc: string;
-  };
   compare: {
     title: string; compareButton: string; compareCount: string;
     backToSkills: string; selectTwo: string; toggleCompare: string;

@@ -735,17 +735,6 @@ export const zh: Dictionary = {
     suggestions: "搜索建议",
     removeRecent: "移除",
   },
-  onboarding: {
-    skip: "跳过引导",
-    next: "下一步",
-    finish: "开始探索",
-    step1Title: "欢迎来到 AI Skills Hub",
-    step1Desc: "这里汇集了最优质的 Agent 技能和 Prompt 模板，帮助你高效使用 AI。",
-    step2Title: "浏览技能市场",
-    step2Desc: "点击下方浏览热门 Agent 技能，一键安装即可让 AI 具备搜索、编码、文件管理等能力。",
-    step3Title: "快速搜索",
-    step3Desc: "使用搜索栏快速找到你需要的技能或模板，支持关键词、标签等多维度搜索。",
-  },
   compare: {
     title: "技能对比",
     compareButton: "对比",

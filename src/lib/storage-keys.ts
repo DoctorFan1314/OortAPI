@@ -30,8 +30,6 @@ export const STORAGE_KEYS = {
   recentSearches: "ai-skills-hub-recent-searches",
   // Notification preferences (user-scoped)
   notificationPrefs: (email: string) => `ai-skills-hub-notification-prefs-${email}`,
-  // Onboarding
-  onboardingCompleted: "ai-skills-hub-onboarding-completed",
   // Legacy global keys (for migration)
   legacyLikes: "ai-skills-hub-likes",
   legacyBookmarks: "ai-skills-hub-bookmarks",

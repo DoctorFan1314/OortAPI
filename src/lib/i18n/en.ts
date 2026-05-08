@@ -735,17 +735,6 @@ export const en: Dictionary = {
     suggestions: "Suggestions",
     removeRecent: "Remove",
   },
-  onboarding: {
-    skip: "Skip Tour",
-    next: "Next",
-    finish: "Get Started",
-    step1Title: "Welcome to AI Skills Hub",
-    step1Desc: "Discover the best Agent Skills and Prompt Templates to use AI efficiently.",
-    step2Title: "Browse the Skills Marketplace",
-    step2Desc: "Click below to explore trending Agent Skills. One-click install lets AI search, code, manage files, and more.",
-    step3Title: "Quick Search",
-    step3Desc: "Use the search bar to quickly find skills or templates. Supports keywords, tags, and more.",
-  },
   compare: {
     title: "Skill Comparison",
     compareButton: "Compare",
