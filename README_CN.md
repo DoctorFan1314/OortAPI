@@ -301,6 +301,12 @@ ai-skills-hub/
 | 收藏集编辑 | ✅ | updateCollection 和 isInCollection 函数 |
 | 认证密码哈希修复 | ✅ | 迁移时立即哈希，不存明文 |
 | 通知状态修复 | ✅ | unreadCount 通过 useEffect 派生，避免 stale state |
+| 夜间模式级联修复 | ✅ | 所有仅亮色 CSS 选择器统一使用 `:root:not(.dark)` |
+| 引导回退定位 | ✅ | scrollIntoView + 目标未找到时屏幕中央回退 |
+| Toast 主题令牌 | ✅ | 硬编码十六进制色替换为主题令牌，适配亮暗模式 |
+| 头像裁剪安全 | ✅ | Canvas null 检查 + reject；错误日志记录 |
+| 导航栏空菜单守卫 | ✅ | 空菜单项时箭头键导航安全守卫 |
+| 通知边界检查 | ✅ | 焦点索引限制在 items 长度范围内 |
 
 ---
 

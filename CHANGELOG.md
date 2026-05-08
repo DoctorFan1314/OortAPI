@@ -6,6 +6,20 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [v2.1.1] — 2026-05-08
+
+### Critical Bug Fixes
+- **Dark mode broken** — `:root body` light gradient had same specificity as `.dark body` and appeared later in cascade, always overriding dark styles. Fixed by using `:root:not(.dark)` for all light-mode-only selectors (`:root`, `:root .glass-card`, `:root .glass-card-hover:hover`, `:root body`)
+- **Onboarding tooltip empty box** — Step 2/3 showed an invisible box because `positionTooltip` silently returned when target element IDs were off-screen. Added `scrollIntoView` + `requestAnimationFrame` for reliable positioning, and a center-screen fallback when elements not found
+- **Toast hardcoded colors** — Replaced `#00d4ff`, `#8b949e`, `text-white` with theme tokens (`text-primary`, `text-muted-foreground`, `text-foreground`) so toasts are readable in both themes
+
+### Bug Fixes
+- **Avatar crop dialog** — `getContext("2d")!` non-null assertion could cause promise to hang forever if canvas unavailable. Added proper null check with reject. Added error logging instead of silent catch
+- **Navbar keyboard nav** — Arrow key navigation in "more" dropdown could crash with `% 0` modulo when menu items list was empty. Added `items.length === 0` guard
+- **Notification bell focus** — `activeIdx` could exceed `items.length` after notifications were deleted while menu was open. Added bounds check
+
+---
+
 ## [v2.1.0] — 2026-05-08
 
 ### Bug Fixes

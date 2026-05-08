@@ -71,13 +71,15 @@ export function AvatarCropDialog({ open, onOpenChange, imageSrc, onCropComplete 
       if (approxBytes > 500 * 1024) {
         // Re-encode at lower quality
         const blob = await fetch(dataUrl).then(r => r.blob());
-        const lower = await new Promise<string>((resolve) => {
+        const lower = await new Promise<string>((resolve, reject) => {
           const canvas = document.createElement("canvas");
           canvas.width = 128;
           canvas.height = 128;
-          const ctx = canvas.getContext("2d")!;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) { reject(new Error("Canvas not supported")); return; }
           const img = new Image();
           img.onload = () => { ctx.drawImage(img, 0, 0, 128, 128); resolve(canvas.toDataURL("image/jpeg", 0.6)); };
+          img.onerror = () => reject(new Error("Failed to compress image"));
           img.src = URL.createObjectURL(blob);
         });
         onCropComplete(lower);
@@ -85,8 +87,8 @@ export function AvatarCropDialog({ open, onOpenChange, imageSrc, onCropComplete 
         onCropComplete(dataUrl);
       }
       onOpenChange(false);
-    } catch {
-      // silently fail
+    } catch (err) {
+      console.error("Avatar crop failed:", err);
     } finally {
       setLoading(false);
     }

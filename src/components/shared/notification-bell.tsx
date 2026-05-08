@@ -106,6 +106,7 @@ export function NotificationBell() {
   useEffect(() => {
     if (!open || activeIdx < 0 || !menuRef.current) return;
     const items = menuRef.current.querySelectorAll('[role="menuitem"]');
+    if (activeIdx >= items.length) return;
     (items[activeIdx] as HTMLElement)?.focus();
   }, [activeIdx, open]);
 

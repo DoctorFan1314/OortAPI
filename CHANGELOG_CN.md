@@ -6,6 +6,20 @@
 
 ---
 
+## [v2.1.1] — 2026-05-08
+
+### 严重 Bug 修复
+- **夜间模式失效** — `:root body` 亮色渐变与 `.dark body` 特异性相同且在样式表中靠后，始终覆盖暗色样式。所有仅亮色模式选择器（`:root`、`:root .glass-card`、`:root .glass-card-hover:hover`、`:root body`）统一改为 `:root:not(.dark)`
+- **新手引导空框** — 第 2/3 步显示不可见框，因为 `positionTooltip` 在目标元素不可见时静默返回。新增 `scrollIntoView` + `requestAnimationFrame` 确保可靠定位，元素未找到时回退到屏幕中央
+- **Toast 硬编码颜色** — 将 `#00d4ff`、`#8b949e`、`text-white` 替换为主题令牌（`text-primary`、`text-muted-foreground`、`text-foreground`），确保亮暗主题下均可读
+
+### Bug 修复
+- **头像裁剪对话框** — `getContext("2d")!` 非空断言在 canvas 不可用时可能导致 Promise 永远挂起。添加正确的 null 检查和 reject。catch 块改为记录错误而非静默吞没
+- **导航栏键盘导航** — "更多"下拉菜单的箭头键导航在菜单项列表为空时可能因除零 `% 0` 崩溃。添加 `items.length === 0` 守卫
+- **通知铃铛焦点** — 通知在菜单打开时被删除后 `activeIdx` 可能超过 `items.length`。添加边界检查
+
+---
+
 ## [v2.1.0] — 2026-05-08
 
 ### 修复

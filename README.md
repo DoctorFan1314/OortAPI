@@ -302,6 +302,12 @@ ai-skills-hub/
 | Collection edit | ✅ | updateCollection and isInCollection functions |
 | Auth password hash fix | ✅ | Migration hashes passwords immediately, no plaintext |
 | Notification state fix | ✅ | unreadCount derived via useEffect, no stale state |
+| Dark mode cascade fix | ✅ | `:root:not(.dark)` for all light-mode-only CSS selectors |
+| Onboarding fallback | ✅ | scrollIntoView + center-screen fallback when target missing |
+| Toast theme tokens | ✅ | Replaced hardcoded hex with theme tokens for both modes |
+| Avatar crop safety | ✅ | Canvas null check with reject; error logging |
+| Navbar empty menu guard | ✅ | Arrow key nav guard for empty menu items |
+| Notification bounds check | ✅ | Focus index clamped to items length |
 
 ---
 

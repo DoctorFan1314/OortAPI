@@ -31,26 +31,38 @@ export function OnboardingTooltip() {
     const stepDef = STEPS[idx];
     if (!stepDef) return;
     const el = document.getElementById(stepDef.targetId);
-    if (!el) return;
 
-    const rect = el.getBoundingClientRect();
-    const gap = 16;
+    if (!el) {
+      // Fallback: center the tooltip on screen
+      setTargetRect({ top: window.innerHeight / 2 - 50, left: window.innerWidth / 2 - 100, width: 200, height: 100 });
+      setTooltipPos({ top: window.innerHeight / 2, left: window.innerWidth / 2 });
+      return;
+    }
 
-    setTargetRect({
-      top: rect.top + window.scrollY,
-      left: rect.left + window.scrollX,
-      width: rect.width,
-      height: rect.height,
+    // Scroll target into view first
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+
+    // Use requestAnimationFrame to wait for scroll to settle
+    requestAnimationFrame(() => {
+      const rect = el.getBoundingClientRect();
+      const gap = 16;
+
+      setTargetRect({
+        top: rect.top + window.scrollY,
+        left: rect.left + window.scrollX,
+        width: rect.width,
+        height: rect.height,
+      });
+
+      // Position tooltip below the target element by default
+      const tooltipTop = rect.bottom + window.scrollY + gap;
+      const tooltipLeft = rect.left + window.scrollX + rect.width / 2;
+
+      // Clamp so tooltip stays on screen
+      const clampedLeft = Math.max(200, Math.min(tooltipLeft, window.innerWidth - 200));
+
+      setTooltipPos({ top: tooltipTop, left: clampedLeft });
     });
-
-    // Position tooltip below the target element by default
-    const tooltipTop = rect.bottom + window.scrollY + gap;
-    const tooltipLeft = rect.left + window.scrollX + rect.width / 2;
-
-    // Clamp so tooltip stays on screen
-    const clampedLeft = Math.max(200, Math.min(tooltipLeft, window.innerWidth - 200));
-
-    setTooltipPos({ top: tooltipTop, left: clampedLeft });
   }, []);
 
   useEffect(() => {

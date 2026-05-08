@@ -49,7 +49,7 @@
 }
 
 /* Light theme (default) */
-:root {
+:root:not(.dark) {
   --background: #ffffff;
   --foreground: #1a1a2e;
   --card: #f8fafc;
@@ -142,7 +142,7 @@
     backdrop-filter: blur(12px);
     border-radius: 1rem;
   }
-  :root .glass-card {
+  :root:not(.dark) .glass-card {
     background: rgba(248, 250, 252, 0.8);
     border: 1px solid rgba(0, 0, 0, 0.06);
     backdrop-filter: blur(16px);
@@ -161,7 +161,7 @@
     border-color: rgba(0, 212, 255, 0.3);
     box-shadow: 0 8px 32px rgba(0, 212, 255, 0.1);
   }
-  :root .glass-card-hover:hover {
+  :root:not(.dark) .glass-card-hover:hover {
     border-color: rgba(8, 145, 178, 0.3);
     box-shadow: 0 8px 32px rgba(8, 145, 178, 0.1);
   }
@@ -212,7 +212,7 @@
 }
 
 /* Light mode subtle gradient */
-:root body {
+:root:not(.dark) body {
   background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
 }
 

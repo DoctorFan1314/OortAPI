@@ -110,6 +110,7 @@ export function Navbar() {
                 className="absolute top-full left-0 mt-1 w-48 bg-card border border-border rounded-xl shadow-xl overflow-hidden animate-[fadeIn_0.1s_ease-out] z-50"
                 onKeyDown={(e) => {
                   const items = Array.from(e.currentTarget.querySelectorAll('[role="menuitem"]')) as HTMLElement[];
+                  if (items.length === 0) return;
                   const idx = items.indexOf(document.activeElement as HTMLElement);
                   if (e.key === "ArrowDown") { e.preventDefault(); items[(idx + 1) % items.length]?.focus(); }
                   if (e.key === "ArrowUp") { e.preventDefault(); items[(idx - 1 + items.length) % items.length]?.focus(); }
