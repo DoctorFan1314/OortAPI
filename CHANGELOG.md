@@ -6,6 +6,105 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [v2.6.0] — 2026-05-09
+
+### Security
+- **Plaintext password fallback removed** — Auth now uses hash-only comparison; plaintext fallback from pre-migration accounts removed
+- **Security headers** — Added X-Frame-Options, X-Content-Type-Options, Referrer-Policy to `next.config.ts`
+- **Middleware route protection** — `src/middleware.ts` created for admin/profile route cache-control headers
+- **Open redirect fix** — Login and register pages now validate `returnUrl` via `safeReturnUrl()` to prevent open redirect via `://` in query params (enhanced from v2.5.1)
+- **Admin variable shadowing fix** — Renamed `.map((t)=>` to `.map((tabItem)=>` to avoid shadowing the `t` i18n function (enhanced from v2.5.1)
+- **Admin localStorage error feedback** — Error banner instead of silent swallow on localStorage load failures (enhanced from v2.5.1)
+
+### Accessibility (22 fixes)
+- **Install command keyboard support** — `role="button"`, `tabIndex`, `onKeyDown` for Enter/Space activation
+- **Mobile file tabs ARIA** — `role="tab"`, `aria-selected`, active visual indicator
+- **Variable inputs label association** — `htmlFor` + `id` connections between labels and inputs
+- **Version history expand state** — `aria-expanded` on version history button
+- **Tags search input** — `role="searchbox"` + `aria-label`
+- **Guide copy button focus** — `focus:opacity-100` for touch device keyboard focus
+- **Search clear button** — Correct `aria-label`
+- **StarRating keyboard navigation** — ArrowLeft/ArrowRight navigation, focus-visible ring, hover scale
+- **CollectionPicker a11y** — Outside-click close, Escape key, Input component
+- **Lightbox improvements** — 44px touch targets, body scroll lock, i18n labels via props
+- **SettingsTab label connections** — `htmlFor` on labels, `aria-pressed` on theme buttons
+- **CreateFromUpload a11y** — Icon picker `aria-label`, public/private `role="radiogroup"`/`role="radio"`
+- **Navbar search** — `<form role="search">` wrapper, avatar `role="img"`
+- **Hero landmark** — `aria-labelledby` on hero landmark
+- **Footer disabled links** — Visible "(Coming soon)" text on disabled links
+- **AgentSkillCard button** — Changed from `<div role="button">` to semantic `<button>`
+- **CreateDropdown touch fix** — Removed `onMouseEnter` handler (touch incompatible)
+- **NotificationBell auto-close** — Auto-close dropdown on route change
+- **ScrollToTop animation** — Slide-in animation with `translate-y`
+
+### i18n (15 fixes)
+- **ErrorFallback full i18n** — All error text uses `t.error.*` keys
+- **NotificationTab i18n** — Filter labels, timeAgo with locale params, empty states
+- **MySubmissionsTab delete confirmation** — i18n confirmation dialog
+- **CommentSection markdown hint** — i18n hint text, removed `setTick` anti-pattern
+- **Lightbox i18n labels** — Labels passed via props for full localization
+- **Categories slug "View all"** — i18n "View all" string
+- **Admin fallback strings** — Always use i18n instead of hardcoded fallbacks
+- **Skills detail version changelog** — Version changelog text i18n
+- **Chinese colon fix** — `：` → `: ` in skill developer labels
+- **Chinese parentheses fix** — `（）` → `()` in prompts and tags pages
+- **Agent skill categories i18n** — Added `nameI18nKey`/`descI18nKey` fields
+- **tFormat optimization** — Replaced `new RegExp()` with `replaceAll()`, added dev-mode warning for unresolved vars
+- **New i18n keys** — 17+ new keys including `clearSearch`, `viewAllItems`, `comingSoon`, `notFound`, `backToList`, `skillNotFound`, `promptNotFound`, `markdownHint`, `notificationFilters.*`, `currentVersion`, `initialRelease`, `deleteSubmissionConfirm`
+
+### UX (20 fixes)
+- **Skills/Prompts not-found messages** — Bilingual message + back link instead of `return null`
+- **Compare page error specificity** — Shows which specific skill IDs are missing
+- **Install command theme-aware color** — `bg-zinc-900 dark:bg-zinc-950`
+- **Mobile file tabs active indicator** — Underline indicator on active tab
+- **Submit success link** — Link to `/submit/status`
+- **NotificationBell auto-close** — Dropdown closes on route change
+- **SkillCard formatNumber** — Usage count uses `formatNumber()` for large numbers
+- **AgentSkillCard relative time** — Shows relative time ("3 months ago")
+- **FeaturedSection conditional rendering** — Conditional render instead of `hidden` class (halves inactive tab DOM)
+- **CommandPalette useMemo** — Memoized command items
+- **Profile tabs localStorage** — Moved to `useEffect`+`useState` (no sync I/O in render)
+- **StatsDashboard transitions** — Animation on value changes
+- **MarkdownRenderer blockquote + links** — Blockquote support, link `[text](url)` rendering
+- **Skeleton deterministic widths** — No `Math.random()` (avoids hydration mismatch)
+- **Not-found page bundle reduction** — Inline arrays instead of mock imports
+- **Trending hover optimization** — `will-change-transform` on hover items
+- **Profile cache protection** — `Cache-Control: no-store` via middleware
+- **useCopyToClipboard cleanup** — Timeout cleanup on unmount
+- **useLocalStorage initialValue** — Wrapped in `useRef` to prevent re-subscriptions
+- **useNotifications stale closure** — `userEmailRef` avoids stale closure
+
+### Hooks (8 fixes)
+- **useCopyToClipboard timeout cleanup** — Timer cleared on component unmount
+- **useLocalStorage useRef** — `initialValue` wrapped in `useRef` to avoid re-subscriptions
+- **useUserLocalStorage improvements** — Per-session guest ID (no collision), `set()` returns boolean
+- **useCollections loaded state** — Added `loaded` state for tracking initialization
+- **useFollows cross-tab sync** — Sync via `storage` event across browser tabs
+- **useNotifications closure fix** — `userEmailRef` to avoid stale closure in callbacks
+
+### Performance
+- **FeaturedSection conditional rendering** — Halves inactive tab DOM by conditionally rendering
+- **CommandPalette useMemo** — Memoized command items for faster re-renders
+- **Profile tab localStorage** — Reads moved to `useEffect` (no sync I/O in render)
+- **LazySyntaxHighlighter deduplication** — Code theme imported from markdown-renderer
+- **globals.css fixes** — `::selection` fixed (hex-compatible), `animate-pulse` in reduced-motion
+
+### Config
+- **Dependency cleanup** — `@types/dompurify` and `shadcn` moved to `devDependencies`
+- **tsconfig target upgrade** — `ES2017` → `ES2022`
+- **Middleware cache headers** — `src/middleware.ts` for admin/profile routes
+- **.env.example created** — Environment variable template file
+- **Security headers** — Added to `next.config.ts`
+
+### SEO
+- **Search/compare noindex** — `/search` and `/skills/compare`: `robots: { index: false }`
+- **Prompts OG truncation** — `/prompts/[id]`: OG description truncated to 160 chars
+- **Users canonical URL** — `/users/[username]`: canonical URL added
+- **Trending JSON-LD** — `/trending`: ItemList structured data
+- **Removed alternates.languages** — Was mapping both locales to same URL
+
+---
+
 ## [v2.5.1] — 2026-05-09
 
 ### Security

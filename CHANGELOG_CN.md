@@ -6,6 +6,105 @@
 
 ---
 
+## [v2.6.0] — 2026-05-09
+
+### 安全
+- **明文密码回退移除** — 认证仅使用哈希比对；移除迁移前账户的明文密码回退
+- **安全响应头** — `next.config.ts` 添加 X-Frame-Options、X-Content-Type-Options、Referrer-Policy
+- **中间件路由保护** — 新建 `src/middleware.ts`，为 admin/profile 路由设置 cache-control 头
+- **开放重定向修复（增强）** — 登录和注册页面通过 `safeReturnUrl()` 验证 `returnUrl`，防止通过查询参数中的 `://` 进行开放重定向
+- **Admin 变量遮蔽修复（增强）** — `.map((t)=>` 重命名为 `.map((tabItem)=>`，避免遮蔽 i18n 函数 `t`
+- **Admin localStorage 错误反馈（增强）** — localStorage 加载失败显示错误横幅，不再静默吞掉
+
+### 无障碍（22 项修复）
+- **安装命令键盘支持** — `role="button"`、`tabIndex`、`onKeyDown` 支持 Enter/Space 激活
+- **移动端文件标签 ARIA** — `role="tab"`、`aria-selected`、活动视觉指示器
+- **变量输入标签关联** — 标签和输入框通过 `htmlFor` + `id` 关联
+- **版本历史展开状态** — 版本历史按钮添加 `aria-expanded`
+- **标签搜索输入** — `role="searchbox"` + `aria-label`
+- **指南复制按钮焦点** — 触摸设备键盘焦点时可见 `focus:opacity-100`
+- **搜索清除按钮** — 正确的 `aria-label`
+- **StarRating 键盘导航** — ArrowLeft/ArrowRight 导航、focus-visible 环、hover 缩放
+- **CollectionPicker 无障碍** — 外部点击关闭、Escape 键、Input 组件
+- **灯箱改进** — 44px 触摸目标、页面滚动锁定、i18n 标签通过 props 传入
+- **SettingsTab 标签关联** — label 添加 `htmlFor`、主题按钮添加 `aria-pressed`
+- **CreateFromUpload 无障碍** — 图标选择器 `aria-label`、公开/私有 `role="radiogroup"`/`role="radio"`
+- **导航栏搜索** — `<form role="search">` 包裹、头像 `role="img"`
+- **Hero 地标** — Hero 地标添加 `aria-labelledby`
+- **Footer 禁用链接** — 禁用链接显示可见的"(即将推出)"文本
+- **AgentSkillCard 按钮** — 从 `<div role="button">` 改为语义化 `<button>`
+- **CreateDropdown 触摸修复** — 移除 `onMouseEnter` 处理器（触摸设备不兼容）
+- **NotificationBell 自动关闭** — 路由切换时自动关闭下拉框
+- **ScrollToTop 动画** — `translate-y` 滑入动画
+
+### 国际化（15 项修复）
+- **ErrorFallback 完整 i18n** — 所有错误文本使用 `t.error.*` 键
+- **NotificationTab i18n** — 筛选标签、带 locale 参数的 timeAgo、空状态
+- **MySubmissionsTab 删除确认** — i18n 确认对话框
+- **CommentSection Markdown 提示** — i18n 提示文本，移除 `setTick` 反模式
+- **Lightbox i18n 标签** — 标签通过 props 传入实现完整本地化
+- **Categories slug "查看全部"** — "查看全部" 字符串 i18n
+- **Admin 回退字符串** — 始终使用 i18n 替代硬编码回退值
+- **技能详情版本更新日志** — 版本更新日志文本 i18n
+- **中文冒号修复** — 技能开发者标签 `：` → `: `
+- **中文括号修复** — prompts 和 tags 页面 `（）` → `()`
+- **Agent 技能分类 i18n** — 添加 `nameI18nKey`/`descI18nKey` 字段
+- **tFormat 优化** — `new RegExp()` 替换为 `replaceAll()`，开发模式下对未解析变量发出警告
+- **新增 i18n 键** — 17+ 新键，包括 `clearSearch`、`viewAllItems`、`comingSoon`、`notFound`、`backToList`、`skillNotFound`、`promptNotFound`、`markdownHint`、`notificationFilters.*`、`currentVersion`、`initialRelease`、`deleteSubmissionConfirm`
+
+### 用户体验（20 项修复）
+- **技能/模板未找到消息** — 双语消息 + 返回链接替代 `return null`
+- **对比页错误具体化** — 显示具体缺失的技能 ID
+- **安装命令主题感知颜色** — `bg-zinc-900 dark:bg-zinc-950`
+- **移动端文件标签活动指示器** — 活动标签下划线指示器
+- **提交成功链接** — 链接到 `/submit/status`
+- **NotificationBell 自动关闭** — 路由切换时关闭下拉框
+- **SkillCard formatNumber** — 使用次数使用 `formatNumber()` 格式化大数字
+- **AgentSkillCard 相对时间** — 显示相对时间（如"3 个月前"）
+- **FeaturedSection 条件渲染** — 条件渲染替代 `hidden` 类（非活动标签 DOM 减半）
+- **CommandPalette useMemo** — 命令项记忆化
+- **Profile 标签 localStorage** — 移至 `useEffect`+`useState`（render 中无同步 I/O）
+- **StatsDashboard 过渡动画** — 数值变化时动画过渡
+- **MarkdownRenderer 引用块 + 链接** — 引用块支持、链接 `[text](url)` 渲染
+- **骨架屏确定性宽度** — 不使用 `Math.random()`（避免水合不匹配）
+- **404 页包体积缩减** — 内联数组替代 mock 导入
+- **排行页悬停优化** — 悬停项添加 `will-change-transform`
+- **Profile 缓存保护** — 通过中间件设置 `Cache-Control: no-store`
+- **useCopyToClipboard 清理** — 组件卸载时清理超时
+- **useLocalStorage initialValue** — 包裹在 `useRef` 中防止重复订阅
+- **useNotifications 闭包修复** — `userEmailRef` 避免回调中的过期闭包
+
+### Hooks（8 项修复）
+- **useCopyToClipboard 超时清理** — 组件卸载时清除计时器
+- **useLocalStorage useRef** — `initialValue` 包裹在 `useRef` 中避免重复订阅
+- **useUserLocalStorage 改进** — 每会话访客 ID（无冲突）、`set()` 返回布尔值
+- **useCollections loaded 状态** — 添加 `loaded` 状态追踪初始化
+- **useFollows 跨标签页同步** — 通过 `storage` 事件跨浏览器标签页同步
+- **useNotifications 闭包修复** — `userEmailRef` 避免回调中的过期闭包
+
+### 性能
+- **FeaturedSection 条件渲染** — 条件渲染非活动标签 DOM 减半
+- **CommandPalette useMemo** — 命令项记忆化，加快重渲染
+- **Profile 标签 localStorage** — 读取移至 `useEffect`（render 中无同步 I/O）
+- **LazySyntaxHighlighter 去重** — 代码主题从 markdown-renderer 导入
+- **globals.css 修复** — `::selection` 修复（十六进制兼容）、`animate-pulse` 在 reduced-motion 中
+
+### 配置
+- **依赖清理** — `@types/dompurify` 和 `shadcn` 移至 `devDependencies`
+- **tsconfig 目标升级** — `ES2017` → `ES2022`
+- **中间件缓存头** — `src/middleware.ts` 用于 admin/profile 路由
+- **.env.example 创建** — 环境变量模板文件
+- **安全响应头** — 添加到 `next.config.ts`
+
+### SEO
+- **搜索/对比页 noindex** — `/search` 和 `/skills/compare` 添加 `robots: { index: false }`
+- **模板 OG 截断** — `/prompts/[id]` OG 描述截断至 160 字符
+- **用户 canonical URL** — `/users/[username]` 添加 canonical URL
+- **排行页 JSON-LD** — `/trending` 添加 ItemList 结构化数据
+- **移除 alternates.languages** — 此前将两个 locale 映射到同一 URL
+
+---
+
 ## [v2.5.1] — 2026-05-09
 
 ### 安全

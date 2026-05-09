@@ -177,6 +177,28 @@ ai-skills-hub/
 
 | 功能 | 状态 | 说明 |
 |------|------|------|
+| 安全响应头 | ✅ | next.config.ts 添加 X-Frame-Options、X-Content-Type-Options、Referrer-Policy |
+| 中间件路由保护 | ✅ | src/middleware.ts 为 admin/profile 路由设置 cache-control 头 |
+| 开放重定向修复 | ✅ | safeReturnUrl() 验证防止 `://` 开放重定向 |
+| 明文密码移除 | ✅ | 认证仅使用哈希比对，移除明文密码回退 |
+| StarRating 键盘导航 | ✅ | ArrowLeft/ArrowRight 导航、focus-visible 环、hover 缩放 |
+| CollectionPicker 无障碍 | ✅ | 外部点击关闭、Escape 键、Input 组件 |
+| 灯箱滚动锁定 | ✅ | 44px 触摸目标、页面滚动锁定、i18n 标签 |
+| MarkdownRenderer 升级 | ✅ | 引用块支持、链接 `[text](url)` 渲染 |
+| NotificationBell 自动关闭 | ✅ | 路由切换时自动关闭下拉框 |
+| 条件标签渲染 | ✅ | FeaturedSection 条件渲染非活动标签 DOM 减半 |
+| 跨标签页同步 (useFollows) | ✅ | 通过 storage 事件跨浏览器标签页同步关注状态 |
+| 每会话访客 ID | ✅ | useUserLocalStorage 每会话生成唯一访客 ID |
+| formatRelativeTime | ✅ | AgentSkillCard 显示相对时间（如"3 个月前"） |
+| 新 i18n 键 (17+) | ✅ | clearSearch、viewAllItems、comingSoon、notFound、backToList、markdownHint 等 |
+| 骨架屏确定性宽度 | ✅ | 不使用 Math.random()，避免水合不匹配 |
+| tFormat 优化 | ✅ | replaceAll() 替代 RegExp；开发模式未解析变量警告 |
+| CreateDropdown 触摸修复 | ✅ | 移除 onMouseEnter（触摸设备不兼容） |
+| AgentSkillCard 语义按钮 | ✅ | 从 `<div role="button">` 改为 `<button>` |
+| Profile 缓存保护 | ✅ | 通过中间件为 profile/admin 路由设置 Cache-Control: no-store |
+| useCollections loaded 状态 | ✅ | 添加 loaded 状态追踪初始化 |
+| .env.example | ✅ | 创建环境变量模板文件 |
+| ES2022 目标 | ✅ | tsconfig.json 目标从 ES2017 升级到 ES2022 |
 | Agent 技能市场 | ✅ | 搜索、筛选、排序、市场卡片 |
 | 技能详情页 | ✅ | 三栏布局：介绍、文件、反馈 |
 | 文件下载 | ✅ | 单文件 + zip 打包下载（JSZip） |

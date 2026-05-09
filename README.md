@@ -178,6 +178,28 @@ ai-skills-hub/
 
 | Feature | Status | Description |
 |---------|--------|-------------|
+| Security headers | ✅ | X-Frame-Options, X-Content-Type-Options, Referrer-Policy in next.config.ts |
+| Middleware route protection | ✅ | src/middleware.ts for admin/profile cache-control headers |
+| Open redirect fix | ✅ | safeReturnUrl() validation prevents open redirect via `://` in query params |
+| Plaintext password removed | ✅ | Auth uses hash-only comparison; plaintext fallback removed |
+| StarRating keyboard nav | ✅ | ArrowLeft/ArrowRight navigation, focus-visible ring, hover scale |
+| CollectionPicker a11y | ✅ | Outside-click close, Escape key, Input component |
+| Lightbox scroll lock | ✅ | 44px touch targets, body scroll lock, i18n labels |
+| MarkdownRenderer upgrades | ✅ | Blockquote support, link `[text](url)` rendering |
+| NotificationBell auto-close | ✅ | Dropdown auto-closes on route change |
+| Conditional tab rendering | ✅ | FeaturedSection halves inactive tab DOM via conditional render |
+| Cross-tab sync (useFollows) | ✅ | Follow state syncs across browser tabs via storage event |
+| Per-session guest ID | ✅ | useUserLocalStorage generates unique guest ID per session |
+| formatRelativeTime | ✅ | AgentSkillCard shows relative time ("3 months ago") |
+| New i18n keys (17+) | ✅ | clearSearch, viewAllItems, comingSoon, notFound, backToList, markdownHint, etc. |
+| Skeleton deterministic widths | ✅ | No Math.random() — avoids hydration mismatch |
+| tFormat optimization | ✅ | replaceAll() instead of RegExp; dev-mode warning for unresolved vars |
+| CreateDropdown touch fix | ✅ | Removed onMouseEnter (touch incompatible) |
+| AgentSkillCard semantic button | ✅ | Changed from `<div role="button">` to `<button>` |
+| Profile cache protection | ✅ | Cache-Control: no-store via middleware for profile/admin routes |
+| useCollections loaded state | ✅ | Added `loaded` state for tracking initialization |
+| .env.example | ✅ | Environment variable template file created |
+| ES2022 target | ✅ | tsconfig.json target upgraded from ES2017 to ES2022 |
 | Agent Skills marketplace | ✅ | Search, filter, sort, marketplace cards |
 | Skill detail page | ✅ | 3-tab layout: intro, files, feedback |
 | File download | ✅ | Single file + zip bundle download (JSZip) |
