@@ -74,6 +74,7 @@ export default function RootLayout({
     <html
       lang="zh-CN" /* Default; the lang-init script updates this at runtime based on user preference */
       suppressHydrationWarning
+      data-scroll-behavior="smooth"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
     >
       <head>

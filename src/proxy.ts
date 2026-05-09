@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   // Admin route protection - check is done client-side
   // This middleware adds security headers only
   const response = NextResponse.next();

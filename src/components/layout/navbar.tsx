@@ -163,7 +163,8 @@ export function Navbar() {
             className="text-muted-foreground hover:text-foreground"
             aria-label={t.common.toggleTheme}
           >
-            {resolvedTheme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            <Sun className="h-4 w-4 hidden dark:block" />
+            <Moon className="h-4 w-4 block dark:hidden" />
           </Button>
 
           <Button
