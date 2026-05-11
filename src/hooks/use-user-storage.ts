@@ -4,6 +4,7 @@ import { useLocalStorage } from "./use-local-storage";
 import { useAuth } from "@/contexts/auth-context";
 
 function getGuestId(): string {
+  if (typeof window === "undefined") return "ssr-guest";
   try {
     let id = sessionStorage.getItem("ai-skills-hub-guest-id");
     if (!id) {

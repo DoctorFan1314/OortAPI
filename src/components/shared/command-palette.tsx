@@ -46,6 +46,9 @@ export function CommandPalette() {
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        // Don't open palette when typing in input fields
+        const target = e.target as HTMLElement;
+        if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) return;
         e.preventDefault();
         handleOpen();
       }

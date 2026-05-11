@@ -36,7 +36,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     }
     return "dark";
   });
-  const isInitialRef = useRef(true);
   const transitionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -44,7 +43,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     setResolvedTheme(resolved);
     // Don't apply transition on initial load
     applyTheme(resolved, true);
-    isInitialRef.current = false;
   }, []);
 
   useEffect(() => {

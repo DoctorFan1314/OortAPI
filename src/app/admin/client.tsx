@@ -292,7 +292,7 @@ export default function AdminClient() {
                       <p className="text-foreground font-medium text-sm">{c.username}</p>
                       <p className="text-xs text-muted-foreground">{t.admin.skillPrefix}{c.skillId} · {new Date(c.createdAt).toLocaleDateString(locale)}</p>
                     </div>
-                    <button onClick={() => handleDeleteComment(c.id)} className="text-muted-foreground hover:text-red-400 transition-colors">
+                    <button onClick={() => handleDeleteComment(c.id)} aria-label={t.admin.confirmDeleteComment || "Delete comment"} className="text-muted-foreground hover:text-red-400 transition-colors">
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>

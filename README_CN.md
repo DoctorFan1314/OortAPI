@@ -280,6 +280,7 @@ ai-skills-hub/
 | Profile 页面 Suspense | ✅ | `ProfileClient` 包裹在 `<Suspense>` + 骨架屏 fallback 中 |
 | 统一搜索页面 | ✅ | `/search` 跨市场搜索，自动补全、最近搜索、键盘导航、ARIA combobox |
 | 通知系统 | ✅ | 铃铛图标带未读徽章、下拉框、标记已读、按用户 localStorage 持久化 |
+| 导航栏头像下拉菜单 | ✅ | 点击头像弹出菜单：用户中心、设置、管理面板（仅管理员）、退出登录 |
 | 公开用户主页 | ✅ | `/users/[username]` 展示头像、简介、统计、已发布技能 |
 | JSON-LD 结构化数据 | ✅ | SoftwareApplication、CreativeWork、BreadcrumbList、Organization、WebSite |
 | 技能详情页：分享 | ✅ | 移动端 navigator.share()，桌面端剪贴板回退 |

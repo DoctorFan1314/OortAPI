@@ -6,6 +6,73 @@
 
 ---
 
+## [v2.8.1] — 2026-05-11
+
+### 功能：导航栏头像下拉菜单
+
+- **头像下拉菜单** — 将直接链接替换为下拉菜单，包含：用户中心、设置、管理面板（仅管理员）、退出登录
+- **键盘导航** — ArrowUp/Down/Escape 支持，`role="menu"` 和 `role="menuitem"` 无障碍属性
+- **外部点击关闭** — 点击菜单外部自动关闭
+- **视觉指示器** — 头像旁 ChevronDown 箭头在展开时旋转
+- **i18n** — 使用现有键（`t.common.profile`、`t.profile.settings`、`t.admin.title`、`t.common.logout`）
+
+---
+
+## [v2.8.0] — 2026-05-10
+
+### 全站审计 — 30 项 Bug 修复
+
+#### 严重问题（4 项）
+- **submit/status 缺少 Suspense** — `useSearchParams()` 组件未包裹 `<Suspense>`，生产环境运行时报错
+- **prompt-versions.ts SSR 崩溃** — `localStorage` 在无 SSR 守卫的服务端渲染中抛出异常
+- **use-notifications.ts 闭包过期** — `markAsRead`/`markAllRead`/`clearAll`/`addNotification` 捕获过期 `user` 引用，登出后调用会抛异常；改用 `userEmailRef`
+- **use-follows.ts 持久化竞态** — `skipPersistRef` 在 persist effect 运行前就被重置为 false，导致中间状态被写入 localStorage；改用 `requestAnimationFrame` 延迟重置
+
+#### 内存泄漏与资源清理（3 项）
+- **头像裁剪 Object URL 泄漏** — `URL.createObjectURL()` 创建后从未 `revokeObjectURL`，每次裁剪泄漏内存
+- **GitHub 导入超时泄漏** — 1500ms `setTimeout` 未清理，关闭对话框后仍触发状态更新；添加 `useRef` + `useEffect` cleanup
+- **Lightbox setTimeout 未清理** — 焦点设置的 `setTimeout` 在快速切换截图时可能聚焦错误元素
+
+#### 数据完整性（4 项）
+- **评论删除 activity 不匹配** — 创建 activity 时使用 `crypto.randomUUID()` 作为 `id`，删除时用 `commentId` 匹配 `a.id` 永远不匹配；添加 `commentId` 字段
+- **settings-tab 清除数据不完整** — `handleClearData` 漏掉了 `likes`、`bookmarks`、`submissions`、`comments`、`activity` 等用户级键
+- **Date.now() ID 碰撞** — 4 个文件使用 `Date.now()` 生成 ID，改为 `crypto.randomUUID()`：`create-from-github.tsx`、`create-from-upload-prompt.tsx`、`skills/[id]/client.tsx`、`prompts/[id]/client.tsx`
+- **剪贴板 API 无错误处理** — `navigator.clipboard.writeText()` 未 await/catch，失败时仍显示"已复制"；改为 `.then().catch()`
+
+#### 水合不匹配（3 项）
+- **tags/loading.tsx `Math.random()`** — 骨架屏宽度在 SSR 和客户端不同，改为确定性计算 `40 + ((i * 17) % 60)``
+- **theme-context.tsx 初始状态** — `useState` 初始化器读取 localStorage，在客户端产生与 SSR 不同的初始值
+- **use-user-local-storage.ts SSR 崩溃** — `crypto.randomUUID()` 在 SSR 中可能不可用；添加 `typeof window === "undefined"` 守卫
+- **use-user-storage.ts 访客键不匹配** — SSR 返回 `"ssr-guest"`，客户端返回真实 UUID，导致水合不匹配；添加 SSR 守卫
+
+#### 无障碍（6 项）
+- **notification-tab.tsx div 无键盘支持** — 通知项使用 `<div onClick>` 但无 `role="button"`、`tabIndex`、`onKeyDown`
+- **notification-bell.tsx 按钮无 aria-label** — `markAllRead` 和 `clearAll` 按钮只有 `title`，改为 `aria-label`
+- **admin 删除按钮无 aria-label** — 评论删除按钮仅有图标，屏幕阅读器无法识别
+- **command-palette.tsx Ctrl+K 拦截输入框** — 全局快捷键不检查 `e.target`，在输入框中按 Ctrl+K 也会打开命令面板
+- **comment-section 删除确认无 aria-live** — 删除确认 UI 未设置 `role="alert"` 和 `aria-live="polite"`
+- **notification-bell handleKeyDown 闭包过期** — `handleNotificationClick` 未包含在 `useCallback` 依赖中
+
+#### 样式与 UI（2 项）
+- **tag-chip.tsx `inline-block` + `flex` 冲突** — `flex` 覆盖 `inline-block`，改为 `inline-flex`
+- **markdown-renderer.tsx sanitize 不一致** — 服务端用正则、客户端用 DOMPurify，产生不同输出；统一为纯正则实现，移除 DOMPurify 依赖
+
+#### useEffect 依赖（4 项）
+- **my-comments-tab.tsx** — `useEffect` 依赖 `user` 对象（每次渲染新引用），改为 `user?.email`
+- **activity-timeline.tsx** — 同上
+- **usage-history-tab.tsx** — 同上
+- **stats-dashboard.tsx** — 同上
+
+#### 死代码清理（2 项）
+- **use-keyboard-shortcuts.ts** — 空文件，无导出，已删除
+- **theme-context.tsx `isInitialRef`** — 设置后从未读取，已移除
+
+#### 硬编码字符串（2 项）
+- **notification-tab.tsx "unread"** — 硬编码英文，改为 locale 感知显示
+- **theme-context.tsx 初始化** — 移除无用的 `isInitialRef` 赋值
+
+---
+
 ## [v2.7.1] — 2026-05-10
 
 ### Agent 技能清理

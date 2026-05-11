@@ -281,6 +281,7 @@ ai-skills-hub/
 | Profile page Suspense | ✅ | `ProfileClient` wrapped in `<Suspense>` with skeleton fallback |
 | Unified search | ✅ | `/search` page with autocomplete, recent history, keyboard nav, ARIA combobox |
 | Notification system | ✅ | Bell icon with unread badge, dropdown, mark-as-read, per-user localStorage |
+| Navbar avatar dropdown | ✅ | Click avatar to open menu with User Center, Settings, Admin Panel (admin-only), Logout |
 | Public user profiles | ✅ | `/users/[username]` with avatar, bio, stats, published skills |
 | JSON-LD structured data | ✅ | SoftwareApplication, CreativeWork, BreadcrumbList, Organization, WebSite |
 | Skill detail: share | ✅ | navigator.share() on mobile, clipboard fallback on desktop |

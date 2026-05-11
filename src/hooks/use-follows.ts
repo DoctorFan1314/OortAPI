@@ -16,14 +16,16 @@ export function useFollows() {
     skipPersistRef.current = true;
     if (!user) {
       setFollowing([]);
-      skipPersistRef.current = false;
+      // Delay resetting skipPersistRef so the persist effect sees it
+      requestAnimationFrame(() => { skipPersistRef.current = false; });
       return;
     }
     try {
       const raw = localStorage.getItem(STORAGE_KEYS.follows(user.email));
       if (raw) setFollowing(JSON.parse(raw));
-    } catch { /* ignore */ }
-    skipPersistRef.current = false;
+      else setFollowing([]);
+    } catch { setFollowing([]); }
+    requestAnimationFrame(() => { skipPersistRef.current = false; });
   }, [user]);
 
   // Persist follows to localStorage whenever they change

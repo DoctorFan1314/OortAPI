@@ -25,8 +25,7 @@ export function UsageHistoryTab() {
       const raw = localStorage.getItem(STORAGE_KEYS.activity(user.email));
       if (raw) setActivities(JSON.parse(raw));
     } catch { /* ignore */ }
-  }, [user]);
-
+  }, [user?.email]);
   if (!user) return null;
 
   const viewAndCopy = activities.filter((a) => a.type === "view" || a.type === "copy");

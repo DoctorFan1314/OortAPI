@@ -3,8 +3,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
-import { useState, useRef, useEffect } from "react";
-import { Search, Menu, X, Sun, Moon, Languages, ChevronDown, TrendingUp, Tags, BookOpen, LayoutGrid } from "lucide-react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { Search, Menu, X, Sun, Moon, Languages, ChevronDown, TrendingUp, Tags, BookOpen, LayoutGrid, User, Settings, Shield, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
@@ -20,7 +20,9 @@ export function Navbar() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sheetOpen, setSheetOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const moreRef = useRef<HTMLDivElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const pathname = usePathname();
   const { user, loaded, logout } = useAuth();
@@ -54,7 +56,34 @@ export function Navbar() {
   }, [moreOpen]);
 
   // Close dropdown on route change
-  useEffect(() => { setMoreOpen(false); }, [pathname]);
+  useEffect(() => { setMoreOpen(false); setUserMenuOpen(false); }, [pathname]);
+
+  // Close user menu on outside click
+  useEffect(() => {
+    if (!userMenuOpen) return;
+    function handleClick(e: MouseEvent) {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [userMenuOpen]);
+
+  const handleUserMenuKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (!userMenuOpen) return;
+      const items = Array.from(
+        (e.currentTarget as HTMLElement).querySelectorAll('[role="menuitem"]')
+      ) as HTMLElement[];
+      if (items.length === 0) return;
+      const idx = items.indexOf(document.activeElement as HTMLElement);
+      if (e.key === "ArrowDown") { e.preventDefault(); items[(idx + 1) % items.length]?.focus(); }
+      if (e.key === "ArrowUp") { e.preventDefault(); items[(idx - 1 + items.length) % items.length]?.focus(); }
+      if (e.key === "Escape") { setUserMenuOpen(false); }
+    },
+    [userMenuOpen]
+  );
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
@@ -182,15 +211,79 @@ export function Navbar() {
 
           <div className="hidden md:flex items-center gap-2">
             {!loaded ? null : user ? (
-              <Link href="/profile">
-                <div role="img" aria-label={user.username} className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-medium cursor-pointer hover:opacity-90 transition-opacity overflow-hidden shrink-0">
-                  {user.avatar ? (
-                    <Image src={user.avatar} alt={user.username} width={32} height={32} className="h-8 w-8 rounded-full object-cover" unoptimized />
-                  ) : (
-                    user.username.charAt(0).toUpperCase()
-                  )}
-                </div>
-              </Link>
+              <div className="relative" ref={userMenuRef}>
+                <button
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  className="flex items-center gap-1.5 group"
+                  aria-expanded={userMenuOpen}
+                  aria-haspopup="menu"
+                  aria-label={user.username}
+                >
+                  <div role="img" aria-label={user.username} className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-medium cursor-pointer group-hover:opacity-90 transition-opacity overflow-hidden shrink-0">
+                    {user.avatar ? (
+                      <Image src={user.avatar} alt={user.username} width={32} height={32} className="h-8 w-8 rounded-full object-cover" unoptimized />
+                    ) : (
+                      user.username.charAt(0).toUpperCase()
+                    )}
+                  </div>
+                  <ChevronDown className={`h-3 w-3 text-muted-foreground transition-transform hidden md:block ${userMenuOpen ? "rotate-180" : ""}`} />
+                </button>
+                {userMenuOpen && (
+                  <div
+                    role="menu"
+                    className="absolute top-full right-0 mt-2 w-56 bg-card border border-border rounded-xl shadow-2xl overflow-hidden z-50 animate-[fadeIn_0.1s_ease-out]"
+                    onKeyDown={handleUserMenuKeyDown}
+                  >
+                    {/* User info header */}
+                    <div className="px-4 py-3 border-b border-border">
+                      <p className="text-sm font-medium text-foreground truncate">{user.username}</p>
+                      <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                    </div>
+                    {/* Menu items */}
+                    <div className="py-1">
+                      <Link
+                        href="/profile"
+                        role="menuitem"
+                        onClick={() => setUserMenuOpen(false)}
+                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors focus:bg-secondary focus:text-foreground focus-visible:outline-none"
+                      >
+                        <User className="h-4 w-4" />
+                        {t.common.profile}
+                      </Link>
+                      <Link
+                        href="/profile?tab=settings"
+                        role="menuitem"
+                        onClick={() => setUserMenuOpen(false)}
+                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors focus:bg-secondary focus:text-foreground focus-visible:outline-none"
+                      >
+                        <Settings className="h-4 w-4" />
+                        {t.profile.settings}
+                      </Link>
+                      {user.role === "admin" && (
+                        <Link
+                          href="/admin"
+                          role="menuitem"
+                          onClick={() => setUserMenuOpen(false)}
+                          className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors focus:bg-secondary focus:text-foreground focus-visible:outline-none"
+                        >
+                          <Shield className="h-4 w-4" />
+                          {t.admin.title}
+                        </Link>
+                      )}
+                    </div>
+                    <div className="border-t border-border py-1">
+                      <button
+                        role="menuitem"
+                        onClick={() => { setUserMenuOpen(false); handleLogout(); }}
+                        className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors focus:bg-secondary focus:text-foreground focus-visible:outline-none"
+                      >
+                        <LogOut className="h-4 w-4" />
+                        {t.common.logout}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             ) : (
               <>
                 <Link href="/login">

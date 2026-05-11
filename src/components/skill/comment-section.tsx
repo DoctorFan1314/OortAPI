@@ -201,6 +201,7 @@ export function CommentSection({ skillId, skillTitle }: { skillId: string; skill
         type: "comment",
         skillId,
         targetTitle: skillTitle,
+        commentId: comment.id,
         timestamp: new Date().toISOString(),
       });
       localStorage.setItem(actKey, JSON.stringify(activities.slice(0, 100)));
@@ -297,8 +298,8 @@ export function CommentSection({ skillId, skillTitle }: { skillId: string; skill
           const actKey = STORAGE_KEYS.activity(user.email);
           const actRaw = localStorage.getItem(actKey);
           const activities = actRaw ? JSON.parse(actRaw) : [];
-          const updatedActivities = activities.filter((a: { type: string; skillId?: string; id?: string }) =>
-            !(a.type === "comment" && a.id === commentId)
+          const updatedActivities = activities.filter((a: { type: string; commentId?: string }) =>
+            !(a.type === "comment" && a.commentId === commentId)
           );
           localStorage.setItem(actKey, JSON.stringify(updatedActivities));
         }
@@ -404,7 +405,7 @@ export function CommentSection({ skillId, skillTitle }: { skillId: string; skill
                   />
                 </div>
                 {deleteConfirmId === c.id && (
-                  <div className="ml-11 mt-2 flex items-center gap-2 text-xs">
+                  <div className="ml-11 mt-2 flex items-center gap-2 text-xs" role="alert" aria-live="polite">
                     <span className="text-muted-foreground">{t.comments.deleteConfirm}</span>
                     <button onClick={() => { handleDelete(c.id); setDeleteConfirmId(null); }} className="text-red-400 hover:underline">{t.common.confirm}</button>
                     <button onClick={() => setDeleteConfirmId(null)} className="text-muted-foreground hover:underline">{t.common.cancel}</button>

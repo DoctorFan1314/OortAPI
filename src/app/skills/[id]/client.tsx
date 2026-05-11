@@ -288,16 +288,18 @@ export default function AgentSkillDetailClient({ id }: { id: string }) {
                   role="button"
                   tabIndex={0}
                   onClick={() => {
-                    navigator.clipboard.writeText(skill.installCommand);
-                    setCopiedInstall(true);
-                    setTimeout(() => setCopiedInstall(false), 2000);
+                    navigator.clipboard.writeText(skill.installCommand).then(() => {
+                      setCopiedInstall(true);
+                      setTimeout(() => setCopiedInstall(false), 2000);
+                    }).catch(() => {});
                   }}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
                       e.preventDefault();
-                      navigator.clipboard.writeText(skill.installCommand);
-                      setCopiedInstall(true);
-                      setTimeout(() => setCopiedInstall(false), 2000);
+                      navigator.clipboard.writeText(skill.installCommand).then(() => {
+                        setCopiedInstall(true);
+                        setTimeout(() => setCopiedInstall(false), 2000);
+                      }).catch(() => {});
                     }
                   }}
                 >

@@ -87,6 +87,15 @@ export function NotificationBell() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, [open]);
 
+  const handleNotificationClick = useCallback((notification: Notification) => {
+    markAsRead(notification.id);
+    if (notification.link) {
+      router.push(notification.link);
+    }
+    setOpen(false);
+    setActiveIdx(-1);
+  }, [markAsRead, router]);
+
   // Keyboard navigation
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -123,7 +132,7 @@ export function NotificationBell() {
         }
       }
     },
-    [open, notifications, activeIdx],
+    [open, notifications, activeIdx, handleNotificationClick],
   );
 
   // Focus active item
@@ -133,15 +142,6 @@ export function NotificationBell() {
     if (activeIdx >= items.length) return;
     (items[activeIdx] as HTMLElement)?.focus();
   }, [activeIdx, open]);
-
-  function handleNotificationClick(notification: Notification) {
-    markAsRead(notification.id);
-    if (notification.link) {
-      router.push(notification.link);
-    }
-    setOpen(false);
-    setActiveIdx(-1);
-  }
 
   if (!user) return null;
 
@@ -184,14 +184,14 @@ export function NotificationBell() {
                   <button
                     onClick={() => markAllRead()}
                     className="text-xs text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded hover:bg-secondary"
-                    title={t.common.markAllRead}
+                    aria-label={t.common.markAllRead}
                   >
                     <CheckCheck className="h-3.5 w-3.5" />
                   </button>
                   <button
                     onClick={() => clearAll()}
                     className="text-xs text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded hover:bg-secondary"
-                    title={t.common.clearAll}
+                    aria-label={t.common.clearAll}
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>

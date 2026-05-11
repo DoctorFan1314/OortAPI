@@ -25,8 +25,7 @@ export function MyCommentsTab() {
       const raw = localStorage.getItem(STORAGE_KEYS.comments(user.email));
       if (raw) setComments(JSON.parse(raw));
     } catch { /* ignore */ }
-  }, [user]);
-
+  }, [user?.email]);
   if (!user) return null;
 
   const handleDelete = (id: string, skillId: string) => {

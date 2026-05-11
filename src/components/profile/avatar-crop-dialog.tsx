@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 const Cropper = lazy(() => import("react-easy-crop"));
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/contexts/i18n-context";
+import { useToast } from "@/contexts/toast-context";
 
 interface AvatarCropDialogProps {
   open: boolean;
@@ -52,6 +53,7 @@ function getCroppedImg(imageSrc: string, pixelCrop: PixelCrop): Promise<string> 
 
 export function AvatarCropDialog({ open, onOpenChange, imageSrc, onCropComplete }: AvatarCropDialogProps) {
   const { t } = useI18n();
+  const { toast } = useToast();
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<PixelCrop | null>(null);
@@ -79,9 +81,10 @@ export function AvatarCropDialog({ open, onOpenChange, imageSrc, onCropComplete 
           const blob = await fetch(dataUrl).then(r => r.blob());
           const lower = await new Promise<string>((resolve, reject) => {
             const img = new Image();
-            img.onload = () => { smallCtx.drawImage(img, 0, 0, 128, 128); resolve(smallCanvas.toDataURL("image/jpeg", 0.6)); };
-            img.onerror = () => reject(new Error("Failed to compress image"));
-            img.src = URL.createObjectURL(blob);
+            const objUrl = URL.createObjectURL(blob);
+            img.onload = () => { smallCtx.drawImage(img, 0, 0, 128, 128); URL.revokeObjectURL(objUrl); resolve(smallCanvas.toDataURL("image/jpeg", 0.6)); };
+            img.onerror = () => { URL.revokeObjectURL(objUrl); reject(new Error("Failed to compress image")); };
+            img.src = objUrl;
           });
           onCropComplete(lower);
         } else {
@@ -93,6 +96,7 @@ export function AvatarCropDialog({ open, onOpenChange, imageSrc, onCropComplete 
       onOpenChange(false);
     } catch (err) {
       console.error("Avatar crop failed:", err);
+      toast("Avatar crop failed. Please try again.", "error");
     } finally {
       setLoading(false);
     }

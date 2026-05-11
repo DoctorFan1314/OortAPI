@@ -82,45 +82,49 @@ export function useNotifications() {
   }, []);
 
   const markAsRead = useCallback((id: string) => {
-    if (!user) return;
+    const email = userEmailRef.current;
+    if (!email) return;
     setNotifications(prev => {
       const updated = prev.map(n => n.id === id ? { ...n, read: true } : n);
-      localStorage.setItem(STORAGE_KEYS.notifications(user.email), JSON.stringify(updated));
+      localStorage.setItem(STORAGE_KEYS.notifications(email), JSON.stringify(updated));
       return updated;
     });
-  }, [user]);
+  }, []);
 
   const markAllRead = useCallback(() => {
-    if (!user) return;
+    const email = userEmailRef.current;
+    if (!email) return;
     setNotifications(prev => {
       const updated = prev.map(n => ({ ...n, read: true }));
-      localStorage.setItem(STORAGE_KEYS.notifications(user.email), JSON.stringify(updated));
+      localStorage.setItem(STORAGE_KEYS.notifications(email), JSON.stringify(updated));
       return updated;
     });
-  }, [user]);
+  }, []);
 
   const clearAll = useCallback(() => {
-    if (!user) return;
+    const email = userEmailRef.current;
+    if (!email) return;
     setNotifications([]);
-    localStorage.removeItem(STORAGE_KEYS.notifications(user.email));
-  }, [user]);
+    localStorage.removeItem(STORAGE_KEYS.notifications(email));
+  }, []);
 
   const addNotification = useCallback((notification: Omit<Notification, "id" | "timestamp" | "read" | "userId">) => {
-    if (!user) return;
+    const email = userEmailRef.current;
+    if (!email) return;
     if (!prefsRef.current[notification.type]) return;
     const newNotif: Notification = {
       ...notification,
       id: crypto.randomUUID(),
       timestamp: new Date().toISOString(),
       read: false,
-      userId: user.email,
+      userId: email,
     };
     setNotifications(prev => {
       const updated = [newNotif, ...prev].slice(0, 50); // max 50
-      localStorage.setItem(STORAGE_KEYS.notifications(user.email), JSON.stringify(updated));
+      localStorage.setItem(STORAGE_KEYS.notifications(email), JSON.stringify(updated));
       return updated;
     });
-  }, [user]);
+  }, []);
 
   return { notifications, unreadCount, markAsRead, markAllRead, clearAll, addNotification, preferences, updatePreference, isTypeEnabled };
 }

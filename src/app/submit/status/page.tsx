@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import SubmitStatusClient from "./client";
 
 export const metadata: Metadata = {
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function SubmitStatusPage() {
-  return <SubmitStatusClient />;
+  return (
+    <Suspense>
+      <SubmitStatusClient />
+    </Suspense>
+  );
 }

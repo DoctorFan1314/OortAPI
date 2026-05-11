@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/auth-context";
 // Lazy-initialized to avoid SSR crash on Node < 19 where crypto.randomUUID may not exist.
 let _guestId: string | null = null;
 function getGuestId(): string {
+  if (typeof window === "undefined") return "ssr-guest";
   if (!_guestId) _guestId = crypto.randomUUID();
   return _guestId;
 }

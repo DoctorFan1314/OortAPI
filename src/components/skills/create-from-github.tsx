@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -43,6 +43,14 @@ export function CreateFromGithub({ open, onClose, onCreated }: Props) {
   const [parsedSkills, setParsedSkills] = useState<{ name: string; title: string; description: string; version: string }[]>([]);
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [done, setDone] = useState(false);
+  const parseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (parseTimeoutRef.current) clearTimeout(parseTimeoutRef.current);
+    };
+  }, []);
 
   function handleParse() {
     if (!githubUrl.trim()) {
@@ -55,7 +63,8 @@ export function CreateFromGithub({ open, onClose, onCreated }: Props) {
     }
     setUrlError("");
     setParsing(true);
-    setTimeout(() => {
+    setParsedSkills([]); // Clear old results immediately
+    parseTimeoutRef.current = setTimeout(() => {
       const results = mockParseGithub(githubUrl);
       setParsedSkills(results);
       setSelected(new Set([0])); // pre-select first
@@ -77,7 +86,7 @@ export function CreateFromGithub({ open, onClose, onCreated }: Props) {
     for (const idx of selected) {
       const s = parsedSkills[idx];
       published.push({
-        id: `gh-${Date.now()}-${idx}`,
+        id: `gh-${crypto.randomUUID()}`,
         name: s.name,
         title: s.title,
         description: s.description,

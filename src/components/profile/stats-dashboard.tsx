@@ -25,7 +25,7 @@ export function StatsDashboard() {
       bookmarks: getLen(STORAGE_KEYS.bookmarks(user.email)),
       comments: getLen(STORAGE_KEYS.comments(user.email)),
     });
-  }, [user]);
+  }, [user?.email]);
 
   if (!user) return null;
 

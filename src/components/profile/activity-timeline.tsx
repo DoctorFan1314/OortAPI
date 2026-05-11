@@ -35,8 +35,7 @@ export function ActivityTimeline() {
       const raw = localStorage.getItem(STORAGE_KEYS.activity(user.email));
       if (raw) setActivities(JSON.parse(raw));
     } catch { /* ignore */ }
-  }, [user]);
-
+  }, [user?.email]);
   if (!user) return null;
 
   const typeConfig = getTypeConfig(t);

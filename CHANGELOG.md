@@ -6,6 +6,72 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [v2.8.1] — 2026-05-11
+
+### Feature: Navbar Avatar Dropdown Menu
+
+- **Avatar dropdown** — Replaced direct link with dropdown menu containing: User Center, Settings, Admin Panel (admin-only), and Logout
+- **Keyboard navigation** — ArrowUp/Down/Escape support with `role="menu"` and `role="menuitem"` ARIA attributes
+- **Outside-click dismissal** — Click outside closes the dropdown
+- **Visual indicator** — ChevronDown arrow next to avatar rotates on open
+- **i18n** — Uses existing keys (`t.common.profile`, `t.profile.settings`, `t.admin.title`, `t.common.logout`)
+
+---
+
+## [v2.8.0] — 2026-05-10
+
+### Full-Site Audit — 30 Bug Fixes
+
+#### Critical (4)
+- **Missing Suspense in submit/status** — `useSearchParams()` component not wrapped in `<Suspense>`, causing production runtime error
+- **prompt-versions.ts SSR crash** — `localStorage` called without SSR guard, throwing during server-side rendering
+- **use-notifications.ts stale closure** — `markAsRead`/`markAllRead`/`clearAll`/`addNotification` captured stale `user` reference; now uses `userEmailRef`
+- **use-follows.ts persist race condition** — `skipPersistRef` reset to `false` before persist effect ran, writing intermediate state to localStorage; now uses `requestAnimationFrame`
+
+#### Memory Leaks & Resource Cleanup (3)
+- **Avatar crop Object URL leak** — `URL.createObjectURL()` never revoked; added `URL.revokeObjectURL()` after image load
+- **GitHub import timeout leak** — 1500ms `setTimeout` not cleaned up on dialog close; added `useRef` + `useEffect` cleanup
+- **Lightbox setTimeout leak** — Focus timeout could fire after rapid screenshot navigation
+
+#### Data Integrity (4)
+- **Comment activity cleanup ID mismatch** — Activity created with `crypto.randomUUID()`, delete matched on `commentId`; added `commentId` field to activity entries
+- **settings-tab incomplete data clearing** — `handleClearData` missed `likes`, `bookmarks`, `submissions`, `comments`, `activity` user-scoped keys
+- **Date.now() ID collision** — 4 files using `Date.now()` for IDs replaced with `crypto.randomUUID()`: `create-from-github.tsx`, `create-from-upload-prompt.tsx`, `skills/[id]/client.tsx`, `prompts/[id]/client.tsx`
+- **Clipboard API no error handling** — `navigator.clipboard.writeText()` not awaited/caught; now uses `.then().catch()`
+
+#### Hydration Mismatches (4)
+- **tags/loading.tsx `Math.random()`** — Skeleton width differed between SSR and client; changed to deterministic `40 + ((i * 17) % 60)`
+- **theme-context.tsx initial state** — `useState` initializer read localStorage, producing different value from SSR
+- **use-user-local-storage.ts SSR crash** — `crypto.randomUUID()` may not exist during SSR; added `typeof window` guard
+- **use-user-storage.ts guest key mismatch** — SSR returned `"ssr-guest"`, client returned real UUID; added SSR guard
+
+#### Accessibility (6)
+- **notification-tab.tsx div no keyboard support** — Notification items used `<div onClick>` without `role="button"`, `tabIndex`, or `onKeyDown`
+- **notification-bell.tsx missing aria-labels** — `markAllRead` and `clearAll` buttons only had `title`; changed to `aria-label`
+- **Admin delete button no aria-label** — Comment delete button had only icon; added `aria-label`
+- **command-palette.tsx Ctrl+K captures input fields** — Global shortcut didn't check `e.target`; now skips INPUT/TEXTAREA/contentEditable
+- **comment-section delete confirm no aria-live** — Added `role="alert"` and `aria-live="polite"`
+- **notification-bell handleKeyDown stale closure** — `handleNotificationClick` missing from `useCallback` deps
+
+#### Style & UI (2)
+- **tag-chip.tsx `inline-block` + `flex` conflict** — `flex` overrides `inline-block`; changed to `inline-flex`
+- **markdown-renderer.tsx sanitize inconsistency** — Server used regex, client used DOMPurify producing different output; unified to regex, removed DOMPurify dependency
+
+#### useEffect Dependencies (4)
+- **my-comments-tab.tsx** — `useEffect` depended on `user` object (new ref each render); changed to `user?.email`
+- **activity-timeline.tsx** — Same fix
+- **usage-history-tab.tsx** — Same fix
+- **stats-dashboard.tsx** — Same fix
+
+#### Dead Code Cleanup (2)
+- **use-keyboard-shortcuts.ts** — Empty file with no exports; deleted
+- **theme-context.tsx `isInitialRef`** — Set but never read; removed
+
+#### Hardcoded Strings (1)
+- **notification-tab.tsx "unread"** — Hardcoded English; changed to locale-aware display
+
+---
+
 ## [v2.7.1] — 2026-05-10
 
 ### Agent Skills Cleanup

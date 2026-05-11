@@ -77,7 +77,7 @@ export function NotificationTab() {
         <div className="flex items-center gap-2">
           {unreadCount > 0 && (
             <span className="text-xs text-muted-foreground">
-              {unreadCount} unread
+              {unreadCount} {locale.startsWith("zh") ? "未读" : "unread"}
             </span>
           )}
         </div>
@@ -129,6 +129,9 @@ export function NotificationTab() {
             <div
               key={n.id}
               onClick={() => { if (!n.read) markAsRead(n.id); }}
+              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); if (!n.read) markAsRead(n.id); } }}
+              role="button"
+              tabIndex={0}
               className={`glass-card p-4 flex items-start gap-3 cursor-pointer transition-colors ${
                 !n.read ? "border-l-2 border-l-primary bg-primary/5" : ""
               }`}

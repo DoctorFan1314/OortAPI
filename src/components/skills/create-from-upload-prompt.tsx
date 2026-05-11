@@ -59,7 +59,7 @@ export function CreateFromUploadPrompt({ open, onClose, onCreated }: Props) {
     const cat = categories.find((c) => c.slug === categorySlug) || categories[0];
     const tagsList = tags ? tags.split(",").map((s) => s.trim()).filter(Boolean) : [];
     const skill: Skill = {
-      id: `custom-prompt-${Date.now()}`,
+      id: `custom-prompt-${crypto.randomUUID()}`,
       title: title.trim(),
       subtitle: subtitle.trim() || title.trim(),
       description: description.trim(),

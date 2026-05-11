@@ -2,7 +2,6 @@
 
 import { memo } from "react";
 import dynamic from "next/dynamic";
-import DOMPurify from "dompurify";
 import { CopyButton } from "@/components/shared/copy-button";
 
 const LazySyntaxHighlighter = dynamic(
@@ -56,7 +55,7 @@ function isTableSeparator(line: string): boolean {
   return /^\|[\s\-:|]+\|$/.test(line.trim());
 }
 
-const sanitize = (html: string) => typeof window !== "undefined" ? DOMPurify.sanitize(html, { ALLOWED_TAGS: [] }) : html.replace(/<[^>]*>/g, "");
+const sanitize = (html: string) => html.replace(/<[^>]*>/g, "");
 
 export const MarkdownRenderer = memo(function MarkdownRenderer({ content }: { content: string }) {
   const sanitizedContent = sanitize(content);
