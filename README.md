@@ -110,8 +110,6 @@ ai-skills-hub/
 │   │   ├── auth-context.tsx          # Auth context (localStorage-based)
 │   │   ├── theme-context.tsx         # Theme context (dark/light)
 │   │   └── i18n-context.tsx          # i18n context (zh/en)
-│   ├── hooks/
-│   │   └── use-keyboard-shortcuts.ts # Command palette shortcuts
 │   └── lib/
 │       ├── types.ts                  # TypeScript type definitions
 │       ├── mock-data.ts              # Prompt mock data (28 templates + 10 reviews)
@@ -176,255 +174,33 @@ ai-skills-hub/
 
 ## Features
 
-| Feature | Status | Description |
-|---------|--------|-------------|
-| Security headers | ✅ | X-Frame-Options, X-Content-Type-Options, Referrer-Policy in next.config.ts |
-| Proxy route protection | ✅ | src/proxy.ts for admin/profile cache-control headers (Next.js 16 convention) |
-| Open redirect fix | ✅ | safeReturnUrl() validation prevents open redirect via `://` in query params |
-| Plaintext password removed | ✅ | Auth uses hash-only comparison; plaintext fallback removed |
-| StarRating keyboard nav | ✅ | ArrowLeft/ArrowRight navigation, focus-visible ring, hover scale |
-| CollectionPicker a11y | ✅ | Outside-click close, Escape key, Input component |
-| Lightbox scroll lock | ✅ | 44px touch targets, body scroll lock, i18n labels |
-| MarkdownRenderer upgrades | ✅ | Blockquote support, link `[text](url)` rendering |
-| NotificationBell auto-close | ✅ | Dropdown auto-closes on route change |
-| Conditional tab rendering | ✅ | FeaturedSection halves inactive tab DOM via conditional render |
-| Cross-tab sync (useFollows) | ✅ | Follow state syncs across browser tabs via storage event |
-| Per-session guest ID | ✅ | useUserLocalStorage generates unique guest ID per session |
-| formatRelativeTime | ✅ | AgentSkillCard shows relative time ("3 months ago") |
-| New i18n keys (17+) | ✅ | clearSearch, viewAllItems, comingSoon, notFound, backToList, markdownHint, etc. |
-| Skeleton deterministic widths | ✅ | No Math.random() — avoids hydration mismatch |
-| tFormat optimization | ✅ | replaceAll() instead of RegExp; dev-mode warning for unresolved vars |
-| CreateDropdown touch fix | ✅ | Removed onMouseEnter (touch incompatible) |
-| AgentSkillCard semantic button | ✅ | Changed from `<div role="button">` to `<button>` |
-| Profile cache protection | ✅ | Cache-Control: no-store via proxy for profile/admin routes |
-| useCollections loaded state | ✅ | Added `loaded` state for tracking initialization |
-| .env.example | ✅ | Environment variable template file created |
-| ES2022 target | ✅ | tsconfig.json target upgraded from ES2017 to ES2022 |
-| Agent Skills marketplace | ✅ | Search, filter, sort, marketplace cards |
-| Skill detail page | ✅ | 3-tab layout: intro, files, feedback |
-| File download | ✅ | Single file + zip bundle download (JSZip) |
-| Code highlighting | ✅ | react-syntax-highlighter with dark theme |
-| Quick Create (Github) | ✅ | Import skills/templates from Github repo |
-| Custom Create (Upload) | ✅ | Upload local files or fill prompt form |
-| Prompt templates | ✅ | 28 templates, search, filter, sort |
-| One-click prompt copy | ✅ | Online/Local versions, clipboard API |
-| Variable fill | ✅ | Real-time prompt template update |
-| Interactive Prompt Playground | ✅ | Fill variables and preview assembled prompt in-browser (client-side) |
-| User auth | ✅ | localStorage-based login/register/logout |
-| Like/Bookmark | ✅ | Persisted via localStorage |
-| i18n | ✅ | Chinese/English, context-based |
-| Dark/Light theme | ✅ | System default + manual toggle |
-| SEO | ✅ | Per-page metadata, OG, canonical URLs, sitemap, robots.txt, JSON-LD |
-| Responsive design | ✅ | Mobile-first, Sheet drawer nav |
-| Skill comments | ✅ | Per-skill comments persisted to localStorage |
-| Dynamic LAN access | ✅ | Dev server accessible from any private IP via wildcard `allowedDevOrigins` |
-| Loading skeletons | ✅ | Skeleton screens for skills, detail, categories, trending, tags, profile |
-| Breadcrumb navigation | ✅ | Reusable breadcrumb on detail pages |
-| Native share | ✅ | navigator.share() on mobile, clipboard fallback on desktop |
-| Page transitions | ✅ | CSS fade-in animation on route changes |
-| Comment reply | ✅ | Reply to comments with @mention and visual indicator |
-| Tag cloud search | ✅ | Real-time tag filtering by name with count display |
-| Newsletter unsubscribe | ✅ | Manage preferences / unsubscribe from footer newsletter |
-| Command palette | ✅ | Keyboard shortcuts with focus restore + animation |
-| Dynamic imports | ✅ | Create modals lazy-loaded via next/dynamic; SyntaxHighlighter, JSZip, file-saver dynamic imported |
-| 404 page enhanced | ✅ | Search box + hot links + browse buttons |
-| Delete confirmation | ✅ | Type DELETE to confirm account deletion |
-| Full a11y | ✅ | ARIA roles, labels, keyboard support, reduced-motion |
-| Full i18n | ✅ | 100% bilingual (zh/en), ~300+ translation keys |
-| Category i18n | ✅ | Category names/descriptions in 14 categories fully localized |
-| Custom avatar | ✅ | Upload, crop (react-easy-crop), set custom avatar; persists as base64 in localStorage |
-| Error boundaries | ✅ | Root + nested route error boundaries with retry, i18n, glass-card UI |
-| Loading skeleton (root) | ✅ | Root-level skeleton screen on initial navigation |
-| Date locale | ✅ | `useLocale()` hook for proper zh-CN/en-US date formatting across all components |
-| MarkdownRenderer (shared) | ✅ | Extracted reusable component with heading anchors and scroll offset |
-| Navbar "More" dropdown | ✅ | Quick access to Categories, Trending, Tags, Guide from navbar |
-| URL-based profile tabs | ✅ | Deep-linkable tabs via `?tab=settings`, preserved on refresh |
-| Register confirm password | ✅ | Password mismatch validation on registration |
-| Login/Register loading states | ✅ | Button shows loading indicator during auth |
-| My Likes/Favorites: Agent Skills | ✅ | Both Agent Skills and Prompts now visible in likes and favorites |
-| Comment delete sync | ✅ | Deleting comments syncs across user, global, and per-skill storage |
-| Usage history correct routing | ✅ | Agent skill history links to `/skills/[id]`, not `/prompts/[id]` |
-| formatNumber: millions | ✅ | `1000000` → "1M" instead of "1000.0k" |
-| Sitemap real dates | ✅ | Uses actual `lastUpdated` dates; base URL from env var |
-| Particle bg homepage-only | ✅ | Canvas animation scoped to homepage; other pages skip it for CPU savings |
-| Memoized filtering | ✅ | `useMemo` for skills/prompts/trending filtering, featured section data |
-| Dynamic `<html lang>` | ✅ | `<html lang>` updates on language switch via `HtmlLangUpdater` component |
-| Featured section keyboard nav | ✅ | ArrowLeft/ArrowRight toggles between Agent/Prompt tabs |
-| Comment star rating ARIA | ✅ | `role="radio"`, `aria-checked`, `aria-label` on rating buttons |
-| Create modal a11y | ✅ | `role="dialog"`, `aria-modal`, `aria-label`, Escape key to close |
-| Search input labels | ✅ | Skills/Prompts search inputs have `aria-label` |
-| UUID generation | ✅ | `crypto.randomUUID()` for comments, submissions, toasts |
-| Category detail i18n | ✅ | Agent category matching uses English slugs, not hardcoded Chinese |
-| Consistent parentheses | ✅ | ASCII `()` in "load more" buttons across all list pages |
-| Comment edit/delete | ✅ | Authors can edit and delete their own comments on skill pages |
-| Avatar auto-compression | ✅ | Auto-compresses images >500KB to 128×128 at 60% JPEG in crop dialog |
-| Guide TOC | ✅ | Table of contents with anchor links to all guide sections |
-| Skip navigation link | ✅ | WCAG 2.4.1 Level A — "Skip to main content" link in root layout |
-| OG images | ✅ | `openGraph.images` and `twitter.images` on all pages for social sharing |
-| Unified metadata language | ✅ | Root layout title, description, OG all in English; consistent across all pages |
-| Theme-consistent skeletons | ✅ | All loading skeletons use `bg-secondary` token (works in light and dark mode) |
-| Dynamic import loading spinners | ✅ | Create modals show spinner while loading via `dynamic()` fallback |
-| i18n hardcoded strings fixed | ✅ | AgentSkillCard "Popular", delete confirmation, footer "Coming soon" all i18n |
-| CreateDropdown ARIA | ✅ | `aria-expanded`, `aria-haspopup`, `role="menu"`, `role="menuitem"` |
-| Comment buttons a11y | ✅ | Like button has `aria-label` + `aria-pressed`; edit/delete have `aria-label` |
-| Prompts filter radiogroup | ✅ | Category, difficulty, sort filters wrapped in `role="radiogroup"` containers |
-| AgentSkillCard a11y fix | ✅ | Removed full-card overlay `<Link>`; title, avatar, description are individual `<Link>` elements |
-| Create modal ARIA | ✅ | `CreateFromUpload` and `CreateFromUploadPrompt` have `role="dialog"`, `aria-modal`, `aria-label` |
-| MarkdownRenderer memo | ✅ | `React.memo` wrapper prevents re-parsing on parent re-renders |
-| Submit form loading state | ✅ | Submit button shows disabled + "..." during submission |
-| AgentSkillCard tags interactive | ✅ | Tags are `<Link>` to `/tags/[tag]`, consistent with SkillCard |
-| Footer stable keys | ✅ | Uses stable `id` keys instead of translated strings; no DOM rebuild on language switch |
-| ScrollToTop CSS transition | ✅ | Uses `opacity-0 pointer-events-none` instead of removing from DOM |
-| Profile stats reactive | ✅ | `StatsDashboard` uses `useEffect` + `useState` instead of reading localStorage in render body |
-| Glass card hover optimization | ✅ | `transition: all` changed to specific `transform, border-color, box-shadow` properties |
-| Delete confirmation i18n | ✅ | Accepts both "DELETE" (English) and "删除" (Chinese) for account deletion |
-| Profile page Suspense | ✅ | `ProfileClient` wrapped in `<Suspense>` with skeleton fallback |
-| Unified search | ✅ | `/search` page with autocomplete, recent history, keyboard nav, ARIA combobox |
-| Notification system | ✅ | Bell icon with unread badge, dropdown, mark-as-read, per-user localStorage |
-| Navbar avatar dropdown | ✅ | Click avatar to open menu with User Center, Settings, Admin Panel (admin-only), Logout |
-| Public user profiles | ✅ | `/users/[username]` with avatar, bio, stats, published skills |
-| JSON-LD structured data | ✅ | SoftwareApplication, CreativeWork, BreadcrumbList, Organization, WebSite |
-| Skill detail: share | ✅ | navigator.share() on mobile, clipboard fallback on desktop |
-| Skill detail: screenshots | ✅ | Screenshot gallery with lightbox zoom |
-| Skill detail: dependencies | ✅ | Sidebar dependency list |
-| Skill detail: verified badge | ✅ | BadgeCheck icon for verified skills |
-| Skill detail: report | ✅ | Report modal with radio button reasons |
-| Skill detail: follow author | ✅ | Follow/unfollow skill authors |
-| Skill detail: collections | ✅ | Add to user-created collections |
-| Skill detail: version history | ✅ | 4th tab with vertical timeline of versions |
-| URL-synced filters | ✅ | Skills page filters synced to URL query params |
-| Hero stagger animation | ✅ | Slide-up entrance animation with staggered delays |
-| Tab crossfade animation | ✅ | Fade-in on tab panel switch |
-| Comment Markdown | ✅ | Comments render Markdown with syntax support |
-| Collections system | ✅ | Create, manage, and browse skill collections |
-| Follow system | ✅ | Follow/unfollow authors with localStorage persistence |
-| Onboarding tour | ✅ | 3-step guided tour for first-time visitors |
-| Print styles | ✅ | Print-optimized CSS with hidden decorative elements |
-| CSS focus-visible | ✅ | Global keyboard focus ring styles |
-| Reduced-motion guard | ✅ | All CSS animations respect prefers-reduced-motion |
-| Light mode glass-card | ✅ | Backdrop blur with proper light-mode colors |
-| Homepage RSC | ✅ | Server component with lazy-loaded particles and client tab state |
-| Fuzzy search | ✅ | Multi-word AND matching with typo tolerance |
-| Search pagination | ✅ | Load More button for search results |
-| Prompts active filters | ✅ | Removable filter tags on prompts page |
-| Comment pagination | ✅ | Load More for comment sections |
-| Comment "edited" mark | ✅ | Edited badge on modified comments |
-| Password strength meter | ✅ | 5-bar strength indicator on registration |
-| Mobile search in Sheet | ✅ | Search input in mobile navigation drawer |
-| Guide code copy | ✅ | One-click copy on guide code examples |
-| Toast warning type | ✅ | Yellow warning toast; max 5 enforced |
-| Theme color-scheme sync | ✅ | `document.documentElement.style.colorScheme` for native widgets |
-| CSS scroll-behavior | ✅ | Smooth scrolling for anchor links |
-| Glow theme-adaptive | ✅ | Glow effects use CSS variables for light/dark |
-| 14 language highlight | ✅ | Python, Bash, YAML, CSS, HTML, SQL, Java, Go, Rust + existing |
-| Skill detail refactor | ✅ | Split into ReportModal, Lightbox, CollectionPicker, VersionTimeline |
-| useFilteredList hook | ✅ | Shared filtering logic for skills and prompts pages |
-| Focus trap (onboarding) | ✅ | Modal focus trap with Tab cycling and focus restore |
-| Lightbox keyboard nav | ✅ | Escape close + ArrowLeft/Right navigation |
-| Report modal ESC | ✅ | Escape to close report dialog |
-| Collection edit | ✅ | updateCollection and isInCollection functions |
-| Auth password hash fix | ✅ | Migration hashes passwords immediately, no plaintext |
-| Notification state fix | ✅ | unreadCount derived via useEffect, no stale state |
-| Dark mode cascade fix | ✅ | `:root:not(.dark)` for all light-mode-only CSS selectors |
-| Onboarding fallback | ✅ | scrollIntoView + center-screen fallback when target missing |
-| Toast theme tokens | ✅ | Replaced hardcoded hex with theme tokens for both modes |
-| Avatar crop safety | ✅ | Canvas null check with reject; error logging |
-| Navbar empty menu guard | ✅ | Arrow key nav guard for empty menu items |
-| Notification bounds check | ✅ | Focus index clamped to items length |
-| Forgot password | ✅ | Inline reset dialog with email lookup + new password form |
-| Data import | ✅ | Import JSON backup with validation and deduplication |
-| Per-user password salt | ✅ | Random 16-byte hex salt, auto-migration on login |
-| Admin dual-check | ✅ | Email + role verification for admin access |
-| html lang init | ✅ | Inline script reads localStorage before first paint |
-| XSS sanitization | ✅ | DOMPurify for Markdown content, script injection prevention |
-| Rate limiting | ✅ | 3s comment, 10s submit, 5s report cooldowns |
-| Profile keyboard nav | ✅ | ArrowLeft/Right/Home/End for tab switching |
-| Profile pagination | ✅ | Load More on activity, history, comments, favorites |
-| Clear data confirmation | ✅ | Confirmation dialog before wiping localStorage |
-| Premium preview limit | ✅ | 4 skills with blurred preview and upgrade prompt |
-| Skill comparison | ✅ | Side-by-side compare at /skills/compare |
-| Notification preferences | ✅ | Toggle switches for 6 notification types |
-| Mobile Sheet avatar | ✅ | Avatar + notification bell in mobile nav drawer |
-| Unified comments | ✅ | Agent skills use shared CommentSection component |
-| Detail page skeletons | ✅ | Animated skeleton for lazy MarkdownRenderer |
-| Comment reply / threading | ✅ | Reply to comments, nested display with indentation |
-| Notification Tab | ✅ | Profile notifications tab with type filters and pagination |
-| Submission edit/delete | ✅ | Delete or edit pending submissions from profile |
-| Admin comment pagination | ✅ | 20 per page with Load More |
-| Admin delete confirmation | ✅ | Confirmation dialog before deleting comments |
-| Report modal a11y | ✅ | `role="dialog"`, focus trap, Escape close |
-| Navbar keyboard hint | ✅ | `Ctrl+K` badge next to search toggle |
-| Scroll to top on nav | ✅ | Auto scroll to top on route change |
-| Onboarding guard | ✅ | Skip mount if onboarding already completed |
-| Compare mode fix | ✅ | Full card clickable in compare mode |
-| Lazy SyntaxHighlighter | ✅ | Dynamic import, ~150KB less initial bundle |
-| Avatar auto-compress | ✅ | 200KB threshold, 128×128 at 60% JPEG |
-| Search input debounce | ✅ | 500ms debounce on URL update |
-| Error boundary API fix | ✅ | `unstable_retry` → `reset()` for Next.js 16 stable |
-| Nested main fix | ✅ | Removed duplicate `<main>` on homepage |
-| Prompt not-found enhanced | ✅ | Search icon, dual buttons, glass-card styling |
-| Share clipboard fallback | ✅ | Prompt share falls back to clipboard copy |
-| OAuth buttons removed | ✅ | Removed non-functional login/register OAuth |
-| User avatar optimization | ✅ | `<img>` → Next.js `<Image>` component |
-| Dropdown focus-visible | ✅ | Removed `outline-none`, restored focus ring |
-| Star rating keyboard focus | ✅ | `.star-rating-btn:focus-visible` CSS rule |
-| Login/Register return URL | ✅ | After auth, redirects back to original page via `returnUrl` param |
-| Skill detail tab keyboard nav | ✅ | ArrowLeft/Right/Home/End key navigation on skill detail tabs |
-| Admin ARIA tabs | ✅ | Full ARIA tab pattern with keyboard navigation on admin page |
-| Submit category radio semantics | ✅ | `role="radiogroup"` + `role="radio"` + arrow keys for category selection |
-| Reusable StarRating component | ✅ | Interactive + readonly modes, shared across comment sections |
-| Reusable TagChip component | ✅ | Unified tag rendering across all card types |
-| useCopyToClipboard hook | ✅ | Consolidated clipboard + toast + copied-state pattern |
-| AgentSkill difficulty badge | ✅ | Beginner/intermediate/advanced levels with color-coded badges |
-| Category dropdown in upload | ✅ | Predefined category `<select>` replaces free-text input |
-| Collection visual identifiers | ✅ | `coverImage` and `color` fields on UserCollection |
-| Auth session expiry | ✅ | Sessions expire after 30 days, auto-cleared on load |
-| Unsaved changes guard | ✅ | Dirty-state tracking with navigate-away warning in settings |
-| Categories page SEO | ✅ | Full metadata, OG, Twitter card, canonical URL |
-| Compare page SEO | ✅ | Metadata export with title and description |
-| Tags detail OG + canonical | ✅ | `openGraph`, `twitter`, `alternates.canonical` on tag pages |
-| Categories detail JSON-LD | ✅ | BreadcrumbList structured data on category pages |
-| Unified English metadata | ✅ | All 8 Chinese-only pages now use English titles |
-| Notification prefs user-scoped | ✅ | Preferences stored per-user instead of global key |
-| useLocalStorage cross-tab sync | ✅ | `storage` event listener reflects changes across tabs |
-| Focus ring overflow fix | ✅ | `box-shadow` fallback for `overflow-hidden` containers |
-| Theme switch smooth transition | ✅ | 0.3s color transition on theme toggle |
-| Prose dark mode overrides | ✅ | Markdown uses project design tokens in dark mode |
-| 7 new error boundaries | ✅ | categories, trending, tags, search, profile, guide, users |
-| 3 new loading skeletons | ✅ | prompts, categories, tags/[tag] pages |
-| Recently Viewed section | ✅ | Profile activity timeline shows last 10 viewed items |
-| Most Liked sort | ✅ | New sort option by like count on prompts page |
-| Toast auto-dismiss | ✅ | Auto-dismiss after 3s/5s with timeout cleanup on unmount |
-| Toast entry animation | ✅ | Fade-in + slide-up animation on toast appearance |
-| i18n interpolation | ✅ | `tFormat(key, {count})` helper for placeholder replacement |
-| Shared ErrorFallback | ✅ | Reusable component across all 10 error.tsx files |
-| Shared CopyButton | ✅ | Unified clipboard copy with i18n aria-labels |
-| Password reset rate limit | ✅ | 60-second cooldown between reset attempts |
-| Compare same-skill warning | ✅ | Warning when both comparison slots have the same skill |
-| Admin delete dialog | ✅ | Replaced window.confirm() with styled Dialog component |
-| Button loading spinners | ✅ | Loader2 spinners on login/register/submit buttons |
-| useUserLocalStorage hook | ✅ | Generic user-scoped localStorage with cross-tab sync |
-| Viewport export | ✅ | Separate viewport with theme-color for light/dark |
-| Dark mode scrollbars | ✅ | Custom thin scrollbars matching the dark theme |
-| Z-index CSS variables | ✅ | --z-dropdown, --z-overlay, --z-toast, --z-command scale |
-| Light mode syntax | ✅ | Code blocks adapt to light/dark theme |
-| StarRating hover preview | ✅ | Interactive stars show hover state before click |
-| Password reset verification | ✅ | Requires email ownership confirmation before reset |
-| Centralized site URL | ✅ | getSiteUrl() helper replaces 8+ hardcoded URLs |
-| Robots.txt blocks /admin | ✅ | Admin and API routes disallowed for crawlers |
-| Sitemap auth cleanup | ✅ | Removed /submit/status from sitemap |
-| Toast aria-live fix | ✅ | Removed role="alert" conflict with aria-live="polite" |
-| TagChip 44px targets | ✅ | WCAG-compliant touch targets for mobile |
-| Notification "just now" | ✅ | Localized text for notifications < 60 seconds |
-| ScrollToTop a11y | ✅ | aria-hidden + tabIndex=-1 when hidden |
-| Comment usernames linked | ✅ | Author names link to /users/[username] |
-| Lightbox a11y | ✅ | role="dialog", focus trap, Escape close, aria-modal |
-| Trending ARIA tabs | ✅ | role="tablist", role="tab", aria-selected with keyboard nav |
-| All 4 providers memoized | ✅ | auth, i18n, toast, theme context values use useMemo |
-| Light/dark blur consistent | ✅ | glass-card uses blur(16px) in both themes |
-| Consolidated reduced-motion | ✅ | 3 @media blocks merged into 1 |
-| CSS ::selection | ✅ | Custom selection highlight using primary color |
-| CSS scroll-padding-top | ✅ | Anchors no longer land under fixed navbar |
+### Core
+- **Agent Skills Marketplace** — Search, filter, sort; 3-tab detail page (intro, files, feedback); file download (single + zip)
+- **Prompt Templates** — 28 templates with category/difficulty/sort filters; variable fill form; one-click copy
+- **Quick Create** — Import skills/templates from GitHub repo, or upload local files
+- **Skill Comparison** — Side-by-side compare at `/skills/compare`
+
+### User System
+- **Auth** — Login/register with password strength meter, forgot password, session expiry, return-URL redirect
+- **Profile** — Custom avatar upload & crop, URL-based tabs (`?tab=settings`), activity timeline, stats dashboard
+- **Social** — Like, bookmark, follow authors, collections, public user profiles (`/users/[username]`)
+- **Comments** — Markdown, star ratings, reply/threading, edit/delete, pagination
+- **Notifications** — Bell icon with unread badge, dropdown, type filters, per-user preferences
+
+### UX & Design
+- **Dark/Light Theme** — System default + manual toggle, glass-card blur, CSS variable tokens
+- **i18n** — 100% Chinese/English, 300+ keys, category names localized, dynamic `<html lang>`
+- **Responsive** — Mobile-first with Sheet drawer nav, 44px touch targets
+- **Command Palette** — Ctrl+K global search with keyboard navigation
+- **Unified Search** — `/search` page with autocomplete, recent history, fuzzy matching
+- **Onboarding Tour** — 3-step guided tour for first-time visitors
+- **Loading & Transitions** — Skeleton screens, page fade-in, stagger animations
+
+### Technical
+- **SEO** — Per-page metadata, OG images, canonical URLs, sitemap, robots.txt, JSON-LD structured data
+- **Accessibility** — ARIA roles/labels, keyboard navigation, focus-visible, reduced-motion, skip-to-content
+- **Security** — XSS sanitization, rate limiting, password hashing with salt, open redirect prevention, admin dual-check
+- **Performance** — Dynamic imports, memoized filtering, canvas animation scoped to homepage, cross-tab localStorage sync
 
 ---
 
