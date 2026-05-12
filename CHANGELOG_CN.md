@@ -8,12 +8,26 @@
 
 ## [v3.3.0] — 2026-05-12
 
-### 模型分析图表、导航重构与文档重写
+### 模型分析图表、工具调用修复、个人中心重设计与 UX 改进
 
 #### 新功能
 - **ECharts 模型消耗分析** — 概览页嵌入全新模型分析模块：堆叠柱状图（按天/按小时模型 **Token 用量**）、饼状图（调用分布）、折线趋势图（调用次数）。所有图表按模型分配颜色，保持一致
 - **独立模型市场** — 模型市场从 `/dashboard/models` 移至 `/models` 作为独立页面（无侧边栏）。顶部导航栏更新为：首页 → 控制台 → 模型市场 → 文档 → 资源中心
 - **文档页面重写** — `/docs` 页面完全重写：快速开始（3 步 + Base URL 配置）、AI 应用集成（ChatBox、Cherry Studio、Open WebUI 等）、SDK 集成、cURL 示例、流式响应、API 端点、计费说明、错误码
+- **个人中心重设计** — 重写个人中心页面：概览标签页（余额、总调用、总 Token、总花费统计卡片 + 控制台快捷链接 + 最近调用表格）和设置标签页（资料编辑、主题偏好）
+- **Anthropic Messages API** — 新增 `/api/v1/messages` 端点，支持 Anthropic 原生格式，实现 OpenAI 与 Anthropic 格式间的 tool_use/tool_result 完整转换
+- **倍率规则** — 新增 `/api/dashboard/multiplier` 端点，支持按模型和按时段的定价倍率
+
+#### 关键 Bug 修复
+- **工具调用透传** — 修复网关未转发 `tools`、`tool_choice`、`functions`、`function_call`、`response_format`、`stop`、`seed`、`presence_penalty`、`frequency_penalty` 到上游服务商的问题。此前模型会输出原始 `<tool_code>` 文本而非正确的工具调用
+- **时间戳时区修复** — SQLite 通过 `CURRENT_TIMESTAMP` 存储 UTC 时间，但前端直接显示未做时区转换。所有 `new Date(timestamp)` 调用现在追加 `"Z"` 后缀，让 JavaScript 正确识别 UTC 并转换为用户本地时区
+- **模型价格编辑 Bug** — 模型市场编辑表单显示人民币值但标签为美元，保存时将人民币价格当作美元存储。已修复为在显示和保存时正确进行货币转换
+
+#### UI 改进
+- **控制台布局加宽** — 控制台和模型市场页面从 `max-w-7xl` 改为 `max-w-[1600px]`，大屏体验更佳
+- **OortAPI 页脚** — 替换旧版"AI Skills Hub"页脚为 OortAPI 品牌页脚：产品、功能、资源、社区四个板块，支持平台列表（OpenAI、Anthropic、Google、DeepSeek、Qwen）
+- **资源中心更新** — 从 2 张卡片（Prompt 模板 + Agent 技能）更新为 3 张（Agent 技能 + Prompt 模板 + API 文档）
+- **用量页货币展示** — 费用列和费用明细跟随货币设置（USD/CNY），不再硬编码 `$`
 
 #### 分析图表交互
 - **时间维度重构** — "按天"模式：7/14/30 按钮控制 X 轴日期范围。"按小时"模式：X 轴固定显示 24 小时刻度（00:00~23:00），范围按钮自动隐藏
@@ -32,7 +46,7 @@
 
 #### 文档
 - **文档页面** — 结构化分节：快速开始、认证、SDK 集成、API 端点、流式响应、计费、错误码
-- **README / README_CN** — 更新项目结构（模型市场在 `/models`）、控制台描述
+- **README / README_CN** — 更新项目结构（模型市场在 `/models`）、控制台描述，新增 Anthropic Messages API 和倍率规则说明
 - **CHANGELOG / CHANGELOG_CN** — 新增 v3.3.0 条目
 
 ---

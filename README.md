@@ -105,6 +105,22 @@ curl https://your-domain.com/api/v1/billing/balance \
   -H "Authorization: Bearer sk-oort-your-key"
 ```
 
+### Anthropic Messages API (Tool Calling)
+
+```bash
+curl https://your-domain.com/api/v1/messages \
+  -H "x-api-key: sk-oort-your-key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "claude-sonnet-4-20250514",
+    "max_tokens": 1024,
+    "messages": [{"role": "user", "content": "What is the weather in Tokyo?"}],
+    "tools": [{"name": "get_weather", "description": "Get weather for a city", "input_schema": {"type": "object", "properties": {"city": {"type": "string"}}}}]
+  }'
+```
+
+Supports full `tool_use` / `tool_result` conversion between Anthropic and OpenAI formats.
+
 ---
 
 ## Supported Models
@@ -146,20 +162,22 @@ oortapi/
 │   │   ├── api/                        # Backend API routes
 │   │   │   ├── v1/
 │   │   │   │   ├── chat/completions/   # Chat completions (streaming)
+│   │   │   │   ├── messages/           # Anthropic Messages API (tool_use conversion)
 │   │   │   │   ├── completions/        # Text completions
 │   │   │   │   ├── images/generations/ # Image generation
 │   │   │   │   ├── embeddings/         # Text embeddings
 │   │   │   │   ├── models/             # Model listing
 │   │   │   │   └── billing/            # Balance, usage & redeem
 │   │   │   ├── auth/                   # Login, register, profile
-│   │   │   ├── dashboard/              # Stats, keys, channels, users, redeem, models, settings CRUD
+│   │   │   ├── dashboard/              # Stats, keys, channels, users, redeem, models, multiplier, settings CRUD
 │   │   │   └── docs/                   # OpenAPI spec endpoint
 │   │   ├── models/                     # Model marketplace (standalone page)
 │   │   │   └── page.tsx               # Card grid with search, provider filter, currency toggle, 4-price display
+│   │   ├── profile/                    # User profile (overview + settings)
 │   │   ├── dashboard/                  # User dashboard pages
 │   │   │   ├── page.tsx                # Overview (stats + ECharts model analytics)
 │   │   │   ├── keys/page.tsx           # API key management
-│   │   │   ├── usage/page.tsx          # Usage analytics (with cache columns)
+│   │   │   ├── usage/page.tsx          # Usage analytics (with cache columns, currency-aware, timezone-correct)
 │   │   │   ├── billing/page.tsx        # Billing, balance & redeem codes
 │   │   │   ├── channels/page.tsx       # Channel management (admin)
 │   │   │   ├── users/page.tsx          # User management (admin) + password reset
@@ -201,11 +219,12 @@ After registering, users get access to a full dashboard:
 - **Overview** — Today's calls, success rate, cost, latency, model consumption charts (ECharts: stacked bar, pie, trend line)
 - **Models** — Standalone page at `/models` with card grid, search, provider filter, USD/CNY toggle, 4-price display
 - **API Keys** — Create/manage keys with per-key rate limits
-- **Usage** — Detailed call history with token breakdown (input, output, cache hit, cache create), currency-aware cost display
+- **Usage** — Detailed call history with token breakdown (input, output, cache hit, cache create), currency-aware cost display, timezone-correct timestamps
 - **Billing** — Balance display (USD/CNY), transaction history, redeem codes
 - **Channels** — Admin: configure AI provider channels with smart routing, connection testing, model sync, health monitoring (24h success rate, latency, call count)
 - **Users** — Admin: user management with role control, balance adjustment, enable/disable, password reset
 - **Redeem Codes** — Admin: batch generate codes for balance top-ups
+- **Multiplier** — Admin: per-model and time-based pricing multiplier rules
 
 ---
 

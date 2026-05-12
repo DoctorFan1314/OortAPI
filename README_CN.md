@@ -105,6 +105,22 @@ curl https://your-domain.com/api/v1/billing/balance \
   -H "Authorization: Bearer sk-oort-your-key"
 ```
 
+### Anthropic Messages API（工具调用）
+
+```bash
+curl https://your-domain.com/api/v1/messages \
+  -H "x-api-key: sk-oort-your-key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "claude-sonnet-4-20250514",
+    "max_tokens": 1024,
+    "messages": [{"role": "user", "content": "东京天气怎么样？"}],
+    "tools": [{"name": "get_weather", "description": "获取城市天气", "input_schema": {"type": "object", "properties": {"city": {"type": "string"}}}}]
+  }'
+```
+
+支持 Anthropic 与 OpenAI 格式间的 `tool_use` / `tool_result` 完整转换。
+
 ---
 
 ## 支持的模型
@@ -146,19 +162,21 @@ oortapi/
 │   │   ├── api/                        # 后端 API 路由
 │   │   │   ├── v1/
 │   │   │   │   ├── chat/completions/   # 聊天补全（流式）
+│   │   │   │   ├── messages/           # Anthropic Messages API（工具调用转换）
 │   │   │   │   ├── completions/        # 文本补全
 │   │   │   │   ├── images/generations/ # 图像生成
 │   │   │   │   ├── embeddings/         # 文本嵌入
 │   │   │   │   ├── models/             # 模型列表
 │   │   │   │   └── billing/            # 余额与用量
 │   │   │   ├── auth/                   # 登录、注册、个人信息
-│   │   │   └── dashboard/              # 统计、密钥、渠道、用户、兑换码、模型、设置 CRUD
+│   │   │   └── dashboard/              # 统计、密钥、渠道、用户、兑换码、模型、倍率、设置 CRUD
 │   │   ├── models/                     # 模型市场（独立页面）
 │   │   │   └── page.tsx               # 卡片网格，搜索、供应商筛选、货币切换、四价展示
+│   │   ├── profile/                    # 个人中心（概览 + 设置）
 │   │   ├── dashboard/                  # 用户控制台页面
 │   │   │   ├── page.tsx                # 概览（统计 + ECharts 模型分析）
 │   │   │   ├── keys/page.tsx           # API 密钥管理
-│   │   │   ├── usage/page.tsx          # 用量分析
+│   │   │   ├── usage/page.tsx          # 用量分析（含缓存列、货币感知、时区正确）
 │   │   │   ├── billing/page.tsx        # 账单与余额
 │   │   │   ├── channels/page.tsx       # 渠道管理（管理员）
 │   │   │   ├── users/page.tsx          # 用户管理（管理员）+ 密码重置
@@ -200,11 +218,12 @@ oortapi/
 - **概览** — 今日调用数、成功率、花费、延迟、ECharts 模型消耗分析（堆叠柱状图、饼状图、趋势折线图）
 - **模型市场** — 独立页面 `/models`，卡片网格布局，支持搜索、供应商筛选、USD/CNY 货币切换、四价展示（输入/补全/缓存读/缓存写）
 - **API 密钥** — 创建/管理密钥，支持独立速率限制
-- **用量分析** — 详细调用历史，含 Token 分拆（输入、输出、缓存命中、缓存创建），货币感知费用展示
+- **用量分析** — 详细调用历史，含 Token 分拆（输入、输出、缓存命中、缓存创建），货币感知费用展示，时区正确的时间戳
 - **账单** — 余额展示（USD/CNY）、交易历史、兑换码充值
 - **渠道管理** — 管理员配置 AI 服务商渠道，支持智能路由、连接测试、模型同步、健康监控（24h 成功率、延迟、调用次数）
 - **用户管理** — 管理员管理用户，角色控制、余额调整、启用/禁用、密码重置
 - **兑换码** — 管理员批量生成兑换码，用户即时兑换充值
+- **倍率规则** — 管理员配置按模型和按时段的定价倍率
 
 ---
 
