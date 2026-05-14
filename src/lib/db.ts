@@ -50,19 +50,43 @@ function getDb(): Database.Database {
   const schema = readFileSync(join(process.cwd(), 'src', 'lib', 'schema.sql'), 'utf-8');
   _db.exec(schema);
 
-  // Seed default subscription plans on every startup
+  // Seed/update default subscription plans on every startup
   try {
+    // Use INSERT OR REPLACE with explicit IDs to handle both new and existing DBs
+    // First ensure the 4 default plans exist with correct pricing
+    const defaultPlans = [
+      { name: 'spark', display_name: 'Lite', tagline: '尝鲜入门', tier: 1, monthly_price: 9, yearly_price: 92, monthly_credits: 9000000, first_purchase_discount: 0.23, overage_rate_multiplier: 1.0, max_concurrency: 10, route_priority: 'standard', off_peak_discount: 0.8, support_level: 'community', popular: 0 },
+      { name: 'flare', display_name: 'Standard', tagline: '适合进阶用户', tier: 2, monthly_price: 29, yearly_price: 296, monthly_credits: 30000000, first_purchase_discount: 0.23, overage_rate_multiplier: 0.95, max_concurrency: 30, route_priority: 'priority', off_peak_discount: 0.8, support_level: 'email', popular: 0 },
+      { name: 'pulse', display_name: 'Pro', tagline: '适合专业开发者', tier: 3, monthly_price: 79, yearly_price: 806, monthly_credits: 85000000, first_purchase_discount: 0.23, overage_rate_multiplier: 0.85, max_concurrency: 100, route_priority: 'ultra', off_peak_discount: 0.8, support_level: 'priority', popular: 1 },
+      { name: 'nova', display_name: 'Max', tagline: '适合编程开发发烧友', tier: 4, monthly_price: 199, yearly_price: 2030, monthly_credits: 220000000, first_purchase_discount: 0.23, overage_rate_multiplier: 0.75, max_concurrency: 500, route_priority: 'exclusive', off_peak_discount: 0.8, support_level: 'dedicated', popular: 0 },
+    ];
+
+    // Delete any duplicates (keep lowest ID per name), then upsert
+    _db.exec(`DELETE FROM subscription_plans WHERE id NOT IN (SELECT MIN(id) FROM subscription_plans GROUP BY name)`);
+
+    const upsert = _db.prepare(`INSERT INTO subscription_plans (name, display_name, tagline, tier, monthly_price, yearly_price, monthly_credits, first_purchase_discount, overage_rate_multiplier, max_concurrency, route_priority, off_peak_discount, support_level, popular)
+      VALUES (@name, @display_name, @tagline, @tier, @monthly_price, @yearly_price, @monthly_credits, @first_purchase_discount, @overage_rate_multiplier, @max_concurrency, @route_priority, @off_peak_discount, @support_level, @popular)
+      ON CONFLICT(name) DO UPDATE SET display_name=excluded.display_name, tagline=excluded.tagline, tier=excluded.tier, monthly_price=excluded.monthly_price, yearly_price=excluded.yearly_price, monthly_credits=excluded.monthly_credits, first_purchase_discount=excluded.first_purchase_discount, overage_rate_multiplier=excluded.overage_rate_multiplier, max_concurrency=excluded.max_concurrency, route_priority=excluded.route_priority, off_peak_discount=excluded.off_peak_discount, support_level=excluded.support_level, popular=excluded.popular`);
+
+    for (const plan of defaultPlans) {
+      upsert.run(plan);
+    }
+
+    // Ensure plan_models bindings exist
+    const planIds = _db.prepare('SELECT id, name FROM subscription_plans').all() as { id: number; name: string }[];
+    const planIdMap: Record<string, number> = {};
+    for (const p of planIds) planIdMap[p.name] = p.id;
+
     _db.exec('DELETE FROM plan_models');
-    _db.exec('DELETE FROM subscription_plans');
-    _db.exec(`INSERT INTO subscription_plans (name, display_name, tagline, tier, monthly_price, yearly_price, monthly_credits, first_purchase_discount, overage_rate_multiplier, max_concurrency, route_priority, off_peak_discount, support_level, popular) VALUES
-      ('spark', 'Lite', '尝鲜入门', 1, 9, 92, 9000000, 0.23, 1.0, 10, 'standard', 0.8, 'community', 0),
-      ('flare', 'Standard', '适合进阶用户', 2, 29, 296, 30000000, 0.23, 0.95, 30, 'priority', 0.8, 'email', 0),
-      ('pulse', 'Pro', '适合专业开发者', 3, 79, 806, 85000000, 0.23, 0.85, 100, 'ultra', 0.8, 'priority', 1),
-      ('nova', 'Max', '适合编程开发发烧友', 4, 199, 2030, 220000000, 0.23, 0.75, 500, 'exclusive', 0.8, 'dedicated', 0)`);
-    _db.exec(`INSERT INTO plan_models (plan_id, model_name, enabled) VALUES
-      (1, 'gpt-4o-mini', 1), (1, 'deepseek-chat', 1), (1, 'gemini-2.0-flash', 1), (1, 'gpt-3.5-turbo', 1),
-      (2, 'gpt-4o', 1), (2, 'claude-3-5-sonnet-20241022', 1), (2, 'claude-3-5-haiku-20241022', 1), (2, 'deepseek-reasoner', 1), (2, 'gemini-1.5-pro', 1), (2, 'qwen-max', 1),
-      (3, 'gpt-4-turbo', 1), (3, 'claude-3-opus-20240229', 1)`);
+    const insertModel = _db.prepare('INSERT INTO plan_models (plan_id, model_name, enabled) VALUES (?, ?, 1)');
+    const modelBindings: [string, string][] = [
+      ['spark', 'gpt-4o-mini'], ['spark', 'deepseek-chat'], ['spark', 'gemini-2.0-flash'], ['spark', 'gpt-3.5-turbo'],
+      ['flare', 'gpt-4o'], ['flare', 'claude-3-5-sonnet-20241022'], ['flare', 'claude-3-5-haiku-20241022'], ['flare', 'deepseek-reasoner'], ['flare', 'gemini-1.5-pro'], ['flare', 'qwen-max'],
+      ['pulse', 'gpt-4-turbo'], ['pulse', 'claude-3-opus-20240229'],
+    ];
+    for (const [planName, model] of modelBindings) {
+      if (planIdMap[planName]) insertModel.run(planIdMap[planName], model);
+    }
   } catch (e) {
     console.error('Plan seed error:', e);
   }

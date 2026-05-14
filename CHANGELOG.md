@@ -40,7 +40,7 @@ All notable changes to this project will be documented in this file.
 - **API key bounds** — `rate_limit` clamped to 1-10000 on create/update
 - **Multiplier try/catch** — POST/DELETE handlers wrapped in try/catch for malformed JSON
 - **Schema safety** — `schema.sql` uses `INSERT OR IGNORE` instead of `DELETE FROM` to preserve existing data
-- **Plan dedup fix** — Plans are now seeded once by db.ts migration only; removed duplicate INSERT from schema.sql
+- **Plan dedup fix** — Added UNIQUE constraint on plan name; seed code uses ON CONFLICT to upsert instead of DELETE+INSERT (foreign key constraint was silently blocking DELETE)
 
 ---
 

@@ -40,7 +40,7 @@
 - **API Key 边界** — `rate_limit` 创建/更新时限制在 1-10000
 - **倍率 try/catch** — POST/DELETE 处理器包裹 try/catch 防止畸形 JSON
 - **Schema 安全** — `schema.sql` 使用 `INSERT OR IGNORE` 替代 `DELETE FROM` 以保留现有数据
-- **套餐去重修复** — 套餐现在仅由 db.ts 迁移负责插入；从 schema.sql 移除了重复 INSERT
+- **套餐去重修复** — 给 plan name 添加 UNIQUE 约束；种子代码改用 ON CONFLICT upsert 代替 DELETE+INSERT（外键约束导致 DELETE 静默失败）
 
 ---
 

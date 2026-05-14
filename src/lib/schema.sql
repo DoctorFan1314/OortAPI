@@ -151,7 +151,7 @@ CREATE TABLE IF NOT EXISTS system_settings (
 -- Subscription plans table
 CREATE TABLE IF NOT EXISTS subscription_plans (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name TEXT NOT NULL,               -- 'spark', 'flare', 'pulse', 'nova'
+  name TEXT NOT NULL UNIQUE,          -- 'spark', 'flare', 'pulse', 'nova'
   display_name TEXT NOT NULL,       -- 'Spark 火花'
   tagline TEXT,                     -- '点燃你的 AI 之旅'
   tier INTEGER NOT NULL,            -- 1, 2, 3, 4 (排序用)
