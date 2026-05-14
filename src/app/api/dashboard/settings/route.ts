@@ -13,8 +13,14 @@ export async function GET(request: NextRequest) {
 
     const rows = db.prepare('SELECT key, value FROM system_settings').all() as { key: string; value: string }[];
     const settings: Record<string, string> = {};
+
+    // Public settings available to all authenticated users
+    const PUBLIC_KEYS = ['currency', 'exchange_rate', 'timezone'];
+
     for (const row of rows) {
-      settings[row.key] = row.value;
+      if (auth.user.role === 'admin' || PUBLIC_KEYS.includes(row.key)) {
+        settings[row.key] = row.value;
+      }
     }
 
     return NextResponse.json({ settings });

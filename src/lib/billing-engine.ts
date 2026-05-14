@@ -27,14 +27,16 @@ export function addBalance(userId: number, amount: number, type: 'recharge' | 'r
   const user = db.prepare('SELECT balance FROM users WHERE id = ?').get(userId) as { balance: number } | undefined;
   if (!user) return { success: false, error: 'User not found' };
 
-  const newBalance = user.balance + amount;
   const txn = db.transaction(() => {
-    db.prepare('UPDATE users SET balance = ? WHERE id = ?').run(newBalance, userId);
-    db.prepare('INSERT INTO billing_records (user_id, amount, type, description, balance_after) VALUES (?, ?, ?, ?, ?)').run(userId, amount, type, description, newBalance);
+    // Atomic: use SQL arithmetic to prevent TOCTOU race on concurrent recharges
+    db.prepare('UPDATE users SET balance = balance + ? WHERE id = ?').run(amount, userId);
+    const updated = db.prepare('SELECT balance FROM users WHERE id = ?').get(userId) as { balance: number };
+    db.prepare('INSERT INTO billing_records (user_id, amount, type, description, balance_after) VALUES (?, ?, ?, ?, ?)').run(userId, amount, type, description, updated.balance);
   });
   txn();
 
-  return { success: true, newBalance };
+  const updated = db.prepare('SELECT balance FROM users WHERE id = ?').get(userId) as { balance: number };
+  return { success: true, newBalance: updated.balance };
 }
 
 export function getEffectiveMultiplier(model: string): { multiplier: number; type: string; description: string } {

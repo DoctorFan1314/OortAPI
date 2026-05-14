@@ -6,6 +6,14 @@ export const dynamic = 'force-dynamic';
 export async function POST(request: NextRequest) {
   try {
     const authHeader = request.headers.get('authorization');
+
+    if (!authHeader) {
+      return NextResponse.json(
+        { error: { message: 'Missing API key', type: 'authentication_error' } },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
 
     if (!body.model) {
