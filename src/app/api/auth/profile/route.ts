@@ -17,8 +17,8 @@ export async function PATCH(request: NextRequest) {
     const values: unknown[] = [];
 
     if (data.username !== undefined) {
-      if (typeof data.username !== 'string' || data.username.trim().length < 2 || data.username.trim().length > 50) {
-        return NextResponse.json({ error: 'Username must be 2-50 characters' }, { status: 400 });
+      if (typeof data.username !== 'string' || data.username.trim().length < 2 || data.username.trim().length > 32) {
+        return NextResponse.json({ error: 'Username must be 2-32 characters' }, { status: 400 });
       }
       updates.push('username = ?'); values.push(data.username.trim());
     }

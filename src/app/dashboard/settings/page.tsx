@@ -170,7 +170,7 @@ export default function SettingsPage() {
             <div>
               <label className="text-sm text-muted-foreground">{lang === "zh" ? "时区" : "Timezone"}</label>
               <select
-                className="w-full h-9 px-3 rounded-md border border-input bg-background text-sm mt-1"
+                className="w-full h-9 px-3 rounded-md border border-input bg-background text-sm mt-1 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                 value={timezone}
                 onChange={e => setTimezone(e.target.value)}
               >
@@ -185,7 +185,7 @@ export default function SettingsPage() {
             <div>
               <label className="text-sm text-muted-foreground">{lang === "zh" ? "默认货币" : "Default Currency"}</label>
               <select
-                className="w-full h-9 px-3 rounded-md border border-input bg-background text-sm mt-1"
+                className="w-full h-9 px-3 rounded-md border border-input bg-background text-sm mt-1 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                 value={systemCurrency}
                 onChange={e => setSystemCurrency(e.target.value)}
               >

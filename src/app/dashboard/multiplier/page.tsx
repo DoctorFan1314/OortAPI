@@ -229,7 +229,7 @@ export default function MultiplierPage() {
               <select
                 value={timeSettings.timezone}
                 onChange={e => setTimeSettings(s => ({ ...s, timezone: e.target.value }))}
-                className="w-full px-3 py-2 bg-muted rounded-lg text-sm border border-border/50 focus:border-primary focus:outline-none"
+                className="w-full h-9 px-3 rounded-md border border-input bg-background text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
               >
                 <option value="Asia/Shanghai">Asia/Shanghai</option>
                 <option value="Asia/Tokyo">Asia/Tokyo</option>

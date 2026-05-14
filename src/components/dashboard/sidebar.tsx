@@ -1,11 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/contexts/i18n-context";
 import { useAuth } from "@/contexts/auth-context";
-import { LayoutDashboard, Key, BarChart3, Wallet, Radio, Settings, Shield, Users, Gift, Percent, Sparkles, ListChecks } from "lucide-react";
+import { LayoutDashboard, Key, BarChart3, Wallet, Radio, Settings, Shield, Users, Gift, Percent, Sparkles, ListChecks, ChevronDown } from "lucide-react";
 
 const NAV_ITEMS = [
   { href: "/dashboard", icon: LayoutDashboard, labelKey: "overview" as const },
@@ -39,12 +40,22 @@ export function DashboardSidebar() {
   const pathname = usePathname();
   const { lang } = useI18n();
   const { user } = useAuth();
+  const [collapsed, setCollapsed] = useState(false);
 
   const items = NAV_ITEMS.filter(item => !item.adminOnly || user?.role === "admin");
 
   return (
     <aside className="w-full lg:w-64 shrink-0">
-      <nav className="space-y-1" role="navigation" aria-label="Dashboard navigation">
+      {/* Mobile collapse toggle */}
+      <button
+        onClick={() => setCollapsed(!collapsed)}
+        className="flex items-center justify-between w-full px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted lg:hidden transition-colors"
+        aria-expanded={!collapsed}
+      >
+        <span>{lang === "zh" ? "导航菜单" : "Navigation"}</span>
+        <ChevronDown className={cn("h-4 w-4 transition-transform", collapsed && "-rotate-90")} />
+      </button>
+      <nav className={cn("space-y-1", collapsed && "hidden lg:block")} role="navigation" aria-label="Dashboard navigation">
         {items.map((item) => {
           const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href + "/"));
           const Icon = item.icon;

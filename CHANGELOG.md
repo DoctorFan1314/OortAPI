@@ -37,10 +37,18 @@ All notable changes to this project will be documented in this file.
 - **Footer pricing link** — Fixed "Pricing" link pointing to `/models` instead of `/token-plan`
 - **Navbar dashboard link** — Dashboard link hidden for unauthenticated users
 - **Mobile sheet toggles** — Mobile navigation sheet now includes language and theme toggles
+- **Dashboard breadcrumbs** — Auto-generated breadcrumb navigation from URL path segments
+- **Usage chart skeleton** — Loading state now shows animated card skeletons instead of blank
+- **Sidebar mobile collapse** — Navigation menu on mobile is now collapsible with chevron toggle
+- **Native select styling** — All `<select>` elements (settings, multiplier) now use consistent form input styling
+
+### Internationalization (Batch 2)
+- **Docs page full i18n** — All section headers, endpoint descriptions, error codes, pricing tiers, and auth descriptions now bilingual via comprehensive DOCS_LABELS
 
 ### Backend/Security
 - **Email validation** — Registration now validates email format server-side
 - **Channel PATCH** — Returns 400 if no fields provided, 404 if channel not found
+- **Username length** — Profile update username limit aligned to 2-32 characters (was 2-50)
 
 ---
 
