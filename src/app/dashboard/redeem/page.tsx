@@ -100,6 +100,14 @@ export default function RedeemPage() {
   useEffect(() => { fetch("/api/plans").then(r => r.json()).then(d => setPlans(d.plans || [])).catch(() => {}); }, []);
 
   async function handleGenerate() {
+    if (genCodeType === "balance" && (!genAmount || parseFloat(genAmount) <= 0)) {
+      showToast(lang === "zh" ? "请输入有效金额" : "Please enter a valid amount", "error");
+      return;
+    }
+    if (genCodeType === "subscription" && !genPlanId) {
+      showToast(lang === "zh" ? "请选择套餐" : "Please select a plan", "error");
+      return;
+    }
     setGenLoading(true);
     setGenResult([]);
     try {

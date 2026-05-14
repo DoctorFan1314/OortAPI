@@ -46,7 +46,7 @@ export function DashboardSidebar() {
     <aside className="w-full lg:w-64 shrink-0">
       <nav className="space-y-1" role="navigation" aria-label="Dashboard navigation">
         {items.map((item) => {
-          const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
+          const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href + "/"));
           const Icon = item.icon;
           return (
             <Link

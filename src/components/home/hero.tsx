@@ -63,17 +63,17 @@ export function Hero() {
           <ul className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-muted-foreground/60 hero-animate-4" aria-label="Platform stats">
             <li className="flex items-center gap-2">
               <Globe className="h-4 w-4 text-primary/60" />
-              30+ AI Models
+              {lang === "zh" ? "30+ AI 模型" : "30+ AI Models"}
             </li>
             <li className="hidden sm:block text-muted-foreground/20" aria-hidden="true">·</li>
             <li className="flex items-center gap-2">
               <Gauge className="h-4 w-4 text-primary/60" />
-              {"< 200ms Latency"}
+              {lang === "zh" ? "< 200ms 延迟" : "< 200ms Latency"}
             </li>
             <li className="hidden sm:block text-muted-foreground/20" aria-hidden="true">·</li>
             <li className="flex items-center gap-2">
               <Shield className="h-4 w-4 text-primary/60" />
-              99.9% Uptime
+              {lang === "zh" ? "99.9% 可用率" : "99.9% Uptime"}
             </li>
           </ul>
         </div>

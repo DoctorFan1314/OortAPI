@@ -52,7 +52,7 @@ function CopyButton({ text }: { text: string }) {
     });
   };
   return (
-    <button onClick={handleCopy} className="shrink-0 p-1.5 rounded-md hover:bg-muted transition-colors" title="复制">
+    <button onClick={handleCopy} className="shrink-0 p-1.5 rounded-md hover:bg-muted transition-colors" title={copied ? "Copied" : "Copy"}>
       {copied ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5 text-muted-foreground" />}
     </button>
   );

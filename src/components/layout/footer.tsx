@@ -11,7 +11,7 @@ export function Footer() {
       { label: t.footer.modelMarket, href: "/models", disabled: false },
       { label: t.footer.apiDocs, href: "/docs", disabled: false },
       { label: t.footer.dashboard, href: "/dashboard", disabled: false },
-      { label: t.footer.pricing, href: "/models", disabled: false },
+      { label: t.footer.pricing, href: "/token-plan", disabled: false },
     ]},
     { id: "features", title: t.footer.features, links: [
       { label: t.footer.unifiedApi, href: "/docs", disabled: false },

@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
     // Return masked API keys for security
     const masked = (channels as DBChannel[]).map(ch => ({
       ...ch,
-      api_key_encrypted: ch.api_key_encrypted ? decrypt(ch.api_key_encrypted).slice(0, 10) + '...' : '',
+      api_key_encrypted: ch.api_key_encrypted ? '••••••••' + decrypt(ch.api_key_encrypted).slice(-4) : '',
     }));
     return NextResponse.json({ channels: masked });
   } catch (error) {
@@ -177,11 +177,19 @@ export async function PATCH(request: NextRequest) {
     if (model_mapping !== undefined) { updates.push('model_mapping = ?'); values.push(JSON.stringify(model_mapping)); }
     if (priority !== undefined) { updates.push('priority = ?'); values.push(priority); }
 
-    if (updates.length > 0) {
-      updates.push('updated_at = CURRENT_TIMESTAMP');
-      values.push(id);
-      db.prepare(`UPDATE channels SET ${updates.join(', ')} WHERE id = ?`).run(...values);
+    if (updates.length === 0) {
+      return NextResponse.json({ error: 'No fields to update' }, { status: 400 });
     }
+
+    // Check channel exists
+    const existing = db.prepare('SELECT id FROM channels WHERE id = ?').get(id) as { id: number } | undefined;
+    if (!existing) {
+      return NextResponse.json({ error: 'Channel not found' }, { status: 404 });
+    }
+
+    updates.push('updated_at = CURRENT_TIMESTAMP');
+    values.push(id);
+    db.prepare(`UPDATE channels SET ${updates.join(', ')} WHERE id = ?`).run(...values);
 
     const channel = db.prepare('SELECT * FROM channels WHERE id = ?').get(id);
 

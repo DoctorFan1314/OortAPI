@@ -2,6 +2,8 @@
 
 import { useI18n } from "@/contexts/i18n-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useEffect, useState } from "react";
 import { Clock, Layers, Plus, Trash2, Save } from "lucide-react";
 import { useToast } from "@/contexts/toast-context";
@@ -82,6 +84,7 @@ export default function MultiplierPage() {
   const [newModel, setNewModel] = useState('');
   const [newMultiplier, setNewMultiplier] = useState('1.0');
   const [newDesc, setNewDesc] = useState('');
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
   const fetchData = () => {
     fetch('/api/dashboard/multiplier', { credentials: 'include' })
@@ -109,14 +112,19 @@ export default function MultiplierPage() {
   };
 
   const handleDeleteRule = (modelName: string) => {
+    setDeleteTarget(modelName);
+  };
+
+  const confirmDeleteRule = () => {
+    if (!deleteTarget) return;
     fetch('/api/dashboard/multiplier', {
       method: 'DELETE',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model_name: modelName }),
+      body: JSON.stringify({ model_name: deleteTarget }),
     }).then(res => { if (!res.ok) throw new Error(); return res.json(); })
-      .then(() => fetchData())
-      .catch(() => showToast(lang === "zh" ? "删除失败" : "Failed to delete rule", "error"));
+      .then(() => { setDeleteTarget(null); fetchData(); })
+      .catch(() => { showToast(lang === "zh" ? "删除失败" : "Failed to delete rule", "error"); setDeleteTarget(null); });
   };
 
   const handleToggleRule = (rule: MultiplierRule) => {
@@ -338,6 +346,22 @@ export default function MultiplierPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteTarget !== null} onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>{lang === "zh" ? "删除倍率规则" : "Delete Multiplier Rule"}</DialogTitle>
+            <DialogDescription>
+              {lang === "zh" ? `确定要删除 "${deleteTarget}" 的倍率规则吗？` : `Delete multiplier rule for "${deleteTarget}"?`}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex gap-2 justify-end pt-2">
+            <Button variant="outline" onClick={() => setDeleteTarget(null)}>{lang === "zh" ? "取消" : "Cancel"}</Button>
+            <Button onClick={confirmDeleteRule} className="bg-red-600 text-white hover:bg-red-700">{lang === "zh" ? "确认删除" : "Delete"}</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

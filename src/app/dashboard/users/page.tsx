@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useToast } from "@/contexts/toast-context";
 import { useCurrency } from "@/contexts/currency-context";
 import { Users, Search, Shield, Loader2, Pencil, Trash2, Wallet, KeyRound } from "lucide-react";
@@ -76,6 +76,8 @@ export default function UsersPage() {
   const [users, setUsers] = useState<UserItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [roleFilter, setRoleFilter] = useState<"all" | "admin" | "user">("all");
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
@@ -102,11 +104,18 @@ export default function UsersPage() {
   const [giftPlanId, setGiftPlanId] = useState<number>(0);
   const [giftCredits, setGiftCredits] = useState("");
   const [subActionLoading, setSubActionLoading] = useState(false);
+  const [confirmAction, setConfirmAction] = useState<{ type: "cancel" | "gift" | "credits"; label: string } | null>(null);
+
+  useEffect(() => {
+    if (searchTimer.current) clearTimeout(searchTimer.current);
+    searchTimer.current = setTimeout(() => setDebouncedSearch(search), 300);
+    return () => { if (searchTimer.current) clearTimeout(searchTimer.current); };
+  }, [search]);
 
   const fetchUsers = useCallback(async () => {
     setLoading(true);
     const params = new URLSearchParams({ page: String(page), limit: "20" });
-    if (search) params.set("search", search);
+    if (debouncedSearch) params.set("search", debouncedSearch);
     if (roleFilter !== "all") params.set("role", roleFilter);
     try {
       const res = await fetch(`/api/dashboard/users?${params}`, { credentials: "include" });
@@ -116,7 +125,7 @@ export default function UsersPage() {
       setHasMore(data.has_more || false);
     } catch { /* ignore */ }
     setLoading(false);
-  }, [page, search, roleFilter]);
+  }, [page, debouncedSearch, roleFilter]);
 
   useEffect(() => { fetchUsers(); }, [fetchUsers]);
 
@@ -215,7 +224,13 @@ export default function UsersPage() {
 
   async function handleGiftSubscription() {
     if (!editUser || !giftPlanId) return;
+    setConfirmAction({ type: "gift", label: lang === "zh" ? `赠送套餐给 ${editUser.email}？` : `Gift subscription to ${editUser.email}?` });
+  }
+
+  async function confirmGiftSubscription() {
+    if (!editUser || !giftPlanId) return;
     setSubActionLoading(true);
+    setConfirmAction(null);
     try {
       const res = await fetch("/api/dashboard/users", {
         method: "PATCH",
@@ -233,7 +248,13 @@ export default function UsersPage() {
 
   async function handleCancelSubscription() {
     if (!editUser?.subscription) return;
+    setConfirmAction({ type: "cancel", label: lang === "zh" ? `取消 ${editUser.email} 的订阅？` : `Cancel subscription for ${editUser.email}?` });
+  }
+
+  async function confirmCancelSubscription() {
+    if (!editUser?.subscription) return;
     setSubActionLoading(true);
+    setConfirmAction(null);
     try {
       const res = await fetch("/api/dashboard/users", {
         method: "PATCH",
@@ -251,7 +272,13 @@ export default function UsersPage() {
 
   async function handleAddCredits() {
     if (!editUser?.subscription || !giftCredits) return;
+    setConfirmAction({ type: "credits", label: lang === "zh" ? `为 ${editUser.email} 添加 ${giftCredits} credits？` : `Add ${giftCredits} credits to ${editUser.email}?` });
+  }
+
+  async function confirmAddCredits() {
+    if (!editUser?.subscription || !giftCredits) return;
     setSubActionLoading(true);
+    setConfirmAction(null);
     try {
       const res = await fetch("/api/dashboard/users", {
         method: "PATCH",
@@ -492,6 +519,29 @@ export default function UsersPage() {
                 {copied ? t.copied : t.copyPassword}
               </Button>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Subscription Action Confirmation Dialog */}
+      <Dialog open={!!confirmAction} onOpenChange={(open) => { if (!open) setConfirmAction(null); }}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>{lang === "zh" ? "确认操作" : "Confirm Action"}</DialogTitle>
+            <DialogDescription>{confirmAction?.label}</DialogDescription>
+          </DialogHeader>
+          <div className="flex gap-2 justify-end pt-2">
+            <Button variant="outline" onClick={() => setConfirmAction(null)}>{t.cancel}</Button>
+            <Button
+              onClick={() => {
+                if (confirmAction?.type === "cancel") confirmCancelSubscription();
+                else if (confirmAction?.type === "gift") confirmGiftSubscription();
+                else if (confirmAction?.type === "credits") confirmAddCredits();
+              }}
+              disabled={subActionLoading}
+            >
+              {subActionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : t.confirm}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

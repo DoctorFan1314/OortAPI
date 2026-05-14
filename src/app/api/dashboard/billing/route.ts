@@ -12,11 +12,17 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: auth.error || 'Unauthorized' }, { status: 401 });
     }
 
-    const records = db.prepare(
-      'SELECT id, amount, type, description, balance_after, created_at FROM billing_records WHERE user_id = ? ORDER BY created_at DESC LIMIT 50'
-    ).all(auth.user.id) as DBBillingRecord[];
+    const limit = Math.min(parseInt(request.nextUrl.searchParams.get('limit') || '20'), 100);
+    const offset = parseInt(request.nextUrl.searchParams.get('offset') || '0');
 
-    return NextResponse.json({ records });
+    const totalRow = db.prepare('SELECT COUNT(*) as cnt FROM billing_records WHERE user_id = ?').get(auth.user.id) as { cnt: number };
+    const total = totalRow.cnt;
+
+    const records = db.prepare(
+      'SELECT id, amount, type, description, balance_after, created_at FROM billing_records WHERE user_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?'
+    ).all(auth.user.id, limit, offset) as DBBillingRecord[];
+
+    return NextResponse.json({ records, total, has_more: offset + records.length < total });
   } catch (error) {
     console.error('Billing records error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

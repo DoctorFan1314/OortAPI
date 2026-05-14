@@ -33,6 +33,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Password must be at least 6 characters' }, { status: 400 });
     }
 
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return NextResponse.json({ error: 'Invalid email format' }, { status: 400 });
+    }
+
     // Check if email already exists
     const existing = db.prepare('SELECT id FROM users WHERE email = ?').get(email);
     if (existing) {

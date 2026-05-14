@@ -87,7 +87,7 @@ export function StatsCards({ lang = "zh" }: { lang?: "zh" | "en" }) {
 
   const cards = [
     { icon: Wallet, label: t.balance, value: formatCost(stats.balance), color: "text-yellow-500", bgColor: "bg-yellow-500/10" },
-    { icon: TrendingDown, label: t.totalCost, value: formatCost(stats.month?.cost || 0), color: "text-red-500", bgColor: "bg-red-500/10" },
+    { icon: TrendingDown, label: t.monthlyCost, value: formatCost(stats.month?.cost || 0), color: "text-red-500", bgColor: "bg-red-500/10" },
     { icon: Activity, label: t.monthlyCalls, value: (stats.month?.calls || 0).toLocaleString(), color: "text-blue-500", bgColor: "bg-blue-500/10" },
     { icon: Coins, label: t.monthlyTokens, value: formatTokens(stats.month?.tokens || 0), color: "text-green-500", bgColor: "bg-green-500/10" },
     { icon: Gauge, label: t.rpm, value: avgRPM, color: "text-purple-500", bgColor: "bg-purple-500/10" },

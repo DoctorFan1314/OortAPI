@@ -35,6 +35,7 @@ const LABELS = {
     disabled: "已禁用",
     never: "从未",
     copied: "已复制到剪贴板",
+    keyCreated: "API Key 创建成功",
     confirmDelete: "确定删除此 Key？",
     noKeys: "暂无 API Key，点击上方按钮创建",
   },
@@ -50,6 +51,7 @@ const LABELS = {
     disabled: "Disabled",
     never: "Never",
     copied: "Copied to clipboard",
+    keyCreated: "API Key created successfully",
     confirmDelete: "Delete this key?",
     noKeys: "No API keys yet. Click above to create one.",
   },
@@ -77,7 +79,7 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
       if (res.ok) {
         setNewKeyName("");
         mutate();
-        showToast(t.copied, "success");
+        showToast(t.keyCreated, "success");
       }
     } finally {
       setCreating(false);
@@ -112,6 +114,21 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
   };
 
   const maskKey = (key: string) => key.slice(0, 12) + "..." + key.slice(-4);
+
+  const formatLastUsed = (dateStr: string | null) => {
+    if (!dateStr) return t.never;
+    const date = new Date(dateStr + "Z");
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMin = Math.floor(diffMs / 60000);
+    if (diffMin < 1) return lang === "zh" ? "刚刚" : "Just now";
+    if (diffMin < 60) return lang === "zh" ? `${diffMin} 分钟前` : `${diffMin}m ago`;
+    const diffHr = Math.floor(diffMin / 60);
+    if (diffHr < 24) return lang === "zh" ? `${diffHr} 小时前` : `${diffHr}h ago`;
+    const diffDay = Math.floor(diffHr / 24);
+    if (diffDay < 30) return lang === "zh" ? `${diffDay} 天前` : `${diffDay}d ago`;
+    return date.toLocaleDateString();
+  };
 
   if (isLoading) {
     return <div className="h-48 animate-pulse bg-muted rounded-lg" />;
@@ -162,7 +179,7 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
                 </div>
                 <div className="text-right text-xs text-muted-foreground shrink-0">
                   <div>{t.calls}: {k.total_calls}</div>
-                  <div>{t.lastUsed}: {k.last_used_at || t.never}</div>
+                  <div>{t.lastUsed}: {formatLastUsed(k.last_used_at)}</div>
                 </div>
                 <div className="flex items-center gap-1">
                   <button onClick={() => toggleKey(k.id, !k.enabled)} className="text-muted-foreground hover:text-foreground" aria-label={k.enabled ? t.disabled : t.enabled}>

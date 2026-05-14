@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import useSWR from "swr";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowUpRight, ArrowDownLeft, RefreshCw, Gift } from "lucide-react";
@@ -23,13 +24,18 @@ const TYPE_CONFIG: Record<string, { icon: typeof ArrowUpRight; color: string; zh
 };
 
 const LABELS = {
-  zh: { title: "账单记录", noRecords: "暂无账单记录", balance: "余额" },
-  en: { title: "Billing History", noRecords: "No billing records yet", balance: "Balance" },
+  zh: { title: "账单记录", noRecords: "暂无账单记录", balance: "余额", prev: "上一页", next: "下一页", showing: "显示" },
+  en: { title: "Billing History", noRecords: "No billing records yet", balance: "Balance", prev: "Previous", next: "Next", showing: "Showing" },
 };
 
 export function BillingHistory({ lang = "zh" }: { lang?: "zh" | "en" }) {
-  const { data, isLoading } = useSWR<{ records: BillingRecord[] }>("/api/dashboard/billing", dashboardSWRConfig);
+  const [page, setPage] = useState(1);
+  const { data, isLoading } = useSWR<{ records: BillingRecord[]; total: number; has_more: boolean }>(
+    `/api/dashboard/billing?limit=20&offset=${(page - 1) * 20}`,
+    dashboardSWRConfig,
+  );
   const records = data?.records || [];
+  const hasMore = data?.has_more || false;
   const { formatPrice } = useCurrency();
   const t = LABELS[lang];
 
@@ -66,6 +72,26 @@ export function BillingHistory({ lang = "zh" }: { lang?: "zh" | "en" }) {
                 </div>
               );
             })}
+          </div>
+        )}
+        {/* Pagination */}
+        {(page > 1 || hasMore) && (
+          <div className="flex items-center justify-between pt-3 border-t border-border/20">
+            <span className="text-xs text-muted-foreground">
+              {t.showing} {records.length} / {data?.total || 0}
+            </span>
+            <div className="flex gap-2">
+              {page > 1 && (
+                <button onClick={() => setPage(p => p - 1)} className="px-3 py-1 text-xs rounded-md bg-muted hover:bg-muted/80">
+                  {t.prev}
+                </button>
+              )}
+              {hasMore && (
+                <button onClick={() => setPage(p => p + 1)} className="px-3 py-1 text-xs rounded-md bg-muted hover:bg-muted/80">
+                  {t.next}
+                </button>
+              )}
+            </div>
           </div>
         )}
       </CardContent>

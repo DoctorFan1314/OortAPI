@@ -41,7 +41,7 @@ export default function BillingPage() {
       });
       const data = await res.json();
       if (res.ok) {
-        toast(`${t.redeemSuccess} +$${data.amount.toFixed(2)}`, "success");
+        toast(`${t.redeemSuccess} +${symbol}${data.amount.toFixed(2)}`, "success");
         setRedeemOpen(false);
         setRedeemCode("");
         refreshUser();

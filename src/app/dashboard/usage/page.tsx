@@ -4,7 +4,7 @@ import { useI18n } from "@/contexts/i18n-context";
 import { useCurrency } from "@/contexts/currency-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Fragment, useMemo, useState } from "react";
-import { Activity, Coins, DollarSign } from "lucide-react";
+import { Activity, Coins, DollarSign, X } from "lucide-react";
 import useSWR from "swr";
 import { dashboardSWRConfig } from "@/lib/swr-fetcher";
 
@@ -375,6 +375,15 @@ export default function UsagePage() {
                     {expandedId === log.id && (
                       <tr className="border-b border-border/20 bg-muted/20">
                         <td colSpan={13} className="px-6 py-4">
+                          <div className="flex justify-end mb-2">
+                            <button
+                              onClick={() => setExpandedId(null)}
+                              className="text-muted-foreground hover:text-foreground p-1 rounded-md hover:bg-muted transition-colors"
+                              aria-label={lang === "zh" ? "关闭" : "Close"}
+                            >
+                              <X className="h-4 w-4" />
+                            </button>
+                          </div>
                           {renderBreakdown(log)}
                         </td>
                       </tr>

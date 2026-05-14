@@ -6,6 +6,44 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [v3.3.4.1] — 2026-05-14
+
+### Critical Fixes
+- **Onboarding link** — Fixed broken link `/dashboard/api-keys` → `/dashboard/keys`
+- **API Key creation toast** — Fixed wrong message (showed "Copied" instead of "API Key created")
+- **Channel PATCH existence check** — Updating non-existent channel now returns 404 instead of silent 200
+- **Channel API key mask** — Channels list now shows `••••••••abcd` instead of leaking first 10 chars
+
+### UX Improvements
+- **Usage chart currency** — Tooltip now uses currency context instead of hardcoded `$`
+- **Billing redeem toast** — Redeem success message now uses dynamic currency symbol
+- **Stats cards label** — "Total Spent" renamed to "Monthly Cost" to match actual data
+- **API Key last_used** — Now shows relative time ("3h ago") instead of raw ISO string
+- **Usage expanded row** — Added close (X) button for collapsing detail rows
+- **Multiplier delete confirmation** — Delete now requires confirmation dialog
+- **Users page confirmations** — Cancel subscription, gift, and add credits now require confirmation
+- **Users search debounce** — Search input now debounces 300ms instead of firing on every keystroke
+- **Redeem form validation** — Empty/invalid amounts now show error instead of submitting
+- **Billing history pagination** — Now paginated (20 per page) instead of loading all records
+- **Billing API pagination** — `/api/dashboard/billing` now supports `limit` and `offset` params
+
+### Internationalization
+- **Hero stats** — "30+ AI Models", "< 200ms Latency", "99.9% Uptime" now bilingual
+- **Docs CopyButton** — Copy button title changed from hardcoded "复制" to bilingual
+- **Dashboard Quick Start** — Code block now has a copy button (hover to reveal)
+
+### UI/Interaction
+- **Sidebar active state** — Fixed overly broad matching (e.g., `/dashboard/settings` no longer highlights for `/dashboard/setting`)
+- **Footer pricing link** — Fixed "Pricing" link pointing to `/models` instead of `/token-plan`
+- **Navbar dashboard link** — Dashboard link hidden for unauthenticated users
+- **Mobile sheet toggles** — Mobile navigation sheet now includes language and theme toggles
+
+### Backend/Security
+- **Email validation** — Registration now validates email format server-side
+- **Channel PATCH** — Returns 400 if no fields provided, 404 if channel not found
+
+---
+
 ## [v3.3.4] — 2026-05-14
 
 ### User Experience & Product Improvements

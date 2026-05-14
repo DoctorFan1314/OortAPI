@@ -29,7 +29,7 @@ export function Navbar() {
 
   const navLinks = [
     { href: "/", label: lang === "zh" ? "首页" : "Home" },
-    { href: "/dashboard", label: lang === "zh" ? "控制台" : "Dashboard" },
+    ...(user ? [{ href: "/dashboard", label: lang === "zh" ? "控制台" : "Dashboard" }] : []),
     { href: "/token-plan", label: lang === "zh" ? "Token Plan" : "Token Plan" },
     { href: "/models", label: lang === "zh" ? "模型市场" : "Models" },
     { href: "/docs", label: lang === "zh" ? "文档" : "Docs" },
@@ -257,6 +257,24 @@ export function Navbar() {
                     {link.label}
                   </Link>
                 ))}
+                <div className="border-t border-border my-4" />
+                {/* Language and Theme toggles for mobile */}
+                <div className="flex items-center gap-2 px-4 py-2">
+                  <button
+                    onClick={() => setLang(lang === "zh" ? "en" : "zh")}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                  >
+                    <Languages className="h-4 w-4" />
+                    {lang === "zh" ? "English" : "中文"}
+                  </button>
+                  <button
+                    onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                  >
+                    {resolvedTheme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                    {resolvedTheme === "dark" ? (lang === "zh" ? "亮色" : "Light") : (lang === "zh" ? "暗色" : "Dark")}
+                  </button>
+                </div>
                 <div className="border-t border-border my-4" />
                 {!loaded ? null : user ? (
                   <>

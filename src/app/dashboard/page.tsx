@@ -6,7 +6,7 @@ import { StatsCards } from "@/components/dashboard/stats-cards";
 import { ModelAnalytics } from "@/components/dashboard/model-analytics";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Code, Key, CreditCard, ArrowRight, Sparkles } from "lucide-react";
+import { Code, Key, CreditCard, ArrowRight, Sparkles, Copy, Check } from "lucide-react";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 import Link from "next/link";
@@ -54,6 +54,7 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const t = LABELS[lang];
   const [baseUrl, setBaseUrl] = useState("https://your-domain.com");
+  const [codeCopied, setCodeCopied] = useState(false);
   const { data: keysData } = useSWR<{ keys: { id: number }[] }>("/api/dashboard/keys", dashboardSWRConfig);
   const { data: subData } = useSWR<{ subscriptions: { id: number }[] }>("/api/dashboard/subscription", dashboardSWRConfig);
 
@@ -93,7 +94,7 @@ export default function DashboardPage() {
                   <span className="font-medium text-sm">{t.step1}</span>
                 </div>
                 <p className="text-xs text-muted-foreground">{t.step1Desc}</p>
-                <Link href="/dashboard/api-keys" className="mt-auto">
+                <Link href="/dashboard/keys" className="mt-auto">
                   <Button size="sm" className="w-full gap-1">
                     {t.createKey} <ArrowRight className="h-3 w-3" />
                   </Button>
@@ -146,7 +147,8 @@ export default function DashboardPage() {
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground mb-4">{t.description}</p>
-          <pre className="bg-muted/50 rounded-lg p-4 overflow-x-auto text-sm font-mono">
+          <div className="relative group">
+            <pre className="bg-muted/50 rounded-lg p-4 overflow-x-auto text-sm font-mono">
 {`curl ${baseUrl}/api/v1/chat/completions \\
   -H "Authorization: Bearer sk-oort-YOUR_API_KEY" \\
   -H "Content-Type: application/json" \\
@@ -154,7 +156,19 @@ export default function DashboardPage() {
     "model": "gpt-4o",
     "messages": [{"role": "user", "content": "Hello!"}]
   }'`}
-          </pre>
+            </pre>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(`curl ${baseUrl}/api/v1/chat/completions \\\n  -H "Authorization: Bearer sk-oort-YOUR_API_KEY" \\\n  -H "Content-Type: application/json" \\\n  -d '{\n    "model": "gpt-4o",\n    "messages": [{"role": "user", "content": "Hello!"}]\n  }'`);
+                setCodeCopied(true);
+                setTimeout(() => setCodeCopied(false), 2000);
+              }}
+              className="absolute top-2 right-2 p-1.5 rounded-md bg-muted hover:bg-muted/80 transition-colors opacity-0 group-hover:opacity-100"
+              aria-label="Copy code"
+            >
+              {codeCopied ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5 text-muted-foreground" />}
+            </button>
+          </div>
         </CardContent>
       </Card>
     </div>

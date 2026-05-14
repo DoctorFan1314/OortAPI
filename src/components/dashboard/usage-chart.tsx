@@ -3,6 +3,7 @@
 import useSWR from "swr";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
+import { useCurrency } from "@/contexts/currency-context";
 import { dashboardSWRConfig } from "@/lib/swr-fetcher";
 
 interface DailyData {
@@ -17,12 +18,13 @@ interface StatsResponse {
 }
 
 const LABELS = {
-  zh: { title: "近 7 天用量", calls: "调用次数", cost: "花费 ($)", tokens: "Token 用量", noData: "暂无数据" },
-  en: { title: "Last 7 Days Usage", calls: "Calls", cost: "Cost ($)", tokens: "Tokens", noData: "No data yet" },
+  zh: { title: "近 7 天用量", calls: "调用次数", cost: "花费", tokens: "Token 用量", noData: "暂无数据" },
+  en: { title: "Last 7 Days Usage", calls: "Calls", cost: "Cost", tokens: "Tokens", noData: "No data yet" },
 };
 
 export function UsageChart({ lang = "zh" }: { lang?: "zh" | "en" }) {
   const { data: stats } = useSWR<StatsResponse>("/api/dashboard/stats", dashboardSWRConfig);
+  const { formatPrice } = useCurrency();
   const data = stats?.daily_usage || [];
   const t = LABELS[lang];
 
@@ -86,7 +88,7 @@ export function UsageChart({ lang = "zh" }: { lang?: "zh" | "en" }) {
                   borderRadius: 8,
                   fontSize: 12,
                 }}
-                formatter={(value) => [`$${Number(value).toFixed(4)}`, t.cost]}
+                formatter={(value) => [formatPrice(Number(value)), t.cost]}
               />
               <Line type="monotone" dataKey="cost" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ r: 3 }} />
             </LineChart>
