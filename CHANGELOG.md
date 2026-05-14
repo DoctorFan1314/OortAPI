@@ -6,6 +6,35 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [v3.3.4] — 2026-05-14
+
+### User Experience & Product Improvements
+
+#### New User Onboarding
+- **Dashboard onboarding** — New users (no API keys + no subscription) now see a 3-step guide: Create Key → Choose Plan → Start Calling
+
+#### Mobile Responsiveness
+- **Usage table responsive** — 14-column usage table now hides secondary columns on mobile (cache tokens, multiplier, latency, notes), showing only core info (model, total, cost, status, time)
+
+#### Error Feedback
+- **Admin page error toasts** — All CRUD operations in multiplier, channel-card, and admin/plans now show success/error toast notifications (previously silently swallowed errors)
+
+#### Documentation
+- **Code block copy buttons** — All code blocks on the docs page now have a copy button in the top-right corner (visible on hover)
+
+#### Forms & Interaction
+- **Register password hint** — Password field shows "At least 8 characters" helper text below (visible before typing)
+- **Recharge button** — Recharge button now disabled with tooltip "Coming soon, use redeem codes" (previously showed toast on click)
+
+#### Internationalization
+- **Hero badge** — Homepage "Unified AI API Gateway" badge now supports Chinese/English switching
+- **Auth error boundary** — Error fallback UI now shows both Chinese and English text
+
+#### Button Consistency
+- **Delete dialog buttons** — All delete confirmation dialogs now use consistent `bg-red-600` styling (previously mixed with `variant="destructive"`)
+
+---
+
 ## [v3.3.3] — 2026-05-14
 
 ### Security Fixes, Race Condition Patches, Rate Limit Headers, Audit Log & Performance

@@ -18,7 +18,7 @@ export function Hero() {
         <div className="text-center max-w-4xl mx-auto">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm mb-8 hero-animate-1">
             <Zap className="h-3.5 w-3.5" />
-            <span>Unified AI API Gateway</span>
+            <span>{lang === "zh" ? "统一 AI API 网关" : "Unified AI API Gateway"}</span>
           </div>
           <h1 id="hero-heading" className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground tracking-tight mb-6 hero-animate-2">
             <span className="gradient-text">

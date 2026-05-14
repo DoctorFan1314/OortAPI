@@ -309,18 +309,17 @@ export default function UsagePage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border/50">
-                    <th className="text-left py-2 px-3 text-muted-foreground font-medium">{t.channel}</th>
                     <th className="text-left py-2 px-3 text-muted-foreground font-medium">{t.model}</th>
-                    <th className="text-right py-2 px-3 text-muted-foreground font-medium">{t.tokensIn}</th>
-                    <th className="text-right py-2 px-3 text-muted-foreground font-medium">{t.tokensOut}</th>
-                    <th className="text-right py-2 px-3 text-muted-foreground font-medium">{t.tokensInCache}</th>
-                    <th className="text-right py-2 px-3 text-muted-foreground font-medium">{t.tokensCacheCreate}</th>
+                    <th className="text-right py-2 px-3 text-muted-foreground font-medium hidden md:table-cell">{t.tokensIn}</th>
+                    <th className="text-right py-2 px-3 text-muted-foreground font-medium hidden md:table-cell">{t.tokensOut}</th>
+                    <th className="text-right py-2 px-3 text-muted-foreground font-medium hidden lg:table-cell">{t.tokensInCache}</th>
+                    <th className="text-right py-2 px-3 text-muted-foreground font-medium hidden lg:table-cell">{t.tokensCacheCreate}</th>
                     <th className="text-right py-2 px-3 text-muted-foreground font-medium">{t.tokens}</th>
-                    <th className="text-center py-2 px-3 text-muted-foreground font-medium">{t.multiplier}</th>
+                    <th className="text-center py-2 px-3 text-muted-foreground font-medium hidden md:table-cell">{t.multiplier}</th>
                     <th className="text-right py-2 px-3 text-muted-foreground font-medium">{t.cost}</th>
-                    <th className="text-center py-2 px-3 text-muted-foreground font-medium">{t.details}</th>
-                    <th className="text-center py-2 px-3 text-muted-foreground font-medium">{t.notes}</th>
-                    <th className="text-right py-2 px-3 text-muted-foreground font-medium">{t.latency}</th>
+                    <th className="text-center py-2 px-3 text-muted-foreground font-medium hidden md:table-cell">{t.details}</th>
+                    <th className="text-center py-2 px-3 text-muted-foreground font-medium hidden lg:table-cell">{t.notes}</th>
+                    <th className="text-right py-2 px-3 text-muted-foreground font-medium hidden lg:table-cell">{t.latency}</th>
                     <th className="text-center py-2 px-3 text-muted-foreground font-medium">{t.status}</th>
                     <th className="text-right py-2 px-3 text-muted-foreground font-medium">{t.time}</th>
                   </tr>
@@ -329,14 +328,16 @@ export default function UsagePage() {
                   {logs.map((log) => (
                     <Fragment key={log.id}>
                     <tr className="border-b border-border/20 hover:bg-muted/30">
-                      <td className="py-2 px-3 text-xs text-muted-foreground">{log.channel_name || t.noChannel}</td>
-                      <td className="py-2 px-3 font-mono text-xs">{log.model}</td>
-                      <td className="py-2 px-3 text-right font-mono">{log.tokens_in.toLocaleString()}</td>
-                      <td className="py-2 px-3 text-right font-mono">{log.tokens_out.toLocaleString()}</td>
-                      <td className="py-2 px-3 text-right font-mono">{log.tokens_in_cache > 0 ? log.tokens_in_cache.toLocaleString() : "0"}</td>
-                      <td className="py-2 px-3 text-right font-mono">{log.tokens_cache_creation > 0 ? log.tokens_cache_creation.toLocaleString() : "0"}</td>
+                      <td className="py-2 px-3">
+                        <div className="font-mono text-xs">{log.model}</div>
+                        <div className="text-xs text-muted-foreground md:hidden">{log.channel_name || t.noChannel}</div>
+                      </td>
+                      <td className="py-2 px-3 text-right font-mono hidden md:table-cell">{log.tokens_in.toLocaleString()}</td>
+                      <td className="py-2 px-3 text-right font-mono hidden md:table-cell">{log.tokens_out.toLocaleString()}</td>
+                      <td className="py-2 px-3 text-right font-mono hidden lg:table-cell">{log.tokens_in_cache > 0 ? log.tokens_in_cache.toLocaleString() : "0"}</td>
+                      <td className="py-2 px-3 text-right font-mono hidden lg:table-cell">{log.tokens_cache_creation > 0 ? log.tokens_cache_creation.toLocaleString() : "0"}</td>
                       <td className="py-2 px-3 text-right font-mono">{(log.tokens_in + log.tokens_out + log.tokens_in_cache + log.tokens_cache_creation).toLocaleString()}</td>
-                      <td className="py-2 px-3 text-center">
+                      <td className="py-2 px-3 text-center hidden md:table-cell">
                         <span className="text-xs px-2 py-0.5 rounded-full bg-muted font-mono">
                           {(log.multiplier ?? 1.0).toFixed(2)}x
                         </span>
@@ -348,7 +349,7 @@ export default function UsagePage() {
                           formatCostDisplay(log.cost)
                         )}
                       </td>
-                      <td className="py-2 px-3 text-center">
+                      <td className="py-2 px-3 text-center hidden md:table-cell">
                         <button
                           onClick={() => setExpandedId(expandedId === log.id ? null : log.id)}
                           className="text-xs text-primary hover:underline"
@@ -356,14 +357,14 @@ export default function UsagePage() {
                           {t.details}
                         </button>
                       </td>
-                      <td className="py-2 px-3 text-center">
+                      <td className="py-2 px-3 text-center hidden lg:table-cell">
                         {log.deduction_source === 'credits' ? (
                           <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400">{t.subUser}</span>
                         ) : (
                           <span className="text-xs text-muted-foreground">{t.balanceUser}</span>
                         )}
                       </td>
-                      <td className="py-2 px-3 text-right font-mono">{log.latency_ms ? `${log.latency_ms}ms` : "-"}</td>
+                      <td className="py-2 px-3 text-right font-mono hidden lg:table-cell">{log.latency_ms ? `${log.latency_ms}ms` : "-"}</td>
                       <td className="py-2 px-3 text-center">
                         <span className={`text-xs px-2 py-0.5 rounded-full ${log.success ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"}`}>
                           {log.success ? t.success : t.failed}
@@ -373,7 +374,7 @@ export default function UsagePage() {
                     </tr>
                     {expandedId === log.id && (
                       <tr className="border-b border-border/20 bg-muted/20">
-                        <td colSpan={14} className="px-6 py-4">
+                        <td colSpan={13} className="px-6 py-4">
                           {renderBreakdown(log)}
                         </td>
                       </tr>

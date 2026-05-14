@@ -26,6 +26,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { useToast } from "@/contexts/toast-context";
 
 interface Channel {
   id: number;
@@ -344,6 +345,7 @@ function ChannelFormFields({
 }
 
 export function ChannelCard({ lang = "zh" }: { lang?: "zh" | "en" }) {
+  const { toast: showToast } = useToast();
   const [channels, setChannels] = useState<Channel[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -401,19 +403,23 @@ export function ChannelCard({ lang = "zh" }: { lang?: "zh" | "en" }) {
   };
 
   const createChannel = async () => {
-    await fetch("/api/dashboard/channels", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({
-        ...form,
-        models: form.models ? form.models.split(",").map((m) => m.trim()) : [],
-        model_mapping: form.model_mapping,
-      }),
-    });
-    setShowForm(false);
-    setForm({ ...defaultForm });
-    fetchChannels();
+    try {
+      const res = await fetch("/api/dashboard/channels", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          ...form,
+          models: form.models ? form.models.split(",").map((m) => m.trim()) : [],
+          model_mapping: form.model_mapping,
+        }),
+      });
+      if (!res.ok) { const d = await res.json().catch(() => ({})); showToast(d.error || (lang === "zh" ? "创建失败" : "Create failed"), "error"); return; }
+      setShowForm(false);
+      setForm({ ...defaultForm });
+      fetchChannels();
+      showToast(lang === "zh" ? "渠道已创建" : "Channel created", "success");
+    } catch { showToast(lang === "zh" ? "网络错误" : "Network error", "error"); }
   };
 
   const startEdit = (ch: Channel) => {
@@ -447,35 +453,46 @@ export function ChannelCard({ lang = "zh" }: { lang?: "zh" | "en" }) {
     if (editForm.api_key_encrypted) {
       body.api_key_encrypted = editForm.api_key_encrypted;
     }
-    await fetch("/api/dashboard/channels", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify(body),
-    });
-    setEditingId(null);
-    fetchChannels();
+    try {
+      const res = await fetch("/api/dashboard/channels", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) { const d = await res.json().catch(() => ({})); showToast(d.error || (lang === "zh" ? "保存失败" : "Save failed"), "error"); return; }
+      setEditingId(null);
+      fetchChannels();
+      showToast(lang === "zh" ? "已保存" : "Saved", "success");
+    } catch { showToast(lang === "zh" ? "网络错误" : "Network error", "error"); }
   };
 
   const toggleChannel = async (id: number, enabled: boolean) => {
-    await fetch("/api/dashboard/channels", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ id, enabled }),
-    });
-    fetchChannels();
+    try {
+      const res = await fetch("/api/dashboard/channels", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ id, enabled }),
+      });
+      if (!res.ok) { showToast(lang === "zh" ? "更新失败" : "Update failed", "error"); return; }
+      fetchChannels();
+    } catch { showToast(lang === "zh" ? "网络错误" : "Network error", "error"); }
   };
 
   const deleteChannel = async (id: number) => {
-    await fetch("/api/dashboard/channels", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ id }),
-    });
-    setDeleteTarget(null);
-    fetchChannels();
+    try {
+      const res = await fetch("/api/dashboard/channels", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ id }),
+      });
+      if (!res.ok) { showToast(lang === "zh" ? "删除失败" : "Delete failed", "error"); return; }
+      setDeleteTarget(null);
+      fetchChannels();
+      showToast(lang === "zh" ? "已删除" : "Deleted", "success");
+    } catch { showToast(lang === "zh" ? "网络错误" : "Network error", "error"); }
   };
 
   const testConnection = async (id: number) => {
@@ -765,7 +782,7 @@ export function ChannelCard({ lang = "zh" }: { lang?: "zh" | "en" }) {
               {t.cancel}
             </Button>
             <Button
-              variant="destructive"
+              className="bg-red-600 text-white hover:bg-red-700"
               onClick={() => deleteTarget && deleteChannel(deleteTarget.id)}
             >
               {t.confirm}

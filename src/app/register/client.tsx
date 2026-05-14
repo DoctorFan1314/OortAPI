@@ -26,7 +26,7 @@ export default function RegisterClient() {
   const { toast } = useToast();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
 
   function getPasswordStrength(pw: string): { score: number; label: string; color: string } {
     let score = 0;
@@ -95,6 +95,7 @@ export default function RegisterClient() {
             <div>
               <label htmlFor="password" className="text-sm text-foreground mb-1.5 block">{t.auth.password}</label>
               <Input id="password" type="password" autoComplete="new-password" placeholder={t.auth.passwordPlaceholder} value={password} onChange={(e) => setPassword(e.target.value)} className="bg-secondary border-border text-foreground placeholder:text-muted-foreground/50" />
+              <p className="mt-1 text-xs text-muted-foreground">{lang === "zh" ? "至少 8 个字符" : "At least 8 characters"}</p>
               {passwordStrength && (
                 <div className="mt-2 space-y-1">
                   <div className="flex gap-1">

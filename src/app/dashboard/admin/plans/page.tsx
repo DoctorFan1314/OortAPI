@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Badge } from "@/components/ui/badge";
 import { useI18n } from "@/contexts/i18n-context";
 import { useAuth } from "@/contexts/auth-context";
+import { useToast } from "@/contexts/toast-context";
 import { AuthGuard } from "@/components/auth/auth-guard";
 import { Plus, Pencil, Trash2, Save, Loader2, Link as LinkIcon, Unlink } from "lucide-react";
 
@@ -28,6 +29,7 @@ export default function AdminPlansPage() {
 function AdminPlansContent() {
   const { lang } = useI18n();
   const { user } = useAuth();
+  const { toast: showToast } = useToast();
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
   const [editPlan, setEditPlan] = useState<Plan | null>(null);
@@ -83,23 +85,24 @@ function AdminPlansContent() {
     if (!editPlan) return; setEditSaving(true);
     try {
       const res = await fetch("/api/dashboard/admin/plans", { method: "PATCH", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify(editPlan) });
-      if (res.ok) { setEditPlan(null); await fetchPlans(); }
-    } catch {} finally { setEditSaving(false); }
+      if (res.ok) { setEditPlan(null); await fetchPlans(); showToast(lang === "zh" ? "已保存" : "Saved", "success"); }
+      else { const data = await res.json().catch(() => ({})); showToast(data.error || (lang === "zh" ? "保存失败" : "Save failed"), "error"); }
+    } catch { showToast(lang === "zh" ? "网络错误" : "Network error", "error"); } finally { setEditSaving(false); }
   }
 
   async function handleDelete() {
     if (!deletePlan) return; setDeleteLoading(true);
-    try { const res = await fetch(`/api/dashboard/admin/plans?id=${deletePlan.id}`, { method: "DELETE", credentials: "include" }); if (res.ok) { setDeletePlan(null); await fetchPlans(); } } catch {} finally { setDeleteLoading(false); }
+    try { const res = await fetch(`/api/dashboard/admin/plans?id=${deletePlan.id}`, { method: "DELETE", credentials: "include" }); if (res.ok) { setDeletePlan(null); await fetchPlans(); showToast(lang === "zh" ? "已删除" : "Deleted", "success"); } else { showToast(lang === "zh" ? "删除失败" : "Delete failed", "error"); } } catch { showToast(lang === "zh" ? "网络错误" : "Network error", "error"); } finally { setDeleteLoading(false); }
   }
 
   async function handleAddModel() {
     if (!modelDialogPlan || !newModel.trim()) return; setModelLoading(true);
-    try { const res = await fetch(`/api/dashboard/admin/plans/${modelDialogPlan.id}/models`, { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({ model_name: newModel.trim() }) }); if (res.ok) { setNewModel(""); await fetchPlanModels(modelDialogPlan.id); } } catch {} finally { setModelLoading(false); }
+    try { const res = await fetch(`/api/dashboard/admin/plans/${modelDialogPlan.id}/models`, { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({ model_name: newModel.trim() }) }); if (res.ok) { setNewModel(""); await fetchPlanModels(modelDialogPlan.id); } else { showToast(lang === "zh" ? "添加失败" : "Failed to add model", "error"); } } catch { showToast(lang === "zh" ? "网络错误" : "Network error", "error"); } finally { setModelLoading(false); }
   }
 
   async function handleRemoveModel(modelName: string) {
     if (!modelDialogPlan) return; setModelLoading(true);
-    try { const res = await fetch(`/api/dashboard/admin/plans/${modelDialogPlan.id}/models?model=${encodeURIComponent(modelName)}`, { method: "DELETE", credentials: "include" }); if (res.ok) await fetchPlanModels(modelDialogPlan.id); } catch {} finally { setModelLoading(false); }
+    try { const res = await fetch(`/api/dashboard/admin/plans/${modelDialogPlan.id}/models?model=${encodeURIComponent(modelName)}`, { method: "DELETE", credentials: "include" }); if (res.ok) await fetchPlanModels(modelDialogPlan.id); else showToast(lang === "zh" ? "删除失败" : "Failed to remove model", "error"); } catch { showToast(lang === "zh" ? "网络错误" : "Network error", "error"); } finally { setModelLoading(false); }
   }
 
   const ROUTE_LABELS: Record<string, { zh: string; en: string }> = { standard: { zh: "标准", en: "Standard" }, priority: { zh: "优先", en: "Priority" }, ultra: { zh: "极速", en: "Ultra" }, exclusive: { zh: "专属", en: "Exclusive" } };
@@ -241,7 +244,7 @@ function AdminPlansContent() {
       {/* Delete Dialog */}
       <Dialog open={!!deletePlan} onOpenChange={() => setDeletePlan(null)}>
         <DialogContent><DialogHeader><DialogTitle>{lang === "zh" ? "删除" : "Delete"}</DialogTitle><DialogDescription>{lang === "zh" ? "确定要删除此套餐吗？" : "Delete this plan?"}</DialogDescription></DialogHeader>
-          <div className="flex justify-end gap-2"><Button variant="outline" onClick={() => setDeletePlan(null)}>{lang === "zh" ? "取消" : "Cancel"}</Button><Button variant="destructive" onClick={handleDelete} disabled={deleteLoading}>{deleteLoading ? <Loader2 className="h-4 w-4 animate-spin mr-1.5" /> : null}{lang === "zh" ? "确定" : "Confirm"}</Button></div>
+          <div className="flex justify-end gap-2"><Button variant="outline" onClick={() => setDeletePlan(null)}>{lang === "zh" ? "取消" : "Cancel"}</Button><Button className="bg-red-600 text-white hover:bg-red-700" onClick={handleDelete} disabled={deleteLoading}>{deleteLoading ? <Loader2 className="h-4 w-4 animate-spin mr-1.5" /> : null}{lang === "zh" ? "确定" : "Confirm"}</Button></div>
         </DialogContent>
       </Dialog>
 

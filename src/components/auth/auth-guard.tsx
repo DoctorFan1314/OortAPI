@@ -39,6 +39,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     <ErrorBoundary fallback={
       <div className="mx-auto max-w-5xl px-4 py-20 text-center">
         <p className="text-muted-foreground">Something went wrong. Please try refreshing the page.</p>
+        <p className="text-muted-foreground text-sm mt-1">出了点问题，请刷新页面重试。</p>
       </div>
     }>
       {children}

@@ -70,7 +70,7 @@ export default function BillingPage() {
                 <Gift className="h-4 w-4" />
                 {t.redeem}
               </Button>
-              <Button className="gap-2" onClick={() => toast(lang === "zh" ? "充值功能即将上线，请使用兑换码充值" : "Recharge coming soon. Use redeem codes for now.", "info")}>
+              <Button className="gap-2" disabled title={lang === "zh" ? "即将上线，请使用兑换码充值" : "Coming soon. Use redeem codes for now."}>
                 <Plus className="h-4 w-4" />
                 {t.recharge}
               </Button>

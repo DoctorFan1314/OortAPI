@@ -4,6 +4,7 @@ import { useI18n } from "@/contexts/i18n-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import { Clock, Layers, Plus, Trash2, Save } from "lucide-react";
+import { useToast } from "@/contexts/toast-context";
 
 interface MultiplierRule {
   id: number;
@@ -72,6 +73,7 @@ const LABELS = {
 export default function MultiplierPage() {
   const { lang } = useI18n();
   const t = LABELS[lang];
+  const { toast: showToast } = useToast();
   const [rules, setRules] = useState<MultiplierRule[]>([]);
   const [timeSettings, setTimeSettings] = useState<TimeSettings>({
     day_start: '08:00', day_end: '22:00', day_rate: 1.0, night_rate: 0.5, timezone: 'Asia/Shanghai', enabled: 0,
@@ -101,7 +103,9 @@ export default function MultiplierPage() {
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ model_name: newModel.trim(), multiplier: parseFloat(newMultiplier) || 1.0, enabled: true, description: newDesc || null }),
-    }).then(() => { setNewModel(''); setNewMultiplier('1.0'); setNewDesc(''); fetchData(); });
+    }).then(res => { if (!res.ok) throw new Error(); return res.json(); })
+      .then(() => { setNewModel(''); setNewMultiplier('1.0'); setNewDesc(''); fetchData(); })
+      .catch(() => showToast(lang === "zh" ? "添加失败" : "Failed to add rule", "error"));
   };
 
   const handleDeleteRule = (modelName: string) => {
@@ -110,7 +114,9 @@ export default function MultiplierPage() {
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ model_name: modelName }),
-    }).then(() => fetchData());
+    }).then(res => { if (!res.ok) throw new Error(); return res.json(); })
+      .then(() => fetchData())
+      .catch(() => showToast(lang === "zh" ? "删除失败" : "Failed to delete rule", "error"));
   };
 
   const handleToggleRule = (rule: MultiplierRule) => {
@@ -119,7 +125,9 @@ export default function MultiplierPage() {
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ model_name: rule.model_name, multiplier: rule.multiplier, enabled: !rule.enabled, description: rule.description }),
-    }).then(() => fetchData());
+    }).then(res => { if (!res.ok) throw new Error(); return res.json(); })
+      .then(() => fetchData())
+      .catch(() => showToast(lang === "zh" ? "更新失败" : "Failed to update rule", "error"));
   };
 
   const handleSaveTimeSettings = () => {
@@ -128,7 +136,9 @@ export default function MultiplierPage() {
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ type: 'time_settings', ...timeSettings }),
-    });
+    }).then(res => { if (!res.ok) throw new Error(); return res.json(); })
+      .then(() => showToast(lang === "zh" ? "已保存" : "Saved", "success"))
+      .catch(() => showToast(lang === "zh" ? "保存失败" : "Failed to save", "error"));
   };
 
   if (loading) {
