@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { useI18n } from "@/contexts/i18n-context";
 import { useAuth } from "@/contexts/auth-context";
 import { useCurrency } from "@/contexts/currency-context";
-import { Pencil, Save, X, RefreshCw, Search, Cpu, Check, Zap } from "lucide-react";
+import { Pencil, Save, X, RefreshCw, Search, Cpu, Check, Zap, ArrowUpDown } from "lucide-react";
 
 interface ChannelModel {
   model_name: string;
@@ -60,6 +60,13 @@ const LABELS = {
     creditRate: "Credit 倍率",
     creditRateHint: "1 token = N credits",
     modelsCount: "个模型",
+    sortBy: "排序",
+    sortName: "名称 A-Z",
+    sortNameDesc: "名称 Z-A",
+    sortInputAsc: "输入价格 ↑",
+    sortInputDesc: "输入价格 ↓",
+    sortOutputAsc: "补全价格 ↑",
+    sortOutputDesc: "补全价格 ↓",
   },
   en: {
     title: "Model Marketplace",
@@ -84,6 +91,13 @@ const LABELS = {
     creditRate: "Credit Rate",
     creditRateHint: "1 token = N credits",
     modelsCount: "models",
+    sortBy: "Sort",
+    sortName: "Name A-Z",
+    sortNameDesc: "Name Z-A",
+    sortInputAsc: "Input price ↑",
+    sortInputDesc: "Input price ↓",
+    sortOutputAsc: "Output price ↑",
+    sortOutputDesc: "Output price ↓",
   },
 };
 
@@ -101,6 +115,7 @@ export default function ModelsPage() {
   const [editForm, setEditForm] = useState({ input_rate: 0, output_rate: 0, cache_rate: 0, cache_creation_rate: 0, credit_rate: 1.0, display_name: "" });
   const [search, setSearch] = useState("");
   const [providerFilter, setProviderFilter] = useState("all");
+  const [sortBy, setSortBy] = useState<string>("name");
   const [syncing, setSyncing] = useState(false);
 
   const fetchModels = () => {
@@ -167,16 +182,30 @@ export default function ModelsPage() {
     fetchModels();
   };
 
-  const filtered = useMemo(() => models.filter((m) => {
-    const q = search.toLowerCase();
-    const matchesSearch = !q ||
-      m.model_name.toLowerCase().includes(q) ||
-      (m.display_name || "").toLowerCase().includes(q) ||
-      m.provider.toLowerCase().includes(q) ||
-      m.channel_name.toLowerCase().includes(q);
-    const matchesProvider = providerFilter === "all" || m.provider === providerFilter;
-    return matchesSearch && matchesProvider;
-  }), [models, search, providerFilter]);
+  const filtered = useMemo(() => {
+    const result = models.filter((m) => {
+      const q = search.toLowerCase();
+      const matchesSearch = !q ||
+        m.model_name.toLowerCase().includes(q) ||
+        (m.display_name || "").toLowerCase().includes(q) ||
+        m.provider.toLowerCase().includes(q) ||
+        m.channel_name.toLowerCase().includes(q);
+      const matchesProvider = providerFilter === "all" || m.provider === providerFilter;
+      return matchesSearch && matchesProvider;
+    });
+
+    // Apply sorting
+    const sorted = [...result];
+    switch (sortBy) {
+      case "name": sorted.sort((a, b) => (a.display_name || a.model_name).localeCompare(b.display_name || b.model_name)); break;
+      case "name_desc": sorted.sort((a, b) => (b.display_name || b.model_name).localeCompare(a.display_name || a.model_name)); break;
+      case "input_asc": sorted.sort((a, b) => a.input_rate - b.input_rate); break;
+      case "input_desc": sorted.sort((a, b) => b.input_rate - a.input_rate); break;
+      case "output_asc": sorted.sort((a, b) => a.output_rate - b.output_rate); break;
+      case "output_desc": sorted.sort((a, b) => b.output_rate - a.output_rate); break;
+    }
+    return sorted;
+  }, [models, search, providerFilter, sortBy]);
 
   const providers = useMemo(() => [...new Set(models.map(m => m.provider))].sort(), [models]);
 
@@ -274,6 +303,22 @@ export default function ModelsPage() {
                   </button>
                 );
               })}
+            </div>
+            {/* Sort dropdown */}
+            <div className="relative">
+              <ArrowUpDown className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="h-9 pl-8 pr-3 rounded-lg text-xs font-medium border border-border bg-background text-foreground appearance-none cursor-pointer"
+              >
+                <option value="name">{t.sortName}</option>
+                <option value="name_desc">{t.sortNameDesc}</option>
+                <option value="input_asc">{t.sortInputAsc}</option>
+                <option value="input_desc">{t.sortInputDesc}</option>
+                <option value="output_asc">{t.sortOutputAsc}</option>
+                <option value="output_desc">{t.sortOutputDesc}</option>
+              </select>
             </div>
           </div>
         </div>
