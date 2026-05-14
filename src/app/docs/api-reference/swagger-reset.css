@@ -1,0 +1,59 @@
+/* Reset Tailwind preflight for swagger-ui elements */
+.swagger-ui {
+  font-family: sans-serif;
+  line-height: 1.5;
+}
+.swagger-ui *,
+.swagger-ui *::before,
+.swagger-ui *::after {
+  box-sizing: content-box;
+}
+.swagger-ui ul,
+.swagger-ui ol {
+  list-style: disc outside none;
+  margin: 1em 0;
+  padding: 0 0 0 1.5em;
+}
+.swagger-ui ol {
+  list-style: decimal;
+}
+.swagger-ui li {
+  margin: 0;
+  padding: 0;
+}
+.swagger-ui h1, .swagger-ui h2, .swagger-ui h3,
+.swagger-ui h4, .swagger-ui h5, .swagger-ui h6 {
+  font-weight: bold;
+  margin: 0.6em 0;
+}
+.swagger-ui h1 { font-size: 2em; }
+.swagger-ui h2 { font-size: 1.5em; }
+.swagger-ui h3 { font-size: 1.17em; }
+.swagger-ui h4 { font-size: 1em; }
+.swagger-ui h5 { font-size: 0.83em; }
+.swagger-ui button {
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  text-transform: none;
+  background: none;
+  border: 0;
+  padding: 0;
+}
+.swagger-ui input,
+.swagger-ui select,
+.swagger-ui textarea {
+  font: inherit;
+  margin: 0;
+}
+.swagger-ui table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+.swagger-ui a {
+  color: #4990e2;
+  text-decoration: none;
+}
+.swagger-ui svg {
+  fill: currentColor;
+}

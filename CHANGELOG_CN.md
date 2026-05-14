@@ -46,6 +46,7 @@
 - **资源中心枢纽** — `/resources` 页面现在作为正式枢纽页，展示所有资源分区（Agent 技能、Prompt 模板、分类浏览、排行榜、标签云、提交模板）
 - **导航栏链接修复** — "资源中心" 导航链接现在指向 `/resources` 枢纽页，而非直接跳转 `/skills`
 - **页脚清理** — 删除页脚中的"新手指南"链接（指南页已删除）；资源分区现列出 Agent 技能、Prompt 模板、分类浏览
+- **Swagger UI 修复** — 为 `/docs/api-reference` 页面添加缺失的 CSS 导入和 Tailwind preflight 重置
 
 ---
 

@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import "swagger-ui-react/swagger-ui.css";
+import "./swagger-reset.css";
 
 // Dynamic import to avoid SSR issues with swagger-ui
 const SwaggerUI = dynamic(() => import("swagger-ui-react"), { ssr: false });

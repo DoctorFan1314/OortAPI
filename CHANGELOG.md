@@ -46,6 +46,7 @@ All notable changes to this project will be documented in this file.
 - **Resources center hub** — `/resources` page now serves as a proper hub showing all resource sections (Agent Skills, Prompt Templates, Categories, Trending, Tags, Submit)
 - **Navbar link fix** — "Resources" nav link now points to `/resources` hub instead of directly to `/skills`
 - **Footer cleanup** — Removed "Guide" link from footer (guide page was deleted); resources section now lists Agent Skills, Prompt Templates, Categories
+- **Swagger UI fix** — Added missing CSS imports and Tailwind preflight resets for `/docs/api-reference` page
 
 ---
 
