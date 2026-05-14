@@ -325,8 +325,8 @@ export interface Dictionary {
     title: string; subtitle: string; placeholder: string;
     recentSearches: string; clearRecent: string;
     noResults: string; noResultsDesc: string;
-    agentSkills: string; promptTemplates: string;
-    viewAllSkills: string; viewAllPrompts: string;
+    models: string; documentation: string;
+    viewAllModels: string; viewDocs: string;
     suggestions: string; removeRecent: string;
   };
   compare: {

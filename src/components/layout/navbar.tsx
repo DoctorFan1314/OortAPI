@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Search, Menu, X, Sun, Moon, Languages, ChevronDown, BookOpen, LayoutDashboard, Terminal, FolderOpen, User, Settings, Shield, LogOut } from "lucide-react";
+import { Search, Menu, X, Sun, Moon, Languages, ChevronDown, BookOpen, LayoutDashboard, Terminal, FolderOpen, User, Settings, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
@@ -71,7 +71,7 @@ export function Navbar() {
     const q = searchQuery.trim();
     if (q) {
       const encoded = encodeURIComponent(q);
-      router.push(`/resources/search?q=${encoded}`);
+      router.push(`/search?q=${encoded}`);
       setSearchOpen(false);
       setSearchQuery("");
     }
@@ -196,10 +196,6 @@ export function Navbar() {
                         <Settings className="h-4 w-4" />
                         {lang === "zh" ? "设置" : "Settings"}
                       </Link>
-                      <Link href="/dashboard" role="menuitem" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors focus:bg-secondary focus:text-foreground focus-visible:outline-none">
-                          <Shield className="h-4 w-4" />
-                          {lang === "zh" ? "管理面板" : "Dashboard"}
-                        </Link>
                     </div>
                     <div className="border-t border-border py-1">
                       <button

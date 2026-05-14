@@ -3,8 +3,8 @@ import { Suspense } from "react";
 import SearchClient from "./client";
 
 export const metadata: Metadata = {
-  title: "Search — AI Skills Hub",
-  description: "Search across Agent Skills and Prompt Templates",
+  title: "Search — OortAPI",
+  description: "Search models, documentation, and more",
   robots: { index: false },
 };
 

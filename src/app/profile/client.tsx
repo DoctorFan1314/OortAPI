@@ -28,6 +28,8 @@ interface UsageLog {
   tokens_in: number;
   tokens_out: number;
   cost: number;
+  credits_used: number;
+  deduction_source: string;
   latency_ms: number | null;
   success: number;
   created_at: string;
@@ -366,7 +368,13 @@ export default function ProfileClient() {
                           <tr key={log.id} className="border-b border-border/20 hover:bg-muted/30">
                             <td className="py-2 px-3 font-mono text-xs">{log.model}</td>
                             <td className="py-2 px-3 text-right font-mono">{(log.tokens_in + log.tokens_out).toLocaleString()}</td>
-                            <td className="py-2 px-3 text-right font-mono">{formatPrice(log.cost)}</td>
+                            <td className="py-2 px-3 text-right font-mono">
+                              {log.deduction_source === "credits" ? (
+                                <span className="text-amber-500">{(log.credits_used || 0).toLocaleString()} credits</span>
+                              ) : (
+                                formatPrice(log.cost)
+                              )}
+                            </td>
                             <td className="py-2 px-3 text-right font-mono">{log.latency_ms ? `${log.latency_ms}ms` : "-"}</td>
                             <td className="py-2 px-3 text-center">
                               <span className={`text-xs px-2 py-0.5 rounded-full ${log.success ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"}`}>

@@ -47,6 +47,9 @@ All notable changes to this project will be documented in this file.
 - **Navbar link fix** — "Resources" nav link now points to `/resources` hub instead of directly to `/skills`
 - **Footer cleanup** — Removed "Guide" link from footer (guide page was deleted); resources section now lists Agent Skills, Prompt Templates, Categories
 - **Swagger UI fix** — Added missing CSS imports and Tailwind preflight resets for `/docs/api-reference` page
+- **Navbar cleanup** — Removed duplicate "Dashboard" menu item; search now redirects to `/search`
+- **Profile plan display** — Recent calls now shows credits used instead of dollar cost for subscription users
+- **Search rewrite** — Search page now queries AI models and documentation instead of Agent Skills and Prompt Templates
 
 ---
 
