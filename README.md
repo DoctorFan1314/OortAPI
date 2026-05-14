@@ -153,6 +153,21 @@ Supports full `tool_use` / `tool_result` conversion between Anthropic and OpenAI
 
 ---
 
+## Key Features
+
+- **OpenAI-compatible API** — Drop-in replacement for OpenAI, Anthropic, Google, and more
+- **Smart routing** — Weighted channel selection with automatic failover (up to 3 retries)
+- **Per-token billing** — 3-tier cache-aware pricing (input, cache read, cache write, output)
+- **Token Plan subscriptions** — 4 tiers with prorated upgrades/downgrades
+- **Tool calling** — Full `tools`/`tool_choice` passthrough for both OpenAI and Anthropic formats
+- **Security** — JWT auth, AES-256-GCM encrypted channel keys, rate limiting, input validation
+- **Middleware auth** — Dashboard routes protected by Next.js middleware
+- **X-Request-Id** — Unique request ID in every response header for tracing
+- **OpenAPI spec** — `GET /api/v1/openapi` for full API documentation
+- **Real-time stats** — Homepage shows live platform metrics (calls, uptime, latency, models)
+
+---
+
 ## Project Structure
 
 ```
@@ -171,8 +186,10 @@ oortapi/
 │   │   │   ├── auth/                   # Login, register, profile
 │   │   │   ├── dashboard/              # Stats, keys, channels, users, redeem, models, multiplier, settings CRUD
 │   │   │   ├── subscribe/              # Subscription API (new/upgrade/downgrade)
-│   │   │   └── plans/                  # Plans listing API
+│   │   │   ├── plans/                  # Plans listing API
+│   │   │   ├── stats/                  # Platform stats (public)
 │   │   │   └── docs/                   # OpenAPI spec endpoint
+│   │   ├── middleware.ts               # Auth middleware + X-Request-Id
 │   │   ├── token-plan/                 # Token Plan subscription page
 │   │   ├── models/                     # Model marketplace (standalone page)
 │   │   │   └── page.tsx               # Card grid with search, provider filter, currency toggle, 4-price display
@@ -199,7 +216,6 @@ oortapi/
 │   │   ├── channel-manager.ts          # Smart channel routing
 │   │   ├── billing-engine.ts           # Per-token billing (3-tier cache pricing)
 │   │   ├── rate-limiter.ts             # Rate limiting
-│   │   └── openapi-spec.ts             # OpenAPI 3.0 specification
 │   ├── components/
 │   │   ├── dashboard/                  # Dashboard UI components
 │   │   ├── home/                       # Homepage components
@@ -221,7 +237,7 @@ After registering, users get access to a full dashboard:
 
 - **Overview** — Today's calls, success rate, cost, latency, model consumption charts (ECharts: stacked bar, pie, trend line)
 - **Token Plan** — Subscription page at `/token-plan` with 4 tiers (Spark/Flare/Pulse/Nova), monthly/yearly toggle, USD/CNY currency switching, prorated upgrade/downgrade
-- **Models** — Standalone page at `/models` with card grid, search, provider filter, USD/CNY toggle, 4-price display
+- **Models** — Standalone page at `/models` with card grid, search, provider filter, sort (name/price), USD/CNY toggle, 4-price display
 - **API Keys** — Create/manage keys with per-key rate limits
 - **Usage** — Detailed call history with token breakdown (input, output, cache hit, cache create), currency-aware cost display, timezone-correct timestamps
 - **Billing** — Balance display (USD/CNY), transaction history, redeem codes
@@ -239,7 +255,7 @@ Admins can configure upstream AI provider channels:
 
 - **Multi-provider support** — Add OpenAI, Anthropic, Google, DeepSeek, Alibaba, etc.
 - **Weighted routing** — Set channel weights for load balancing
-- **Automatic failover** — Channels with 3 consecutive failures are temporarily disabled
+- **Automatic failover** — Channels with 3 consecutive failures are temporarily disabled; gateway retries up to 3 channels on 5xx errors
 - **Model mapping** — Map requested model names to actual provider model names
 - **Priority system** — Higher priority channels are preferred
 - **Connection testing** — Verify upstream connectivity with latency measurement

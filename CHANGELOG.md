@@ -6,6 +6,43 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [v3.3.2] — 2026-05-14
+
+### Security Hardening, Gateway Failover, Middleware Auth & Feature Upgrades
+
+#### Security Fixes
+- **Auth validation** — Added explicit API key validation in completions and images routes before processing
+- **Settings access control** — Regular users can only read public settings (currency, exchange_rate, timezone); admin-only keys are filtered
+- **Balance race condition** — `addBalance` now uses atomic SQL (`balance = balance + ?`) to prevent TOCTOU on concurrent recharges
+- **Decrypt failure** — `decrypt()` now throws on failure instead of silently returning ciphertext
+- **Error message sanitization** — Redeem route no longer leaks internal error details to clients
+
+#### Gateway Improvements
+- **Channel failover retry** — Gateway automatically retries up to 3 channels on 5xx upstream errors
+- **Stream health reporting** — `reportChannelSuccess` deferred to stream completion, not stream start
+- **JSON parse error handling** — Non-JSON upstream responses are caught and return 502 instead of crashing
+- **Tool call passthrough** — `tools`, `tool_choice`, `functions`, `function_call` and other OpenAI params are now forwarded to upstream providers
+- **Overnight multiplier fix** — Time-based multiplier now correctly handles overnight ranges (e.g., 22:00-06:00)
+- **Rate limiter fix** — Denied requests no longer increment the counter (check before increment)
+
+#### New Features
+- **X-Request-Id** — Middleware generates a unique request ID for every request, added to response headers for tracing
+- **Dashboard auth middleware** — `/dashboard/*` routes are now protected by middleware; unauthenticated users redirect to login
+- **OpenAPI 3.0 spec** — `GET /api/v1/openapi` returns the full API specification for all endpoints
+- **Model sorting** — Model marketplace now has a sort dropdown (name A-Z/Z-A, input price, output price)
+- **Dynamic homepage stats** — Platform stats (total calls, uptime, latency, model count) are now fetched from real data via `/api/stats`
+
+#### Code Quality
+- **estimateTokens deduplication** — Removed duplicate function from 3 files, exported from `api-gateway.ts`
+- **React anti-pattern fix** — `api-key-table.tsx` changed `useState` initializer to `useEffect` for data fetching
+- **alert() → toast** — Replaced all `alert()` calls with toast notifications in users and redeem pages
+- **Profile input validation** — Username (2-50 chars), avatar (max 1MB), bio (max 500 chars) validation on PATCH
+- **API key bounds** — `rate_limit` clamped to 1-10000 on create/update
+- **Multiplier try/catch** — POST/DELETE handlers wrapped in try/catch for malformed JSON
+- **Schema safety** — `schema.sql` uses `INSERT OR IGNORE` instead of `DELETE FROM` to preserve existing data
+
+---
+
 ## [v3.3.1] — 2026-05-13
 
 ### Token Plan Subscription System, Currency Toggle, VIP Card Effects & Number Format Fix

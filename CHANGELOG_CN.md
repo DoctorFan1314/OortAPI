@@ -6,6 +6,43 @@
 
 ---
 
+## [v3.3.2] — 2026-05-14
+
+### 安全加固、网关故障转移、中间件鉴权与功能升级
+
+#### 安全修复
+- **Auth 验证** — completions 和 images 路由在处理请求前显式验证 API Key
+- **设置访问控制** — 普通用户只能读取公开设置（currency、exchange_rate、timezone）；管理员专属 key 被过滤
+- **余额竞态** — `addBalance` 使用原子 SQL（`balance = balance + ?`）防止并发充值的 TOCTOU 竞态
+- **解密失败** — `decrypt()` 现在解密失败时抛出异常，而非静默返回密文
+- **错误消息脱敏** — 兑换路由不再向客户端泄露内部错误详情
+
+#### 网关改进
+- **渠道故障转移重试** — 网关遇到 5xx 上游错误时自动重试最多 3 个渠道
+- **流式健康上报** — `reportChannelSuccess` 延迟到流完成时调用，而非流开始
+- **JSON 解析错误处理** — 非 JSON 上游响应被捕获并返回 502，不再崩溃
+- **工具调用透传** — `tools`、`tool_choice`、`functions`、`function_call` 等 OpenAI 参数现在正确转发到上游
+- **跨天倍率修复** — 时间倍率现在正确处理跨天范围（如 22:00-06:00）
+- **限流器修复** — 被拒绝的请求不再递增计数器（先检查后递增）
+
+#### 新功能
+- **X-Request-Id** — 中间件为每个请求生成唯一 ID，添加到响应头用于链路追踪
+- **仪表盘鉴权中间件** — `/dashboard/*` 路由现在受中间件保护；未认证用户重定向到登录页
+- **OpenAPI 3.0 规范** — `GET /api/v1/openapi` 返回所有端点的完整 API 规范
+- **模型排序** — 模型市场新增排序下拉框（名称 A-Z/Z-A、输入价格、补全价格）
+- **动态首页统计** — 平台统计（总调用量、可用率、延迟、模型数）现在从 `/api/stats` 获取真实数据
+
+#### 代码质量
+- **estimateTokens 去重** — 从 3 个文件中移除重复函数，从 `api-gateway.ts` 导出
+- **React 反模式修复** — `api-key-table.tsx` 将 `useState` 初始化器改为 `useEffect`
+- **alert() → toast** — 用户管理和兑换页面的所有 `alert()` 调用替换为 toast 通知
+- **Profile 输入验证** — 用户名（2-50 字符）、头像（最大 1MB）、简介（最大 500 字符）的 PATCH 验证
+- **API Key 边界** — `rate_limit` 创建/更新时限制在 1-10000
+- **倍率 try/catch** — POST/DELETE 处理器包裹 try/catch 防止畸形 JSON
+- **Schema 安全** — `schema.sql` 使用 `INSERT OR IGNORE` 替代 `DELETE FROM` 以保留现有数据
+
+---
+
 ## [v3.3.1] — 2026-05-13
 
 ### Token Plan 订阅系统、货币切换、VIP 卡片特效与数字格式修复
