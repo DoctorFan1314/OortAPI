@@ -3,8 +3,10 @@
 import { useI18n } from "@/contexts/i18n-context";
 import { useCurrency } from "@/contexts/currency-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { Activity, Coins, DollarSign } from "lucide-react";
+import useSWR from "swr";
+import { dashboardSWRConfig } from "@/lib/swr-fetcher";
 
 interface UsageLog {
   id: number;
@@ -27,12 +29,6 @@ interface UsageLog {
   output_rate: number | null;
   cache_rate: number | null;
   cache_creation_rate: number | null;
-}
-
-interface UsageSummary {
-  total_calls: number;
-  total_tokens: number;
-  total_cost: number;
 }
 
 const LABELS = {
@@ -116,26 +112,20 @@ function formatRate(rate: number | null | undefined): string {
 export default function UsagePage() {
   const { lang } = useI18n();
   const { currency, exchangeRate, formatPrice, symbol } = useCurrency();
-  const [logs, setLogs] = useState<UsageLog[]>([]);
-  const [summary, setSummary] = useState<UsageSummary>({ total_calls: 0, total_tokens: 0, total_cost: 0 });
-  const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const t = LABELS[lang];
 
-  useEffect(() => {
-    fetch("/api/v1/billing/usage?limit=50", { credentials: "include" })
-      .then(res => res.json())
-      .then(d => {
-        const logsData = d.data || [];
-        setLogs(logsData);
-        const totalCalls = logsData.length;
-        const totalTokens = logsData.reduce((s: number, l: UsageLog) => s + l.tokens_in + l.tokens_out + l.tokens_in_cache + l.tokens_cache_creation, 0);
-        const totalCost = logsData.reduce((s: number, l: UsageLog) => s + l.cost, 0);
-        setSummary({ total_calls: totalCalls, total_tokens: totalTokens, total_cost: totalCost });
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, []);
+  const { data, isLoading } = useSWR<{ data: UsageLog[]; total: number }>(
+    "/api/v1/billing/usage?limit=50",
+    dashboardSWRConfig,
+  );
+
+  const logs = data?.data || [];
+  const summary = useMemo(() => {
+    const totalTokens = logs.reduce((s, l) => s + l.tokens_in + l.tokens_out + l.tokens_in_cache + l.tokens_cache_creation, 0);
+    const totalCost = logs.reduce((s, l) => s + l.cost, 0);
+    return { total_calls: logs.length, total_tokens: totalTokens, total_cost: totalCost };
+  }, [logs]);
 
   const formatTokens = (n: number) => {
     return n.toLocaleString();
@@ -302,7 +292,7 @@ export default function UsagePage() {
           <CardTitle className="text-lg">{t.title}</CardTitle>
         </CardHeader>
         <CardContent>
-          {loading ? (
+          {isLoading ? (
             <div className="h-48 animate-pulse bg-muted rounded-lg" />
           ) : logs.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground text-sm">{t.noLogs}</div>

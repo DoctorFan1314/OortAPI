@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { AuthGuard } from "@/components/auth/auth-guard";
 import { useI18n } from "@/contexts/i18n-context";
 import { useAuth } from "@/contexts/auth-context";
@@ -8,6 +8,8 @@ import { useCurrency } from "@/contexts/currency-context";
 import { useLocale } from "@/hooks/use-locale";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import useSWR from "swr";
+import { dashboardSWRConfig } from "@/lib/swr-fetcher";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
@@ -129,9 +131,6 @@ export default function ProfileClient() {
   const t = LABELS[lang];
 
   const [activeTab, setActiveTab] = useState<"overview" | "settings">("overview");
-  const [logs, setLogs] = useState<UsageLog[]>([]);
-  const [stats, setStats] = useState({ totalCalls: 0, totalTokens: 0, totalCost: 0 });
-  const [loading, setLoading] = useState(true);
 
   // Settings state
   const [username, setUsername] = useState(user?.username || "");
@@ -139,21 +138,17 @@ export default function ProfileClient() {
   const [saving, setSaving] = useState(false);
   const [cropImage, setCropImage] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetch("/api/v1/billing/usage?limit=10", { credentials: "include" })
-      .then(res => res.json())
-      .then(d => {
-        const logsData = d.data || [];
-        setLogs(logsData);
-        setStats({
-          totalCalls: d.total || logsData.length,
-          totalTokens: logsData.reduce((s: number, l: UsageLog) => s + l.tokens_in + l.tokens_out, 0),
-          totalCost: logsData.reduce((s: number, l: UsageLog) => s + l.cost, 0),
-        });
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, []);
+  const { data: usageData, isLoading } = useSWR<{ data: UsageLog[]; total: number }>(
+    "/api/v1/billing/usage?limit=10",
+    dashboardSWRConfig,
+  );
+
+  const logs = usageData?.data || [];
+  const stats = useMemo(() => ({
+    totalCalls: usageData?.total || logs.length,
+    totalTokens: logs.reduce((s, l) => s + l.tokens_in + l.tokens_out, 0),
+    totalCost: logs.reduce((s, l) => s + l.cost, 0),
+  }), [usageData, logs]);
 
   const handleSaveProfile = () => {
     if (!username.trim()) {
@@ -346,7 +341,7 @@ export default function ProfileClient() {
                 <CardTitle className="text-lg">{t.recentUsage}</CardTitle>
               </CardHeader>
               <CardContent>
-                {loading ? (
+                {isLoading ? (
                   <div className="h-32 animate-pulse bg-muted rounded-lg" />
                 ) : logs.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground text-sm">{t.noUsage}</div>

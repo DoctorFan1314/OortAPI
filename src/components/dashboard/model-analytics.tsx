@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useState, useMemo } from "react";
+import useSWR from "swr";
 import dynamic from "next/dynamic";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useI18n } from "@/contexts/i18n-context";
 import { useCurrency } from "@/contexts/currency-context";
 import { BarChart3, TrendingUp, PieChart as PieIcon } from "lucide-react";
+import { dashboardSWRConfig } from "@/lib/swr-fetcher";
 
 const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false });
 
@@ -103,21 +105,15 @@ export function ModelAnalytics() {
   const { currency, exchangeRate } = useCurrency();
   const t = LABELS[lang];
 
-  const [data, setData] = useState<AnalyticsData | null>(null);
   const [range, setRange] = useState<7 | 14 | 30>(7);
   const [timeMode, setTimeMode] = useState<"day" | "hour">("day");
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    setLoading(true);
-    const groupBy = timeMode === "hour" ? "hour" : "day";
-    const r = timeMode === "hour" ? "7d" : `${range}d`;
-    fetch(`/api/dashboard/analytics?range=${r}&group_by=${groupBy}`, { credentials: "include" })
-      .then(res => res.json())
-      .then(setData)
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, [range, timeMode]);
+  const groupBy = timeMode === "hour" ? "hour" : "day";
+  const r = timeMode === "hour" ? "7d" : `${range}d`;
+  const { data, isLoading } = useSWR<AnalyticsData>(
+    `/api/dashboard/analytics?range=${r}&group_by=${groupBy}`,
+    dashboardSWRConfig,
+  );
 
   // Unique model list
   const models = useMemo(() => {
@@ -274,7 +270,7 @@ export function ModelAnalytics() {
     };
   }, [data, colorMap]);
 
-  if (loading && !data) {
+  if (isLoading && !data) {
     return (
       <div className="grid md:grid-cols-2 gap-4">
         {Array.from({ length: 3 }).map((_, i) => (

@@ -51,6 +51,7 @@ All notable changes to this project will be documented in this file.
 - **Profile plan display** — Recent calls now shows credits used instead of dollar cost for subscription users
 - **Search rewrite** — Search page now queries AI models and documentation instead of Agent Skills and Prompt Templates
 - **Subscription credits bug** — Upgrading a plan now correctly carries over consumed credits instead of resetting to full
+- **Auto-refresh with SWR** — Dashboard stats, usage logs, API keys, model analytics, and profile now auto-refresh every 30s and on tab focus
 
 ---
 

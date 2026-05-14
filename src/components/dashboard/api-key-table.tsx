@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import useSWR from "swr";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Copy, Eye, EyeOff, Plus, Trash2, ToggleLeft, ToggleRight } from "lucide-react";
 import { useToast } from "@/contexts/toast-context";
+import { dashboardSWRConfig } from "@/lib/swr-fetcher";
 
 interface ApiKey {
   id: number;
@@ -53,22 +55,13 @@ const LABELS = {
 };
 
 export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
-  const [keys, setKeys] = useState<ApiKey[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data, isLoading, mutate } = useSWR<{ keys: ApiKey[] }>("/api/dashboard/keys", dashboardSWRConfig);
+  const keys = data?.keys || [];
   const [showKey, setShowKey] = useState<Record<number, boolean>>({});
   const [newKeyName, setNewKeyName] = useState("");
   const [creating, setCreating] = useState(false);
   const { toast: showToast } = useToast();
   const t = LABELS[lang];
-
-  const fetchKeys = () => {
-    fetch("/api/dashboard/keys", { credentials: "include" })
-      .then(res => res.json())
-      .then(d => { setKeys(d.keys || []); setLoading(false); })
-      .catch(() => setLoading(false));
-  };
-
-  useEffect(() => { fetchKeys(); }, []);
 
   const createKey = async () => {
     setCreating(true);
@@ -81,7 +74,7 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
       });
       if (res.ok) {
         setNewKeyName("");
-        fetchKeys();
+        mutate();
         showToast(t.copied, "success");
       }
     } finally {
@@ -96,7 +89,7 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
       credentials: "include",
       body: JSON.stringify({ id, enabled }),
     });
-    fetchKeys();
+    mutate();
   };
 
   const deleteKey = async (id: number) => {
@@ -107,7 +100,7 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
       credentials: "include",
       body: JSON.stringify({ id }),
     });
-    fetchKeys();
+    mutate();
   };
 
   const copyKey = (key: string) => {
@@ -117,7 +110,7 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
 
   const maskKey = (key: string) => key.slice(0, 12) + "..." + key.slice(-4);
 
-  if (loading) {
+  if (isLoading) {
     return <div className="h-48 animate-pulse bg-muted rounded-lg" />;
   }
 

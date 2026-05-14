@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import useSWR from "swr";
 import { Card, CardContent } from "@/components/ui/card";
 import { useCurrency } from "@/contexts/currency-context";
 import { Wallet, TrendingDown, Activity, Coins, Gauge, Cpu } from "lucide-react";
+import { dashboardSWRConfig } from "@/lib/swr-fetcher";
 
 interface StatsData {
   today: {
@@ -49,16 +50,9 @@ const LABELS = {
 };
 
 export function StatsCards({ lang = "zh" }: { lang?: "zh" | "en" }) {
-  const [stats, setStats] = useState<StatsData | null>(null);
+  const { data: stats } = useSWR<StatsData>("/api/dashboard/stats", dashboardSWRConfig);
   const { currency, exchangeRate, symbol } = useCurrency();
   const t = LABELS[lang];
-
-  useEffect(() => {
-    fetch("/api/dashboard/stats", { credentials: "include" })
-      .then(res => res.json())
-      .then(setStats)
-      .catch(() => {});
-  }, []);
 
   const formatCost = (usd: number) => {
     if (currency === "CNY") return `¥${(usd * exchangeRate).toFixed(2)}`;

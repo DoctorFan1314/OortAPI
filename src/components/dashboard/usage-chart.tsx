@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import useSWR from "swr";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
+import { dashboardSWRConfig } from "@/lib/swr-fetcher";
 
 interface DailyData {
   date: string;
@@ -11,21 +12,19 @@ interface DailyData {
   tokens: number;
 }
 
+interface StatsResponse {
+  daily_usage: DailyData[];
+}
+
 const LABELS = {
   zh: { title: "近 7 天用量", calls: "调用次数", cost: "花费 ($)", tokens: "Token 用量", noData: "暂无数据" },
   en: { title: "Last 7 Days Usage", calls: "Calls", cost: "Cost ($)", tokens: "Tokens", noData: "No data yet" },
 };
 
 export function UsageChart({ lang = "zh" }: { lang?: "zh" | "en" }) {
-  const [data, setData] = useState<DailyData[]>([]);
+  const { data: stats } = useSWR<StatsResponse>("/api/dashboard/stats", dashboardSWRConfig);
+  const data = stats?.daily_usage || [];
   const t = LABELS[lang];
-
-  useEffect(() => {
-    fetch("/api/dashboard/stats", { credentials: "include" })
-      .then(res => res.json())
-      .then(d => setData(d.daily_usage || []))
-      .catch(() => {});
-  }, []);
 
   if (data.length === 0) {
     return (
