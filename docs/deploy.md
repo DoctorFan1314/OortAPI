@@ -10,18 +10,17 @@
 ### 部署步骤
 
 ```bash
-# 1. 克隆项目
-git clone https://github.com/DoctorFan1314/OortAPI.git
-cd Oortapi
-
-# 2. 一键启动
+# 方式一：直接下载 docker-compose.yml（推荐，使用预构建镜像）
+curl -O https://raw.githubusercontent.com/DoctorFan1314/OortAPI/main/docker-compose.yml
 docker compose up -d
 
-# 3. 访问
-# 浏览器打开 http://localhost:3000
+# 方式二：克隆项目（可选，支持本地构建）
+git clone https://github.com/DoctorFan1314/OortAPI.git
+cd OortAPI
+docker compose up -d
 ```
 
-首次启动会自动构建镜像，约 2-3 分钟。后续启动秒级完成。
+镜像从 GitHub Container Registry (ghcr.io) 自动拉取，无需本地构建。
 
 ### 常用命令
 

@@ -1,6 +1,9 @@
 services:
   oortapi:
-    build: .
+    # Option 1: Use pre-built image (recommended)
+    image: ghcr.io/doctorfan1314/oortapi:latest
+    # Option 2: Build from source (uncomment below, comment out image above)
+    # build: .
     container_name: oortapi
     restart: unless-stopped
     ports:

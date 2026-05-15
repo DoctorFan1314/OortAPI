@@ -307,7 +307,14 @@ NEXT_PUBLIC_SITE_URL=https://your-domain.com
 
 ### Docker (Recommended)
 
-One-command deployment:
+Quick start with pre-built image (no build required):
+
+```bash
+curl -O https://raw.githubusercontent.com/DoctorFan1314/OortAPI/main/docker-compose.yml
+docker compose up -d
+```
+
+Or clone the repo:
 
 ```bash
 git clone https://github.com/DoctorFan1314/OortAPI.git
@@ -315,7 +322,7 @@ cd OortAPI
 docker compose up -d
 ```
 
-Open http://localhost:3000. First build takes ~2-3 minutes, subsequent starts are instant.
+Open http://localhost:3000. Image is pulled from GitHub Container Registry automatically.
 
 Common commands:
 

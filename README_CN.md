@@ -307,13 +307,22 @@ NEXT_PUBLIC_SITE_URL=https://your-domain.com
 
 ### Docker 一键部署（推荐）
 
+使用预构建镜像，无需本地构建：
+
+```bash
+curl -O https://raw.githubusercontent.com/DoctorFan1314/OortAPI/main/docker-compose.yml
+docker compose up -d
+```
+
+或克隆仓库：
+
 ```bash
 git clone https://github.com/DoctorFan1314/OortAPI.git
 cd OortAPI
 docker compose up -d
 ```
 
-打开 http://localhost:3000 即可访问。首次构建约 2-3 分钟，后续启动秒级完成。
+打开 http://localhost:3000 即可访问。镜像从 GitHub Container Registry 自动拉取，无需本地构建。
 
 常用命令：
 
