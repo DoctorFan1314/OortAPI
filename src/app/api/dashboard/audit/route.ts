@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
       params.push(from);
     }
     if (to) {
-      conditions.push('a.created_at <= ?');
+      conditions.push("a.created_at < date(?, '+1 day')");
       params.push(to);
     }
 

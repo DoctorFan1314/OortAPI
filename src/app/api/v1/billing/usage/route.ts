@@ -50,7 +50,8 @@ export async function GET(request: NextRequest) {
       params.push(from);
     }
     if (to) {
-      conditions.push('u.created_at <= ?');
+      // Add one day to include all records on the 'to' date
+      conditions.push("u.created_at < date(?, '+1 day')");
       params.push(to);
     }
 
