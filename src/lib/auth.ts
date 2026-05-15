@@ -86,7 +86,9 @@ export function getTokenFromCookie(cookieHeader: string | null): string | null {
 }
 
 export function setTokenCookie(token: string): string {
-  const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || '';
+  const isHttps = siteUrl.startsWith('https://') || process.env.COOKIE_SECURE === 'true';
+  const secure = isHttps ? '; Secure' : '';
   return `${TOKEN_NAME}=${encodeURIComponent(token)}; Path=/; HttpOnly; SameSite=Lax${secure}; Max-Age=${JWT_EXPIRY}`;
 }
 
