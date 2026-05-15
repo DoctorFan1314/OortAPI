@@ -155,7 +155,9 @@ export function Navbar() {
           {user && <NotificationBell />}
 
           <div className="hidden md:flex items-center gap-2">
-            {!loaded ? null : user ? (
+            {!loaded ? (
+              <div className="h-8 w-8 rounded-full bg-secondary animate-pulse" />
+            ) : user ? (
               <div className="relative" ref={userMenuRef}>
                 <button
                   onClick={() => setUserMenuOpen(!userMenuOpen)}

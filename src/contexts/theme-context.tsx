@@ -38,12 +38,15 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   });
   const transitionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Sync resolvedTheme when theme changes (not on mount - already initialized)
   useEffect(() => {
     const resolved = resolveTheme(theme);
     setResolvedTheme(resolved);
-    // Don't apply transition on initial load
-    applyTheme(resolved, true);
-  }, []);
+    // Only apply if different from what theme-init script already set
+    if (typeof window !== "undefined") {
+      applyTheme(resolved, false, transitionTimeoutRef);
+    }
+  }, [theme]);
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
