@@ -177,6 +177,9 @@ curl https://your-domain.com/api/v1/messages \
 - **API Key 权限** — 解析 permissions JSON，强制执行模型白名单
 - **限流持久化** — SQLite 持久化限流计数器，重启不丢失
 - **无障碍** — 所有图标按钮添加 aria-label，Dialog 替换原生 confirm
+- **Docker 部署** — 一条命令 `docker compose up -d`，SQLite 数据持久化
+- **自动管理员** — 第一个注册的用户自动成为管理员
+- **删除账户** — 用户可删除账户，需密码验证 + 输入确认
 
 ---
 

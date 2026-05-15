@@ -82,6 +82,15 @@ const LABELS = {
     deleteBtn: "永久删除",
     deleting: "删除中...",
     deleteSuccess: "账户已删除",
+    changePassword: "修改密码",
+    currentPassword: "当前密码",
+    newPassword: "新密码",
+    confirmPassword: "确认新密码",
+    passwordChanged: "密码修改成功",
+    passwordMismatch: "两次输入的密码不一致",
+    wrongPassword: "当前密码不正确",
+    passwordMinLength: "新密码至少 8 位",
+    changePwBtn: "修改密码",
     model: "模型",
     tokens: "Tokens",
     cost: "费用",
@@ -132,6 +141,15 @@ const LABELS = {
     deleteBtn: "Delete Forever",
     deleting: "Deleting...",
     deleteSuccess: "Account deleted",
+    changePassword: "Change Password",
+    currentPassword: "Current Password",
+    newPassword: "New Password",
+    confirmPassword: "Confirm Password",
+    passwordChanged: "Password changed successfully",
+    passwordMismatch: "Passwords do not match",
+    wrongPassword: "Current password is incorrect",
+    passwordMinLength: "New password must be at least 8 characters",
+    changePwBtn: "Change Password",
     model: "Model",
     tokens: "Tokens",
     cost: "Cost",
@@ -143,7 +161,7 @@ const LABELS = {
 
 export default function ProfileClient() {
   const { t: i18nT } = useI18n();
-  const { user, updateProfile } = useAuth();
+  const { user, updateProfile, changePassword } = useAuth();
   const { formatPrice } = useCurrency();
   const { lang } = useI18n();
   const { theme, setTheme } = useTheme();
@@ -163,6 +181,12 @@ export default function ProfileClient() {
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState("");
+
+  // Change password state
+  const [currentPw, setCurrentPw] = useState("");
+  const [newPw, setNewPw] = useState("");
+  const [confirmPw, setConfirmPw] = useState("");
+  const [pwLoading, setPwLoading] = useState(false);
 
   const { data: usageData, isLoading } = useSWR<{ data: UsageLog[]; total: number }>(
     "/api/v1/billing/usage?limit=10",
@@ -213,6 +237,23 @@ export default function ProfileClient() {
       setDeleteError(t.failed);
       setDeleteLoading(false);
     }
+  };
+
+  const handleChangePassword = async () => {
+    if (newPw.length < 8) { toast(t.passwordMinLength, "error"); return; }
+    if (newPw !== confirmPw) { toast(t.passwordMismatch, "error"); return; }
+    setPwLoading(true);
+    try {
+      await changePassword(currentPw, newPw);
+      toast(t.passwordChanged, "success");
+      setCurrentPw("");
+      setNewPw("");
+      setConfirmPw("");
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Password change failed";
+      toast(msg.includes("incorrect") ? t.wrongPassword : msg, "error");
+    }
+    setPwLoading(false);
   };
 
   const formatTokens = (n: number) => {
@@ -514,6 +555,33 @@ export default function ProfileClient() {
                   <Button onClick={handleSaveProfile} disabled={saving}>
                     {saving ? <Loader2 className="h-4 w-4 animate-spin mr-1.5" /> : <Save className="h-4 w-4 mr-1.5" />}
                     {t.saveProfile}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Change Password */}
+            <Card className="glass-card">
+              <CardHeader>
+                <CardTitle className="text-lg">{t.changePassword}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4 max-w-md">
+                  <div>
+                    <label className="text-sm mb-1.5 block">{t.currentPassword}</label>
+                    <Input type="password" value={currentPw} onChange={e => setCurrentPw(e.target.value)} placeholder="********" />
+                  </div>
+                  <div>
+                    <label className="text-sm mb-1.5 block">{t.newPassword}</label>
+                    <Input type="password" value={newPw} onChange={e => setNewPw(e.target.value)} />
+                  </div>
+                  <div>
+                    <label className="text-sm mb-1.5 block">{t.confirmPassword}</label>
+                    <Input type="password" value={confirmPw} onChange={e => setConfirmPw(e.target.value)} />
+                  </div>
+                  <Button onClick={handleChangePassword} disabled={pwLoading || !currentPw || !newPw || !confirmPw}>
+                    {pwLoading ? <Loader2 className="h-4 w-4 animate-spin mr-1.5" /> : <Key className="h-4 w-4 mr-1.5" />}
+                    {t.changePwBtn}
                   </Button>
                 </div>
               </CardContent>

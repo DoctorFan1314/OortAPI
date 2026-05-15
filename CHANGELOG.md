@@ -6,6 +6,25 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [v3.3.4.3] — 2026-05-15
+
+### New Features
+- **Docker one-click deployment** — Added `Dockerfile` (multi-stage build) and `docker-compose.yml` for one-command deployment with persistent SQLite storage
+- **First user auto-admin** — First registered user automatically becomes admin; admin can promote others in user management
+- **Delete account** — Profile page now supports account deletion with password verification and typed "DELETE" confirmation dialog
+- **Change password in profile** — Moved change password from dashboard settings to profile settings tab for better UX
+
+### Fixes
+- **Usage page SQL error** — Fixed COUNT query alias mismatch (`u.user_id` → `user_id`) that caused empty usage logs
+- **Usage page filter bar** — Added manual filter button; filters only apply on click, not on page load
+- **Date range filter** — Fixed "to" date to include all records on that date (`created_at < date(?, '+1 day')`)
+- **Docker schema.sql** — Fixed `schema.sql` not being copied into Docker image, causing registration to fail
+
+### Changed
+- **Dashboard settings cleanup** — Removed account settings (username/bio) and change password from dashboard settings (now in profile); dashboard settings only shows API endpoint + system settings (admin)
+
+---
+
 ## [v3.3.4.2] — 2026-05-14
 
 ### Critical Fixes

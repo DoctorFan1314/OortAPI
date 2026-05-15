@@ -177,6 +177,9 @@ Supports full `tool_use` / `tool_result` conversion between Anthropic and OpenAI
 - **API key permissions** — Parses permissions JSON, enforces model whitelist
 - **Rate limiter persistence** — SQLite-persisted rate limit counters, survives restarts
 - **Accessibility** — aria-labels on all icon buttons, Dialog replaces native confirm
+- **Docker deployment** — One-command `docker compose up -d` with persistent SQLite volume
+- **Auto admin** — First registered user automatically becomes admin
+- **Delete account** — Users can delete their account with password verification
 
 ---
 
