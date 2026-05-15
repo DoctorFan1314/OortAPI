@@ -307,14 +307,7 @@ NEXT_PUBLIC_SITE_URL=https://your-domain.com
 
 ### Docker (Recommended)
 
-Quick start with pre-built image (no build required):
-
-```bash
-curl -O https://raw.githubusercontent.com/DoctorFan1314/OortAPI/main/docker-compose.yml
-docker compose up -d
-```
-
-Or clone the repo:
+Build from source:
 
 ```bash
 git clone https://github.com/DoctorFan1314/OortAPI.git
@@ -322,7 +315,15 @@ cd OortAPI
 docker compose up -d
 ```
 
-Open http://localhost:3000. Image is pulled from GitHub Container Registry automatically.
+Or use pre-built image (faster, no build tools needed):
+
+```bash
+curl -O https://raw.githubusercontent.com/DoctorFan1314/OortAPI/main/docker-compose.yml
+# Edit docker-compose.yml: comment out 'build: .' and uncomment 'image: ...'
+docker compose up -d
+```
+
+Open http://localhost:3000.
 
 Common commands:
 
