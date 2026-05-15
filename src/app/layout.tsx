@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
-import { Geist, Geist_Mono } from "next/font/google";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
@@ -24,16 +25,6 @@ export const viewport: Viewport = {
     { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
   ],
 };
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 const siteUrl = getSiteUrl();
 
@@ -76,7 +67,7 @@ export default function RootLayout({
       lang="zh-CN" /* Default; the lang-init script updates this at runtime based on user preference */
       suppressHydrationWarning
       data-scroll-behavior="smooth"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
+      className={`${GeistSans.variable} ${GeistMono.variable} h-full antialiased dark`}
     >
       <head>
         <Script
