@@ -18,11 +18,12 @@ import { useToast } from "@/contexts/toast-context";
 import {
   User, Mail, Calendar, Shield, Activity, Key, Coins, DollarSign,
   Sun, Moon, Monitor, Camera, Save, Loader2, Clock, Zap, BarChart3,
-  Settings, ArrowRight,
+  Settings, ArrowRight, Trash2, AlertTriangle,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { AvatarCropDialog } from "@/components/profile/avatar-crop-dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 interface UsageLog {
   id: number;
@@ -71,6 +72,16 @@ const LABELS = {
     changeAvatar: "更换头像",
     success: "成功",
     failed: "失败",
+    dangerZone: "危险操作",
+    deleteAccount: "删除账户",
+    deleteAccountDesc: "删除账户将永久清除所有数据，包括调用记录、API Key、余额等。此操作不可撤销。",
+    deleteConfirmTitle: "确认删除账户",
+    deleteConfirmDesc: "此操作将永久删除你的账户及所有数据，无法恢复。",
+    deleteConfirmInput: '请输入 "DELETE" 确认',
+    deletePassword: "请输入密码验证",
+    deleteBtn: "永久删除",
+    deleting: "删除中...",
+    deleteSuccess: "账户已删除",
     model: "模型",
     tokens: "Tokens",
     cost: "费用",
@@ -111,6 +122,16 @@ const LABELS = {
     changeAvatar: "Change Avatar",
     success: "Success",
     failed: "Failed",
+    dangerZone: "Danger Zone",
+    deleteAccount: "Delete Account",
+    deleteAccountDesc: "Permanently delete your account and all data, including usage logs, API keys, and balance. This cannot be undone.",
+    deleteConfirmTitle: "Confirm Account Deletion",
+    deleteConfirmDesc: "This will permanently delete your account and all data. This action cannot be undone.",
+    deleteConfirmInput: 'Type "DELETE" to confirm',
+    deletePassword: "Enter your password to verify",
+    deleteBtn: "Delete Forever",
+    deleting: "Deleting...",
+    deleteSuccess: "Account deleted",
     model: "Model",
     tokens: "Tokens",
     cost: "Cost",
@@ -137,6 +158,11 @@ export default function ProfileClient() {
   const [bio, setBio] = useState(user?.bio || "");
   const [saving, setSaving] = useState(false);
   const [cropImage, setCropImage] = useState<string | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   const { data: usageData, isLoading } = useSWR<{ data: UsageLog[]; total: number }>(
     "/api/v1/billing/usage?limit=10",
@@ -164,6 +190,29 @@ export default function ProfileClient() {
   const handleCropComplete = (dataUrl: string) => {
     updateProfile({ avatar: dataUrl });
     setCropImage(null);
+  };
+
+  const handleDeleteAccount = async () => {
+    setDeleteError("");
+    setDeleteLoading(true);
+    try {
+      const res = await fetch("/api/auth/delete-account", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ password: deletePassword }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setDeleteError(data.error || t.failed);
+        setDeleteLoading(false);
+        return;
+      }
+      window.location.href = "/";
+    } catch {
+      setDeleteError(t.failed);
+      setDeleteLoading(false);
+    }
   };
 
   const formatTokens = (n: number) => {
@@ -501,8 +550,81 @@ export default function ProfileClient() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Danger Zone */}
+            <Card className="glass-card border-red-500/20">
+              <CardHeader>
+                <CardTitle className="text-lg text-red-400 flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5" />
+                  {t.dangerZone}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium">{t.deleteAccount}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{t.deleteAccountDesc}</p>
+                  </div>
+                  <Button
+                    variant="destructive"
+                    onClick={() => setShowDeleteDialog(true)}
+                    className="shrink-0"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    {t.deleteAccount}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         )}
+
+        {/* Delete Account Dialog */}
+        <Dialog open={showDeleteDialog} onOpenChange={(open) => {
+          setShowDeleteDialog(open);
+          if (!open) { setDeletePassword(""); setDeleteConfirmText(""); setDeleteError(""); }
+        }}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className="text-red-400">{t.deleteConfirmTitle}</DialogTitle>
+              <DialogDescription>{t.deleteConfirmDesc}</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm text-muted-foreground block mb-1">{t.deletePassword}</label>
+                <Input
+                  type="password"
+                  value={deletePassword}
+                  onChange={e => setDeletePassword(e.target.value)}
+                  placeholder="********"
+                  className="bg-secondary border-border"
+                />
+              </div>
+              <div>
+                <label className="text-sm text-muted-foreground block mb-1">{t.deleteConfirmInput}</label>
+                <Input
+                  value={deleteConfirmText}
+                  onChange={e => setDeleteConfirmText(e.target.value)}
+                  placeholder="DELETE"
+                  className="bg-secondary border-border"
+                />
+              </div>
+              {deleteError && <p className="text-sm text-red-400" role="alert">{deleteError}</p>}
+              <Button
+                variant="destructive"
+                className="w-full"
+                disabled={deleteConfirmText !== "DELETE" || !deletePassword || deleteLoading}
+                onClick={handleDeleteAccount}
+              >
+                {deleteLoading ? (
+                  <><Loader2 className="h-4 w-4 mr-2 animate-spin" />{t.deleting}</>
+                ) : (
+                  <><Trash2 className="h-4 w-4 mr-2" />{t.deleteBtn}</>
+                )}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {cropImage && (
           <AvatarCropDialog
