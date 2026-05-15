@@ -12,3 +12,7 @@ services:
       - ./data:/app/data
     environment:
       - NEXT_PUBLIC_SITE_URL=http://localhost:3000
+      # JWT_SECRET and ENCRYPTION_KEY are auto-generated on first run
+      # Uncomment below to set your own values:
+      # - JWT_SECRET=your-secret-here
+      # - ENCRYPTION_KEY=your-key-here
