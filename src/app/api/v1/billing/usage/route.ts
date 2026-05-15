@@ -33,25 +33,25 @@ export async function GET(request: NextRequest) {
     const to = searchParams.get('to'); // ISO date string
     const format = searchParams.get('format'); // 'csv' or default JSON
 
-    const conditions: string[] = ['u.user_id = ?'];
+    const conditions: string[] = ['user_id = ?'];
     const params: unknown[] = [userId];
 
     if (model) {
-      conditions.push('u.model LIKE ?');
+      conditions.push('model LIKE ?');
       params.push(`%${model}%`);
     }
     if (status === 'success') {
-      conditions.push('u.success = 1');
+      conditions.push('success = 1');
     } else if (status === 'failed') {
-      conditions.push('u.success = 0');
+      conditions.push('success = 0');
     }
     if (from) {
-      conditions.push('u.created_at >= ?');
+      conditions.push('created_at >= ?');
       params.push(from);
     }
     if (to) {
       // Add one day to include all records on the 'to' date
-      conditions.push("u.created_at < date(?, '+1 day')");
+      conditions.push("created_at < date(?, '+1 day')");
       params.push(to);
     }
 

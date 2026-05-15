@@ -3,10 +3,8 @@
 import { useI18n } from "@/contexts/i18n-context";
 import { useCurrency } from "@/contexts/currency-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Fragment, useMemo, useState, useRef, useEffect } from "react";
-import { Activity, Coins, DollarSign, X, Search, Download, Pause, Play } from "lucide-react";
-import useSWR from "swr";
-import { dashboardSWRConfig } from "@/lib/swr-fetcher";
+import { Fragment, useEffect, useState } from "react";
+import { Activity, Coins, DollarSign, X, Search, Download, Filter } from "lucide-react";
 
 interface UsageLog {
   id: number;
@@ -29,6 +27,12 @@ interface UsageLog {
   output_rate: number | null;
   cache_rate: number | null;
   cache_creation_rate: number | null;
+}
+
+interface UsageSummary {
+  total_calls: number;
+  total_tokens: number;
+  total_cost: number;
 }
 
 const LABELS = {
@@ -76,7 +80,7 @@ const LABELS = {
     dateTo: "结束日期",
     clearFilters: "清除筛选",
     exportCSV: "导出 CSV",
-    live: "实时", pause: "暂停", resume: "恢复",
+    filterBtn: "筛选",
   },
   en: {
     title: "Call Logs",
@@ -122,7 +126,7 @@ const LABELS = {
     dateTo: "To",
     clearFilters: "Clear filters",
     exportCSV: "Export CSV",
-    live: "Live", pause: "Pause", resume: "Resume",
+    filterBtn: "Filter",
   },
 };
 
@@ -134,54 +138,74 @@ function formatRate(rate: number | null | undefined): string {
 export default function UsagePage() {
   const { lang } = useI18n();
   const { currency, exchangeRate, formatPrice, symbol } = useCurrency();
+  const [logs, setLogs] = useState<UsageLog[]>([]);
+  const [summary, setSummary] = useState<UsageSummary>({ total_calls: 0, total_tokens: 0, total_cost: 0 });
+  const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  // Input state (form fields) — does NOT trigger API calls
+  const [inputModel, setInputModel] = useState("");
+  const [inputStatus, setInputStatus] = useState("");
+  const [inputFrom, setInputFrom] = useState("");
+  const [inputTo, setInputTo] = useState("");
+  // Applied filter state — triggers API calls only when "Filter" button is clicked
   const [filterModel, setFilterModel] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
   const [filterFrom, setFilterFrom] = useState("");
   const [filterTo, setFilterTo] = useState("");
-  const [liveMode, setLiveMode] = useState(true);
-  const prevIdsRef = useRef<Set<number>>(new Set());
-  const [newIds, setNewIds] = useState<Set<number>>(new Set());
   const t = LABELS[lang];
 
-  const filterParams = [
-    `limit=50&offset=${(page - 1) * 50}`,
-    filterModel ? `model=${encodeURIComponent(filterModel)}` : '',
-    filterStatus ? `status=${filterStatus}` : '',
-    filterFrom ? `from=${filterFrom}` : '',
-    filterTo ? `to=${filterTo}` : '',
-  ].filter(Boolean).join('&');
+  const applyFilters = () => {
+    setFilterModel(inputModel);
+    setFilterStatus(inputStatus);
+    setFilterFrom(inputFrom);
+    setFilterTo(inputTo);
+    setPage(1);
+  };
 
-  const { data, isLoading } = useSWR<{ data: UsageLog[]; total: number; has_more: boolean }>(
-    `/api/v1/billing/usage?${filterParams}`,
-    { ...dashboardSWRConfig, refreshInterval: liveMode && page === 1 ? 30_000 : 0 },
-  );
+  const clearFilters = () => {
+    setInputModel("");
+    setInputStatus("");
+    setInputFrom("");
+    setInputTo("");
+    setFilterModel("");
+    setFilterStatus("");
+    setFilterFrom("");
+    setFilterTo("");
+    setPage(1);
+  };
 
-  // Track new rows for highlighting
+  const hasActiveFilters = filterModel || filterStatus || filterFrom || filterTo;
+
   useEffect(() => {
-    if (!data?.data || page !== 1) return;
-    const currentIds = new Set(data.data.map(l => l.id));
-    if (prevIdsRef.current.size > 0) {
-      const newlyAdded = new Set<number>();
-      for (const id of currentIds) {
-        if (!prevIdsRef.current.has(id)) newlyAdded.add(id);
-      }
-      if (newlyAdded.size > 0) {
-        setNewIds(newlyAdded);
-        setTimeout(() => setNewIds(new Set()), 3000);
-      }
-    }
-    prevIdsRef.current = currentIds;
-  }, [data, page]);
+    setLoading(true);
+    const parts = [`limit=50&offset=${(page - 1) * 50}`];
+    if (filterModel) parts.push(`model=${encodeURIComponent(filterModel)}`);
+    if (filterStatus) parts.push(`status=${filterStatus}`);
+    if (filterFrom) parts.push(`from=${filterFrom}`);
+    if (filterTo) parts.push(`to=${filterTo}`);
+    const url = `/api/v1/billing/usage?${parts.join('&')}`;
 
-  const logs = data?.data || [];
-  const hasMore = data?.has_more || false;
-  const summary = useMemo(() => {
-    const totalTokens = logs.reduce((s, l) => s + l.tokens_in + l.tokens_out + l.tokens_in_cache + l.tokens_cache_creation, 0);
-    const totalCost = logs.reduce((s, l) => s + l.cost, 0);
-    return { total_calls: logs.length, total_tokens: totalTokens, total_cost: totalCost };
-  }, [logs]);
+    fetch(url, { credentials: "include" })
+      .then(res => {
+        if (!res.ok) throw new Error(`${res.status}`);
+        return res.json();
+      })
+      .then(d => {
+        const logsData = d.data || [];
+        setLogs(logsData);
+        setTotal(d.total || 0);
+        const totalTokens = logsData.reduce((s: number, l: UsageLog) => s + l.tokens_in + l.tokens_out + l.tokens_in_cache + l.tokens_cache_creation, 0);
+        const totalCost = logsData.reduce((s: number, l: UsageLog) => s + l.cost, 0);
+        setSummary({ total_calls: logsData.length, total_tokens: totalTokens, total_cost: totalCost });
+        setLoading(false);
+      })
+      .catch(() => {
+        setLogs([]);
+        setLoading(false);
+      });
+  }, [page, filterModel, filterStatus, filterFrom, filterTo]);
 
   const formatTokens = (n: number) => {
     return n.toLocaleString();
@@ -304,25 +328,7 @@ export default function UsagePage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{t.title}</h1>
-        {page === 1 && (
-          <button
-            onClick={() => setLiveMode(!liveMode)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
-              liveMode
-                ? "bg-green-500/10 text-green-500 border-green-500/30"
-                : "bg-muted text-muted-foreground border-border"
-            }`}
-          >
-            {liveMode ? (
-              <><span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span></span>{t.pause}</>
-            ) : (
-              <><Play className="h-3 w-3" />{t.resume}</>
-            )}
-          </button>
-        )}
-      </div>
+      <h1 className="text-2xl font-bold">{t.title}</h1>
 
       {/* Summary stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -367,13 +373,14 @@ export default function UsagePage() {
           <label className="text-xs text-muted-foreground block mb-1">{t.filterModel}</label>
           <div className="relative">
             <Search className="absolute left-2.5 top-2 h-4 w-4 text-muted-foreground" />
-            <input value={filterModel} onChange={e => { setFilterModel(e.target.value); setPage(1); }}
+            <input value={inputModel} onChange={e => setInputModel(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') applyFilters(); }}
               placeholder="gpt-4o" className="w-full pl-8 pr-3 py-1.5 bg-background rounded-lg text-sm border border-border/50 focus:border-primary focus:outline-none" />
           </div>
         </div>
         <div className="w-32">
           <label className="text-xs text-muted-foreground block mb-1">{t.filterStatus}</label>
-          <select value={filterStatus} onChange={e => { setFilterStatus(e.target.value); setPage(1); }}
+          <select value={inputStatus} onChange={e => setInputStatus(e.target.value)}
             className="w-full h-8 px-2 rounded-md border border-input bg-background text-sm focus:border-primary focus:outline-none">
             <option value="">{t.all}</option>
             <option value="success">{t.success}</option>
@@ -382,16 +389,20 @@ export default function UsagePage() {
         </div>
         <div className="w-36">
           <label className="text-xs text-muted-foreground block mb-1">{t.dateFrom}</label>
-          <input type="date" value={filterFrom} onChange={e => { setFilterFrom(e.target.value); setPage(1); }}
+          <input type="date" value={inputFrom} onChange={e => setInputFrom(e.target.value)}
             className="w-full h-8 px-2 rounded-md border border-input bg-background text-sm focus:border-primary focus:outline-none" />
         </div>
         <div className="w-36">
           <label className="text-xs text-muted-foreground block mb-1">{t.dateTo}</label>
-          <input type="date" value={filterTo} onChange={e => { setFilterTo(e.target.value); setPage(1); }}
+          <input type="date" value={inputTo} onChange={e => setInputTo(e.target.value)}
             className="w-full h-8 px-2 rounded-md border border-input bg-background text-sm focus:border-primary focus:outline-none" />
         </div>
-        {(filterModel || filterStatus || filterFrom || filterTo) && (
-          <button onClick={() => { setFilterModel(""); setFilterStatus(""); setFilterFrom(""); setFilterTo(""); setPage(1); }}
+        <button onClick={applyFilters}
+          className="h-8 px-4 text-xs bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors flex items-center gap-1.5">
+          <Filter className="h-3.5 w-3.5" />{t.filterBtn}
+        </button>
+        {hasActiveFilters && (
+          <button onClick={clearFilters}
             className="h-8 px-3 text-xs text-muted-foreground hover:text-foreground border border-border/50 rounded-md hover:bg-muted transition-colors">
             {t.clearFilters}
           </button>
@@ -416,7 +427,7 @@ export default function UsagePage() {
           <CardTitle className="text-lg">{t.title}</CardTitle>
         </CardHeader>
         <CardContent>
-          {isLoading ? (
+          {loading ? (
             <div className="h-48 animate-pulse bg-muted rounded-lg" />
           ) : logs.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground text-sm">{t.noLogs}</div>
@@ -425,17 +436,18 @@ export default function UsagePage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border/50">
+                    <th className="text-left py-2 px-3 text-muted-foreground font-medium">{t.channel}</th>
                     <th className="text-left py-2 px-3 text-muted-foreground font-medium">{t.model}</th>
-                    <th className="text-right py-2 px-3 text-muted-foreground font-medium hidden md:table-cell">{t.tokensIn}</th>
-                    <th className="text-right py-2 px-3 text-muted-foreground font-medium hidden md:table-cell">{t.tokensOut}</th>
-                    <th className="text-right py-2 px-3 text-muted-foreground font-medium hidden lg:table-cell">{t.tokensInCache}</th>
-                    <th className="text-right py-2 px-3 text-muted-foreground font-medium hidden lg:table-cell">{t.tokensCacheCreate}</th>
+                    <th className="text-right py-2 px-3 text-muted-foreground font-medium">{t.tokensIn}</th>
+                    <th className="text-right py-2 px-3 text-muted-foreground font-medium">{t.tokensOut}</th>
+                    <th className="text-right py-2 px-3 text-muted-foreground font-medium">{t.tokensInCache}</th>
+                    <th className="text-right py-2 px-3 text-muted-foreground font-medium">{t.tokensCacheCreate}</th>
                     <th className="text-right py-2 px-3 text-muted-foreground font-medium">{t.tokens}</th>
-                    <th className="text-center py-2 px-3 text-muted-foreground font-medium hidden md:table-cell">{t.multiplier}</th>
+                    <th className="text-center py-2 px-3 text-muted-foreground font-medium">{t.multiplier}</th>
                     <th className="text-right py-2 px-3 text-muted-foreground font-medium">{t.cost}</th>
-                    <th className="text-center py-2 px-3 text-muted-foreground font-medium hidden md:table-cell">{t.details}</th>
-                    <th className="text-center py-2 px-3 text-muted-foreground font-medium hidden lg:table-cell">{t.notes}</th>
-                    <th className="text-right py-2 px-3 text-muted-foreground font-medium hidden lg:table-cell">{t.latency}</th>
+                    <th className="text-center py-2 px-3 text-muted-foreground font-medium">{t.details}</th>
+                    <th className="text-center py-2 px-3 text-muted-foreground font-medium">{t.notes}</th>
+                    <th className="text-right py-2 px-3 text-muted-foreground font-medium">{t.latency}</th>
                     <th className="text-center py-2 px-3 text-muted-foreground font-medium">{t.status}</th>
                     <th className="text-right py-2 px-3 text-muted-foreground font-medium">{t.time}</th>
                   </tr>
@@ -443,17 +455,15 @@ export default function UsagePage() {
                 <tbody>
                   {logs.map((log) => (
                     <Fragment key={log.id}>
-                    <tr className={`border-b border-border/20 hover:bg-muted/30 transition-colors ${newIds.has(log.id) ? "bg-green-500/5" : ""}`}>
-                      <td className="py-2 px-3">
-                        <div className="font-mono text-xs">{log.model}</div>
-                        <div className="text-xs text-muted-foreground md:hidden">{log.channel_name || t.noChannel}</div>
-                      </td>
-                      <td className="py-2 px-3 text-right font-mono hidden md:table-cell">{log.tokens_in.toLocaleString()}</td>
-                      <td className="py-2 px-3 text-right font-mono hidden md:table-cell">{log.tokens_out.toLocaleString()}</td>
-                      <td className="py-2 px-3 text-right font-mono hidden lg:table-cell">{log.tokens_in_cache > 0 ? log.tokens_in_cache.toLocaleString() : "0"}</td>
-                      <td className="py-2 px-3 text-right font-mono hidden lg:table-cell">{log.tokens_cache_creation > 0 ? log.tokens_cache_creation.toLocaleString() : "0"}</td>
+                    <tr className="border-b border-border/20 hover:bg-muted/30">
+                      <td className="py-2 px-3 text-xs text-muted-foreground">{log.channel_name || t.noChannel}</td>
+                      <td className="py-2 px-3 font-mono text-xs">{log.model}</td>
+                      <td className="py-2 px-3 text-right font-mono">{log.tokens_in.toLocaleString()}</td>
+                      <td className="py-2 px-3 text-right font-mono">{log.tokens_out.toLocaleString()}</td>
+                      <td className="py-2 px-3 text-right font-mono">{log.tokens_in_cache > 0 ? log.tokens_in_cache.toLocaleString() : "0"}</td>
+                      <td className="py-2 px-3 text-right font-mono">{log.tokens_cache_creation > 0 ? log.tokens_cache_creation.toLocaleString() : "0"}</td>
                       <td className="py-2 px-3 text-right font-mono">{(log.tokens_in + log.tokens_out + log.tokens_in_cache + log.tokens_cache_creation).toLocaleString()}</td>
-                      <td className="py-2 px-3 text-center hidden md:table-cell">
+                      <td className="py-2 px-3 text-center">
                         <span className="text-xs px-2 py-0.5 rounded-full bg-muted font-mono">
                           {(log.multiplier ?? 1.0).toFixed(2)}x
                         </span>
@@ -465,7 +475,7 @@ export default function UsagePage() {
                           formatCostDisplay(log.cost)
                         )}
                       </td>
-                      <td className="py-2 px-3 text-center hidden md:table-cell">
+                      <td className="py-2 px-3 text-center">
                         <button
                           onClick={() => setExpandedId(expandedId === log.id ? null : log.id)}
                           className="text-xs text-primary hover:underline"
@@ -473,14 +483,14 @@ export default function UsagePage() {
                           {t.details}
                         </button>
                       </td>
-                      <td className="py-2 px-3 text-center hidden lg:table-cell">
+                      <td className="py-2 px-3 text-center">
                         {log.deduction_source === 'credits' ? (
                           <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400">{t.subUser}</span>
                         ) : (
                           <span className="text-xs text-muted-foreground">{t.balanceUser}</span>
                         )}
                       </td>
-                      <td className="py-2 px-3 text-right font-mono hidden lg:table-cell">{log.latency_ms ? `${log.latency_ms}ms` : "-"}</td>
+                      <td className="py-2 px-3 text-right font-mono">{log.latency_ms ? `${log.latency_ms}ms` : "-"}</td>
                       <td className="py-2 px-3 text-center">
                         <span className={`text-xs px-2 py-0.5 rounded-full ${log.success ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"}`}>
                           {log.success ? t.success : t.failed}
@@ -490,13 +500,11 @@ export default function UsagePage() {
                     </tr>
                     {expandedId === log.id && (
                       <tr className="border-b border-border/20 bg-muted/20">
-                        <td colSpan={13} className="px-6 py-4">
+                        <td colSpan={14} className="px-6 py-4">
                           <div className="flex justify-end mb-2">
-                            <button
-                              onClick={() => setExpandedId(null)}
+                            <button onClick={() => setExpandedId(null)}
                               className="text-muted-foreground hover:text-foreground p-1 rounded-md hover:bg-muted transition-colors"
-                              aria-label={lang === "zh" ? "关闭" : "Close"}
-                            >
+                              aria-label={lang === "zh" ? "关闭" : "Close"}>
                               <X className="h-4 w-4" />
                             </button>
                           </div>
@@ -511,20 +519,20 @@ export default function UsagePage() {
             </div>
           )}
           {/* Pagination */}
-          {(page > 1 || hasMore) && (
+          {(page > 1 || total > 50) && (
             <div className="flex items-center justify-between pt-3 border-t border-border/20">
               <span className="text-xs text-muted-foreground">
-                {t.showing || "Showing"} {logs.length} / {data?.total || 0}
+                {t.showing} {logs.length} / {total}
               </span>
               <div className="flex gap-2">
                 {page > 1 && (
                   <button onClick={() => setPage(p => p - 1)} className="px-3 py-1 text-xs rounded-md bg-muted hover:bg-muted/80">
-                    {t.prev || "Previous"}
+                    {t.prev}
                   </button>
                 )}
-                {hasMore && (
+                {page * 50 < total && (
                   <button onClick={() => setPage(p => p + 1)} className="px-3 py-1 text-xs rounded-md bg-muted hover:bg-muted/80">
-                    {t.next || "Next"}
+                    {t.next}
                   </button>
                 )}
               </div>
