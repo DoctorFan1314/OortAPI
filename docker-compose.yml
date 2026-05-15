@@ -1,9 +1,11 @@
 services:
   oortapi:
     # Option 1: Build from source (default)
-    build: .
+    build:
+      context: .
+      network: host
     # Option 2: Use pre-built image (faster, no build tools needed)
-    # Comment out 'build: .' above and uncomment below:
+    # Comment out 'build:' above and uncomment below:
     # image: ghcr.io/doctorfan1314/oortapi:latest
     container_name: oortapi
     restart: unless-stopped
