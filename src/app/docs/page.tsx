@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { Code, Zap, Shield, BookOpen, Terminal, CreditCard, Cpu, ArrowRight, Globe, Key, AppWindow, Copy, Check } from "lucide-react";
+import { Code, Zap, Shield, BookOpen, Terminal, CreditCard, Cpu, ArrowRight, Globe, Key, AppWindow, Copy, Check, Server } from "lucide-react";
 import { useI18n } from "@/contexts/i18n-context";
 
 const DOCS_LABELS = {
@@ -84,6 +84,18 @@ const DOCS_LABELS = {
     authAnthropicEnd: "和",
     authAnthropicEnd2: "两种方式。",
     browseModels: "浏览可用模型与定价",
+    deployTitle: "部署指南",
+    deployDesc: "OortAPI 支持 Docker 一键部署、VPS 手动部署等多种方式。",
+    dockerTitle: "Docker 一键部署（推荐）",
+    dockerDesc: "最简单的部署方式，一条命令启动。",
+    vpsTitle: "VPS 手动部署",
+    vpsDesc: "适用于已有 Node.js 环境的服务器。",
+    dockerCompose: "Docker Compose",
+    dockerComposeDesc: "编辑 docker-compose.yml 自定义端口和站点 URL",
+    envVars: "环境变量",
+    dataBackup: "数据备份",
+    dataBackupDesc: "SQLite 数据库存储在 ./data 目录，备份只需复制此目录",
+    nginxTitle: "Nginx 反向代理",
   },
   en: {
     badge: "OpenAI + Anthropic Dual Protocol · One Key for All AI Services",
@@ -163,6 +175,18 @@ const DOCS_LABELS = {
     authAnthropicEnd: "and",
     authAnthropicEnd2: "methods.",
     browseModels: "Browse available models and pricing",
+    deployTitle: "Deployment",
+    deployDesc: "OortAPI supports Docker one-click deployment, VPS manual deployment, and more.",
+    dockerTitle: "Docker (Recommended)",
+    dockerDesc: "The easiest way to deploy — one command to start.",
+    vpsTitle: "VPS Manual Deployment",
+    vpsDesc: "For servers with an existing Node.js environment.",
+    dockerCompose: "Docker Compose",
+    dockerComposeDesc: "Edit docker-compose.yml to customize port and site URL",
+    envVars: "Environment Variables",
+    dataBackup: "Data Backup",
+    dataBackupDesc: "SQLite database is stored in ./data — just copy this directory to backup",
+    nginxTitle: "Nginx Reverse Proxy",
   },
 };
 
@@ -750,6 +774,126 @@ curl ${oai}/models \\
               </div>
               <p className="text-sm text-muted-foreground mb-3">{L.authAnthropicDesc} <code className="text-xs bg-muted px-1 rounded">x-api-key</code> {L.authAnthropicEnd} <code className="text-xs bg-muted px-1 rounded">Authorization: Bearer</code> {L.authAnthropicEnd2}</p>
               <CodeBlock code={`x-api-key: sk-oort-YOUR_API_KEY`} />
+            </div>
+          </div>
+        </section>
+
+        {/* ===== Deployment ===== */}
+        <section id="deploy">
+          <h2 className="text-2xl font-bold mb-2">{L.deployTitle}</h2>
+          <p className="text-muted-foreground mb-8">{L.deployDesc}</p>
+
+          <div className="space-y-8">
+            {/* Docker */}
+            <div className="rounded-xl border border-border/50 overflow-hidden">
+              <div className="px-5 py-4 bg-muted/30 border-b border-border/50 flex items-center gap-2">
+                <Server className="h-4 w-4 text-emerald-400" />
+                <h3 className="font-semibold">{L.dockerTitle}</h3>
+                <span className="text-xs text-muted-foreground ml-auto">{L.dockerDesc}</span>
+              </div>
+              <div className="p-5 space-y-4">
+                <CodeBlock code={`git clone https://github.com/DoctorFan1314/OortAPI.git
+cd OortAPI
+docker compose up -d
+
+# 打开 http://localhost:3000 即可访问`} />
+
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="rounded-lg border border-border/30 p-4">
+                    <p className="text-xs font-medium text-muted-foreground mb-2">{L.dockerCompose}</p>
+                    <CodeBlock code={`services:
+  oortapi:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - NEXT_PUBLIC_SITE_URL=https://your-domain.com`} />
+                  </div>
+                  <div className="space-y-4">
+                    <div className="rounded-lg border border-border/30 p-4">
+                      <p className="text-xs font-medium text-muted-foreground mb-2">{lang === "zh" ? "常用命令" : "Common Commands"}</p>
+                      <div className="text-sm font-mono space-y-1.5 text-muted-foreground">
+                        <p>docker compose logs -f<span className="text-xs ml-2 text-muted-foreground/60"># {lang === "zh" ? "查看日志" : "View logs"}</span></p>
+                        <p>docker compose down<span className="text-xs ml-2 text-muted-foreground/60"># {lang === "zh" ? "停止" : "Stop"}</span></p>
+                        <p>docker compose up -d --build<span className="text-xs ml-2 text-muted-foreground/60"># {lang === "zh" ? "重新构建" : "Rebuild"}</span></p>
+                      </div>
+                    </div>
+                    <div className="rounded-lg border border-border/30 p-4">
+                      <p className="text-xs font-medium text-muted-foreground mb-2">{L.dataBackup}</p>
+                      <p className="text-xs text-muted-foreground">{L.dataBackupDesc}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* VPS */}
+            <div className="rounded-xl border border-border/50 overflow-hidden">
+              <div className="px-5 py-4 bg-muted/30 border-b border-border/50 flex items-center gap-2">
+                <Terminal className="h-4 w-4 text-primary" />
+                <h3 className="font-semibold">{L.vpsTitle}</h3>
+                <span className="text-xs text-muted-foreground ml-auto">{L.vpsDesc}</span>
+              </div>
+              <div className="p-5 space-y-4">
+                <CodeBlock code={`npm ci
+npm run build
+npm start
+
+# 使用 PM2 管理进程
+npm install -g pm2
+pm2 start npm --name oortapi -- start
+pm2 save
+pm2 startup`} />
+              </div>
+            </div>
+
+            {/* Nginx */}
+            <div className="rounded-xl border border-border/50 overflow-hidden">
+              <div className="px-5 py-4 bg-muted/30 border-b border-border/50 flex items-center gap-2">
+                <Globe className="h-4 w-4 text-amber-400" />
+                <h3 className="font-semibold">{L.nginxTitle}</h3>
+              </div>
+              <div className="p-5">
+                <CodeBlock code={`server {
+    listen 80;
+    server_name your-domain.com;
+
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}`} />
+              </div>
+            </div>
+
+            {/* Env Vars */}
+            <div className="rounded-xl border border-border/50 overflow-hidden">
+              <div className="px-5 py-4 bg-muted/30 border-b border-border/50 flex items-center gap-2">
+                <Key className="h-4 w-4 text-primary" />
+                <h3 className="font-semibold">{L.envVars}</h3>
+              </div>
+              <div className="divide-y divide-border/20">
+                {[
+                  { name: "NEXT_PUBLIC_SITE_URL", desc: lang === "zh" ? "站点 URL（SEO、Sitemap）" : "Site URL (SEO, Sitemap)", default: "http://localhost:3000" },
+                  { name: "PORT", desc: lang === "zh" ? "服务端口" : "Server port", default: "3000" },
+                  { name: "DATABASE_PATH", desc: lang === "zh" ? "SQLite 数据库路径" : "SQLite database path", default: "./data/oortapi.db" },
+                  { name: "JWT_SECRET", desc: lang === "zh" ? "JWT 签名密钥（首次运行自动生成）" : "JWT signing secret (auto-generated on first run)", default: lang === "zh" ? "自动生成" : "Auto-generated" },
+                ].map((v) => (
+                  <div key={v.name} className="flex items-center gap-4 px-5 py-3">
+                    <code className="text-xs font-mono text-emerald-400 w-56 shrink-0">{v.name}</code>
+                    <span className="text-xs text-muted-foreground flex-1">{v.desc}</span>
+                    <code className="text-xs font-mono text-muted-foreground/60">{v.default}</code>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>

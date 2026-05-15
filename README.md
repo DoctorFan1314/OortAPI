@@ -302,29 +302,59 @@ NEXT_PUBLIC_SITE_URL=https://your-domain.com
 
 ## Deployment
 
+### Docker (Recommended)
+
+One-command deployment:
+
+```bash
+git clone https://github.com/DoctorFan1314/OortAPI.git
+cd OortAPI
+docker compose up -d
+```
+
+Open http://localhost:3000. First build takes ~2-3 minutes, subsequent starts are instant.
+
+Common commands:
+
+```bash
+docker compose logs -f          # View logs
+docker compose down             # Stop
+docker compose up -d --build    # Rebuild after code update
+```
+
+SQLite data is persisted in `./data` via volume mount. To backup, just copy this directory.
+
+To customize port or site URL, edit `docker-compose.yml`:
+
+```yaml
+ports:
+  - "8080:3000"        # Change host port
+environment:
+  - NEXT_PUBLIC_SITE_URL=https://your-domain.com
+```
+
 ### Vercel
 
 > Note: SQLite requires a persistent filesystem. For Vercel, use a VPS or Docker deployment instead.
 
-### Docker
+### VPS (Manual)
 
 ```bash
-docker build -t oortapi .
-docker run -p 3000:3000 -v ./data:/app/data oortapi
-```
-
-### VPS
-
-```bash
+npm ci
 npm run build
 npm start
 ```
 
-Use a process manager like PM2 for production:
+Use PM2 for production:
 
 ```bash
+npm install -g pm2
 pm2 start npm --name oortapi -- start
+pm2 save
+pm2 startup
 ```
+
+See [docs/deploy.md](docs/deploy.md) for full deployment guide (Nginx reverse proxy, environment variables, etc.).
 
 ---
 

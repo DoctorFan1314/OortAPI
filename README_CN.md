@@ -302,20 +302,43 @@ NEXT_PUBLIC_SITE_URL=https://your-domain.com
 
 ## 部署
 
+### Docker 一键部署（推荐）
+
+```bash
+git clone https://github.com/DoctorFan1314/OortAPI.git
+cd OortAPI
+docker compose up -d
+```
+
+打开 http://localhost:3000 即可访问。首次构建约 2-3 分钟，后续启动秒级完成。
+
+常用命令：
+
+```bash
+docker compose logs -f          # 查看日志
+docker compose down             # 停止服务
+docker compose up -d --build    # 代码更新后重新构建
+```
+
+SQLite 数据库通过 volume 挂载到 `./data` 目录，备份只需复制此目录。
+
+自定义端口或站点 URL，编辑 `docker-compose.yml`：
+
+```yaml
+ports:
+  - "8080:3000"        # 修改宿主机端口
+environment:
+  - NEXT_PUBLIC_SITE_URL=https://your-domain.com
+```
+
 ### Vercel
 
 > 注意：SQLite 需要持久化文件系统。Vercel 环境建议使用 VPS 或 Docker 部署。
 
-### Docker
+### VPS 手动部署
 
 ```bash
-docker build -t oortapi .
-docker run -p 3000:3000 -v ./data:/app/data oortapi
-```
-
-### VPS
-
-```bash
+npm ci
 npm run build
 npm start
 ```
@@ -323,8 +346,13 @@ npm start
 使用 PM2 进行生产环境管理：
 
 ```bash
+npm install -g pm2
 pm2 start npm --name oortapi -- start
+pm2 save
+pm2 startup
 ```
+
+完整部署指南（Nginx 反向代理、环境变量等）见 [docs/deploy.md](docs/deploy.md)。
 
 ---
 

@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: 'standalone',
   transpilePackages: ["echarts", "zrender"],
   allowedDevOrigins: [
     "192.168.31.125",

@@ -1,0 +1,11 @@
+services:
+  oortapi:
+    build: .
+    container_name: oortapi
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - NEXT_PUBLIC_SITE_URL=http://localhost:3000
