@@ -49,6 +49,7 @@ interface UsageSummary {
   total_tokens_in_noncached: number;
   total_tokens_in_cache: number;
   total_tokens_out: number;
+  total_credits_used?: number;
 }
 
 const LABELS = {
@@ -165,6 +166,7 @@ export default function UsagePage() {
   const [logs, setLogs] = useState<UsageLog[]>([]);
   const [summary, setSummary] = useState<UsageSummary>({ total_calls: 0, total_tokens: 0, total_cost: 0, total_tokens_in_noncached: 0, total_tokens_in_cache: 0, total_tokens_out: 0 });
   const [dailyTrend, setDailyTrend] = useState<DailyTrend[]>([]);
+  const [isCreditsUser, setIsCreditsUser] = useState(false);
   const [chartMetric, setChartMetric] = useState<"cost" | "tokens" | "calls">("cost");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -271,7 +273,8 @@ export default function UsagePage() {
         return res.json();
       })
       .then(d => {
-        setLogs(d.data || []);
+        const data = d.data || [];
+        setLogs(data);
         setTotal(d.total || 0);
         setSummary({
           total_calls: d.total_calls || 0,
@@ -280,7 +283,17 @@ export default function UsagePage() {
           total_tokens_in_noncached: d.total_tokens_in_noncached || 0,
           total_tokens_in_cache: d.total_tokens_in_cache || 0,
           total_tokens_out: d.total_tokens_out || 0,
+          total_credits_used: d.total_credits_used || 0,
         });
+        // Auto-detect if user is on subscription (credits) mode
+        const hasCredits = data.some((log: UsageLog) => log.deduction_source === 'credits');
+        if (hasCredits) {
+          setIsCreditsUser(true);
+        }
+        // Switch chart default from cost to tokens for credits users on first detection
+        if (hasCredits && chartMetric === "cost") {
+          setChartMetric("tokens");
+        }
         setDailyTrend(d.daily_trend || []);
         setLoading(false);
       })
@@ -309,8 +322,9 @@ export default function UsagePage() {
     const totalTokens = log.tokens_in + log.tokens_out;
 
     if (isCredits) {
-      // Subscription user — show credits breakdown
-      const creditsUsed = Math.ceil(totalTokens * creditRate);
+      // Subscription user — show credits breakdown (cache hits at 50% discount)
+      const CACHE_DISCOUNT = 0.5;
+      const creditsUsed = Math.ceil(Math.max(0, log.tokens_in - log.tokens_in_cache + log.tokens_in_cache * CACHE_DISCOUNT + log.tokens_out) * creditRate);
       return (
         <div className="text-xs space-y-3 font-mono">
           <p className="font-semibold text-sm">{lang === "zh" ? "额度明细" : "Credits Breakdown"}</p>
@@ -323,8 +337,8 @@ export default function UsagePage() {
               <span>= {((log.tokens_in - log.tokens_in_cache) * creditRate).toLocaleString()} credits</span>
             </div>
             <div className="flex justify-between gap-4">
-              <span className="text-muted-foreground">{lang === "zh" ? "输入(命中缓存)Tokens" : "Input(cache hit)Tokens"}: {log.tokens_in_cache.toLocaleString()} × {creditRate}</span>
-              <span>= {(log.tokens_in_cache * creditRate).toLocaleString()} credits</span>
+              <span className="text-muted-foreground">{lang === "zh" ? "输入(命中缓存)Tokens" : "Input(cache hit)Tokens"}: {log.tokens_in_cache.toLocaleString()} × {creditRate} × {CACHE_DISCOUNT}</span>
+              <span>= {(log.tokens_in_cache * creditRate * CACHE_DISCOUNT).toLocaleString()} credits</span>
             </div>
             <div className="flex justify-between gap-4">
               <span className="text-muted-foreground">{lang === "zh" ? "输出 Tokens" : "Output Tokens"}: {log.tokens_out.toLocaleString()} × {creditRate}</span>
@@ -460,17 +474,31 @@ export default function UsagePage() {
             </div>
           </CardContent>
         </Card>
-        <Card className="glass-card">
-          <CardContent className="p-4 flex items-center gap-3">
-            <div className="p-2 rounded-md bg-red-500/10">
-              <DollarSign className="h-4 w-4 text-red-500" />
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">{t.totalCost}</p>
-              <p className="text-xl font-bold font-mono">{formatPrice(summary.total_cost)}</p>
-            </div>
-          </CardContent>
-        </Card>
+        {isCreditsUser && summary.total_credits_used ? (
+          <Card className="glass-card">
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="p-2 rounded-md bg-amber-500/10">
+                <Coins className="h-4 w-4 text-amber-500" />
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">{lang === "zh" ? "已消耗额度" : "Credits Used"}</p>
+                <p className="text-xl font-bold font-mono">{summary.total_credits_used.toLocaleString()}</p>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="glass-card">
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="p-2 rounded-md bg-red-500/10">
+                <DollarSign className="h-4 w-4 text-red-500" />
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">{t.totalCost}</p>
+                <p className="text-xl font-bold font-mono">{formatPrice(summary.total_cost)}</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {/* Trend chart */}
@@ -625,7 +653,7 @@ export default function UsagePage() {
                     <tr className="border-b border-border/20 hover:bg-muted/30">
                       <td className="py-2 px-3 text-xs text-muted-foreground">{log.channel_name || t.noChannel}</td>
                       <td className="py-2 px-3 font-mono text-xs">{log.model}</td>
-                      <td className="py-2 px-3 text-right font-mono">{log.tokens_in.toLocaleString()}</td>
+                      <td className="py-2 px-3 text-right font-mono">{Math.max(0, log.tokens_in - log.tokens_in_cache).toLocaleString()}</td>
                       <td className="py-2 px-3 text-right font-mono">{log.tokens_in_cache > 0 ? log.tokens_in_cache.toLocaleString() : "0"}</td>
                       <td className="py-2 px-3 text-right font-mono">{log.tokens_out.toLocaleString()}</td>
                       <td className="py-2 px-3 text-right font-mono">{(log.tokens_in + log.tokens_out).toLocaleString()}</td>

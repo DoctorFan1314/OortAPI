@@ -89,9 +89,10 @@ export async function GET(request: NextRequest) {
         COUNT(*) as total_calls,
         COALESCE(SUM(tokens_in - tokens_in_cache), 0) as total_tokens_in_noncached,
         COALESCE(SUM(tokens_in_cache), 0) as total_tokens_in_cache,
-        COALESCE(SUM(tokens_out), 0) as total_tokens_out
+        COALESCE(SUM(tokens_out), 0) as total_tokens_out,
+        COALESCE(SUM(credits_used), 0) as total_credits_used
        FROM usage_logs u WHERE ${whereClause}`
-    ).get(...params) as { total_tokens: number; total_cost: number; total_calls: number; total_tokens_in_noncached: number; total_tokens_in_cache: number; total_tokens_out: number };
+    ).get(...params) as { total_tokens: number; total_cost: number; total_calls: number; total_tokens_in_noncached: number; total_tokens_in_cache: number; total_tokens_out: number; total_credits_used: number };
 
     // Daily trend (only for JSON, not CSV)
     interface TrendRow { date: string; calls: number; cost: number; tokens: number; tokens_in_noncached: number; tokens_in_cache: number; tokens_out: number }
@@ -140,6 +141,7 @@ export async function GET(request: NextRequest) {
       total_tokens_in_noncached: agg.total_tokens_in_noncached,
       total_tokens_in_cache: agg.total_tokens_in_cache,
       total_tokens_out: agg.total_tokens_out,
+      total_credits_used: agg.total_credits_used,
       daily_trend: dailyTrend,
       has_more: offset + limit < total.count,
     });
