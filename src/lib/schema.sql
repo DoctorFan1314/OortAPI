@@ -305,17 +305,17 @@ INSERT OR IGNORE INTO system_settings (key, value) VALUES
 
 -- Default model rates (popular models)
 INSERT OR IGNORE INTO model_rates (model_name, display_name, provider, input_rate, output_rate, cache_rate, cache_creation_rate) VALUES
-  ('gpt-4o', 'GPT-4o', 'openai', 0.0025, 0.01, 0.00125, 0.003125),
-  ('gpt-4o-mini', 'GPT-4o Mini', 'openai', 0.00015, 0.0006, 0.000075, 0.0001875),
-  ('gpt-4-turbo', 'GPT-4 Turbo', 'openai', 0.01, 0.03, 0.005, 0.0125),
-  ('gpt-3.5-turbo', 'GPT-3.5 Turbo', 'openai', 0.0005, 0.0015, 0.00025, 0.000625),
-  ('claude-3-5-sonnet-20241022', 'Claude 3.5 Sonnet', 'anthropic', 0.003, 0.015, 0.0015, 0.00375),
-  ('claude-3-5-haiku-20241022', 'Claude 3.5 Haiku', 'anthropic', 0.001, 0.005, 0.0005, 0.00125),
-  ('claude-3-opus-20240229', 'Claude 3 Opus', 'anthropic', 0.015, 0.075, 0.0075, 0.01875),
-  ('deepseek-chat', 'DeepSeek Chat', 'deepseek', 0.00014, 0.00028, 0.00007, 0.000175),
-  ('deepseek-reasoner', 'DeepSeek Reasoner', 'deepseek', 0.00055, 0.00219, 0.000275, 0.0006875),
-  ('gemini-2.0-flash', 'Gemini 2.0 Flash', 'google', 0.0001, 0.0004, 0.00005, 0.000125),
-  ('gemini-1.5-pro', 'Gemini 1.5 Pro', 'google', 0.00125, 0.005, 0.000625, 0.0015625),
-  ('qwen-max', 'Qwen Max', 'alibaba', 0.0016, 0.0064, 0.0008, 0.002);
+  ('gpt-4o', 'GPT-4o', 'openai', 2.5, 10.0, 1.25, 3.125),
+  ('gpt-4o-mini', 'GPT-4o Mini', 'openai', 0.15, 0.6, 0.075, 0.1875),
+  ('gpt-4-turbo', 'GPT-4 Turbo', 'openai', 10.0, 30.0, 5.0, 12.5),
+  ('gpt-3.5-turbo', 'GPT-3.5 Turbo', 'openai', 0.5, 1.5, 0.25, 0.625),
+  ('claude-3-5-sonnet-20241022', 'Claude 3.5 Sonnet', 'anthropic', 3.0, 15.0, 1.5, 3.75),
+  ('claude-3-5-haiku-20241022', 'Claude 3.5 Haiku', 'anthropic', 1.0, 5.0, 0.5, 1.25),
+  ('claude-3-opus-20240229', 'Claude 3 Opus', 'anthropic', 15.0, 75.0, 7.5, 18.75),
+  ('deepseek-chat', 'DeepSeek Chat', 'deepseek', 0.14, 0.28, 0.07, 0.175),
+  ('deepseek-reasoner', 'DeepSeek Reasoner', 'deepseek', 0.55, 2.19, 0.275, 0.6875),
+  ('gemini-2.0-flash', 'Gemini 2.0 Flash', 'google', 0.1, 0.4, 0.05, 0.125),
+  ('gemini-1.5-pro', 'Gemini 1.5 Pro', 'google', 1.25, 5.0, 0.625, 1.5625),
+  ('qwen-max', 'Qwen Max', 'alibaba', 1.6, 6.4, 0.8, 2.0);
 
 -- Subscription plans and plan_models are seeded by db.ts migration (not here)

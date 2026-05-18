@@ -78,6 +78,19 @@ function getDb(): Database.Database {
     'ALTER TABLE webhooks ADD COLUMN last_triggered_at DATETIME',
     'ALTER TABLE webhooks ADD COLUMN last_status_code INTEGER',
     'ALTER TABLE api_keys ADD COLUMN expires_at TEXT',
+    // Migration: convert model_rates from $/1K to $/1M (values ×1000)
+    // Guard: old seed rates are all < 0.02; after ×1000 they're >= 0.1
+    // Admin-set rates are left untouched (model_name not in list)
+    `UPDATE model_rates SET
+       input_rate = ROUND(input_rate * 1000, 6),
+       output_rate = ROUND(output_rate * 1000, 6),
+       cache_rate = ROUND(cache_rate * 1000, 6),
+       cache_creation_rate = ROUND(cache_creation_rate * 1000, 6)
+     WHERE input_rate < 0.02 AND model_name IN
+       ('gpt-4o','gpt-4o-mini','gpt-4-turbo','gpt-3.5-turbo',
+        'claude-3-5-sonnet-20241022','claude-3-5-haiku-20241022','claude-3-opus-20240229',
+        'deepseek-chat','deepseek-reasoner',
+        'gemini-2.0-flash','gemini-1.5-pro','qwen-max')`,
   ];
   for (const sql of migrations) {
     try {

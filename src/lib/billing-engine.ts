@@ -98,15 +98,16 @@ export function calculateCost(
   const rate = db.prepare('SELECT input_rate, output_rate, cache_rate FROM model_rates WHERE model_name = ? AND enabled = 1').get(model) as { input_rate: number; output_rate: number; cache_rate: number } | undefined;
 
   if (!rate) {
-    return (tokensIn * 0.001 + tokensOut * 0.002) / 1000;
+    return (tokensIn * 1.0 + tokensOut * 2.0) / 1000000;
   }
 
   // Input(non-cached): charged at input_rate
   // Input(cache hit): charged at cache_rate
   // Output: charged at output_rate
-  return Math.max(0, tokensIn - tokensInCache) * rate.input_rate / 1000
-       + tokensInCache * rate.cache_rate / 1000
-       + tokensOut * rate.output_rate / 1000;
+  // Rates stored as $/1M tokens
+  return Math.max(0, tokensIn - tokensInCache) * rate.input_rate / 1000000
+       + tokensInCache * rate.cache_rate / 1000000
+       + tokensOut * rate.output_rate / 1000000;
 }
 
 export function logUsage(data: {

@@ -362,9 +362,9 @@ export default function UsagePage() {
 
     // Non-subscription user — show dollar breakdown
     const nonCachedIn = Math.max(0, log.tokens_in - log.tokens_in_cache);
-    const inputCost = nonCachedIn * inputRate / 1000;
-    const cacheHitCost = log.tokens_in_cache * cacheRate / 1000;
-    const outputCost = log.tokens_out * outputRate / 1000;
+    const inputCost = nonCachedIn * inputRate / 1000000;
+    const cacheHitCost = log.tokens_in_cache * cacheRate / 1000000;
+    const outputCost = log.tokens_out * outputRate / 1000000;
     const baseCost = inputCost + cacheHitCost + outputCost;
     const finalCost = baseCost * mult;
     const rateSource = log.input_rate != null ? "" : ` (${t.noRateData})`;
@@ -381,19 +381,19 @@ export default function UsagePage() {
         <div className="space-y-1">
           {nonCachedIn > 0 && (
             <div className="flex justify-between gap-4">
-              <span className="text-muted-foreground">{t.inputCost}: {nonCachedIn.toLocaleString()} × {inputRate.toFixed(4)} / 1000</span>
+              <span className="text-muted-foreground">{t.inputCost}: {nonCachedIn.toLocaleString()} × {inputRate.toFixed(4)} / 1M</span>
               <span>= {formatCostDisplay(inputCost)}</span>
             </div>
           )}
           {log.tokens_in_cache > 0 && (
             <div className="flex justify-between gap-4">
-              <span className="text-muted-foreground">{t.cacheReadCost}: {log.tokens_in_cache.toLocaleString()} × {cacheRate.toFixed(4)} / 1000</span>
+              <span className="text-muted-foreground">{t.cacheReadCost}: {log.tokens_in_cache.toLocaleString()} × {cacheRate.toFixed(4)} / 1M</span>
               <span>= {formatCostDisplay(cacheHitCost)}</span>
             </div>
           )}
           {log.tokens_out > 0 && (
             <div className="flex justify-between gap-4">
-              <span className="text-muted-foreground">{t.outputCost}: {log.tokens_out.toLocaleString()} × {outputRate.toFixed(4)} / 1000</span>
+              <span className="text-muted-foreground">{t.outputCost}: {log.tokens_out.toLocaleString()} × {outputRate.toFixed(4)} / 1M</span>
               <span>= {formatCostDisplay(outputCost)}</span>
             </div>
           )}
