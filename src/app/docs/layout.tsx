@@ -3,7 +3,7 @@ import { DocsSidebar } from "@/components/docs/sidebar";
 
 export const metadata: Metadata = {
   title: "API Documentation — OortAPI",
-  description: "OortAPI unified AI API relay platform documentation — quick start, API endpoints, SDK integration, pricing, and deployment guides.",
+  description: "Complete OortAPI unified AI API relay platform documentation — quick start guides, API endpoints reference, OpenAI & Anthropic SDK integration, streaming, cache-aware pricing tiers, error codes, rate limits, and deployment instructions.",
 };
 
 export default function DocsLayout({ children }: { children: React.ReactNode }) {

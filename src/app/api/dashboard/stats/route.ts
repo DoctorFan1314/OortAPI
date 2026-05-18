@@ -37,7 +37,11 @@ export async function GET(request: NextRequest) {
       SELECT
         COUNT(*) as total_calls,
         SUM(cost) as total_cost,
-        SUM(tokens_in + tokens_out) as total_tokens
+        SUM(tokens_in + tokens_out) as total_tokens,
+        SUM(tokens_in - tokens_in_cache - tokens_cache_creation) as tokens_in_noncached,
+        SUM(tokens_in_cache) as tokens_in_cache,
+        SUM(tokens_cache_creation) as tokens_cache_creation,
+        SUM(tokens_out) as tokens_out
       FROM usage_logs
       WHERE user_id = ? AND created_at >= ?
     `).get(userId, monthStart.toISOString()) as Record<string, number | null>;
@@ -77,6 +81,10 @@ export async function GET(request: NextRequest) {
         calls: monthStats?.total_calls || 0,
         cost: monthStats?.total_cost || 0,
         tokens: monthStats?.total_tokens || 0,
+        tokens_in_noncached: monthStats?.tokens_in_noncached || 0,
+        tokens_in_cache: monthStats?.tokens_in_cache || 0,
+        tokens_cache_creation: monthStats?.tokens_cache_creation || 0,
+        tokens_out: monthStats?.tokens_out || 0,
       },
       active_keys: activeKeys.count,
       daily_usage: dailyUsage,

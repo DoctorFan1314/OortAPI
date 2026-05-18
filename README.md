@@ -187,6 +187,7 @@ Supports full `tool_use` / `tool_result` conversion between Anthropic and OpenAI
 - **Channel routing matrix** — Visual model-to-channel mapping with priority/weight
 - **Budget management** — Monthly spending limits with threshold alerts
 - **Per-Key analytics** — 7-day stats per API Key (calls, cost, tokens, latency, error rate)
+- **Token breakdown** — Dashboard shows detailed token usage split: input, cache hit, output
 
 ---
 

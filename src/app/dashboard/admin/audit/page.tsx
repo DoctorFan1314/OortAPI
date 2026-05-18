@@ -2,7 +2,7 @@
 
 import { useI18n } from "@/contexts/i18n-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Shield, Search, Download } from "lucide-react";
 import useSWR from "swr";
 import { dashboardSWRConfig } from "@/lib/swr-fetcher";
@@ -79,6 +79,15 @@ export default function AuditPage() {
   const [filterFrom, setFilterFrom] = useState("");
   const [filterTo, setFilterTo] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  // Debounce search query to avoid API calls on every keystroke
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   const filterParams = [
     `limit=50&offset=${(page - 1) * 50}`,
@@ -86,7 +95,7 @@ export default function AuditPage() {
     filterTarget ? `target_type=${encodeURIComponent(filterTarget)}` : "",
     filterFrom ? `from=${filterFrom}` : "",
     filterTo ? `to=${filterTo}` : "",
-    searchQuery ? `search=${encodeURIComponent(searchQuery)}` : "",
+    debouncedSearch ? `search=${encodeURIComponent(debouncedSearch)}` : "",
   ].filter(Boolean).join("&");
 
   const { data, isLoading } = useSWR<{ logs: AuditLog[]; total: number; has_more: boolean }>(

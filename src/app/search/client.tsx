@@ -332,7 +332,7 @@ export default function SearchClient() {
             value={query}
             onChange={(e) => handleInputChange(e.target.value)}
             onFocus={() => { clearTimeout(blurTimeoutRef.current); setInputFocused(true); }}
-            onBlur={() => { blurTimeoutRef.current = setTimeout(() => setInputFocused(false), 200); }}
+            onBlur={() => { blurTimeoutRef.current = setTimeout(() => setInputFocused(false), 300); }}
             onKeyDown={handleKeyDown}
             placeholder={t.search.placeholder}
             aria-label={t.search.placeholder}
@@ -389,7 +389,7 @@ export default function SearchClient() {
                       </div>
                       <button
                         onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); handleRemoveRecent(term); }}
-                        className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-foreground transition-all p-1"
+                        className="opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 text-muted-foreground hover:text-foreground transition-all p-1"
                         aria-label={`${t.search.removeRecent} ${term}`}
                       >
                         <X className="h-3.5 w-3.5" />

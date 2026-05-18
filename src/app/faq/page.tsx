@@ -52,11 +52,11 @@ function FaqAccordion({ items }: { items: FaqItem[] }) {
             <span>{item.q}</span>
             <ChevronDown className={cn("h-4 w-4 text-muted-foreground shrink-0 transition-transform", openIndex === i && "rotate-180")} />
           </button>
-          {openIndex === i && (
+          <div className={`overflow-hidden transition-all duration-300 ease-in-out ${openIndex === i ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}>
             <div className="px-4 pb-3 text-sm text-muted-foreground leading-relaxed">
               {item.a}
             </div>
-          )}
+          </div>
         </div>
       ))}
     </div>

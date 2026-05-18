@@ -69,9 +69,9 @@ export function generateOrganizationJsonLd() {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "name": "AI Skills Hub",
+    "name": "OortAPI",
     "url": siteUrl,
-    "description": "Discover executable Agent Skills and high-quality Prompt Templates",
+    "description": "Unified AI API Gateway — one endpoint for all AI models",
     "sameAs": [],
   };
 }
@@ -81,9 +81,9 @@ export function generateWebSiteJsonLd() {
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "AI Skills Hub",
+    "name": "OortAPI",
     "url": siteUrl,
-    "description": "Agent Skills Marketplace + Prompt Template Platform",
+    "description": "Unified AI API Gateway — one API key for all AI models, smart routing, and fine-grained billing",
     "potentialAction": {
       "@type": "SearchAction",
       "target": `${siteUrl}/search?q={search_term_string}`,

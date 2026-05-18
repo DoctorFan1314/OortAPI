@@ -21,12 +21,37 @@ export default function RegisterClient() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<{ username?: string; email?: string; password?: string; confirmPassword?: string }>({});
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { t, lang } = useI18n();
+
+  function validate(): boolean {
+    const errors: typeof fieldErrors = {};
+    if (!username.trim()) {
+      errors.username = lang === "zh" ? "请输入用户名" : "Username is required";
+    }
+    if (!email.trim()) {
+      errors.email = lang === "zh" ? "请输入邮箱" : "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      errors.email = lang === "zh" ? "邮箱格式不正确" : "Invalid email format";
+    }
+    if (!password) {
+      errors.password = lang === "zh" ? "请输入密码" : "Password is required";
+    } else if (password.length < 8) {
+      errors.password = lang === "zh" ? "密码至少 8 个字符" : "Password must be at least 8 characters";
+    }
+    if (!confirmPassword) {
+      errors.confirmPassword = lang === "zh" ? "请确认密码" : "Please confirm your password";
+    } else if (password !== confirmPassword) {
+      errors.confirmPassword = lang === "zh" ? "两次密码不一致" : "Passwords do not match";
+    }
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  }
 
   function getPasswordStrength(pw: string): { score: number; label: string; color: string } {
     let score = 0;
@@ -47,20 +72,9 @@ export default function RegisterClient() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-    if (!username.trim() || !email.trim() || !password) {
-      setError(t.auth.fillAllFields);
-      return;
-    }
-    if (password.length < 8) {
-      setError(t.auth.passwordMinLength);
-      return;
-    }
+    if (!validate()) return;
     if (password !== confirmPassword) {
       setError(t.auth.passwordMismatch);
-      return;
-    }
-    if (!email.includes("@")) {
-      setError(t.auth.emailInvalid);
       return;
     }
     setLoading(true);
@@ -86,15 +100,18 @@ export default function RegisterClient() {
           <form className="space-y-5" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="username" className="text-sm text-foreground mb-1.5 block">{t.auth.username}</label>
-              <Input id="username" autoComplete="username" placeholder={t.auth.usernamePlaceholder} value={username} onChange={(e) => setUsername(e.target.value)} className="bg-secondary border-border text-foreground placeholder:text-muted-foreground/50" />
+              <Input id="username" autoComplete="username" placeholder={t.auth.usernamePlaceholder} value={username} onChange={(e) => { setUsername(e.target.value); setFieldErrors(f => ({ ...f, username: undefined })); }} className="bg-secondary border-border text-foreground placeholder:text-muted-foreground/50" />
+              {fieldErrors.username && <p className="text-xs text-red-400 mt-1">{fieldErrors.username}</p>}
             </div>
             <div>
               <label htmlFor="email" className="text-sm text-foreground mb-1.5 block">{t.auth.email}</label>
-              <Input id="email" type="email" autoComplete="email" placeholder="your@email.com" value={email} onChange={(e) => setEmail(e.target.value)} className="bg-secondary border-border text-foreground placeholder:text-muted-foreground/50" />
+              <Input id="email" type="email" autoComplete="email" placeholder="your@email.com" value={email} onChange={(e) => { setEmail(e.target.value); setFieldErrors(f => ({ ...f, email: undefined })); }} className="bg-secondary border-border text-foreground placeholder:text-muted-foreground/50" />
+              {fieldErrors.email && <p className="text-xs text-red-400 mt-1">{fieldErrors.email}</p>}
             </div>
             <div>
               <label htmlFor="password" className="text-sm text-foreground mb-1.5 block">{t.auth.password}</label>
-              <Input id="password" type="password" autoComplete="new-password" placeholder={t.auth.passwordPlaceholder} value={password} onChange={(e) => setPassword(e.target.value)} className="bg-secondary border-border text-foreground placeholder:text-muted-foreground/50" />
+              <Input id="password" type="password" autoComplete="new-password" placeholder={t.auth.passwordPlaceholder} value={password} onChange={(e) => { setPassword(e.target.value); setFieldErrors(f => ({ ...f, password: undefined })); }} className="bg-secondary border-border text-foreground placeholder:text-muted-foreground/50" />
+              {fieldErrors.password && <p className="text-xs text-red-400 mt-1">{fieldErrors.password}</p>}
               <p className="mt-1 text-xs text-muted-foreground">{lang === "zh" ? "至少 8 个字符" : "At least 8 characters"}</p>
               {passwordStrength && (
                 <div className="mt-2 space-y-1">
@@ -116,7 +133,8 @@ export default function RegisterClient() {
             </div>
             <div>
               <label htmlFor="confirmPassword" className="text-sm text-foreground mb-1.5 block">{t.auth.confirmPassword}</label>
-              <Input id="confirmPassword" type="password" autoComplete="new-password" placeholder={t.auth.confirmPasswordPlaceholder} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="bg-secondary border-border text-foreground placeholder:text-muted-foreground/50" />
+              <Input id="confirmPassword" type="password" autoComplete="new-password" placeholder={t.auth.confirmPasswordPlaceholder} value={confirmPassword} onChange={(e) => { setConfirmPassword(e.target.value); setFieldErrors(f => ({ ...f, confirmPassword: undefined })); }} className="bg-secondary border-border text-foreground placeholder:text-muted-foreground/50" />
+              {fieldErrors.confirmPassword && <p className="text-xs text-red-400 mt-1">{fieldErrors.confirmPassword}</p>}
             </div>
             {error && <p role="alert" className="text-sm text-red-400 text-center">{error}</p>}
             <Button type="submit" disabled={loading} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-medium h-11">{loading ? <Loader2 className="h-4 w-4 animate-spin" /> : t.auth.registerNow}</Button>

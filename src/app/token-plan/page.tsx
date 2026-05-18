@@ -84,7 +84,7 @@ export default function TokenPlanPage() {
                        data.action === "downgrade" ? (lang === "zh" ? "降级成功！" : "Downgraded!") :
                        (lang === "zh" ? "订阅成功！" : "Subscribed!");
         showToast(action, "success");
-        router.push("/dashboard/token-plan");
+        router.replace("/dashboard/token-plan");
       } else {
         showToast(data.error || (lang === "zh" ? "订阅失败" : "Failed"), "error");
       }

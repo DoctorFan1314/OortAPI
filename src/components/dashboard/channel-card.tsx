@@ -312,6 +312,10 @@ function ChannelFormFields({
   const [fetchedModels, setFetchedModels] = useState<string[]>([]);
   const [selectedModels, setSelectedModels] = useState<Set<string>>(new Set());
 
+  const urlError = form.base_url && !form.base_url.startsWith("http://") && !form.base_url.startsWith("https://")
+    ? (lang === "zh" ? "URL 必须以 http:// 或 https:// 开头" : "URL must start with http:// or https://")
+    : null;
+
   const handleFetchModels = async () => {
     setFetching(true);
     try {
@@ -425,8 +429,9 @@ function ChannelFormFields({
               setForm((f) => ({ ...f, base_url: e.target.value }))
             }
             placeholder="https://api.openai.com"
-            className="h-9 mt-1"
+            className={`h-9 mt-1 ${urlError ? "border-red-500" : ""}`}
           />
+          {urlError && <p className="text-xs text-red-400 mt-1">{urlError}</p>}
         </div>
         <div>
           <label className="text-xs text-muted-foreground">{t.weight}</label>
@@ -617,6 +622,10 @@ export function ChannelCard({ lang = "zh" }: { lang?: "zh" | "en" }) {
   };
 
   const createChannel = async () => {
+    if (form.base_url && !form.base_url.startsWith("http://") && !form.base_url.startsWith("https://")) {
+      showToast(lang === "zh" ? "URL 必须以 http:// 或 https:// 开头" : "URL must start with http:// or https://", "error");
+      return;
+    }
     try {
       const res = await fetch("/api/dashboard/channels", {
         method: "POST",
@@ -652,6 +661,10 @@ export function ChannelCard({ lang = "zh" }: { lang?: "zh" | "en" }) {
 
   const saveEdit = async () => {
     if (!editingId) return;
+    if (editForm.base_url && !editForm.base_url.startsWith("http://") && !editForm.base_url.startsWith("https://")) {
+      showToast(lang === "zh" ? "URL 必须以 http:// 或 https:// 开头" : "URL must start with http:// or https://", "error");
+      return;
+    }
     const body: Record<string, unknown> = {
       id: editingId,
       name: editForm.name,

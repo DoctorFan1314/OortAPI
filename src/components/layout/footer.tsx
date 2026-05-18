@@ -56,7 +56,7 @@ export function Footer() {
                 {section.links.map((link) => (
                   <li key={link.label}>
                     {link.disabled ? (
-                      <span className="text-sm text-muted-foreground/50 cursor-not-allowed" aria-disabled="true">{link.label} <span className="text-[10px]">({t.footer.comingSoon || "Coming soon"})</span></span>
+                      <span className="text-sm text-muted-foreground/50 cursor-not-allowed" aria-disabled="true" tabIndex={-1}>{link.label} <span className="text-[10px]">({t.footer.comingSoon || "Coming soon"})</span></span>
                     ) : (
                       <Link href={link.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                         {link.label}

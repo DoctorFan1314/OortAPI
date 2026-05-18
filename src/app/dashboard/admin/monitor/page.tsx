@@ -9,7 +9,6 @@ import {
   AlertTriangle,
   Clock,
   Zap,
-  PhoneCall,
   DollarSign,
   Coins,
   Server,
@@ -248,7 +247,7 @@ export default function MonitorPage() {
       desc: t.p95Desc,
     },
     {
-      icon: <PhoneCall className="h-4 w-4 text-blue-500" />,
+      icon: <Activity className="h-4 w-4 text-blue-500" />,
       iconBg: "bg-blue-500/10",
       label: t.totalCalls,
       value: data.total_calls_24h.toLocaleString(),
@@ -354,16 +353,16 @@ export default function MonitorPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border/50">
-                    <th className="text-left py-2 px-3 text-muted-foreground font-medium">
+                    <th scope="col" className="text-left py-2 px-3 text-muted-foreground font-medium">
                       {t.provider}
                     </th>
-                    <th className="text-right py-2 px-3 text-muted-foreground font-medium">
+                    <th scope="col" className="text-right py-2 px-3 text-muted-foreground font-medium">
                       {t.calls}
                     </th>
-                    <th className="text-right py-2 px-3 text-muted-foreground font-medium">
+                    <th scope="col" className="text-right py-2 px-3 text-muted-foreground font-medium">
                       {t.errorRate}
                     </th>
-                    <th className="text-right py-2 px-3 text-muted-foreground font-medium">
+                    <th scope="col" className="text-right py-2 px-3 text-muted-foreground font-medium">
                       {t.avgLatency}
                     </th>
                   </tr>

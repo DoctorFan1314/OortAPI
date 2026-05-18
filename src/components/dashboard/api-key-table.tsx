@@ -309,10 +309,10 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
                   )}
                 </div>
                 <div className="flex items-center gap-1">
-                  <button onClick={() => toggleKey(k.id, !k.enabled)} className="text-muted-foreground hover:text-foreground" aria-label={k.enabled ? t.disabled : t.enabled}>
+                  <button onClick={() => toggleKey(k.id, !k.enabled)} className="text-muted-foreground hover:text-foreground" aria-label={k.enabled ? "Disable key" : "Enable key"}>
                     {k.enabled ? <ToggleRight className="h-5 w-5 text-green-500" /> : <ToggleLeft className="h-5 w-5" />}
                   </button>
-                  <button onClick={() => setDeleteTarget(k.id)} className="text-muted-foreground hover:text-red-500" aria-label={t.confirmDelete}>
+                  <button onClick={() => setDeleteTarget(k.id)} className="text-muted-foreground hover:text-red-500" aria-label="Delete key">
                     <Trash2 className="h-4 w-4" />
                   </button>
                 </div>

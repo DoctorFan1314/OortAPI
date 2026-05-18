@@ -64,6 +64,7 @@ export default function DocsLandingPage() {
               onChange={e => setSearchQuery(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter' && searchQuery.trim()) { router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`); } }}
               placeholder={(L as Record<string, string>).navDocsSearchPlaceholder || "Search docs..."}
+              aria-label="Search documentation"
               className="w-full pl-10 pr-4 py-2 bg-background rounded-lg text-sm border border-border/50 focus:border-primary focus:outline-none"
             />
           </div>

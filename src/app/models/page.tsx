@@ -350,6 +350,7 @@ export default function ModelsPage() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
+                aria-label="Sort models"
                 className="h-9 pl-8 pr-3 rounded-lg text-xs font-medium border border-border bg-background text-foreground appearance-none cursor-pointer"
               >
                 <option value="name">{t.sortName}</option>
@@ -518,13 +519,13 @@ export default function ModelsPage() {
                             {m.channel_name}
                           </div>
                           <div className="flex items-center gap-2">
-                            <Link href={`/models/${encodeURIComponent(m.model_name)}`} className="text-muted-foreground hover:text-primary transition-colors" title={lang === "zh" ? "查看详情" : "View details"}>
+                            <Link href={`/models/${encodeURIComponent(m.model_name)}`} aria-label={`View ${m.display_name || m.model_name} details`} className="text-muted-foreground hover:text-primary transition-colors" title={lang === "zh" ? "查看详情" : "View details"}>
                               <ExternalLink className="h-3.5 w-3.5" />
                             </Link>
                             {isAdmin && (
                               <button
                                 onClick={() => startEdit(m)}
-                                className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-primary transition-all"
+                                className="opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 text-muted-foreground hover:text-primary transition-all"
                                 title={t.edit}
                               >
                                 <Pencil className="h-3.5 w-3.5" />

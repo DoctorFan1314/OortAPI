@@ -18,6 +18,10 @@ interface StatsData {
     calls: number;
     cost: number;
     tokens: number;
+    tokens_in_noncached: number;
+    tokens_in_cache: number;
+    tokens_cache_creation: number;
+    tokens_out: number;
   };
   active_keys: number;
   balance: number;
@@ -35,6 +39,10 @@ const LABELS = {
     monthlyCalls: "本月调用",
     monthlyCost: "本月花费",
     monthlyTokens: "本月 Tokens",
+    tokensInput: "输入 Token",
+    tokensInputNonCached: "普通输入",
+    tokensCacheHit: "缓存命中",
+    tokensOutput: "输出 Token",
   },
   en: {
     balance: "Balance",
@@ -46,6 +54,10 @@ const LABELS = {
     monthlyCalls: "Monthly Calls",
     monthlyCost: "Monthly Cost",
     monthlyTokens: "Monthly Tokens",
+    tokensInput: "Input Tokens",
+    tokensInputNonCached: "Non-cached",
+    tokensCacheHit: "Cache Hit",
+    tokensOutput: "Output Tokens",
   },
 };
 
@@ -89,7 +101,6 @@ export function StatsCards({ lang = "zh" }: { lang?: "zh" | "en" }) {
     { icon: Wallet, label: t.balance, value: formatCost(stats.balance), color: "text-yellow-500", bgColor: "bg-yellow-500/10" },
     { icon: TrendingDown, label: t.monthlyCost, value: formatCost(stats.month?.cost || 0), color: "text-red-500", bgColor: "bg-red-500/10" },
     { icon: Activity, label: t.monthlyCalls, value: (stats.month?.calls || 0).toLocaleString(), color: "text-blue-500", bgColor: "bg-blue-500/10" },
-    { icon: Coins, label: t.monthlyTokens, value: formatTokens(stats.month?.tokens || 0), color: "text-green-500", bgColor: "bg-green-500/10" },
     { icon: Gauge, label: t.rpm, value: avgRPM, color: "text-purple-500", bgColor: "bg-purple-500/10" },
     { icon: Cpu, label: t.tpm, value: formatTokens(avgTPM), color: "text-cyan-500", bgColor: "bg-cyan-500/10" },
   ];
@@ -109,6 +120,45 @@ export function StatsCards({ lang = "zh" }: { lang?: "zh" | "en" }) {
           </CardContent>
         </Card>
       ))}
+
+      {/* Token breakdown card */}
+      <Card className="glass-card overflow-hidden">
+        <CardContent className="p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="p-1.5 rounded-md bg-green-500/10">
+              <Coins className="h-3.5 w-3.5 text-green-500" />
+            </div>
+            <span className="text-xs text-muted-foreground">{t.monthlyTokens}</span>
+          </div>
+          <div className="text-xl font-bold font-mono mb-2">{formatTokens(stats.month?.tokens || 0)}</div>
+          <div className="space-y-1 text-xs border-t border-border/20 pt-2">
+            {stats.month.tokens_in_noncached > 0 && (
+              <div className="flex justify-between">
+                <span className="text-muted-foreground"><span className="text-blue-400">■</span> {t.tokensInputNonCached}</span>
+                <span className="font-mono">{formatTokens(stats.month.tokens_in_noncached)}</span>
+              </div>
+            )}
+            {stats.month.tokens_in_cache > 0 && (
+              <div className="flex justify-between">
+                <span className="text-muted-foreground"><span className="text-emerald-400">■</span> {t.tokensCacheHit}</span>
+                <span className="font-mono">{formatTokens(stats.month.tokens_in_cache)}</span>
+              </div>
+            )}
+            {stats.month.tokens_cache_creation > 0 && (
+              <div className="flex justify-between">
+                <span className="text-muted-foreground"><span className="text-amber-400">■</span> 缓存创建</span>
+                <span className="font-mono">{formatTokens(stats.month.tokens_cache_creation)}</span>
+              </div>
+            )}
+            {stats.month.tokens_out > 0 && (
+              <div className="flex justify-between">
+                <span className="text-muted-foreground"><span className="text-orange-400">■</span> {t.tokensOutput}</span>
+                <span className="font-mono">{formatTokens(stats.month.tokens_out)}</span>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

@@ -229,7 +229,7 @@ export default function UsagePage() {
       if (chartMetric === "tokens") return d.tokens;
       return d.calls;
     });
-    const color = chartMetric === "cost" ? "#ef4444" : chartMetric === "tokens" ? "#22c55e" : "#3b82f6";
+    const color = chartMetric === "cost" ? "#8b5cf6" : chartMetric === "tokens" ? "#22c55e" : "#3b82f6";
     const label = chartMetric === "cost" ? (currency === "CNY" ? "¥" : "$") : "";
     return {
       tooltip: { trigger: "axis" as const, formatter: (params: { axisValue: string; value: number }[]) => {
@@ -568,41 +568,41 @@ export default function UsagePage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border/50">
-                    <th className="text-left py-2 px-3 text-muted-foreground font-medium">{t.channel}</th>
-                    <th className="text-left py-2 px-3 text-muted-foreground font-medium">{t.model}</th>
-                    <th className="text-right py-2 px-3 text-muted-foreground font-medium cursor-pointer hover:text-foreground select-none"
+                    <th scope="col" className="text-left py-2 px-3 text-muted-foreground font-medium">{t.channel}</th>
+                    <th scope="col" className="text-left py-2 px-3 text-muted-foreground font-medium">{t.model}</th>
+                    <th scope="col" className="text-right py-2 px-3 text-muted-foreground font-medium cursor-pointer hover:text-foreground select-none"
                       onClick={() => { setSortKey('tokens_in'); setSortDir(d => d === 'asc' ? 'desc' : 'asc'); }}>
                       {t.tokensIn}{sortKey === 'tokens_in' ? (sortDir === 'asc' ? ' ↑' : ' ↓') : ''}
                     </th>
-                    <th className="text-right py-2 px-3 text-muted-foreground font-medium cursor-pointer hover:text-foreground select-none"
+                    <th scope="col" className="text-right py-2 px-3 text-muted-foreground font-medium cursor-pointer hover:text-foreground select-none"
                       onClick={() => { setSortKey('tokens_out'); setSortDir(d => d === 'asc' ? 'desc' : 'asc'); }}>
                       {t.tokensOut}{sortKey === 'tokens_out' ? (sortDir === 'asc' ? ' ↑' : ' ↓') : ''}
                     </th>
-                    <th className="text-right py-2 px-3 text-muted-foreground font-medium cursor-pointer hover:text-foreground select-none"
+                    <th scope="col" className="text-right py-2 px-3 text-muted-foreground font-medium cursor-pointer hover:text-foreground select-none"
                       onClick={() => { setSortKey('tokens_in_cache'); setSortDir(d => d === 'asc' ? 'desc' : 'asc'); }}>
                       {t.tokensInCache}{sortKey === 'tokens_in_cache' ? (sortDir === 'asc' ? ' ↑' : ' ↓') : ''}
                     </th>
-                    <th className="text-right py-2 px-3 text-muted-foreground font-medium cursor-pointer hover:text-foreground select-none"
+                    <th scope="col" className="text-right py-2 px-3 text-muted-foreground font-medium cursor-pointer hover:text-foreground select-none"
                       onClick={() => { setSortKey('tokens_cache_creation'); setSortDir(d => d === 'asc' ? 'desc' : 'asc'); }}>
                       {t.tokensCacheCreate}{sortKey === 'tokens_cache_creation' ? (sortDir === 'asc' ? ' ↑' : ' ↓') : ''}
                     </th>
-                    <th className="text-right py-2 px-3 text-muted-foreground font-medium cursor-pointer hover:text-foreground select-none"
+                    <th scope="col" className="text-right py-2 px-3 text-muted-foreground font-medium cursor-pointer hover:text-foreground select-none"
                       onClick={() => { setSortKey('total'); setSortDir(d => d === 'asc' ? 'desc' : 'asc'); }}>
                       {t.tokens}{sortKey === 'total' ? (sortDir === 'asc' ? ' ↑' : ' ↓') : ''}
                     </th>
-                    <th className="text-center py-2 px-3 text-muted-foreground font-medium">{t.multiplier}</th>
-                    <th className="text-right py-2 px-3 text-muted-foreground font-medium cursor-pointer hover:text-foreground select-none"
+                    <th scope="col" className="text-center py-2 px-3 text-muted-foreground font-medium">{t.multiplier}</th>
+                    <th scope="col" className="text-right py-2 px-3 text-muted-foreground font-medium cursor-pointer hover:text-foreground select-none"
                       onClick={() => { setSortKey('cost'); setSortDir(d => d === 'asc' ? 'desc' : 'asc'); }}>
                       {t.cost}{sortKey === 'cost' ? (sortDir === 'asc' ? ' ↑' : ' ↓') : ''}
                     </th>
-                    <th className="text-center py-2 px-3 text-muted-foreground font-medium">{t.details}</th>
-                    <th className="text-center py-2 px-3 text-muted-foreground font-medium">{t.notes}</th>
-                    <th className="text-right py-2 px-3 text-muted-foreground font-medium cursor-pointer hover:text-foreground select-none"
+                    <th scope="col" className="text-center py-2 px-3 text-muted-foreground font-medium">{t.details}</th>
+                    <th scope="col" className="text-center py-2 px-3 text-muted-foreground font-medium">{t.notes}</th>
+                    <th scope="col" className="text-right py-2 px-3 text-muted-foreground font-medium cursor-pointer hover:text-foreground select-none"
                       onClick={() => { setSortKey('latency_ms'); setSortDir(d => d === 'asc' ? 'desc' : 'asc'); }}>
                       {t.latency}{sortKey === 'latency_ms' ? (sortDir === 'asc' ? ' ↑' : ' ↓') : ''}
                     </th>
-                    <th className="text-center py-2 px-3 text-muted-foreground font-medium">{t.status}</th>
-                    <th className="text-right py-2 px-3 text-muted-foreground font-medium cursor-pointer hover:text-foreground select-none"
+                    <th scope="col" className="text-center py-2 px-3 text-muted-foreground font-medium">{t.status}</th>
+                    <th scope="col" className="text-right py-2 px-3 text-muted-foreground font-medium cursor-pointer hover:text-foreground select-none"
                       onClick={() => { setSortKey('created_at'); setSortDir(d => d === 'asc' ? 'desc' : 'asc'); }}>
                       {t.time}{sortKey === 'created_at' ? (sortDir === 'asc' ? ' ↑' : ' ↓') : ''}
                     </th>
@@ -680,7 +680,7 @@ export default function UsagePage() {
               <span className="text-xs text-muted-foreground">
                 {t.showing} {logs.length} / {total}
               </span>
-              <div className="flex gap-2">
+              <div className="flex items-center gap-2">
                 {page > 1 && (
                   <button onClick={() => setPage(p => p - 1)} className="px-3 py-1 text-xs rounded-md bg-muted hover:bg-muted/80">
                     {t.prev}
@@ -691,6 +691,14 @@ export default function UsagePage() {
                     {t.next}
                   </button>
                 )}
+                <span className="text-xs text-muted-foreground mx-1">|</span>
+                <label className="flex items-center gap-1 text-xs text-muted-foreground">
+                  {lang === "zh" ? "跳转" : "Go to"}
+                  <input type="number" min={1} max={Math.ceil(total / 50) || 1}
+                    onKeyDown={e => { if (e.key === 'Enter') { const v = parseInt((e.target as HTMLInputElement).value); if (v > 0) setPage(v); } }}
+                    className="w-12 h-7 px-1 rounded border border-border/50 bg-background text-xs text-center focus:border-primary focus:outline-none"
+                  />
+                </label>
               </div>
             </div>
           )}

@@ -6,6 +6,37 @@
 
 ---
 
+## [v3.3.4.9] — 2026-05-18
+
+### 控制台
+- **Token 明细拆分** — 概览卡片将月 Token 拆分为：普通输入、缓存命中、缓存创建、输出
+- **登录/注册校验** — 邮箱格式、密码长度、必填字段即时校验
+- **翻页跳转** — 调用日志页码可手动输入跳转
+- **Curl 修正** — 占位符改为 `sk-oort-xxxxxxxxxxxx`，hydration 前不渲染
+
+### 无障碍
+- **aria-labels** — 模型链接、排序下拉、Key 开关/删除按钮等 10+ 修复
+- **表格标签** — 所有数据表 th 添加 `scope="col"`
+- **焦点状态** — hover-only 按钮添加 focus 可见性（键盘/触屏）
+
+### SEO
+- **Sitemap** — 补充 /docs、/models、/changelog、/faq、/token-plan 等缺失页面
+- **JSON-LD** — 品牌名从 "AI Skills Hub" 修正为 "OortAPI"
+- **文档元数据** — 扩展 docs layout 描述
+
+### 视觉与交互
+- **FAQ 动画** — 平滑展开/收起过渡
+- **监控图标** — PhoneCall 改为 Activity
+- **图表颜色** — 费用指标从红色改为紫色
+- **订阅跳转** — 使用 `router.replace` 而非 `push`
+- **主题按钮** — aria-label 动态反映当前模式
+- **禁用链接** — 添加 tabIndex={-1} 避免聚焦
+- **渠道 URL** — 新增 http/https 格式校验
+- **审计搜索** — 300ms 防抖，减少 API 请求
+- **版本日志** — fetch 添加 10s 超时 + 失败重试
+
+---
+
 ## [v3.3.4.8] — 2026-05-18
 
 ### 新功能

@@ -19,6 +19,7 @@ export default function LoginClient() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string }>({});
   const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const { login } = useAuth();
@@ -27,13 +28,26 @@ export default function LoginClient() {
   const searchParams = useSearchParams();
   const { t, lang } = useI18n();
 
+  function validate(): boolean {
+    const errors: { email?: string; password?: string } = {};
+    if (!email.trim()) {
+      errors.email = lang === "zh" ? "请输入邮箱" : "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      errors.email = lang === "zh" ? "邮箱格式不正确" : "Invalid email format";
+    }
+    if (!password) {
+      errors.password = lang === "zh" ? "请输入密码" : "Password is required";
+    } else if (password.length < 8) {
+      errors.password = lang === "zh" ? "密码至少 8 个字符" : "Password must be at least 8 characters";
+    }
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-    if (!email.trim() || !password) {
-      setError(t.auth.fillAllFields);
-      return;
-    }
+    if (!validate()) return;
     setLoading(true);
     const result = await login(email, password, rememberMe);
     setLoading(false);
@@ -57,11 +71,13 @@ export default function LoginClient() {
           <form className="space-y-5" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="email" className="text-sm text-foreground mb-1.5 block">{t.auth.email}</label>
-              <Input id="email" type="email" autoComplete="email" placeholder="your@email.com" value={email} onChange={(e) => setEmail(e.target.value)} className="bg-secondary border-border text-foreground placeholder:text-muted-foreground/50" />
+              <Input id="email" type="email" autoComplete="email" placeholder="your@email.com" value={email} onChange={(e) => { setEmail(e.target.value); setFieldErrors(e => ({ ...e, email: undefined })); }} className="bg-secondary border-border text-foreground placeholder:text-muted-foreground/50" />
+              {fieldErrors.email && <p className="text-xs text-red-400 mt-1">{fieldErrors.email}</p>}
             </div>
             <div>
               <label htmlFor="password" className="text-sm text-foreground mb-1.5 block">{t.auth.password}</label>
-              <Input id="password" type="password" autoComplete="current-password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} className="bg-secondary border-border text-foreground placeholder:text-muted-foreground/50" />
+              <Input id="password" type="password" autoComplete="current-password" placeholder="••••••••" value={password} onChange={(e) => { setPassword(e.target.value); setFieldErrors(e => ({ ...e, password: undefined })); }} className="bg-secondary border-border text-foreground placeholder:text-muted-foreground/50" />
+              {fieldErrors.password && <p className="text-xs text-red-400 mt-1">{fieldErrors.password}</p>}
               <div className="flex justify-end mt-1">
                 <Link href="/forgot-password" className="text-xs text-primary hover:underline">{t.auth.forgotPassword}</Link>
               </div>

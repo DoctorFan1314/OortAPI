@@ -6,6 +6,37 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [v3.3.4.9] — 2026-05-18
+
+### Dashboard
+- **Token breakdown** — Stats card now splits monthly tokens into non-cached input, cache hit, cache creation, and output
+- **Login/register validation** — Client-side email format, password length, and required field checks with inline errors
+- **Page jump** — Usage pagination now has "Go to page" input
+- **Curl fix** — Placeholder changed to `sk-oort-xxxxxxxxxxxx`, no longer renders before hydration
+
+### Accessibility
+- **aria-labels** — Added to model links, sort dropdowns, key toggle/delete buttons (10+ fixes)
+- **scope="col"** — Added to all data table headers
+- **focus states** — Hover-only buttons now also visible on focus (keyboard/touch)
+
+### SEO
+- **Sitemap** — Added /docs, /models, /changelog, /faq, /token-plan, /resources, /search and all doc sub-pages
+- **JSON-LD** — Fixed brand name from "AI Skills Hub" to "OortAPI"
+- **Doc metadata** — Expanded layout description for all doc pages
+
+### Visual & Interaction
+- **FAQ animation** — Smooth expand/collapse transition
+- **Monitor icons** — Fixed PhoneCall → Activity for call volume
+- **Chart color** — Cost metric changed from red to purple
+- **Subscription redirect** — Uses `router.replace` instead of `push`
+- **Theme aria-label** — Dynamic "Switch to light/dark mode"
+- **Disabled links** — Added tabIndex={-1} to prevent focus
+- **Channel URL validation** — Validates http/https format
+- **Audit search** — 300ms debounce to prevent excessive API calls
+- **Changelog** — 10s timeout + retry on fetch failure
+
+---
+
 ## [v3.3.4.8] — 2026-05-18
 
 ### New Features

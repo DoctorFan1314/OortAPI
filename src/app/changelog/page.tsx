@@ -42,20 +42,33 @@ export default function ChangelogPage() {
     const stored = localStorage.getItem("oortapi-changelog-cache");
     const cached = stored ? JSON.parse(stored) : null;
 
-    fetch(CHANGELOG_URLS[lang])
-      .then(r => r.text())
-      .then(text => {
-        const parsed = parseChangelog(text) as Array<{ version: string; date: string; content: string }>;
-        setVersions(parsed);
-        localStorage.setItem("oortapi-changelog-cache", JSON.stringify({ data: parsed, ts: Date.now() }));
-        setLoading(false);
-      })
-      .catch(() => {
-        if (cached?.data) {
-          setVersions(cached.data);
-        }
-        setLoading(false);
-      });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+    function doFetch(url: string, retries = 1): Promise<void> {
+      return fetch(url, { signal: controller.signal })
+        .then(r => r.text())
+        .then(text => {
+          const parsed = parseChangelog(text) as Array<{ version: string; date: string; content: string }>;
+          setVersions(parsed);
+          localStorage.setItem("oortapi-changelog-cache", JSON.stringify({ data: parsed, ts: Date.now() }));
+          setLoading(false);
+        })
+        .catch(() => {
+          if (retries > 0) return doFetch(url, retries - 1);
+          if (cached?.data) {
+            setVersions(cached.data);
+          }
+          setLoading(false);
+        });
+    }
+
+    doFetch(CHANGELOG_URLS[lang], 1);
+
+    return () => {
+      clearTimeout(timeoutId);
+      controller.abort();
+    };
   }, [lang]);
 
   return (

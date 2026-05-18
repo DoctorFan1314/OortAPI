@@ -43,6 +43,7 @@ const PROVIDER_COLORS: Record<string, string> = {
   deepseek: "bg-sky-500/10 text-sky-400 border-sky-500/20",
   google: "bg-red-500/10 text-red-400 border-red-500/20",
   alibaba: "bg-violet-500/10 text-violet-400 border-violet-500/20",
+  unknown: "bg-muted text-muted-foreground border-border/20",
 };
 
 const LABELS = {
@@ -205,7 +206,6 @@ export default function ModelDetailPage() {
           <CardContent className="p-3">
             <p className="text-[10px] text-muted-foreground">{t.creditRate}</p>
             <p className="text-lg font-bold font-mono">{model.credit_rate}</p>
-            <p className="text-[10px] text-muted-foreground">1 token = {model.credit_rate} credits</p>
           </CardContent>
         </Card>
       </div>

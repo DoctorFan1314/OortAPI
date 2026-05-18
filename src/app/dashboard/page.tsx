@@ -53,7 +53,7 @@ export default function DashboardPage() {
   const { lang } = useI18n();
   const { user } = useAuth();
   const t = LABELS[lang];
-  const [baseUrl, setBaseUrl] = useState("https://your-domain.com");
+  const [baseUrl, setBaseUrl] = useState("");
   const [codeCopied, setCodeCopied] = useState(false);
   const { data: keysData, error: keysError, mutate: mutateKeys } = useSWR<{ keys: { id: number }[] }>("/api/dashboard/keys", dashboardSWRConfig);
   const { data: subData, error: subError, mutate: mutateSub } = useSWR<{ subscriptions: { id: number; status: string; current_period_end: string; plan_display_name: string; auto_renew: number }[] }>("/api/dashboard/subscription", dashboardSWRConfig);
@@ -214,6 +214,7 @@ export default function DashboardPage() {
       <StatsCards lang={lang} />
       <ModelAnalytics />
 
+      {baseUrl && (
       <Card className="glass-card">
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
@@ -226,7 +227,7 @@ export default function DashboardPage() {
           <div className="relative group">
             <pre className="bg-muted/50 rounded-lg p-4 overflow-x-auto text-sm font-mono">
 {`curl ${baseUrl}/api/v1/chat/completions \\
-  -H "Authorization: Bearer sk-oort-YOUR_API_KEY" \\
+  -H "Authorization: Bearer sk-oort-xxxxxxxxxxxx" \\
   -H "Content-Type: application/json" \\
   -d '{
     "model": "gpt-4o",
@@ -235,11 +236,11 @@ export default function DashboardPage() {
             </pre>
             <button
               onClick={() => {
-                navigator.clipboard.writeText(`curl ${baseUrl}/api/v1/chat/completions \\\n  -H "Authorization: Bearer sk-oort-YOUR_API_KEY" \\\n  -H "Content-Type: application/json" \\\n  -d '{\n    "model": "gpt-4o",\n    "messages": [{"role": "user", "content": "Hello!"}]\n  }'`);
+                navigator.clipboard.writeText(`curl ${baseUrl}/api/v1/chat/completions \\\n  -H "Authorization: Bearer sk-oort-xxxxxxxxxxxx" \\\n  -H "Content-Type: application/json" \\\n  -d '{\n    "model": "gpt-4o",\n    "messages": [{"role": "user", "content": "Hello!"}]\n  }'`);
                 setCodeCopied(true);
                 setTimeout(() => setCodeCopied(false), 2000);
               }}
-              className="absolute top-2 right-2 p-1.5 rounded-md bg-muted hover:bg-muted/80 transition-colors opacity-0 group-hover:opacity-100"
+              className="absolute top-2 right-2 p-1.5 rounded-md bg-muted hover:bg-muted/80 transition-colors opacity-0 group-hover:opacity-100 group-focus-within:opacity-100"
               aria-label="Copy code"
             >
               {codeCopied ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5 text-muted-foreground" />}
@@ -247,6 +248,7 @@ export default function DashboardPage() {
           </div>
         </CardContent>
       </Card>
+      )}
     </div>
   );
 }

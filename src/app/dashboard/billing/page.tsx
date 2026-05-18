@@ -97,7 +97,7 @@ export default function BillingPage() {
                   {t.recharge}
                 </Button>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {lang === "zh" ? "请使用兑换码充值" : "Use redeem codes to add balance"}
+                  {lang === "zh" ? "充值功能即将上线，目前请使用兑换码充值" : "Direct recharge coming soon. Use redeem codes for now."}
                 </p>
               </div>
             </div>
