@@ -25,12 +25,16 @@ export async function GET(request: NextRequest) {
         model,
         COUNT(*) as calls,
         SUM(cost) as cost,
-        SUM(tokens_in + tokens_out) as tokens
+        SUM(tokens_in + tokens_out) as tokens,
+        SUM(tokens_in - tokens_in_cache - tokens_cache_creation) as tokens_in_noncached,
+        SUM(tokens_in_cache) as tokens_in_cache,
+        SUM(tokens_cache_creation) as tokens_cache_creation,
+        SUM(tokens_out) as tokens_out
       FROM usage_logs
       WHERE user_id = ? AND created_at >= DATE('now', ?)
       GROUP BY DATE(created_at), model
       ORDER BY date ASC
-    `).all(userId, dateFilter) as Array<{ date: string; model: string; calls: number; cost: number; tokens: number }>;
+    `).all(userId, dateFilter) as Array<{ date: string; model: string; calls: number; cost: number; tokens: number; tokens_in_noncached: number; tokens_in_cache: number; tokens_cache_creation: number; tokens_out: number }>;
 
     // If groupBy=hour, get hourly breakdown for last 24 hours
     let modelByHour: Array<{ hour: string; model: string; calls: number; cost: number; tokens: number }> = [];
@@ -41,12 +45,16 @@ export async function GET(request: NextRequest) {
           model,
           COUNT(*) as calls,
           SUM(cost) as cost,
-          SUM(tokens_in + tokens_out) as tokens
+          SUM(tokens_in + tokens_out) as tokens,
+          SUM(tokens_in - tokens_in_cache - tokens_cache_creation) as tokens_in_noncached,
+          SUM(tokens_in_cache) as tokens_in_cache,
+          SUM(tokens_cache_creation) as tokens_cache_creation,
+          SUM(tokens_out) as tokens_out
         FROM usage_logs
         WHERE user_id = ? AND created_at >= datetime('now', '-24 hours')
         GROUP BY strftime('%H:00', created_at), model
         ORDER BY hour ASC
-      `).all(userId) as Array<{ hour: string; model: string; calls: number; cost: number; tokens: number }>;
+      `).all(userId) as Array<{ hour: string; model: string; calls: number; cost: number; tokens: number; tokens_in_noncached: number; tokens_in_cache: number; tokens_cache_creation: number; tokens_out: number }>;
     }
 
     // Call distribution by model (for pie chart)
@@ -55,12 +63,16 @@ export async function GET(request: NextRequest) {
         model,
         COUNT(*) as calls,
         SUM(cost) as cost,
-        SUM(tokens_in + tokens_out) as tokens
+        SUM(tokens_in + tokens_out) as tokens,
+        SUM(tokens_in - tokens_in_cache - tokens_cache_creation) as tokens_in_noncached,
+        SUM(tokens_in_cache) as tokens_in_cache,
+        SUM(tokens_cache_creation) as tokens_cache_creation,
+        SUM(tokens_out) as tokens_out
       FROM usage_logs
       WHERE user_id = ? AND created_at >= DATE('now', ?)
       GROUP BY model
       ORDER BY calls DESC
-    `).all(userId, dateFilter) as Array<{ model: string; calls: number; cost: number; tokens: number }>;
+    `).all(userId, dateFilter) as Array<{ model: string; calls: number; cost: number; tokens: number; tokens_in_noncached: number; tokens_in_cache: number; tokens_cache_creation: number; tokens_out: number }>;
 
     // Daily trend (for line chart)
     const dailyTrend = db.prepare(`
@@ -69,12 +81,16 @@ export async function GET(request: NextRequest) {
         COUNT(*) as calls,
         SUM(cost) as cost,
         SUM(tokens_in + tokens_out) as tokens,
-        AVG(latency_ms) as avg_latency
+        AVG(latency_ms) as avg_latency,
+        SUM(tokens_in - tokens_in_cache - tokens_cache_creation) as tokens_in_noncached,
+        SUM(tokens_in_cache) as tokens_in_cache,
+        SUM(tokens_cache_creation) as tokens_cache_creation,
+        SUM(tokens_out) as tokens_out
       FROM usage_logs
       WHERE user_id = ? AND created_at >= DATE('now', ?)
       GROUP BY DATE(created_at)
       ORDER BY date ASC
-    `).all(userId, dateFilter) as Array<{ date: string; calls: number; cost: number; tokens: number; avg_latency: number | null }>;
+    `).all(userId, dateFilter) as Array<{ date: string; calls: number; cost: number; tokens: number; avg_latency: number | null; tokens_in_noncached: number; tokens_in_cache: number; tokens_cache_creation: number; tokens_out: number }>;
 
     // RPM & TPM (requests per minute, tokens per minute) — last hour
     const lastHourStats = db.prepare(`
