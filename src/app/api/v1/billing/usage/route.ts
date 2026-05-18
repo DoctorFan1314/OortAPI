@@ -83,23 +83,31 @@ export async function GET(request: NextRequest) {
 
     // Aggregate stats across all matching records (not just current page)
     const agg = db.prepare(
-      `SELECT COALESCE(SUM(tokens_in + tokens_out + tokens_in_cache), 0) as total_tokens,
-              COALESCE(SUM(cost), 0) as total_cost,
-              COUNT(*) as total_calls
+      `SELECT
+        COALESCE(SUM(tokens_in + tokens_out + tokens_in_cache), 0) as total_tokens,
+        COALESCE(SUM(cost), 0) as total_cost,
+        COUNT(*) as total_calls,
+        COALESCE(SUM(tokens_in - tokens_in_cache), 0) as total_tokens_in_noncached,
+        COALESCE(SUM(tokens_in_cache), 0) as total_tokens_in_cache,
+        COALESCE(SUM(tokens_out), 0) as total_tokens_out
        FROM usage_logs u WHERE ${whereClause}`
-    ).get(...params) as { total_tokens: number; total_cost: number; total_calls: number };
+    ).get(...params) as { total_tokens: number; total_cost: number; total_calls: number; total_tokens_in_noncached: number; total_tokens_in_cache: number; total_tokens_out: number };
 
     // Daily trend (only for JSON, not CSV)
-    let dailyTrend: Array<{ date: string; calls: number; cost: number; tokens: number }> = [];
+    interface TrendRow { date: string; calls: number; cost: number; tokens: number; tokens_in_noncached: number; tokens_in_cache: number; tokens_out: number }
+    let dailyTrend: TrendRow[] = [];
     if (format !== 'csv') {
       dailyTrend = db.prepare(
         `SELECT DATE(u.created_at) as date,
                 COUNT(*) as calls,
                 COALESCE(SUM(cost), 0) as cost,
-                COALESCE(SUM(u.tokens_in + u.tokens_out + u.tokens_in_cache), 0) as tokens
+                COALESCE(SUM(u.tokens_in + u.tokens_out + u.tokens_in_cache), 0) as tokens,
+                COALESCE(SUM(u.tokens_in - u.tokens_in_cache), 0) as tokens_in_noncached,
+                COALESCE(SUM(u.tokens_in_cache), 0) as tokens_in_cache,
+                COALESCE(SUM(u.tokens_out), 0) as tokens_out
          FROM usage_logs u WHERE ${whereClause}
          GROUP BY DATE(created_at) ORDER BY date ASC`
-      ).all(...params) as typeof dailyTrend;
+      ).all(...params) as TrendRow[];
     }
 
     // CSV export
@@ -129,6 +137,9 @@ export async function GET(request: NextRequest) {
       total_tokens: agg.total_tokens,
       total_cost: agg.total_cost,
       total_calls: agg.total_calls,
+      total_tokens_in_noncached: agg.total_tokens_in_noncached,
+      total_tokens_in_cache: agg.total_tokens_in_cache,
+      total_tokens_out: agg.total_tokens_out,
       daily_trend: dailyTrend,
       has_more: offset + limit < total.count,
     });

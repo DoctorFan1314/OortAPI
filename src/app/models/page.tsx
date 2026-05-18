@@ -42,10 +42,9 @@ const LABELS = {
   zh: {
     title: "模型市场",
     subtitle: "浏览所有可用的 AI 模型及其定价",
-    inputPrice: "输入",
-    outputPrice: "补全",
-    cacheRead: "缓存读取",
-    cacheCreate: "缓存创建",
+    inputPrice: "输入(未命中缓存)",
+    outputPrice: "输出",
+    cacheRead: "输入(命中缓存)",
     channel: "渠道",
     available: "可用",
     unavailable: "不可用",
@@ -73,10 +72,9 @@ const LABELS = {
   en: {
     title: "Model Marketplace",
     subtitle: "Browse all available AI models and their pricing",
-    inputPrice: "Input",
+    inputPrice: "Input(non-cached)",
     outputPrice: "Output",
-    cacheRead: "Cache Read",
-    cacheCreate: "Cache Write",
+    cacheRead: "Input(cache hit)",
     channel: "Channel",
     available: "Available",
     unavailable: "Unavailable",
@@ -404,7 +402,6 @@ export default function ModelsPage() {
                             { key: "input_rate" as const, label: t.inputPrice },
                             { key: "output_rate" as const, label: t.outputPrice },
                             { key: "cache_rate" as const, label: t.cacheRead },
-                            { key: "cache_creation_rate" as const, label: t.cacheCreate },
                           ].map(({ key, label }) => (
                             <div key={key}>
                               <label className="text-xs text-muted-foreground mb-1 block">{label} ({currency === "CNY" ? "¥" : "$"}/1M)</label>
@@ -485,7 +482,6 @@ export default function ModelsPage() {
                               <PriceCell label={t.inputPrice} value={fmtPrice(m.input_rate)} />
                               <PriceCell label={t.outputPrice} value={fmtPrice(m.output_rate)} />
                               <PriceCell label={t.cacheRead} value={fmtPrice(m.cache_rate)} />
-                              <PriceCell label={t.cacheCreate} value={fmtPrice(m.cache_creation_rate)} />
                             </div>
                             <div className="px-3 py-1.5 border-t border-border/50 bg-muted/30">
                               <span className="text-[10px] text-muted-foreground">{t.creditRate}: 1 token = {m.credit_rate ?? 1.0} credits</span>

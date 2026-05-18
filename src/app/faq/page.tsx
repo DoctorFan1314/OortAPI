@@ -27,7 +27,7 @@ const FAQS: Record<string, FaqItem[]> = {
   en: [
     { q: "What AI models does OortAPI support?", a: "OortAPI supports 30+ AI models including OpenAI (GPT-4o, GPT-4 Turbo, GPT-3.5), Anthropic (Claude 4 Sonnet, Claude 4 Opus), Google (Gemini), DeepSeek, Alibaba (Qwen), and more. Visit the Model Market for the full list and real-time pricing." },
     { q: "How do I get an API Key?", a: "After registering, go to Dashboard > API Keys and click Create. Your key starts with sk-oort-. Save it immediately — you won't be able to see the full key again after closing the page." },
-    { q: "How does billing work?", a: "Your balance is auto-deducted after each API call. Rates depend on the model used. We use 3-tier cache-aware pricing: Input Tokens, Output Tokens, Cache Read (cheaper), and Cache Create. See per-model rates in the Model Market." },
+    { q: "How does billing work?", a: "Your balance is auto-deducted after each API call. Rates depend on the model used. We use 3-tier pricing: Input(non-cached), Input(cache hit), Output. Cache-hit tokens enjoy a lower rate. See per-model rates in the Model Market." },
     { q: "What happens when my balance runs out?", a: "The API returns a 402 status code. You'll need a redeem code or admin top-up to continue. Direct recharge is coming soon — please use redeem codes for now." },
     { q: "What are redeem codes?", a: "Redeem codes are batch-generated top-up codes (format: RC-XXXXXXXX) created by admins. Redeem them in the Billing Center. Codes are typically distributed by administrators." },
     { q: "Which API protocols are supported?", a: "Both OpenAI format (/api/v1/*) and Anthropic format (/api/*) are supported. Most AI clients use the OpenAI-compatible protocol. Both protocols use the same API Key." },

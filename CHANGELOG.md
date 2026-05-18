@@ -6,6 +6,29 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [v3.3.4.11] — 2026-05-18
+
+### Token Category System Overhaul
+- **3-category model** — Replaced confusing 4-category system (input/cache_hit/cache_create/output) with standard 3: Input(non-cached), Input(cache hit), Output
+- **calculateCost** — Removed `cached` boolean and `tokensCacheCreation` parameters, simplified to 3-part formula
+- **calculateCredits** — Cache-hit tokens no longer consume credits (was charging full price)
+- **deductCreditsOrBalance** — Removed `tokensCacheCreation` parameter, simplified signature
+- **Local prompt cache** — Extracted to `lib/prompt-cache.ts`, shared between routes
+- **Messages route** — Now uses local prompt cache for providers without cache stats
+- **Usage API** — Aggregate and daily trend queries now include token breakdown fields
+- **Analytics API** — Queries updated to 3-category model
+
+### Display Updates
+- **Usage table** — Columns reordered: Input(non-cached) → Input(cache hit) → Output → Total
+- **Usage summary cards** — Token card now shows detailed 3-way breakdown
+- **Stats cards** — Token breakdown updated to 3-category labels
+- **Model analytics** — Tooltip and summary use 3-category display
+- **Model market** — Pricing cards show: Input(non-cached), Input(cache hit), Output
+- **Model detail** — Updated pricing labels to match
+- **All pages** — Standardized labels: 输入(未命中缓存), 输入(命中缓存), 输出
+
+---
+
 ## [v3.3.4.10] — 2026-05-18
 
 ### Data Consistency

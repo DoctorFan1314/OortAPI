@@ -40,9 +40,9 @@ const LABELS = {
     monthlyCost: "本月花费",
     monthlyTokens: "本月 Tokens",
     tokensInput: "输入 Token",
-    tokensInputNonCached: "普通输入",
-    tokensCacheHit: "缓存命中",
-    tokensOutput: "输出 Token",
+    tokensInputNonCached: "输入(未命中缓存)",
+    tokensCacheHit: "输入(命中缓存)",
+    tokensOutput: "输出",
   },
   en: {
     balance: "Balance",
@@ -55,9 +55,9 @@ const LABELS = {
     monthlyCost: "Monthly Cost",
     monthlyTokens: "Monthly Tokens",
     tokensInput: "Input Tokens",
-    tokensInputNonCached: "Non-cached",
-    tokensCacheHit: "Cache Hit",
-    tokensOutput: "Output Tokens",
+    tokensInputNonCached: "Input(non-cached)",
+    tokensCacheHit: "Input(cache hit)",
+    tokensOutput: "Output",
   },
 };
 

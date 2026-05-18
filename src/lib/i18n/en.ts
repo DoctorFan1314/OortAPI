@@ -960,7 +960,7 @@ export const en: Dictionary = {
     inputTokenDesc: "Regular input requests",
     completionToken: "Completion Tokens",
     completionTokenDesc: "Model-generated output",
-    cacheRead: "Cache Read",
+    cacheRead: "Input(cache hit)",
     cacheReadDesc: "Cache-hit input (cheaper)",
     cacheCreate: "Cache Create",
     cacheCreateDesc: "First-time cache write input",

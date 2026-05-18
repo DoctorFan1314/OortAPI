@@ -209,8 +209,8 @@ export function ModelAnalytics() {
             html += `<div style="font-size:12px;font-weight:500;margin-top:3px;white-space:nowrap"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${color};margin-right:4px"></span> ${p.seriesName}: ${fmt(val)} tokens</div>`;
             const brk = byModelBreakdown[p.seriesName]?.[slot];
             if (brk) {
-              if (brk.inNoncached > 0) html += `<div style="font-size:11px;padding-left:16px;color:#888;white-space:nowrap">${lang === "zh" ? "输入(未缓存)" : "Input(non-cached)"}: ${fmt(brk.inNoncached)}</div>`;
-              if (brk.inCache > 0) html += `<div style="font-size:11px;padding-left:16px;color:#888;white-space:nowrap">${lang === "zh" ? "输入(缓存命中)" : "Input(cache hit)"}: ${fmt(brk.inCache)}</div>`;
+              if (brk.inNoncached > 0) html += `<div style="font-size:11px;padding-left:16px;color:#888;white-space:nowrap">${lang === "zh" ? "输入(未命中缓存)" : "Input(non-cached)"}: ${fmt(brk.inNoncached)}</div>`;
+              if (brk.inCache > 0) html += `<div style="font-size:11px;padding-left:16px;color:#888;white-space:nowrap">${lang === "zh" ? "输入(命中缓存)" : "Input(cache hit)"}: ${fmt(brk.inCache)}</div>`;
               if (brk.out > 0) html += `<div style="font-size:11px;padding-left:16px;color:#888;white-space:nowrap">${lang === "zh" ? "输出" : "Output"}: ${fmt(brk.out)}</div>`;
             }
           }
@@ -382,10 +382,10 @@ export function ModelAnalytics() {
               <p className="text-lg font-bold font-mono mb-1">{data.total.tokens.toLocaleString()}</p>
               <div className="text-[10px] space-y-0.5 text-muted-foreground border-t border-border/20 pt-1.5">
                 {data.total.tokens_in_noncached > 0 && (
-                  <div className="flex justify-between"><span><span className="text-blue-400">■</span> {lang === "zh" ? "普通输入" : "Input"}</span><span className="font-mono">{data.total.tokens_in_noncached.toLocaleString()}</span></div>
+                  <div className="flex justify-between"><span><span className="text-blue-400">■</span> {lang === "zh" ? "输入(未命中缓存)" : "Input(non-cached)"}</span><span className="font-mono">{data.total.tokens_in_noncached.toLocaleString()}</span></div>
                 )}
                 {data.total.tokens_in_cache > 0 && (
-                  <div className="flex justify-between"><span><span className="text-emerald-400">■</span> {lang === "zh" ? "缓存命中" : "Cache Hit"}</span><span className="font-mono">{data.total.tokens_in_cache.toLocaleString()}</span></div>
+                  <div className="flex justify-between"><span><span className="text-emerald-400">■</span> {lang === "zh" ? "输入(命中缓存)" : "Input(cache hit)"}</span><span className="font-mono">{data.total.tokens_in_cache.toLocaleString()}</span></div>
                 )}
                 {data.total.tokens_out > 0 && (
                   <div className="flex justify-between"><span><span className="text-orange-400">■</span> {lang === "zh" ? "输出" : "Output"}</span><span className="font-mono">{data.total.tokens_out.toLocaleString()}</span></div>

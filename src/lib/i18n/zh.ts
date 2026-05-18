@@ -957,10 +957,10 @@ export const zh: Dictionary = {
     streamAnthropic: "Anthropic 格式",
     // Pricing section
     inputToken: "输入 Token",
-    inputTokenDesc: "普通输入请求",
+    inputTokenDesc: "未命中缓存的输入请求",
     completionToken: "补全 Token",
     completionTokenDesc: "模型生成输出",
-    cacheRead: "缓存读取",
+    cacheRead: "输入(命中缓存)",
     cacheReadDesc: "命中缓存的输入（更便宜）",
     cacheCreate: "缓存创建",
     cacheCreateDesc: "首次写入缓存的输入",

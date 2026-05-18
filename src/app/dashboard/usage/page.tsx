@@ -37,12 +37,18 @@ interface DailyTrend {
   calls: number;
   cost: number;
   tokens: number;
+  tokens_in_noncached: number;
+  tokens_in_cache: number;
+  tokens_out: number;
 }
 
 interface UsageSummary {
   total_calls: number;
   total_tokens: number;
   total_cost: number;
+  total_tokens_in_noncached: number;
+  total_tokens_in_cache: number;
+  total_tokens_out: number;
 }
 
 const LABELS = {
@@ -50,9 +56,9 @@ const LABELS = {
     title: "调用日志",
     model: "模型",
     channel: "渠道",
-    tokensIn: "输入 Tokens",
+    tokensIn: "输入(未命中缓存)Tokens",
     tokensOut: "输出 Tokens",
-    tokensInCache: "缓存命中",
+    tokensInCache: "输入(命中缓存)Tokens",
     tokens: "总 Tokens",
     cost: "费用",
     latency: "延迟",
@@ -68,7 +74,7 @@ const LABELS = {
     totalCost: "总花费",
     inputCost: "输入费用",
     outputCost: "输出费用",
-    cacheReadCost: "缓存读取费用",
+    cacheReadCost: "输入(命中缓存)费用",
     costBreakdown: "费用明细",
     noChannel: "无渠道",
     formula: "计算公式",
@@ -100,9 +106,9 @@ const LABELS = {
     title: "Call Logs",
     model: "Model",
     channel: "Channel",
-    tokensIn: "Input Tokens",
+    tokensIn: "Input(non-cached)Tokens",
     tokensOut: "Output Tokens",
-    tokensInCache: "Cache Hit",
+    tokensInCache: "Input(cache hit)Tokens",
     tokens: "Total Tokens",
     cost: "Cost",
     latency: "Latency",
@@ -118,7 +124,7 @@ const LABELS = {
     totalCost: "Total Cost",
     inputCost: "Input Cost",
     outputCost: "Output Cost",
-    cacheReadCost: "Cache Read Cost",
+    cacheReadCost: "Input(cache hit)Cost",
     costBreakdown: "Cost Breakdown",
     noChannel: "No channel",
     formula: "Formula",
@@ -157,7 +163,7 @@ export default function UsagePage() {
   const { lang } = useI18n();
   const { currency, exchangeRate, formatPrice, symbol } = useCurrency();
   const [logs, setLogs] = useState<UsageLog[]>([]);
-  const [summary, setSummary] = useState<UsageSummary>({ total_calls: 0, total_tokens: 0, total_cost: 0 });
+  const [summary, setSummary] = useState<UsageSummary>({ total_calls: 0, total_tokens: 0, total_cost: 0, total_tokens_in_noncached: 0, total_tokens_in_cache: 0, total_tokens_out: 0 });
   const [dailyTrend, setDailyTrend] = useState<DailyTrend[]>([]);
   const [chartMetric, setChartMetric] = useState<"cost" | "tokens" | "calls">("cost");
   const [loading, setLoading] = useState(true);
@@ -226,16 +232,27 @@ export default function UsagePage() {
     const color = chartMetric === "cost" ? "#8b5cf6" : chartMetric === "tokens" ? "#22c55e" : "#3b82f6";
     const label = chartMetric === "cost" ? (currency === "CNY" ? "¥" : "$") : "";
     return {
-      tooltip: { trigger: "axis" as const, formatter: (params: { axisValue: string; value: number }[]) => {
-        const p = params[0];
-        return `${p.axisValue}<br/>${label}${typeof p.value === "number" ? p.value.toLocaleString() : p.value}`;
-      }},
+      tooltip: {
+        trigger: "axis" as const,
+        formatter: (params: { axisValue: string; value: number; dataIndex: number }[]) => {
+          const p = params[0];
+          const day = chartMetric === "tokens" ? dailyTrend[p.dataIndex] : null;
+          if (!day || chartMetric !== "tokens") {
+            return `${p.axisValue}<br/>${label}${typeof p.value === "number" ? p.value.toLocaleString() : p.value}`;
+          }
+          let html = `<div style="font-size:12px;font-weight:600;white-space:nowrap">${day.date}</div>`;
+          if (day.tokens_in_noncached > 0) html += `<div style="font-size:11px;white-space:nowrap"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#3b82f6;margin-right:4px"></span>${lang === "zh" ? "输入(未命中缓存)" : "Input(non-cached)"}: ${day.tokens_in_noncached.toLocaleString()}</div>`;
+          if (day.tokens_in_cache > 0) html += `<div style="font-size:11px;white-space:nowrap"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#22c55e;margin-right:4px"></span>${lang === "zh" ? "输入(命中缓存)" : "Input(cache hit)"}: ${day.tokens_in_cache.toLocaleString()}</div>`;
+          if (day.tokens_out > 0) html += `<div style="font-size:11px;white-space:nowrap"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#f97316;margin-right:4px"></span>${lang === "zh" ? "输出" : "Output"}: ${day.tokens_out.toLocaleString()}</div>`;
+          return html;
+        },
+      },
       grid: { left: 60, right: 20, top: 10, bottom: 30 },
       xAxis: { type: "category" as const, data: dates, axisLabel: { fontSize: 11 } },
       yAxis: { type: "value" as const, axisLabel: { fontSize: 11, formatter: (v: number) => label + (v >= 1000 ? (v / 1000).toFixed(0) + "k" : v) } },
       series: [{ type: "bar" as const, data: values, itemStyle: { color, borderRadius: [4, 4, 0, 0] }, barMaxWidth: 32 }],
     };
-  }, [dailyTrend, chartMetric, exchangeRate, currency]);
+  }, [dailyTrend, chartMetric, exchangeRate, currency, lang]);
 
   useEffect(() => {
     setLoading(true);
@@ -260,6 +277,9 @@ export default function UsagePage() {
           total_calls: d.total_calls || 0,
           total_tokens: d.total_tokens || 0,
           total_cost: d.total_cost || 0,
+          total_tokens_in_noncached: d.total_tokens_in_noncached || 0,
+          total_tokens_in_cache: d.total_tokens_in_cache || 0,
+          total_tokens_out: d.total_tokens_out || 0,
         });
         setDailyTrend(d.daily_trend || []);
         setLoading(false);
@@ -299,8 +319,12 @@ export default function UsagePage() {
           </div>
           <div className="space-y-1">
             <div className="flex justify-between gap-4">
-              <span className="text-muted-foreground">{lang === "zh" ? "输入 Tokens" : "Input Tokens"}: {log.tokens_in.toLocaleString()} × {creditRate}</span>
-              <span>= {(log.tokens_in * creditRate).toLocaleString()} credits</span>
+              <span className="text-muted-foreground">{lang === "zh" ? "输入(未命中缓存)Tokens" : "Input(non-cached)Tokens"}: {(log.tokens_in - log.tokens_in_cache).toLocaleString()} × {creditRate}</span>
+              <span>= {((log.tokens_in - log.tokens_in_cache) * creditRate).toLocaleString()} credits</span>
+            </div>
+            <div className="flex justify-between gap-4">
+              <span className="text-muted-foreground">{lang === "zh" ? "输入(命中缓存)Tokens" : "Input(cache hit)Tokens"}: {log.tokens_in_cache.toLocaleString()} × {creditRate}</span>
+              <span>= {(log.tokens_in_cache * creditRate).toLocaleString()} credits</span>
             </div>
             <div className="flex justify-between gap-4">
               <span className="text-muted-foreground">{lang === "zh" ? "输出 Tokens" : "Output Tokens"}: {log.tokens_out.toLocaleString()} × {creditRate}</span>
@@ -332,8 +356,9 @@ export default function UsagePage() {
         <p className="font-semibold text-sm">{t.costBreakdown}</p>
         <div className="text-muted-foreground space-y-0.5">
           <p>{lang === "zh" ? "模型费率" : "Model Rates"}{rateSource}:</p>
-          <p className="pl-3">input = {formatRate(inputRate)}, output = {formatRate(outputRate)}</p>
-          <p className="pl-3">cache_read = {formatRate(cacheRate)}</p>
+          <p className="pl-3">{lang === "zh" ? "输入(未命中缓存)" : "Input(non-cached)"} = {formatRate(inputRate)}</p>
+          <p className="pl-3">{lang === "zh" ? "输入(命中缓存)" : "Input(cache hit)"} = {formatRate(cacheRate)}</p>
+          <p className="pl-3">{lang === "zh" ? "输出" : "Output"} = {formatRate(outputRate)}</p>
         </div>
         <div className="space-y-1">
           {nonCachedIn > 0 && (
@@ -414,13 +439,24 @@ export default function UsagePage() {
           </CardContent>
         </Card>
         <Card className="glass-card">
-          <CardContent className="p-4 flex items-center gap-3">
-            <div className="p-2 rounded-md bg-green-500/10">
-              <Coins className="h-4 w-4 text-green-500" />
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 mb-1">
+              <div className="p-2 rounded-md bg-green-500/10">
+                <Coins className="h-4 w-4 text-green-500" />
+              </div>
+              <span className="text-xs text-muted-foreground">{t.totalTokens}</span>
             </div>
-            <div>
-              <p className="text-xs text-muted-foreground">{t.totalTokens}</p>
-              <p className="text-xl font-bold font-mono">{formatTokens(summary.total_tokens)}</p>
+            <p className="text-xl font-bold font-mono mb-1">{formatTokens(summary.total_tokens)}</p>
+            <div className="space-y-0.5 text-[11px] text-muted-foreground border-t border-border/20 pt-1.5">
+              {summary.total_tokens_in_noncached > 0 && (
+                <div className="flex justify-between"><span><span className="text-blue-400">■</span> {lang === "zh" ? "输入(未命中缓存)" : "Input(non-cached)"}</span><span className="font-mono">{formatTokens(summary.total_tokens_in_noncached)}</span></div>
+              )}
+              {summary.total_tokens_in_cache > 0 && (
+                <div className="flex justify-between"><span><span className="text-emerald-400">■</span> {lang === "zh" ? "输入(命中缓存)" : "Input(cache hit)"}</span><span className="font-mono">{formatTokens(summary.total_tokens_in_cache)}</span></div>
+              )}
+              {summary.total_tokens_out > 0 && (
+                <div className="flex justify-between"><span><span className="text-orange-400">■</span> {lang === "zh" ? "输出" : "Output"}</span><span className="font-mono">{formatTokens(summary.total_tokens_out)}</span></div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -554,12 +590,12 @@ export default function UsagePage() {
                       {t.tokensIn}{sortKey === 'tokens_in' ? (sortDir === 'asc' ? ' ↑' : ' ↓') : ''}
                     </th>
                     <th scope="col" className="text-right py-2 px-3 text-muted-foreground font-medium cursor-pointer hover:text-foreground select-none"
-                      onClick={() => { setSortKey('tokens_out'); setSortDir(d => d === 'asc' ? 'desc' : 'asc'); }}>
-                      {t.tokensOut}{sortKey === 'tokens_out' ? (sortDir === 'asc' ? ' ↑' : ' ↓') : ''}
-                    </th>
-                    <th scope="col" className="text-right py-2 px-3 text-muted-foreground font-medium cursor-pointer hover:text-foreground select-none"
                       onClick={() => { setSortKey('tokens_in_cache'); setSortDir(d => d === 'asc' ? 'desc' : 'asc'); }}>
                       {t.tokensInCache}{sortKey === 'tokens_in_cache' ? (sortDir === 'asc' ? ' ↑' : ' ↓') : ''}
+                    </th>
+                    <th scope="col" className="text-right py-2 px-3 text-muted-foreground font-medium cursor-pointer hover:text-foreground select-none"
+                      onClick={() => { setSortKey('tokens_out'); setSortDir(d => d === 'asc' ? 'desc' : 'asc'); }}>
+                      {t.tokensOut}{sortKey === 'tokens_out' ? (sortDir === 'asc' ? ' ↑' : ' ↓') : ''}
                     </th>
                     <th scope="col" className="text-right py-2 px-3 text-muted-foreground font-medium cursor-pointer hover:text-foreground select-none"
                       onClick={() => { setSortKey('total'); setSortDir(d => d === 'asc' ? 'desc' : 'asc'); }}>
@@ -590,8 +626,8 @@ export default function UsagePage() {
                       <td className="py-2 px-3 text-xs text-muted-foreground">{log.channel_name || t.noChannel}</td>
                       <td className="py-2 px-3 font-mono text-xs">{log.model}</td>
                       <td className="py-2 px-3 text-right font-mono">{log.tokens_in.toLocaleString()}</td>
-                      <td className="py-2 px-3 text-right font-mono">{log.tokens_out.toLocaleString()}</td>
                       <td className="py-2 px-3 text-right font-mono">{log.tokens_in_cache > 0 ? log.tokens_in_cache.toLocaleString() : "0"}</td>
+                      <td className="py-2 px-3 text-right font-mono">{log.tokens_out.toLocaleString()}</td>
                       <td className="py-2 px-3 text-right font-mono">{(log.tokens_in + log.tokens_out).toLocaleString()}</td>
                       <td className="py-2 px-3 text-center">
                         <span className="text-xs px-2 py-0.5 rounded-full bg-muted font-mono">
