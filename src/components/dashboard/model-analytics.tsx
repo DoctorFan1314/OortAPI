@@ -206,7 +206,7 @@ export function ModelAnalytics() {
           for (const p of params) {
             const val = byModelTokens[p.seriesName]?.[slot] || 0;
             const color = (colorMap as Record<string, string>)[p.seriesName] || "#888";
-            html += `<div style="font-size:12px;font-weight:500;margin-top:3px;white-space:nowrap"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${color};margin-right:4px"></span> ${p.seriesName}: ${fmt(val)} t</div>`;
+            html += `<div style="font-size:12px;font-weight:500;margin-top:3px;white-space:nowrap"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${color};margin-right:4px"></span> ${p.seriesName}: ${fmt(val)} tokens</div>`;
             const brk = byModelBreakdown[p.seriesName]?.[slot];
             if (brk) {
               if (brk.inNoncached > 0) html += `<div style="font-size:11px;padding-left:16px;color:#888;white-space:nowrap">${lang === "zh" ? "输入(未缓存)" : "Input(non-cached)"}: ${fmt(brk.inNoncached)}</div>`;
@@ -217,7 +217,7 @@ export function ModelAnalytics() {
           }
           return html;
         },
-        extraCssText: "max-width:600px;white-space:nowrap",
+        extraCssText: "max-width:800px;white-space:nowrap;overflow:visible",
       },
       legend: { type: "scroll" as const, bottom: 0, textStyle: { fontSize: 11 } },
       grid: { left: 70, right: 20, top: 20, bottom: 60 },
