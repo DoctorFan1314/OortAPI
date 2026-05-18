@@ -171,7 +171,7 @@ export function NotificationBell() {
           role="menu"
           aria-label={t.common.notifications}
           onKeyDown={handleKeyDown}
-          className="absolute top-full right-0 mt-2 w-80 bg-card border border-border rounded-xl shadow-2xl overflow-hidden z-50 animate-[fadeIn_0.1s_ease-out]"
+          className="absolute top-full right-0 mt-2 w-80 bg-card border border-border rounded-xl shadow-2xl overflow-hidden z-50 animate-fadeIn"
         >
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-border">

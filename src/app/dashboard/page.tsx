@@ -163,7 +163,7 @@ export default function DashboardPage() {
           <CardContent>
             <div className="grid gap-4 md:grid-cols-3">
               {/* Step 1 */}
-              <div className="flex flex-col gap-2 p-4 rounded-lg border border-border/50 bg-muted/30">
+              <div className="flex flex-col gap-2 p-4 rounded-lg glass-card glass-card-hover">
                 <div className="flex items-center gap-2">
                   <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold">1</span>
                   <Key className="h-4 w-4 text-primary" />
@@ -178,7 +178,7 @@ export default function DashboardPage() {
               </div>
 
               {/* Step 2 */}
-              <div className="flex flex-col gap-2 p-4 rounded-lg border border-border/50 bg-muted/30">
+              <div className="flex flex-col gap-2 p-4 rounded-lg glass-card glass-card-hover">
                 <div className="flex items-center gap-2">
                   <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold">2</span>
                   <CreditCard className="h-4 w-4 text-primary" />
@@ -193,7 +193,7 @@ export default function DashboardPage() {
               </div>
 
               {/* Step 3 */}
-              <div className="flex flex-col gap-2 p-4 rounded-lg border border-border/50 bg-muted/30">
+              <div className="flex flex-col gap-2 p-4 rounded-lg glass-card glass-card-hover">
                 <div className="flex items-center gap-2">
                   <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold">3</span>
                   <Code className="h-4 w-4 text-primary" />

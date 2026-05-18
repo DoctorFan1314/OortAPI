@@ -6,6 +6,33 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [v3.3.4.12] — 2026-05-18
+
+### Beautification & UX Polish
+- **Animation classes** — Standardized all inline arbitrary animations to reusable utility classes
+- **Token Plan page** — Enhanced hero with gradient background, decorative orbs, staggered entry animation
+- **Comparison table** — Plan-colored gradient headers with star markers, row hover highlights, better typography
+- **FAQ section** — Upgraded to interactive accordion (expand/collapse) with smooth rotation indicators
+- **Subscription cards** — Replaced hardcoded hex colors with CSS variables (theme-aware), added hover scale/shadow
+- **Onboarding cards** — Upgraded to `glass-card` styling with hover effects matching dashboard theme
+- **StatusBadge** — Dark-mode-aware color contrast fix, added `transition-colors` animation
+- **Copy button** — Added `group-focus-within` for touch device visibility
+
+### UX Improvements
+- **API Key delete** — Replaced raw Dialog with shared ConfirmDialog (consistent styling site-wide)
+- **Cancel subscription** — Replaced raw Dialog with shared ConfirmDialog
+- **Settings: window.confirm** — Replaced native confirm with custom ConfirmDialog for exchange rate changes
+- **Settings: form validation** — Added min/max constraints for exchange rate and budget inputs
+- **Settings: error feedback** — Replaced silent `.catch()` with toast notifications on save failures
+- **Settings: budget stability** — Budget progress bar persists even when input is cleared (saved value fallback)
+- **API Key creation** — Added name validation (required), date min attribute (no past dates)
+- **API Key status** — Unified with shared StatusBadge component
+- **Recharge tooltip** — Disabled button now shows hover tooltip explaining "Coming soon"
+- **Redeem codes** — Added hint text that codes auto-capitalize
+- **Playground** — Chat history, model/key selections, params, system prompt now persist via localStorage
+
+---
+
 ## [v3.3.4.11] — 2026-05-18
 
 ### Token Category System Overhaul

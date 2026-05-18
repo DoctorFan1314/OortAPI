@@ -89,6 +89,15 @@
   --sidebar-accent-foreground: #1a1a2e;
   --sidebar-border: rgba(0, 0, 0, 0.08);
   --sidebar-ring: #0891b2;
+  /* Plan card brand gradients */
+  --plan-spark-from: #667eea;
+  --plan-spark-to: #764ba2;
+  --plan-flare-from: #48bb78;
+  --plan-flare-to: #38a169;
+  --plan-pulse-from: #f6ad55;
+  --plan-pulse-to: #ed8936;
+  --plan-nova-from: #9f7aea;
+  --plan-nova-to: #7c3aed;
 }
 
 /* Dark theme */
@@ -125,6 +134,15 @@
   --sidebar-accent-foreground: #e6edf3;
   --sidebar-border: rgba(255, 255, 255, 0.08);
   --sidebar-ring: #00d4ff;
+  /* Plan card brand gradients (dark theme: slightly brighter) */
+  --plan-spark-from: #7b8ff7;
+  --plan-spark-to: #8b5cf6;
+  --plan-flare-from: #4ade80;
+  --plan-flare-to: #2dd4a0;
+  --plan-pulse-from: #fbbf24;
+  --plan-pulse-to: #f59e0b;
+  --plan-nova-from: #a78bfa;
+  --plan-nova-to: #7c3aed;
 }
 
 @layer base {
@@ -214,6 +232,25 @@
   }
   .animate-page-fade-in {
     animation: fadeIn 200ms ease-out;
+  }
+  .animate-fadeIn {
+    animation: fadeIn 0.15s ease-out;
+  }
+  .animate-slideDown {
+    animation: slideDown 0.15s ease-out;
+  }
+  /* Plan card gradient utilities */
+  .gradient-spark {
+    background: linear-gradient(135deg, var(--plan-spark-from), var(--plan-spark-to));
+  }
+  .gradient-flare {
+    background: linear-gradient(135deg, var(--plan-flare-from), var(--plan-flare-to));
+  }
+  .gradient-pulse {
+    background: linear-gradient(135deg, var(--plan-pulse-from), var(--plan-pulse-to));
+  }
+  .gradient-nova {
+    background: linear-gradient(135deg, var(--plan-nova-from), var(--plan-nova-to));
   }
 }
 

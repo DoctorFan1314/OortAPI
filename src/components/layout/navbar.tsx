@@ -190,7 +190,7 @@ export function Navbar() {
                 {userMenuOpen && (
                   <div
                     role="menu"
-                    className="absolute top-full right-0 mt-2 w-56 bg-card border border-border rounded-xl shadow-2xl overflow-hidden z-50 animate-[fadeIn_0.1s_ease-out]"
+                    className="absolute top-full right-0 mt-2 w-56 bg-card border border-border rounded-xl shadow-2xl overflow-hidden z-50 animate-fadeIn"
                     onKeyDown={handleUserMenuKeyDown}
                   >
                     <div className="px-4 py-3 border-b border-border">

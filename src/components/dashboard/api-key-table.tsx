@@ -10,6 +10,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Copy, Eye, EyeOff, Plus, Trash2, ToggleLeft, ToggleRight } from "lucide-react";
 import { useToast } from "@/contexts/toast-context";
 import { dashboardSWRConfig } from "@/lib/swr-fetcher";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { StatusBadge } from "@/components/shared/status-badge";
 
 interface ApiKey {
   id: number;
@@ -109,13 +111,17 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
   const t = LABELS[lang];
 
   const createKey = async () => {
+    if (!newKeyName.trim()) {
+      showToast(lang === "zh" ? "请输入 Key 名称" : "Key name is required", "error");
+      return;
+    }
     setCreating(true);
     try {
       const res = await fetch("/api/dashboard/keys", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ name: newKeyName || "Default", expires_at: newKeyExpires || null }),
+        body: JSON.stringify({ name: newKeyName, expires_at: newKeyExpires || null }),
       });
       if (res.ok) {
         const data = await res.json();
@@ -228,6 +234,7 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <span>{t.expires}:</span>
             <input type="date" value={newKeyExpires} onChange={e => setNewKeyExpires(e.target.value)}
+              min={new Date().toISOString().split('T')[0]}
               className="h-9 px-2 rounded-md border border-input bg-background text-sm" />
           </div>
           <Button size="sm" onClick={createKey} disabled={creating}>
@@ -261,9 +268,7 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
                       className={`text-xs px-1.5 py-0.5 rounded transition-colors ${expandedKeyId === k.id ? "bg-primary/20 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}>
                       {t.keyAnalytics}
                     </button>
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${k.enabled ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"}`}>
-                      {k.enabled ? t.enabled : t.disabled}
-                    </span>
+                    <StatusBadge variant={k.enabled ? "success" : "error"} label={k.enabled ? t.enabled : t.disabled} />
                     {isExpired && (
                       <span className="text-xs px-2 py-0.5 rounded-full bg-red-500/10 text-red-500">{t.expired}</span>
                     )}
@@ -360,18 +365,17 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
         )}
       </CardContent>
 
-      <Dialog open={deleteTarget !== null} onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}>
-        <DialogContent className="sm:max-w-sm">
-          <DialogHeader>
-            <DialogTitle>{t.confirmDelete}: {deleteTarget ? `"${keys.find(k => k.id === deleteTarget)?.name}"` : ""}</DialogTitle>
-            <DialogDescription>{t.confirmDelete}</DialogDescription>
-          </DialogHeader>
-          <div className="flex gap-2 justify-end pt-2">
-            <Button variant="outline" onClick={() => setDeleteTarget(null)}>{lang === "zh" ? "取消" : "Cancel"}</Button>
-            <Button onClick={confirmDelete} className="bg-red-600 text-white hover:bg-red-700">{lang === "zh" ? "确认删除" : "Delete"}</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}
+        title={lang === "zh" ? "删除 API Key" : "Delete API Key"}
+        message={deleteTarget
+          ? (lang === "zh" ? `确定要删除「${keys.find(k => k.id === deleteTarget)?.name}」吗？此操作不可撤销。` : `Delete "${keys.find(k => k.id === deleteTarget)?.name}"? This cannot be undone.`)
+          : ""}
+        onConfirm={confirmDelete}
+        confirmLabel={lang === "zh" ? "确认删除" : "Delete"}
+        variant="danger"
+      />
 
       {/* Show full key after creation */}
       <Dialog open={newKeyFull !== null} onOpenChange={(open) => { if (!open) setNewKeyFull(null); }}>

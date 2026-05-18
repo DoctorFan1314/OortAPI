@@ -83,10 +83,10 @@ export function CommandPalette() {
 
   return (
     <div className="fixed inset-0 flex items-start justify-center pt-[15vh]" style={{ zIndex: "var(--z-command)" }} onClick={handleClose} role="dialog" aria-modal="true" aria-label={t.commandPalette.searchPlaceholder}>
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm animate-[fadeIn_0.15s_ease-out]" aria-hidden="true" />
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm animate-fadeIn" aria-hidden="true" />
       <div
         ref={containerRef}
-        className="relative w-full max-w-lg mx-4 bg-card border border-border rounded-xl shadow-2xl overflow-hidden animate-[slideDown_0.15s_ease-out]"
+        className="relative w-full max-w-lg mx-4 bg-card border border-border rounded-xl shadow-2xl overflow-hidden animate-slideDown"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center gap-3 px-4 border-b border-border">

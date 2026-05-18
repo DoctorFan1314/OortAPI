@@ -31,33 +31,29 @@ interface SubscriptionCardProps {
   children?: React.ReactNode;
 }
 
-const THEMES: Record<string, { gradient: string; shadow: string; glow: string; accent: string; icon: typeof Sparkles }> = {
+const THEMES: Record<string, { gradientClass: string; shadowColor: string; accent: string; icon: typeof Sparkles }> = {
   spark: {
-    gradient: "from-[#667eea] to-[#764ba2]",
-    shadow: "shadow-[0_4px_20px_rgba(102,126,234,0.4)]",
-    glow: "hover:shadow-[0_8px_30px_rgba(102,126,234,0.5)]",
-    accent: "text-[#667eea]",
+    gradientClass: "gradient-spark",
+    shadowColor: "var(--plan-spark-from)",
+    accent: "text-[var(--plan-spark-from)]",
     icon: Zap,
   },
   flare: {
-    gradient: "from-[#48bb78] to-[#38a169]",
-    shadow: "shadow-[0_4px_20px_rgba(72,187,120,0.4)]",
-    glow: "hover:shadow-[0_8px_30px_rgba(72,187,120,0.5)]",
-    accent: "text-[#48bb78]",
+    gradientClass: "gradient-flare",
+    shadowColor: "var(--plan-flare-from)",
+    accent: "text-[var(--plan-flare-from)]",
     icon: Sparkles,
   },
   pulse: {
-    gradient: "from-[#f6ad55] to-[#ed8936]",
-    shadow: "shadow-[0_4px_20px_rgba(246,173,85,0.4)]",
-    glow: "hover:shadow-[0_8px_30px_rgba(246,173,85,0.5)]",
-    accent: "text-[#f6ad55]",
+    gradientClass: "gradient-pulse",
+    shadowColor: "var(--plan-pulse-from)",
+    accent: "text-[var(--plan-pulse-from)]",
     icon: Star,
   },
   nova: {
-    gradient: "from-[#9f7aea] to-[#7c3aed]",
-    shadow: "shadow-[0_4px_20px_rgba(159,122,234,0.4)]",
-    glow: "hover:shadow-[0_8px_30px_rgba(159,122,234,0.5)]",
-    accent: "text-[#9f7aea]",
+    gradientClass: "gradient-nova",
+    shadowColor: "var(--plan-nova-from)",
+    accent: "text-[var(--plan-nova-from)]",
     icon: Diamond,
   },
 };
@@ -108,8 +104,8 @@ export function SubscriptionCard({
   if (variant === "current") {
     // Compact card for current subscription
     return (
-      <div className={`relative rounded-xl overflow-hidden ${theme.shadow} ${theme.glow} transition-all duration-300 hover:scale-[1.01]`}>
-        <div className={`relative bg-gradient-to-r ${theme.gradient} p-5`}>
+      <div className={`relative rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-xl`}>
+        <div className={`relative ${theme.gradientClass} p-5`}>
           {/* Decorative elements */}
           <div className="absolute inset-0 opacity-10">
             <div className="absolute top-0 right-0 w-40 h-40 bg-white rounded-full -translate-y-1/2 translate-x-1/4" />
@@ -145,14 +141,14 @@ export function SubscriptionCard({
   return (
     <div
       className={`relative rounded-xl transition-all duration-300 cursor-pointer ${
-        selected ? `ring-2 ring-primary ${theme.shadow}` : `ring-1 ring-border hover:ring-muted-foreground/30 ${theme.glow}`
-      } ${isPopular ? theme.shadow : ""}`}
+        selected ? "ring-2 ring-primary shadow-lg" : "ring-1 ring-border hover:ring-muted-foreground/30"
+      } ${isPopular ? "shadow-lg" : ""} hover:scale-[1.02] hover:shadow-xl`}
       onClick={onSelect}
     >
       {/* Popular badge */}
       {isPopular && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
-          <Badge className={`bg-gradient-to-r ${theme.gradient} text-white border-0 px-4 py-1 text-[11px] font-bold shadow-lg`}>
+          <Badge className={`${theme.gradientClass} text-white border-0 px-4 py-1 text-[11px] font-bold shadow-lg`}>
             <Star className="h-3 w-3 mr-1 fill-current" />
             {lang === "zh" ? "最受欢迎" : "Most Popular"}
           </Badge>
@@ -160,7 +156,7 @@ export function SubscriptionCard({
       )}
 
       {/* Card header with gradient */}
-      <div className={`relative rounded-t-xl bg-gradient-to-r ${theme.gradient} p-5 overflow-hidden`}>
+      <div className={`relative rounded-t-xl ${theme.gradientClass} p-5 overflow-hidden`}>
         {/* Decorative elements */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 right-0 w-32 h-32 bg-white rounded-full -translate-y-1/2 translate-x-1/4" />

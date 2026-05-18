@@ -118,6 +118,35 @@ export default function PlaygroundPage() {
   });
   const [systemPrompt, setSystemPrompt] = useState("");
   const abortRef = useRef<AbortController | null>(null);
+  const STORAGE_KEY = "oortapi-playground";
+
+  // Restore playground state from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.chatHistory) setChatHistory(parsed.chatHistory);
+        if (parsed.selectedModel) setSelectedModel(parsed.selectedModel);
+        if (parsed.selectedKeyId) setSelectedKeyId(parsed.selectedKeyId);
+        if (parsed.params) setParams(parsed.params);
+        if (parsed.systemPrompt !== undefined) setSystemPrompt(parsed.systemPrompt);
+      }
+    } catch { /* ignore */ }
+  }, []);
+
+  // Persist playground state to localStorage on changes
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        chatHistory,
+        selectedModel,
+        selectedKeyId,
+        params,
+        systemPrompt,
+      }));
+    } catch { /* ignore */ }
+  }, [chatHistory, selectedModel, selectedKeyId, params, systemPrompt]);
   const responseRef = useRef<HTMLDivElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
@@ -291,6 +320,7 @@ export default function PlaygroundPage() {
     setResponse("");
     setError("");
     setUsage(null);
+    try { localStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {

@@ -360,7 +360,7 @@ export default function SearchClient() {
             id="search-listbox"
             role="listbox"
             aria-label={query.trim() ? t.search.suggestions : t.search.recentSearches}
-            className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-xl shadow-2xl overflow-hidden z-50 animate-[fadeIn_0.1s_ease-out]"
+            className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-xl shadow-2xl overflow-hidden z-50 animate-fadeIn"
           >
             {/* Recent searches */}
             {!query.trim() && recentSearches.length > 0 && (

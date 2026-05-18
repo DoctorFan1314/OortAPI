@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import { useToast } from "@/contexts/toast-context";
 import { Loader2, Settings, Download, Upload, Wallet } from "lucide-react";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 
 const LABELS = {
   zh: { apiEndpoint: "API 端点", copyEndpoint: "复制", systemSettings: "系统设置", timezone: "时区", currency: "默认货币", exchangeRate: "汇率", saveSystem: "保存系统设置", saved: "已保存", budget: "预算管理", budgetDesc: "设置每月消费上限，接近阈值时将收到提醒", monthlyBudget: "月度预算上限", currentSpend: "本月已消费", noBudget: "未设置预算", saveBudget: "保存预算", budgetWarning: "预算提醒", budgetExceeded: "已超出预算！", budgetNear: "已接近预算上限", budgetOk: "预算正常" },
@@ -29,8 +30,10 @@ export default function SettingsPage() {
   const [monthlyBudget, setMonthlyBudget] = useState("");
   const [currentSpend, setCurrentSpend] = useState(0);
   const [budgetSaving, setBudgetSaving] = useState(false);
+  const [savedBudget, setSavedBudget] = useState(0);
+  const [confirmExchangeOpen, setConfirmExchangeOpen] = useState(false);
 
-  const budgetLimit = monthlyBudget ? parseFloat(monthlyBudget) : 0;
+  const budgetLimit = monthlyBudget ? parseFloat(monthlyBudget) : savedBudget;
   const budgetPercent = budgetLimit > 0 ? (currentSpend / budgetLimit) * 100 : 0;
   const budgetStatus = budgetLimit > 0 ? (budgetPercent >= 100 ? "exceeded" : budgetPercent >= 80 ? "near" : "ok") : "none";
 
@@ -69,8 +72,13 @@ export default function SettingsPage() {
 
   const handleSaveSystem = async () => {
     if (exchangeRate !== initialExchangeRate) {
-      if (!window.confirm(lang === "zh" ? "确定要修改汇率吗？" : "Are you sure you want to change the exchange rate?")) return;
+      setConfirmExchangeOpen(true);
+      return;
     }
+    doSaveSystem();
+  };
+
+  const doSaveSystem = async () => {
     setSystemSaving(true);
     try {
       const res = await fetch("/api/dashboard/settings", {
@@ -80,26 +88,41 @@ export default function SettingsPage() {
         body: JSON.stringify({ timezone, currency: systemCurrency, exchange_rate: exchangeRate }),
       });
       if (res.ok) {
+        setInitialExchangeRate(exchangeRate);
         showToast(t.saved, "success");
-        // Update localStorage so CurrencyProvider picks up the change immediately
         try { localStorage.setItem("oortapi-currency", systemCurrency); } catch { /* ignore */ }
+      } else {
+        showToast(lang === "zh" ? "保存失败" : "Save failed", "error");
       }
-    } catch { /* ignore */ }
+    } catch {
+      showToast(lang === "zh" ? "网络错误，保存失败" : "Network error", "error");
+    }
     setSystemSaving(false);
   };
 
   const handleSaveBudget = async () => {
+    const budget = monthlyBudget ? parseFloat(monthlyBudget) : 0;
+    if (budget < 0) {
+      showToast(lang === "zh" ? "预算不能为负数" : "Budget cannot be negative", "error");
+      return;
+    }
     setBudgetSaving(true);
     try {
-      const budget = monthlyBudget ? parseFloat(monthlyBudget) : null;
       const res = await fetch("/api/dashboard/settings", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ monthly_budget: budget }),
+        body: JSON.stringify({ monthly_budget: budget || null }),
       });
-      if (res.ok) showToast(t.saved, "success");
-    } catch { /* ignore */ }
+      if (res.ok) {
+        setSavedBudget(budget);
+        showToast(t.saved, "success");
+      } else {
+        showToast(lang === "zh" ? "保存失败" : "Save failed", "error");
+      }
+    } catch {
+      showToast(lang === "zh" ? "网络错误" : "Network error", "error");
+    }
     setBudgetSaving(false);
   };
 
@@ -221,6 +244,7 @@ export default function SettingsPage() {
               <Input
                 type="number"
                 step="0.01"
+                min="0.01"
                 value={exchangeRate}
                 onChange={e => setExchangeRate(e.target.value)}
                 className="mt-1"
@@ -283,6 +307,16 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
       )}
+
+      <ConfirmDialog
+        open={confirmExchangeOpen}
+        onOpenChange={setConfirmExchangeOpen}
+        title={lang === "zh" ? "修改汇率" : "Change Exchange Rate"}
+        message={lang === "zh" ? "确定要修改汇率吗？这将影响所有 USD/CNY 价格显示。" : "Are you sure you want to change the exchange rate? This will affect all USD/CNY price displays."}
+        onConfirm={() => { setConfirmExchangeOpen(false); doSaveSystem(); }}
+        confirmLabel={lang === "zh" ? "确认修改" : "Confirm"}
+        variant="default"
+      />
     </div>
   );
 }

@@ -8,8 +8,9 @@ import { useI18n } from "@/contexts/i18n-context";
 import { useAuth } from "@/contexts/auth-context";
 import { AuthGuard } from "@/components/auth/auth-guard";
 import { SubscriptionCard } from "@/components/shared/subscription-card";
-import { Sparkles, XCircle, CheckCircle, AlertTriangle, Copy, CheckCheck, Key, Globe, Loader2 } from "lucide-react";
+import { Sparkles, XCircle, CheckCircle, AlertTriangle, Copy, CheckCheck, Key, Globe, Loader2, ChevronDown } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 
 interface Subscription {
   id: number;
@@ -357,18 +358,16 @@ function TokenPlanContent() {
         </div>
       )}
 
-      <Dialog open={cancelTarget !== null} onOpenChange={(open) => { if (!open) setCancelTarget(null); }}>
-        <DialogContent className="sm:max-w-sm">
-          <DialogHeader>
-            <DialogTitle>{lang === "zh" ? "取消订阅" : "Cancel Subscription"}</DialogTitle>
-            <DialogDescription>{lang === "zh" ? "确定要取消订阅吗？当前周期结束后将不再续费。" : "Cancel subscription? It remains active until end of current period."}</DialogDescription>
-          </DialogHeader>
-          <div className="flex gap-2 justify-end pt-2">
-            <Button variant="outline" onClick={() => setCancelTarget(null)}>{lang === "zh" ? "取消" : "Cancel"}</Button>
-            <Button onClick={confirmCancel} disabled={actionLoading !== null} className="bg-red-600 text-white hover:bg-red-700">{lang === "zh" ? "确认取消" : "Confirm Cancel"}</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <ConfirmDialog
+        open={cancelTarget !== null}
+        onOpenChange={(open) => { if (!open) setCancelTarget(null); }}
+        title={lang === "zh" ? "取消订阅" : "Cancel Subscription"}
+        message={lang === "zh" ? "确定要取消订阅吗？当前周期结束后将不再续费，已使用的额度不受影响。" : "Cancel subscription? It remains active until the end of the current period. Used credits are unaffected."}
+        onConfirm={confirmCancel}
+        confirmLabel={lang === "zh" ? "确认取消" : "Confirm Cancel"}
+        variant="danger"
+        loading={actionLoading !== null}
+      />
 
       {/* Change Plan Dialog */}
       <Dialog open={upgradeOpen} onOpenChange={(open) => { if (!open) setUpgradeOpen(false); }}>

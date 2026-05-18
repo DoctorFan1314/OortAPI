@@ -91,14 +91,14 @@ export default function BillingPage() {
                 <Gift className="h-4 w-4" />
                 {t.redeem}
               </Button>
-              <div>
-                <Button className="gap-2" disabled title={lang === "zh" ? "即将上线，请使用兑换码充值" : "Coming soon. Use redeem codes for now."}>
+              <div className="relative group">
+                <Button className="gap-2" disabled>
                   <Plus className="h-4 w-4" />
                   {t.recharge}
                 </Button>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {lang === "zh" ? "充值功能即将上线，目前请使用兑换码充值" : "Direct recharge coming soon. Use redeem codes for now."}
-                </p>
+                <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg bg-popover border border-border text-xs text-muted-foreground whitespace-nowrap opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity pointer-events-none shadow-lg">
+                  {lang === "zh" ? "即将上线，请使用兑换码充值" : "Coming soon. Use redeem codes."}
+                </div>
               </div>
             </div>
           </div>
@@ -153,6 +153,7 @@ export default function BillingPage() {
               />
             </div>
             {redeemError && <p className="text-sm text-red-400">{redeemError}</p>}
+            <p className="text-[11px] text-muted-foreground">{lang === "zh" ? "兑换码将自动转换为大写" : "Codes are auto-capitalized"}</p>
             <div className="flex gap-2 justify-end">
               <Button variant="outline" onClick={() => { setRedeemOpen(false); setRedeemCode(""); setRedeemError(""); }}>{t.cancel}</Button>
               <Button onClick={handleRedeem} disabled={redeemLoading || !redeemCode.trim()}>
