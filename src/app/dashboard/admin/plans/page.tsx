@@ -220,6 +220,9 @@ function AdminPlansContent() {
                     <Badge variant="outline" className="text-[10px]">{plan.currency}</Badge>
                   </div>
                   <p className="text-xs text-muted-foreground">{plan.tagline || plan.name}</p>
+                  <div className="text-[10px] text-muted-foreground/60 mt-1">
+                    {new Date(plan.created_at).toLocaleDateString()} · {new Date(plan.updated_at).toLocaleDateString()}
+                  </div>
                 </div>
                 <div className="flex items-center gap-5 text-sm">
                   <div className="text-center">
@@ -268,7 +271,7 @@ function AdminPlansContent() {
           <DialogHeader><DialogTitle>{lang === "zh" ? "创建套餐" : "Create Plan"}</DialogTitle><DialogDescription>{lang === "zh" ? "填写新套餐信息" : "Enter new plan details"}</DialogDescription></DialogHeader>
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              <div><label className="text-sm text-muted-foreground mb-1.5 block">{lang === "zh" ? "名称" : "Name"}</label><Input value={createForm.name} onChange={e => setCreateForm({ ...createForm, name: e.target.value })} placeholder="spark" className="h-10" /></div>
+              <div><label className="text-sm text-muted-foreground mb-1.5 block">{lang === "zh" ? "名称" : "Name"}</label><Input value={createForm.name} onChange={e => setCreateForm({ ...createForm, name: e.target.value })} placeholder="spark" className="h-10" autoFocus /></div>
               <div><label className="text-sm text-muted-foreground mb-1.5 block">{lang === "zh" ? "显示名称" : "Display Name"}</label><Input value={createForm.display_name} onChange={e => setCreateForm({ ...createForm, display_name: e.target.value })} placeholder="Lite" className="h-10" /></div>
             </div>
             <div><label className="text-sm text-muted-foreground mb-1.5 block">{lang === "zh" ? "标语" : "Tagline"}</label><Input value={createForm.tagline} onChange={e => setCreateForm({ ...createForm, tagline: e.target.value })} placeholder={lang === "zh" ? "尝鲜入门" : "Great for getting started"} className="h-10" /></div>
@@ -309,7 +312,7 @@ function AdminPlansContent() {
             <div className="space-y-5">
               {/* Basic Info */}
               <div className="grid grid-cols-2 gap-5">
-                <div><label className="text-sm text-muted-foreground mb-1.5 block">{lang === "zh" ? "显示名称" : "Display Name"}</label><Input value={editPlan.display_name} onChange={e => setEditPlan({ ...editPlan, display_name: e.target.value })} className="h-10" /></div>
+                <div><label className="text-sm text-muted-foreground mb-1.5 block">{lang === "zh" ? "显示名称" : "Display Name"}</label><Input value={editPlan.display_name} onChange={e => setEditPlan({ ...editPlan, display_name: e.target.value })} className="h-10" autoFocus /></div>
                 <div><label className="text-sm text-muted-foreground mb-1.5 block">{lang === "zh" ? "宣传语" : "Tagline"}</label><Input value={editPlan.tagline || ""} onChange={e => setEditPlan({ ...editPlan, tagline: e.target.value })} className="h-10" /></div>
               </div>
 
@@ -384,7 +387,7 @@ function AdminPlansContent() {
 
       {/* Delete Dialog */}
       <Dialog open={!!deletePlan} onOpenChange={() => setDeletePlan(null)}>
-        <DialogContent><DialogHeader><DialogTitle>{lang === "zh" ? "删除" : "Delete"}</DialogTitle><DialogDescription>{lang === "zh" ? "确定要删除此套餐吗？" : "Delete this plan?"}</DialogDescription></DialogHeader>
+        <DialogContent><DialogHeader><DialogTitle>{lang === "zh" ? "删除" : "Delete"}</DialogTitle><DialogDescription>{lang === "zh" ? `确定要删除套餐「${deletePlan?.display_name}」吗？` : `Delete plan "${deletePlan?.display_name}"?`}</DialogDescription></DialogHeader>
           <div className="flex justify-end gap-2"><Button variant="outline" onClick={() => setDeletePlan(null)}>{lang === "zh" ? "取消" : "Cancel"}</Button><Button className="bg-red-600 text-white hover:bg-red-700" onClick={handleDelete} disabled={deleteLoading}>{deleteLoading ? <Loader2 className="h-4 w-4 animate-spin mr-1.5" /> : null}{lang === "zh" ? "确定" : "Confirm"}</Button></div>
         </DialogContent>
       </Dialog>

@@ -24,6 +24,7 @@ export default function SettingsPage() {
   const [timezone, setTimezone] = useState("Asia/Shanghai");
   const [systemCurrency, setSystemCurrency] = useState("USD");
   const [exchangeRate, setExchangeRate] = useState("7.3");
+  const [initialExchangeRate, setInitialExchangeRate] = useState("7.3");
   const [systemSaving, setSystemSaving] = useState(false);
   const [monthlyBudget, setMonthlyBudget] = useState("");
   const [currentSpend, setCurrentSpend] = useState(0);
@@ -41,6 +42,7 @@ export default function SettingsPage() {
           setTimezone(d.settings.timezone || "Asia/Shanghai");
           setSystemCurrency(d.settings.currency || "USD");
           setExchangeRate(d.settings.exchange_rate || "7.3");
+          setInitialExchangeRate(d.settings.exchange_rate || "7.3");
         }
         if (d.preferences?.monthly_budget) {
           setMonthlyBudget(String(d.preferences.monthly_budget));
@@ -66,6 +68,9 @@ export default function SettingsPage() {
   }, [budgetLimit, budgetPercent]);
 
   const handleSaveSystem = async () => {
+    if (exchangeRate !== initialExchangeRate) {
+      if (!window.confirm(lang === "zh" ? "确定要修改汇率吗？" : "Are you sure you want to change the exchange rate?")) return;
+    }
     setSystemSaving(true);
     try {
       const res = await fetch("/api/dashboard/settings", {

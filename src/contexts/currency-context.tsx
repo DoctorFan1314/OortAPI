@@ -9,7 +9,7 @@ interface CurrencyContextValue {
   currency: Currency;
   setCurrency: (c: Currency) => void;
   exchangeRate: number;
-  formatPrice: (usdAmount: number) => string;
+  formatPrice: (usdAmount: number, decimals?: number) => string;
   symbol: string;
 }
 
@@ -17,7 +17,7 @@ const CurrencyContext = createContext<CurrencyContextValue>({
   currency: "USD",
   setCurrency: () => {},
   exchangeRate: 7.3,
-  formatPrice: (usd) => `$${usd.toFixed(4)}`,
+  formatPrice: (usd, decimals) => decimals ? `$${usd.toFixed(decimals)}` : `$${usd.toFixed(6)}`,
   symbol: "$",
 });
 
@@ -84,11 +84,11 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
 
   const symbol = currency === "CNY" ? "¥" : "$";
 
-  const formatPrice = useCallback((usdAmount: number) => {
+  const formatPrice = useCallback((usdAmount: number, decimals?: number) => {
     if (currency === "CNY") {
-      return `¥${(usdAmount * exchangeRate).toFixed(2)}`;
+      return `¥${(usdAmount * exchangeRate).toFixed(decimals ?? 2)}`;
     }
-    return `$${usdAmount.toFixed(4)}`;
+    return `$${usdAmount.toFixed(decimals ?? 6)}`;
   }, [currency, exchangeRate]);
 
   const value = useMemo(

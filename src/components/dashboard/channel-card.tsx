@@ -382,6 +382,7 @@ function ChannelFormFields({
             value={form.name}
             onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
             className="h-9 mt-1"
+            autoFocus
           />
         </div>
         <div>
@@ -565,12 +566,11 @@ export function ChannelCard({ lang = "zh" }: { lang?: "zh" | "en" }) {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editForm, setEditForm] = useState<ChannelForm>({ ...defaultForm });
   const [testingId, setTestingId] = useState<number | null>(null);
-  const [testResult, setTestResult] = useState<{
-    id: number;
+  const [testResults, setTestResults] = useState<Record<number, {
     success: boolean;
     latency?: number;
     error?: string;
-  } | null>(null);
+  }>>({});
   const [deleteTarget, setDeleteTarget] = useState<Channel | null>(null);
   const [syncingId, setSyncingId] = useState<number | null>(null);
   const [syncResult, setSyncResult] = useState<{
@@ -724,7 +724,6 @@ export function ChannelCard({ lang = "zh" }: { lang?: "zh" | "en" }) {
 
   const testConnection = async (id: number) => {
     setTestingId(id);
-    setTestResult(null);
     try {
       const res = await fetch("/api/dashboard/channels", {
         method: "POST",
@@ -733,14 +732,9 @@ export function ChannelCard({ lang = "zh" }: { lang?: "zh" | "en" }) {
         body: JSON.stringify({ action: "test", id }),
       });
       const data = await res.json();
-      setTestResult({
-        id,
-        success: data.success,
-        latency: data.latency_ms,
-        error: data.error,
-      });
+      setTestResults(prev => ({ ...prev, [id]: { success: data.success, latency: data.latency_ms, error: data.error } }));
     } catch {
-      setTestResult({ id, success: false, error: "Request failed" });
+      setTestResults(prev => ({ ...prev, [id]: { success: false, error: "Request failed" } }));
     } finally {
       setTestingId(null);
     }
@@ -1030,13 +1024,13 @@ export function ChannelCard({ lang = "zh" }: { lang?: "zh" | "en" }) {
                             </>
                           )}
                         </div>
-                        {testResult?.id === ch.id && (
+                        {testResults[ch.id] && (
                           <div
-                            className={`text-xs mt-1 ${testResult.success ? "text-green-500" : "text-red-500"}`}
+                            className={`text-xs mt-1 ${testResults[ch.id].success ? "text-green-500" : "text-red-500"}`}
                           >
-                            {testResult.success
-                              ? `${t.testSuccess} (${t.latency}: ${testResult.latency}ms)`
-                              : `${t.testFail}: ${testResult.error}`}
+                            {testResults[ch.id].success
+                              ? `${t.testSuccess} (${t.latency}: ${testResults[ch.id].latency}ms)`
+                              : `${t.testFail}: ${testResults[ch.id].error}`}
                           </div>
                         )}
                         {syncResult?.id === ch.id && (

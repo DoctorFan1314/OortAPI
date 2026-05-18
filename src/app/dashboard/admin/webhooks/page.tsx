@@ -220,7 +220,7 @@ export default function WebhooksPage() {
                   <div key={wh.id} className="flex items-center gap-4 p-4 hover:bg-muted/30 transition-colors">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <code className="text-sm font-mono truncate">{wh.url}</code>
+                        <code className="text-sm font-mono truncate" title={wh.url}>{wh.url}</code>
                         <span className={`text-xs px-2 py-0.5 rounded-full ${wh.enabled ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"}`}>
                           {wh.enabled ? t.enabled : t.disabled}
                         </span>
@@ -246,8 +246,9 @@ export default function WebhooksPage() {
                         )}
                       </div>
                     </div>
-                    <div className="text-right text-xs text-muted-foreground shrink-0">
-                      {new Date(wh.created_at + "Z").toLocaleDateString()}
+                    <div className="text-right text-xs text-muted-foreground shrink-0 text-center">
+                      <div>{new Date(wh.created_at + "Z").toLocaleDateString()}</div>
+                      <div className="text-[10px] opacity-70">{new Date(wh.updated_at + "Z").toLocaleDateString()}</div>
                     </div>
                     <div className="flex items-center gap-1 shrink-0">
                       <button onClick={() => toggleEnabled(wh.id, !wh.enabled)} className="text-muted-foreground hover:text-foreground" aria-label="Toggle">
@@ -281,7 +282,7 @@ export default function WebhooksPage() {
           <div className="space-y-4">
             <div>
               <label className="text-sm font-medium block mb-1">{t.url}</label>
-              <Input value={url} onChange={e => setUrl(e.target.value)} placeholder="https://example.com/webhook" />
+              <Input value={url} onChange={e => setUrl(e.target.value)} placeholder="https://example.com/webhook" autoFocus />
             </div>
             <div>
               <label className="text-sm font-medium block mb-2">{t.events}</label>
@@ -312,7 +313,11 @@ export default function WebhooksPage() {
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>{t.title}</DialogTitle>
-            <DialogDescription>{t.confirmDelete}</DialogDescription>
+            <DialogDescription>
+              {t.confirmDelete}
+              <br />
+              <code className="text-xs">{webhooks.find(w => w.id === deleteTarget)?.url}</code>
+            </DialogDescription>
           </DialogHeader>
           <div className="flex gap-2 justify-end pt-2">
             <Button variant="outline" onClick={() => setDeleteTarget(null)}>{t.cancel}</Button>

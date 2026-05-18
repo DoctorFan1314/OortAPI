@@ -156,7 +156,7 @@ const LABELS = {
 
 function formatRate(rate: number | null | undefined): string {
   if (rate == null || rate === 0) return "-";
-  return `$${rate.toFixed(4)}/1K`;
+  return `$${(rate * 1000).toFixed(4)}/1M tokens`;
 }
 
 export default function UsagePage() {
@@ -281,13 +281,8 @@ export default function UsagePage() {
     return n.toLocaleString();
   };
 
-  // Format cost in the current currency (small amounts use USD precision then convert)
-  const formatCostDisplay = (usd: number) => {
-    if (currency === "CNY") {
-      return `¥${(usd * exchangeRate).toFixed(4)}`;
-    }
-    return `$${usd.toFixed(6)}`;
-  };
+  // Format cost with higher precision for line items
+  const formatCostDisplay = (usd: number) => formatPrice(usd, 4);
 
   // Render detailed cost breakdown for a log entry
   const renderBreakdown = (log: UsageLog) => {

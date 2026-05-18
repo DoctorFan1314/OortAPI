@@ -63,13 +63,8 @@ const LABELS = {
 
 export function StatsCards({ lang = "zh" }: { lang?: "zh" | "en" }) {
   const { data: stats } = useSWR<StatsData>("/api/dashboard/stats", dashboardSWRConfig);
-  const { currency, exchangeRate, symbol } = useCurrency();
+  const { currency, exchangeRate, symbol, formatPrice } = useCurrency();
   const t = LABELS[lang];
-
-  const formatCost = (usd: number) => {
-    if (currency === "CNY") return `¥${(usd * exchangeRate).toFixed(2)}`;
-    return `$${usd.toFixed(2)}`;
-  };
 
   const formatTokens = (n: number) => {
     return n.toLocaleString();
@@ -98,8 +93,8 @@ export function StatsCards({ lang = "zh" }: { lang?: "zh" | "en" }) {
   const avgTPM = Math.round(avgDailyTokens / 1440);
 
   const cards = [
-    { icon: Wallet, label: t.balance, value: formatCost(stats.balance), color: "text-yellow-500", bgColor: "bg-yellow-500/10" },
-    { icon: TrendingDown, label: t.monthlyCost, value: formatCost(stats.month?.cost || 0), color: "text-red-500", bgColor: "bg-red-500/10" },
+    { icon: Wallet, label: t.balance, value: formatPrice(stats.balance), color: "text-yellow-500", bgColor: "bg-yellow-500/10" },
+    { icon: TrendingDown, label: t.monthlyCost, value: formatPrice(stats.month?.cost || 0), color: "text-red-500", bgColor: "bg-red-500/10" },
     { icon: Activity, label: t.monthlyCalls, value: (stats.month?.calls || 0).toLocaleString(), color: "text-blue-500", bgColor: "bg-blue-500/10" },
     { icon: Gauge, label: t.rpm, value: avgRPM, color: "text-purple-500", bgColor: "bg-purple-500/10" },
     { icon: Cpu, label: t.tpm, value: formatTokens(avgTPM), color: "text-cyan-500", bgColor: "bg-cyan-500/10" },

@@ -6,6 +6,34 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [v3.3.4.10] — 2026-05-18
+
+### Data Consistency
+- **Cost precision unified** — All pages now use `formatPrice` from currency context with consistent decimal places
+- **Currency system unified** — Models page now uses shared `useCurrency()` context instead of local state
+- **Token rate unit** — All pages now show `/1M tokens` consistently
+- **Date timezone** — Fixed missing "+Z" suffix on redeem codes and API keys expiry dates
+- **Search labels** — Aligned with rest of site ("Input"/"Output" instead of "in"/"out")
+- **Profile stats** — Now uses server-side aggregates instead of last 10 logs
+
+### Admin Panel UX
+- **Delete confirmations** — Now show the actual name/code/URL of the item being deleted
+- **updated_at displayed** — Webhooks and Plans now show last modified date
+- **Settings confirm** — Exchange rate changes now prompt for confirmation
+- **Dialog autoFocus** — All create/edit dialogs now auto-focus the first input
+- **URL tooltip** — Truncated webhook URLs show full URL on hover
+- **total_calls formatted** — API key list now uses locale formatting
+- **Channel test results** — Each channel now has independent test result state
+- **Count badges** — API Keys and Redeem codes now show total count
+
+### Shared Components
+- **StatCard** — Reusable stat card component (8 color variants)
+- **StatusBadge** — Reusable status badge (success/error/warning/info/muted)
+- **ConfirmDialog** — Reusable confirmation dialog with danger variant
+- **LoadingSkeleton** — Reusable loading skeleton
+
+---
+
 ## [v3.3.4.9] — 2026-05-18
 
 ### Dashboard

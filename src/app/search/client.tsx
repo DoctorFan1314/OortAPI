@@ -455,8 +455,8 @@ export default function SearchClient() {
                       <p className="text-xs text-muted-foreground font-mono truncate">{m.id}</p>
                       {m.pricing && (
                         <div className="mt-2 flex gap-3 text-xs text-muted-foreground">
-                          <span>${m.pricing.input ?? "—"}/1M in</span>
-                          <span>${m.pricing.output ?? "—"}/1M out</span>
+                          <span>${m.pricing.input ?? "—"}/1M Input</span>
+                          <span>${m.pricing.output ?? "—"}/1M Output</span>
                         </div>
                       )}
                     </Link>

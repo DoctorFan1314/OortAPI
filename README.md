@@ -184,6 +184,7 @@ Supports full `tool_use` / `tool_result` conversion between Anthropic and OpenAI
 - **System monitor** — Admin dashboard: QPS, error rate, P50/P95 latency, per-provider health
 - **API Playground** — Interactive testing: select model + key, multi-turn conversation, configurable parameters, streaming response
 - **Multi-page documentation** — Sidebar-navigated docs with Quick Start, Authentication, API Endpoints, SDK, Streaming, Pricing, Error Codes, Rate Limits, Deployment, Integration Guides, and Swagger UI
+- **Shared component library** — StatCard, StatusBadge, ConfirmDialog, LoadingSkeleton, and more reusable components
 - **Channel routing matrix** — Visual model-to-channel mapping with priority/weight
 - **Budget management** — Monthly spending limits with threshold alerts
 - **Per-Key analytics** — 7-day stats per API Key (calls, cost, tokens, latency, error rate)

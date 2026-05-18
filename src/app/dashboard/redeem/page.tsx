@@ -265,7 +265,7 @@ export default function RedeemPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold flex items-center gap-2"><Gift className="h-6 w-6" />{t.title}</h1>
+        <h1 className="text-2xl font-bold flex items-center gap-2"><Gift className="h-6 w-6" />{t.title}{!loading && <Badge variant="secondary" className="ml-1 text-xs">{codes.length}</Badge>}</h1>
         <Button onClick={() => { setGenOpen(true); setGenResult([]); }} size="sm">
           <Plus className="h-4 w-4 mr-1.5" />{t.generate}
         </Button>
@@ -352,7 +352,7 @@ export default function RedeemPage() {
                           <Badge variant="secondary" className={st.cls}>{st.label}</Badge>
                         </td>
                         <td className="py-3 px-4 text-right text-xs text-muted-foreground">
-                          {c.expires_at ? new Date(c.expires_at).toLocaleDateString() : "-"}
+                          {c.expires_at ? new Date(c.expires_at + "Z").toLocaleDateString() : "-"}
                         </td>
                         <td className="py-3 px-4 text-right">
                           <div className="flex justify-end gap-1">
@@ -406,7 +406,7 @@ export default function RedeemPage() {
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="text-sm text-foreground mb-1.5 block">{t.amount}</label>
-                    <Input type="number" min="0.01" step="0.01" value={genAmount} onChange={(e) => setGenAmount(e.target.value)} className="bg-secondary border-border" />
+                    <Input type="number" min="0.01" step="0.01" value={genAmount} onChange={(e) => setGenAmount(e.target.value)} className="bg-secondary border-border" autoFocus />
                   </div>
                   <div>
                     <label className="text-sm text-foreground mb-1.5 block">{t.count}</label>
@@ -477,7 +477,11 @@ export default function RedeemPage() {
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>{t.delete}</DialogTitle>
-            <DialogDescription>{t.deleteConfirm}</DialogDescription>
+            <DialogDescription>
+              {t.deleteConfirm}
+              <br />
+              <code className="text-xs">{codes.find(c => c.id === deleteId)?.code}</code>
+            </DialogDescription>
           </DialogHeader>
           <div className="flex gap-2 justify-end pt-2">
             <Button variant="outline" onClick={() => setDeleteId(null)}>{t.cancel}</Button>

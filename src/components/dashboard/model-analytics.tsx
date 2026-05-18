@@ -102,7 +102,7 @@ function generateHourSlots(): string[] {
 
 export function ModelAnalytics() {
   const { lang } = useI18n();
-  const { currency, exchangeRate } = useCurrency();
+  const { formatPrice } = useCurrency();
   const t = LABELS[lang];
 
   const [range, setRange] = useState<7 | 14 | 30>(7);
@@ -366,7 +366,7 @@ export function ModelAnalytics() {
               <div>
                 <p className="text-xs text-muted-foreground">{t.cost}</p>
                 <p className="text-lg font-bold font-mono">
-                  {currency === "CNY" ? `¥${(data.total.cost * exchangeRate).toFixed(2)}` : `$${data.total.cost.toFixed(4)}`}
+                  {formatPrice(data.total.cost)}
                 </p>
               </div>
             </CardContent>

@@ -111,8 +111,7 @@ export default function ModelsPage() {
 
   const [models, setModels] = useState<ChannelModel[]>([]);
   const [loading, setLoading] = useState(true);
-  const [currency, setCurrency] = useState<Currency>("USD");
-  const [exchangeRate, setExchangeRate] = useState(7.3);
+  const { currency, setCurrency, exchangeRate, formatPrice } = useCurrency();
   const [editingModel, setEditingModel] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({ input_rate: 0, output_rate: 0, cache_rate: 0, cache_creation_rate: 0, credit_rate: 1.0, display_name: "" });
   const [search, setSearch] = useState("");
@@ -130,17 +129,6 @@ export default function ModelsPage() {
   };
 
   useEffect(() => { fetchModels(); }, []);
-
-  useEffect(() => {
-    fetch("/api/dashboard/settings", { credentials: "include" })
-      .then(res => res.ok ? res.json() : null)
-      .then(data => {
-        if (data?.settings?.exchange_rate) {
-          setExchangeRate(parseFloat(data.settings.exchange_rate) || 7.3);
-        }
-      })
-      .catch(() => {});
-  }, []);
 
   const syncAllChannels = async () => {
     setSyncing(true);
@@ -223,8 +211,7 @@ export default function ModelsPage() {
 
   const fmtPrice = (rate: number) => {
     if (rate <= 0) return "-";
-    if (currency === "CNY") return `¥${(rate * exchangeRate).toFixed(2)}`;
-    return `$${rate.toFixed(4)}`;
+    return formatPrice(rate, 6);
   };
 
   const pc = (provider: string) => PROVIDER_COLORS[provider] || PROVIDER_COLORS.unknown;
@@ -286,7 +273,7 @@ export default function ModelsPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="pl-9 h-9 bg-background"
-              />
+             />
             </div>
             <div className="flex gap-1.5 flex-wrap">
               <button
@@ -410,7 +397,7 @@ export default function ModelsPage() {
                             value={editForm.display_name}
                             onChange={(e) => setEditForm((f) => ({ ...f, display_name: e.target.value }))}
                             className="h-8 text-xs"
-                          />
+                         />
                         </div>
                         <div className="grid grid-cols-2 gap-2">
                           {[
@@ -431,7 +418,7 @@ export default function ModelsPage() {
                                   setEditForm((f) => ({ ...f, [key]: usdValue }));
                                 }}
                                 className="h-8 text-xs"
-                              />
+                             />
                             </div>
                           ))}
                         </div>
@@ -446,7 +433,7 @@ export default function ModelsPage() {
                               value={editForm.credit_rate}
                               onChange={(e) => setEditForm((f) => ({ ...f, credit_rate: parseFloat(e.target.value) || 1.0 }))}
                               className="h-8 text-xs w-24"
-                            />
+                           />
                             <span className="text-xs text-muted-foreground whitespace-nowrap">credits</span>
                           </div>
                           <p className="text-[10px] text-muted-foreground mt-1">{t.creditRateHint}</p>
@@ -495,10 +482,10 @@ export default function ModelsPage() {
                         {m.rate_id ? (
                           <div className="mx-5 mb-3 rounded-lg border border-border/50 overflow-hidden">
                             <div className="grid grid-cols-2 divide-x divide-y divide-border/50">
-                              <PriceCell label={t.inputPrice} value={fmtPrice(m.input_rate)} currency={currency} />
-                              <PriceCell label={t.outputPrice} value={fmtPrice(m.output_rate)} currency={currency} />
-                              <PriceCell label={t.cacheRead} value={fmtPrice(m.cache_rate)} currency={currency} />
-                              <PriceCell label={t.cacheCreate} value={fmtPrice(m.cache_creation_rate)} currency={currency} />
+                              <PriceCell label={t.inputPrice} value={fmtPrice(m.input_rate)} />
+                              <PriceCell label={t.outputPrice} value={fmtPrice(m.output_rate)} />
+                              <PriceCell label={t.cacheRead} value={fmtPrice(m.cache_rate)} />
+                              <PriceCell label={t.cacheCreate} value={fmtPrice(m.cache_creation_rate)} />
                             </div>
                             <div className="px-3 py-1.5 border-t border-border/50 bg-muted/30">
                               <span className="text-[10px] text-muted-foreground">{t.creditRate}: 1 token = {m.credit_rate ?? 1.0} credits</span>
@@ -557,7 +544,7 @@ export default function ModelsPage() {
   );
 }
 
-function PriceCell({ label, value, currency }: { label: string; value: string; currency: Currency }) {
+function PriceCell({ label, value }: { label: string; value: string }) {
   return (
     <div className="px-3 py-2">
       <div className="text-[10px] text-muted-foreground uppercase tracking-wide mb-0.5">{label}</div>

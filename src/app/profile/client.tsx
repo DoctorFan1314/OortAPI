@@ -188,7 +188,7 @@ export default function ProfileClient() {
   const [confirmPw, setConfirmPw] = useState("");
   const [pwLoading, setPwLoading] = useState(false);
 
-  const { data: usageData, isLoading } = useSWR<{ data: UsageLog[]; total: number }>(
+  const { data: usageData, isLoading } = useSWR<{ data: UsageLog[]; total: number; total_tokens: number; total_cost: number }>(
     "/api/v1/billing/usage?limit=10",
     dashboardSWRConfig,
   );
@@ -196,8 +196,8 @@ export default function ProfileClient() {
   const logs = usageData?.data || [];
   const stats = useMemo(() => ({
     totalCalls: usageData?.total || logs.length,
-    totalTokens: logs.reduce((s, l) => s + l.tokens_in + l.tokens_out, 0),
-    totalCost: logs.reduce((s, l) => s + l.cost, 0),
+    totalTokens: usageData?.total_tokens || logs.reduce((s, l) => s + l.tokens_in + l.tokens_out, 0),
+    totalCost: usageData?.total_cost || logs.reduce((s, l) => s + l.cost, 0),
   }), [usageData, logs]);
 
   const handleSaveProfile = () => {

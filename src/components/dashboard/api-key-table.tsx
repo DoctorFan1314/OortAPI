@@ -5,6 +5,7 @@ import useSWR from "swr";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Copy, Eye, EyeOff, Plus, Trash2, ToggleLeft, ToggleRight } from "lucide-react";
 import { useToast } from "@/contexts/toast-context";
@@ -216,7 +217,7 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
   return (
     <Card className="glass-card">
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-lg">{t.title}</CardTitle>
+        <CardTitle className="text-lg flex items-center gap-2">{t.title}{!isLoading && <Badge variant="secondary" className="ml-1 text-xs">{keys.length}</Badge>}</CardTitle>
         <div className="flex items-center gap-2">
           <Input
             placeholder={t.name}
@@ -281,7 +282,7 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
                   <div className="text-xs text-muted-foreground mt-1">
                     {k.expires_at ? (
                       <span className={isExpired ? "text-red-500" : ""}>
-                        {t.expires}: {new Date(k.expires_at).toLocaleDateString()}
+                        {t.expires}: {new Date(k.expires_at + "Z").toLocaleDateString()}
                         {isExpired ? ` (${t.expired})` : calcDaysLeft !== null ? ` (${t.expiresIn.replace('{days}', String(calcDaysLeft))})` : ""}
                       </span>
                     ) : (
@@ -290,7 +291,7 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
                   </div>
                 </div>
                 <div className="text-right text-xs text-muted-foreground shrink-0">
-                  <div>{t.calls}: {k.total_calls}</div>
+                  <div>{t.calls}: {k.total_calls.toLocaleString()}</div>
                   <div>{t.lastUsed}: {formatLastUsed(k.last_used_at)}</div>
                   {editingRateId === k.id ? (
                     <div className="flex items-center gap-1 mt-1">
