@@ -286,19 +286,6 @@ export default function UsagePage() {
           total_tokens_out: d.total_tokens_out || 0,
           total_credits_used: d.total_credits_used || 0,
         });
-        // Auto-detect display mode: credits only if ALL logs are credits-based
-        const hasCredits = data.some((log: UsageLog) => log.deduction_source === 'credits');
-        const hasBalance = data.some((log: UsageLog) => log.deduction_source === 'balance');
-        const isPureCredits = hasCredits && !hasBalance;
-        if (isPureCredits) {
-          setIsCreditsUser(true);
-        } else {
-          setIsCreditsUser(false);
-        }
-        // Switch chart default from cost to tokens for credits users on first detection
-        if (isPureCredits && chartMetric === "cost") {
-          setChartMetric("tokens");
-        }
         setDailyTrend(d.daily_trend || []);
         setLoading(false);
       })
@@ -308,6 +295,22 @@ export default function UsagePage() {
         setLoading(false);
       });
   }, [page, filterModel, filterStatus, filterFrom, filterTo, filterKeyId]);
+
+  // Check subscription status: no subscription → show cost, has subscription → show credits
+  useEffect(() => {
+    fetch("/api/dashboard/subscription", { credentials: "include" })
+      .then(r => r.json())
+      .then(d => {
+        const hasActive = d.subscriptions?.some((s: { status: string }) => s.status === 'active');
+        if (hasActive) {
+          setIsCreditsUser(true);
+          setChartMetric("tokens");
+        } else {
+          setIsCreditsUser(false);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const formatTokens = (n: number) => {
     return n.toLocaleString();
