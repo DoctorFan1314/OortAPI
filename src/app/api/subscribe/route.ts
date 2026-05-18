@@ -25,6 +25,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'billing_cycle must be monthly or yearly' }, { status: 400 });
     }
 
+    // Get exchange rate for CNY plan conversion
+    const exchangeRateSetting = db.prepare("SELECT value FROM system_settings WHERE key = 'exchange_rate'").get() as { value: string } | undefined;
+    const exchangeRate = parseFloat(exchangeRateSetting?.value || '7.3');
+
     // Fetch the target plan
     const plan = db.prepare(
       'SELECT * FROM subscription_plans WHERE id = ? AND enabled = 1'
@@ -120,7 +124,9 @@ export async function POST(request: NextRequest) {
       // New subscription
       const basePrice = billing_cycle === 'yearly' ? plan.yearly_price : plan.monthly_price;
       const discount = isFirstPurchase ? plan.first_purchase_discount : 0;
-      finalPrice = basePrice * (1 - discount);
+      // Convert plan price to USD (balance is stored in USD)
+      const priceInUSD = plan.currency === 'CNY' ? basePrice / exchangeRate : basePrice;
+      finalPrice = priceInUSD * (1 - discount);
       action = 'new';
 
       if (user.balance < finalPrice) {
