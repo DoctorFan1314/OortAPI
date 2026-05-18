@@ -68,7 +68,6 @@ function TokenPlanContent() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
-  const [showKey, setShowKey] = useState<number | null>(null);
   const [cancelTarget, setCancelTarget] = useState<number | null>(null);
   const [upgradeOpen, setUpgradeOpen] = useState(false);
   const [plans, setPlans] = useState<{ id: number; name: string; display_name: string; monthly_credits: number; monthly_price: number; tier: number }[]>([]);
@@ -159,11 +158,6 @@ function TokenPlanContent() {
         alert(data.error || "Plan change failed");
       }
     } catch {} finally { setUpgradeLoading(false); }
-  }
-
-  function maskKey(key: string): string {
-    if (key.length <= 12) return key;
-    return key.slice(0, 9) + "****" + key.slice(-4);
   }
 
   function formatDate(dateStr: string): string {
@@ -292,12 +286,9 @@ function TokenPlanContent() {
                 {apiKeys.slice(0, 3).map((k) => (
                   <div key={k.id} className="flex items-center gap-2 p-3 rounded-lg bg-muted/50 border border-border">
                     <span className="text-xs text-muted-foreground shrink-0 w-16 truncate">{k.name}</span>
-                    <code className={`flex-1 text-sm font-mono text-foreground ${showKey === k.id ? "break-all" : "truncate"}`}>
-                      {showKey === k.id ? k.key_value : maskKey(k.key_value)}
+                    <code className="flex-1 text-sm font-mono text-foreground break-all">
+                      {k.key_value}
                     </code>
-                    <button onClick={() => setShowKey(showKey === k.id ? null : k.id)} className="text-xs text-muted-foreground hover:text-foreground shrink-0">
-                      {showKey === k.id ? text.hide : text.show}
-                    </button>
                     <button onClick={() => handleCopy(k.key_value, `key-${k.id}`)} className="shrink-0" aria-label="Copy API key">
                       {copied === `key-${k.id}` ? <CheckCheck className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground" />}
                     </button>

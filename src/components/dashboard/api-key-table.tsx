@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Copy, Eye, EyeOff, Plus, Trash2, ToggleLeft, ToggleRight } from "lucide-react";
+import { Copy, Plus, Trash2, ToggleLeft, ToggleRight } from "lucide-react";
 import { useToast } from "@/contexts/toast-context";
 import { dashboardSWRConfig } from "@/lib/swr-fetcher";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
@@ -96,7 +96,6 @@ const LABELS = {
 export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
   const { data, isLoading, mutate } = useSWR<{ keys: ApiKey[] }>("/api/dashboard/keys", dashboardSWRConfig);
   const keys = data?.keys || [];
-  const [showKey, setShowKey] = useState<Record<number, boolean>>({});
   const [newKeyName, setNewKeyName] = useState("");
   const [newKeyExpires, setNewKeyExpires] = useState("");
   const [creating, setCreating] = useState(false);
@@ -274,13 +273,10 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
                     )}
                   </div>
                   <div className="flex items-center gap-2">
-                    <code className="text-xs font-mono text-muted-foreground">
-                      {showKey[k.id] ? k.key_value : maskKey(k.key_value)}
+                    <code className="text-xs font-mono text-muted-foreground break-all">
+                      {k.key_value}
                     </code>
-                    <button onClick={() => setShowKey(p => ({ ...p, [k.id]: !p[k.id] }))} className="text-muted-foreground hover:text-foreground" aria-label={showKey[k.id] ? "Hide key" : "Show key"}>
-                      {showKey[k.id] ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
-                    </button>
-                    <button onClick={() => copyKey(k.key_value)} className="text-muted-foreground hover:text-foreground" aria-label="Copy key">
+                    <button onClick={() => copyKey(k.key_value)} className="text-muted-foreground hover:text-foreground shrink-0" aria-label="Copy key">
                       <Copy className="h-3 w-3" />
                     </button>
                   </div>
