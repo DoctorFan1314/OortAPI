@@ -6,6 +6,28 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [v3.3.4.7] — 2026-05-18
+
+### Major — Documentation Overhaul
+- **Multi-page docs** — Monolithic single-page `/docs` split into 10 sub-pages with persistent sidebar navigation: Quick Start, Authentication, API Endpoints, SDK Integration, Streaming, Pricing, Error Codes, Rate Limits, Deployment, and Integration Guides
+- **Docs sidebar** — Grouped, collapsible navigation sidebar with client-side search filtering, mobile responsive
+- **Docs landing page** — Navigation hub with categorized card grid replacing the 920-line single page
+- **Shared components** — Extracted `CodeBlock`, `BaseUrlDisplay`, `EndpointRow`, and `DocsSidebar` as reusable components
+- **i18n expansion** — Extended `apiDocs` namespace from ~20 to ~90 keys for full bilingual support
+
+### New Pages
+- **Changelog** — `/changelog` renders CHANGELOG.md from GitHub with version history
+- **FAQ** — `/faq` with 10 expandable common questions (bilingual)
+- **Rate Limits** — `/docs/rate-limits` with retry code examples (Python/Node.js)
+- **Integration Guides** — `/docs/integrations` with per-app configuration guides
+
+### Improvements
+- **Footer** — Added FAQ link, system status indicator (polls `/api/health`)
+- **Navbar** — Removed changelog/FAQ from navbar (footer only)
+- **Build** — Project now generates 181 static pages (up from 169)
+
+---
+
 ## [v3.3.4.6] — 2026-05-18
 
 ### New Features

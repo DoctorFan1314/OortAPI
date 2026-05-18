@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { useI18n } from "@/contexts/i18n-context";
+import { StatusIndicator } from "@/components/layout/status-indicator";
 
 export function Footer() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
 
   const footerSections = [
     { id: "product", title: t.footer.product, links: [
@@ -12,6 +13,7 @@ export function Footer() {
       { label: t.footer.apiDocs, href: "/docs", disabled: false },
       { label: t.footer.dashboard, href: "/dashboard", disabled: false },
       { label: t.footer.pricing, href: "/token-plan", disabled: false },
+      { label: lang === "zh" ? "常见问题" : "FAQ", href: "/faq", disabled: false },
     ]},
     { id: "features", title: t.footer.features, links: [
       { label: t.footer.unifiedApi, href: "/docs", disabled: false },
@@ -23,6 +25,7 @@ export function Footer() {
       { label: t.footer.agentSkills, href: "/skills", disabled: false },
       { label: t.footer.promptTemplates, href: "/prompts", disabled: false },
       { label: t.footer.categories, href: "/categories", disabled: false },
+      { label: t.common.changelog, href: "/changelog", disabled: false },
     ]},
     { id: "community", title: t.footer.community, links: [
       { label: t.footer.github, href: "#", disabled: true },
