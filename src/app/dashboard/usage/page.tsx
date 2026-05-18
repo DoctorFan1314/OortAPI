@@ -157,7 +157,7 @@ const LABELS = {
 
 function formatRate(rate: number | null | undefined): string {
   if (rate == null || rate === 0) return "-";
-  return `$${(rate * 1000).toFixed(4)}/1M tokens`;
+  return `$${rate.toFixed(4)}/1M tokens`;
 }
 
 export default function UsagePage() {

@@ -52,7 +52,7 @@ const LABELS = {
     save: "保存",
     cancel: "取消",
     noModels: "暂无模型，请先在渠道管理中配置",
-    perMillion: "/1K tokens",
+    perMillion: "/1M tokens",
     syncing: "同步中...",
     syncAll: "同步渠道",
     search: "搜索模型名称、供应商...",
@@ -82,7 +82,7 @@ const LABELS = {
     save: "Save",
     cancel: "Cancel",
     noModels: "No models available. Configure channels first.",
-    perMillion: "/1K tokens",
+    perMillion: "/1M tokens",
     syncing: "Syncing...",
     syncAll: "Sync Channels",
     search: "Search models, providers...",
@@ -404,7 +404,7 @@ export default function ModelsPage() {
                             { key: "cache_rate" as const, label: t.cacheRead },
                           ].map(({ key, label }) => (
                             <div key={key}>
-                              <label className="text-xs text-muted-foreground mb-1 block">{label} ({currency === "CNY" ? "¥" : "$"}/1K)</label>
+                              <label className="text-xs text-muted-foreground mb-1 block">{label} ({currency === "CNY" ? "¥" : "$"}/1M)</label>
                               <Input
                                 type="number"
                                 step="0.0001"
