@@ -11,7 +11,7 @@ All notable changes to this project will be documented in this file.
 ### Token Category System Overhaul
 - **3-category model** — Replaced confusing 4-category system (input/cache_hit/cache_create/output) with standard 3: Input(non-cached), Input(cache hit), Output
 - **calculateCost** — Removed `cached` boolean and `tokensCacheCreation` parameters, simplified to 3-part formula
-- **calculateCredits** — Cache-hit tokens no longer consume credits (was charging full price)
+- **calculateCredits** — Cache-hit tokens now consume credits at reduced rate (proportional to cache_rate/input_rate ratio)
 - **deductCreditsOrBalance** — Removed `tokensCacheCreation` parameter, simplified signature
 - **Local prompt cache** — Extracted to `lib/prompt-cache.ts`, shared between routes
 - **Messages route** — Now uses local prompt cache for providers without cache stats

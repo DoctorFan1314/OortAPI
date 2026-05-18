@@ -11,7 +11,7 @@
 ### Token 三分类体系重构
 - **三分类模型** — 废弃旧的 4 分类（输入/缓存命中/缓存创建/输出），统一为：输入(未命中缓存)、输入(命中缓存)、输出
 - **calculateCost** — 移除 `cached` 布尔参数和 `tokensCacheCreation`，简化为 3 段公式
-- **calculateCredits** — 缓存命中 Token 不再消耗额度（原为全额扣费）
+- **calculateCredits** — 缓存命中 Token 按比例折扣消耗额度（cache_rate/input_rate 比例）
 - **deductCreditsOrBalance** — 移除 `tokensCacheCreation` 参数
 - **本地提示缓存** — 提取到 `lib/prompt-cache.ts`，路由间共享
 - **Messages 路由** — 接入本地缓存回退
