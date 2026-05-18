@@ -1,6 +1,7 @@
 "use client";
 
 import { useI18n } from "@/contexts/i18n-context";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -180,13 +181,13 @@ export default function WebhooksPage() {
   const testWebhook = async (id: number) => {
     setTesting(id);
     try {
-      await fetch(`/api/dashboard/webhooks/${id}/test`, {
+      const res = await fetch(`/api/dashboard/webhooks/${id}/test`, {
         method: "POST",
         credentials: "include",
       });
-      showToast(t.testSent, "success");
+      showToast(res.ok ? t.testSent : (lang === "zh" ? "测试请求失败" : "Test failed"), res.ok ? "success" : "error");
     } catch {
-      showToast(t.testSent, "success");
+      showToast(lang === "zh" ? "网络错误" : "Network error", "error");
     } finally {
       setTesting(null);
     }
@@ -308,23 +309,14 @@ export default function WebhooksPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteTarget !== null} onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}>
-        <DialogContent className="sm:max-w-sm">
-          <DialogHeader>
-            <DialogTitle>{t.title}</DialogTitle>
-            <DialogDescription>
-              {t.confirmDelete}
-              <br />
-              <code className="text-xs">{webhooks.find(w => w.id === deleteTarget)?.url}</code>
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex gap-2 justify-end pt-2">
-            <Button variant="outline" onClick={() => setDeleteTarget(null)}>{t.cancel}</Button>
-            <Button onClick={confirmDelete} className="bg-red-600 text-white hover:bg-red-700">{t.delete}</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}
+        title={t.confirmDelete}
+        message={webhooks.find(w => w.id === deleteTarget)?.url || ""}
+        onConfirm={confirmDelete}
+        confirmLabel={t.delete}
+        variant="danger" />
     </div>
   );
 }

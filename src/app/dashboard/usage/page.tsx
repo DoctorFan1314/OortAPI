@@ -614,7 +614,7 @@ export default function UsagePage() {
           ) : loading && logs.length === 0 ? (
             <div className="h-48 animate-pulse bg-muted rounded-lg" />
           ) : logs.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground text-sm">{t.noLogs}</div>
+            <div className="text-center py-8 text-muted-foreground text-sm">{hasActiveFilters ? (lang === "zh" ? "无匹配记录，请调整筛选条件" : "No matching records. Adjust your filters.") : t.noLogs}</div>
           ) : (
             <>{loading && logs.length > 0 && <div className="h-1 bg-primary/20 rounded-full overflow-hidden mb-2"><div className="h-full bg-primary animate-pulse rounded-full" style={{width: '30%'}} /></div>}
             <div className="overflow-x-auto">

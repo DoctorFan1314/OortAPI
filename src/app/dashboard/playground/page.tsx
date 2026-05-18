@@ -113,7 +113,7 @@ export default function PlaygroundPage() {
   const [showParams, setShowParams] = useState(false);
   const [params, setParams] = useState<PlaygroundParams>({
     temperature: 0.7,
-    max_tokens: 2048,
+    max_tokens: 4096,
     top_p: 1,
   });
   const [systemPrompt, setSystemPrompt] = useState("");
@@ -135,16 +135,18 @@ export default function PlaygroundPage() {
     } catch { /* ignore */ }
   }, []);
 
-  // Persist playground state to localStorage on changes
+  // Persist playground state to localStorage on changes (max ~2MB)
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({
-        chatHistory,
-        selectedModel,
-        selectedKeyId,
-        params,
-        systemPrompt,
-      }));
+      const data = { chatHistory, selectedModel, selectedKeyId, params, systemPrompt };
+      const json = JSON.stringify(data);
+      if (json.length > 2_000_000) {
+        // Trim older half of chat history if too large
+        const trimmed = { ...data, chatHistory: chatHistory.slice(-20) };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(trimmed));
+      } else {
+        localStorage.setItem(STORAGE_KEY, json);
+      }
     } catch { /* ignore */ }
   }, [chatHistory, selectedModel, selectedKeyId, params, systemPrompt]);
   const responseRef = useRef<HTMLDivElement>(null);
@@ -394,8 +396,8 @@ export default function PlaygroundPage() {
                 </div>
                 <div>
                   <label className="text-xs text-muted-foreground block mb-1">{t.maxTokens}</label>
-                  <input type="number" min="1" max="16384" step="1" value={params.max_tokens}
-                    onChange={e => setParams(p => ({ ...p, max_tokens: parseInt(e.target.value) || 2048 }))}
+                  <input type="number" min="1" max="131072" step="1" value={params.max_tokens}
+                    onChange={e => setParams(p => ({ ...p, max_tokens: parseInt(e.target.value) || 4096 }))}
                     className="w-full h-8 px-2 rounded-md border border-input bg-background text-sm" />
                 </div>
                 <div>
