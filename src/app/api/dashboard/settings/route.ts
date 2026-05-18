@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({ settings });
+    return NextResponse.json({ settings, preferences: auth.user.preferences ? JSON.parse(auth.user.preferences) : {} });
   } catch (error) {
     console.error('Settings get error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -55,11 +55,31 @@ export async function GET(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   try {
     const auth = validateUserFromCookie(request.headers.get('cookie'));
-    if (!auth.valid || !auth.user || auth.user.role !== 'admin') {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+    if (!auth.valid || !auth.user) {
+      return NextResponse.json({ error: auth.error || 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
+
+    // Handle user budget (available to all authenticated users)
+    if (body.monthly_budget !== undefined) {
+      let prefs: Record<string, unknown> = {};
+      try { prefs = JSON.parse(auth.user.preferences || '{}'); } catch {}
+      if (body.monthly_budget === null || body.monthly_budget === '') {
+        delete prefs.monthly_budget;
+      } else {
+        prefs.monthly_budget = Number(body.monthly_budget);
+      }
+      db.prepare('UPDATE users SET preferences = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
+        .run(JSON.stringify(prefs), auth.user.id);
+      return NextResponse.json({ success: true, preferences: prefs });
+    }
+
+    // System settings (admin only)
+    if (auth.user.role !== 'admin') {
+      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+    }
+
     const ALLOWED_KEYS = ['site_name', 'registration_enabled', 'default_rate_limit', 'default_balance', 'maintenance_mode', 'currency', 'exchange_rate', 'timezone'];
     const stmt = db.prepare('INSERT OR REPLACE INTO system_settings (key, value, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP)');
 

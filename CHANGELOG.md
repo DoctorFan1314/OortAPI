@@ -6,6 +6,33 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [v3.3.4.6] — 2026-05-18
+
+### New Features
+- **Usage trend chart** — ECharts bar chart above usage logs, toggle between cost/tokens/calls dimensions, linked to filters
+- **Usage aggregate stats** — Summary cards now show full-filter totals (not just current page), plus daily trend data
+- **Usage API Key filter** — Filter usage logs by API Key with a dropdown selector
+- **API Key rate limit** — Display and inline-edit RPM rate limit per API Key
+- **Per-Key analytics** — Expandable 7-day stats per key: calls, cost, tokens, avg latency, error rate
+- **Budget management** — Settings page monthly budget limit with progress bar and threshold alerts
+- **System monitor** — Admin dashboard at `/dashboard/admin/monitor`: QPS, error rate, P50/P95 latency, per-provider health (auto-refresh)
+- **API Playground** — Interactive page at `/dashboard/playground`: select model + API Key, send messages, streaming response display
+- **Channel search & filter** — Search channels by name, filter by status (online/offline/enabled/disabled) and provider type
+- **Channel batch operations** — Multi-select channels with checkboxes, batch enable/disable/delete
+- **Channel routing matrix** — Toggle view showing model-to-channel mapping with priority and weight
+- **Multiplier effective price** — Table shows effective input/output price (base rate × multiplier), plus batch edit
+- **Audit log export** — CSV export button and full-text search across action and details fields
+- **User activity timeline** — Admin user detail page shows last 20 calls with model, tokens, cost, latency
+
+### Improvements
+- **Model detail exchange rate** — Uses system exchange rate setting instead of hardcoded 7.3
+- **Search result links** — Search results now link to model detail pages (`/models/{id}`) instead of models list
+- **Homepage providers** — ModelWall fetches actual providers from API instead of hardcoded list
+- **Billing button UX** — Recharge button shows visible hint text to use redeem codes
+- **Toast position** — Moved to bottom-20 to avoid overlap with scroll-to-top button
+
+---
+
 ## [v3.3.4.5] — 2026-05-15
 
 ### New Features

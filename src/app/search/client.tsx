@@ -447,7 +447,7 @@ export default function SearchClient() {
                 </div>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   {searchResults.models.slice(0, 12).map((m) => (
-                    <Link key={m.id} href="/models" className="glass-card glass-card-hover p-4 rounded-xl group">
+                    <Link key={m.id} href={`/models/${encodeURIComponent(m.id)}`} className="glass-card glass-card-hover p-4 rounded-xl group">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-mono">{m.owned_by || "unknown"}</span>
                       </div>

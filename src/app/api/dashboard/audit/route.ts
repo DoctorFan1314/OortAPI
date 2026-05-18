@@ -18,6 +18,8 @@ export async function GET(request: NextRequest) {
     const targetType = searchParams.get('target_type');
     const from = searchParams.get('from');
     const to = searchParams.get('to');
+    const search = searchParams.get('search');
+    const format = searchParams.get('format');
 
     const conditions: string[] = [];
     const params: unknown[] = [];
@@ -38,20 +40,44 @@ export async function GET(request: NextRequest) {
       conditions.push("a.created_at < date(?, '+1 day')");
       params.push(to);
     }
+    if (search) {
+      conditions.push('(a.action LIKE ? OR a.details LIKE ?)');
+      params.push(`%${search}%`, `%${search}%`);
+    }
 
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
-    const offset = (page - 1) * limit;
+    const effectiveLimit = format === 'csv' ? 10000 : limit;
+    const effectiveOffset = format === 'csv' ? 0 : (page - 1) * limit;
 
     const logs = db.prepare(
       `SELECT a.*, u.email as admin_email FROM audit_log a
        LEFT JOIN users u ON a.admin_id = u.id
        ${whereClause}
        ORDER BY a.created_at DESC LIMIT ? OFFSET ?`
-    ).all(...params, limit, offset);
+    ).all(...params, effectiveLimit, effectiveOffset);
 
     const total = (db.prepare(`SELECT COUNT(*) as count FROM audit_log a ${whereClause}`).get(...params) as { count: number }).count;
 
-    return NextResponse.json({ logs, total, has_more: offset + logs.length < total, page });
+    if (format === 'csv') {
+      const headers = ['id', 'admin_email', 'action', 'target_type', 'target_id', 'details', 'ip_address', 'created_at'];
+      const rows = (logs as Record<string, unknown>[]).map(row =>
+        headers.map(h => {
+          const v = row[h];
+          if (v === null || v === undefined) return '';
+          const s = String(v);
+          return s.includes(',') || s.includes('"') || s.includes('\n') ? `"${s.replace(/"/g, '""')}"` : s;
+        }).join(',')
+      );
+      const csv = [headers.join(','), ...rows].join('\n');
+      return new NextResponse(csv, {
+        headers: {
+          'Content-Type': 'text/csv; charset=utf-8',
+          'Content-Disposition': `attachment; filename="audit-${new Date().toISOString().slice(0, 10)}.csv"`,
+        },
+      });
+    }
+
+    return NextResponse.json({ logs, total, has_more: effectiveOffset + logs.length < total, page });
   } catch (error) {
     console.error('Audit logs error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

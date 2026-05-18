@@ -180,6 +180,12 @@ Supports full `tool_use` / `tool_result` conversion between Anthropic and OpenAI
 - **Docker deployment** — One-command `docker compose up -d` with persistent SQLite volume
 - **Auto admin** — First registered user automatically becomes admin
 - **Delete account** — Users can delete their account with password verification
+- **Usage trend charts** — ECharts bar chart with cost/tokens/calls toggle, filter-linked
+- **System monitor** — Admin dashboard: QPS, error rate, P50/P95 latency, per-provider health
+- **API Playground** — Interactive testing: select model + key, streaming response
+- **Channel routing matrix** — Visual model-to-channel mapping with priority/weight
+- **Budget management** — Monthly spending limits with threshold alerts
+- **Per-Key analytics** — 7-day stats per API Key (calls, cost, tokens, latency, error rate)
 
 ---
 
@@ -254,13 +260,17 @@ After registering, users get access to a full dashboard:
 - **Token Plan** — Subscription page at `/token-plan` with 4 tiers (Spark/Flare/Pulse/Nova), monthly/yearly toggle, USD/CNY currency switching, prorated upgrade/downgrade
 - **Models** — Standalone page at `/models` with card grid, search, provider filter, sort (name/price), USD/CNY toggle, 4-price display
 - **API Keys** — Create/manage keys with per-key rate limits
-- **Usage** — Detailed call history with token breakdown (input, output, cache hit, cache create), currency-aware cost display, timezone-correct timestamps
+- **Usage** — Detailed call history with ECharts trend chart, API Key filter, full-filter aggregate stats, token breakdown (input, output, cache hit, cache create), currency-aware cost display, timezone-correct timestamps
 - **Billing** — Balance display (USD/CNY), transaction history, redeem codes
-- **Channels** — Admin: configure AI provider channels with smart routing, connection testing, model sync, health monitoring (24h success rate, latency, call count)
-- **Users** — Admin: user management with role control, balance adjustment, enable/disable, password reset
+- **Channels** — Admin: configure AI provider channels with smart routing, connection testing, model sync, health monitoring (24h success rate, latency, call count), search/filter, batch operations, routing matrix
+- **Users** — Admin: user management with role control, balance adjustment, enable/disable, password reset, recent activity timeline
 - **Redeem Codes** — Admin: batch generate codes for balance top-ups
 - **Plans** — Admin: manage subscription plans at `/dashboard/admin/plans` with currency toggle and plan-model bindings
-- **Multiplier** — Admin: per-model and time-based pricing multiplier rules
+- **Multiplier** — Admin: per-model and time-based pricing multiplier rules with effective price display and batch edit
+- **System Monitor** — Admin: real-time platform health at `/dashboard/admin/monitor` (QPS, error rate, P50/P95 latency, per-provider stats)
+- **API Playground** — Interactive API testing at `/dashboard/playground` with model selector, streaming response
+- **Budget** — Monthly spending limit with progress bar and threshold alerts
+- **Audit Logs** — Admin: full-text search, CSV export, date range filtering
 
 ---
 

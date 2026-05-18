@@ -51,7 +51,13 @@ export async function GET(request: NextRequest) {
         `SELECT us.*, sp.display_name as plan_display_name, sp.name as plan_name FROM user_subscriptions us JOIN subscription_plans sp ON us.plan_id = sp.id WHERE us.user_id = ? AND us.status = 'active' ORDER BY us.created_at DESC LIMIT 1`
       ).get(userId) as Record<string, unknown> | undefined;
 
-      return NextResponse.json({ user, stats, topModels, trend, keys, subscription: subscription || null });
+      // Recent activity (last 20 calls)
+      const recentActivity = db.prepare(
+        `SELECT model, tokens_in, tokens_out, cost, success, latency_ms, created_at
+         FROM usage_logs WHERE user_id = ? ORDER BY created_at DESC LIMIT 20`
+      ).all(userId) as { model: string; tokens_in: number; tokens_out: number; cost: number; success: number; latency_ms: number | null; created_at: string }[];
+
+      return NextResponse.json({ user, stats, topModels, trend, keys, subscription: subscription || null, recentActivity });
     }
 
     const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));

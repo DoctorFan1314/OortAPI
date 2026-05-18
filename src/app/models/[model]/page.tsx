@@ -92,7 +92,7 @@ const LABELS = {
 
 export default function ModelDetailPage() {
   const { lang } = useI18n();
-  const { formatPrice, symbol } = useCurrency();
+  const { formatPrice, symbol, exchangeRate } = useCurrency();
   const t = LABELS[lang];
   const params = useParams();
   const modelName = decodeURIComponent(params.model as string);
@@ -175,21 +175,21 @@ export default function ModelDetailPage() {
         <Card className="glass-card">
           <CardContent className="p-3">
             <p className="text-[10px] text-muted-foreground">{t.inputRate}</p>
-            <p className="text-lg font-bold font-mono">{symbol}{(model.input_rate * (lang === "zh" ? 7.3 : 1)).toFixed(4)}</p>
+            <p className="text-lg font-bold font-mono">{symbol}{(model.input_rate * exchangeRate).toFixed(4)}</p>
             <p className="text-[10px] text-muted-foreground">{t.perMillion}</p>
           </CardContent>
         </Card>
         <Card className="glass-card">
           <CardContent className="p-3">
             <p className="text-[10px] text-muted-foreground">{t.outputRate}</p>
-            <p className="text-lg font-bold font-mono">{symbol}{(model.output_rate * (lang === "zh" ? 7.3 : 1)).toFixed(4)}</p>
+            <p className="text-lg font-bold font-mono">{symbol}{(model.output_rate * exchangeRate).toFixed(4)}</p>
             <p className="text-[10px] text-muted-foreground">{t.perMillion}</p>
           </CardContent>
         </Card>
         <Card className="glass-card">
           <CardContent className="p-3">
             <p className="text-[10px] text-muted-foreground">{t.cacheRead}</p>
-            <p className="text-lg font-bold font-mono">{symbol}{(model.cache_rate * (lang === "zh" ? 7.3 : 1)).toFixed(4)}</p>
+            <p className="text-lg font-bold font-mono">{symbol}{(model.cache_rate * exchangeRate).toFixed(4)}</p>
             <p className="text-[10px] text-muted-foreground">{t.perMillion}</p>
           </CardContent>
         </Card>

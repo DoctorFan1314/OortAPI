@@ -3,8 +3,11 @@
 import { useI18n } from "@/contexts/i18n-context";
 import { useCurrency } from "@/contexts/currency-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Fragment, useEffect, useState } from "react";
-import { Activity, Coins, DollarSign, X, Search, Download, Filter } from "lucide-react";
+import { Fragment, useEffect, useState, useMemo } from "react";
+import { Activity, Coins, DollarSign, X, Search, Download, Filter, BarChart3 } from "lucide-react";
+import dynamic from "next/dynamic";
+
+const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false });
 
 interface UsageLog {
   id: number;
@@ -23,10 +26,19 @@ interface UsageLog {
   created_at: string;
   multiplier: number | null;
   channel_name: string | null;
+  key_name: string | null;
+  api_key_id: number | null;
   input_rate: number | null;
   output_rate: number | null;
   cache_rate: number | null;
   cache_creation_rate: number | null;
+}
+
+interface DailyTrend {
+  date: string;
+  calls: number;
+  cost: number;
+  tokens: number;
 }
 
 interface UsageSummary {
@@ -81,6 +93,12 @@ const LABELS = {
     clearFilters: "清除筛选",
     exportCSV: "导出 CSV",
     filterBtn: "筛选",
+    apiKey: "API Key",
+    allKeys: "所有 Key",
+    trend: "趋势",
+    byCost: "费用",
+    byTokens: "Token",
+    byCalls: "调用",
   },
   en: {
     title: "Call Logs",
@@ -127,6 +145,12 @@ const LABELS = {
     clearFilters: "Clear filters",
     exportCSV: "Export CSV",
     filterBtn: "Filter",
+    apiKey: "API Key",
+    allKeys: "All Keys",
+    trend: "Trend",
+    byCost: "Cost",
+    byTokens: "Tokens",
+    byCalls: "Calls",
   },
 };
 
@@ -140,6 +164,8 @@ export default function UsagePage() {
   const { currency, exchangeRate, formatPrice, symbol } = useCurrency();
   const [logs, setLogs] = useState<UsageLog[]>([]);
   const [summary, setSummary] = useState<UsageSummary>({ total_calls: 0, total_tokens: 0, total_cost: 0 });
+  const [dailyTrend, setDailyTrend] = useState<DailyTrend[]>([]);
+  const [chartMetric, setChartMetric] = useState<"cost" | "tokens" | "calls">("cost");
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [page, setPage] = useState(1);
@@ -149,18 +175,30 @@ export default function UsagePage() {
   const [inputStatus, setInputStatus] = useState("");
   const [inputFrom, setInputFrom] = useState("");
   const [inputTo, setInputTo] = useState("");
+  const [inputKeyId, setInputKeyId] = useState("");
   // Applied filter state — triggers API calls only when "Filter" button is clicked
   const [filterModel, setFilterModel] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
   const [filterFrom, setFilterFrom] = useState("");
   const [filterTo, setFilterTo] = useState("");
+  const [filterKeyId, setFilterKeyId] = useState("");
+  // API keys for filter dropdown
+  const [apiKeys, setApiKeys] = useState<{ id: number; name: string }[]>([]);
   const t = LABELS[lang];
+
+  useEffect(() => {
+    fetch("/api/dashboard/keys", { credentials: "include" })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d?.keys) setApiKeys(d.keys); })
+      .catch(() => {});
+  }, []);
 
   const applyFilters = () => {
     setFilterModel(inputModel);
     setFilterStatus(inputStatus);
     setFilterFrom(inputFrom);
     setFilterTo(inputTo);
+    setFilterKeyId(inputKeyId);
     setPage(1);
   };
 
@@ -169,14 +207,38 @@ export default function UsagePage() {
     setInputStatus("");
     setInputFrom("");
     setInputTo("");
+    setInputKeyId("");
     setFilterModel("");
     setFilterStatus("");
     setFilterFrom("");
     setFilterTo("");
+    setFilterKeyId("");
     setPage(1);
   };
 
-  const hasActiveFilters = filterModel || filterStatus || filterFrom || filterTo;
+  const hasActiveFilters = filterModel || filterStatus || filterFrom || filterTo || filterKeyId;
+
+  const chartOption = useMemo(() => {
+    if (dailyTrend.length === 0) return null;
+    const dates = dailyTrend.map(d => d.date);
+    const values = dailyTrend.map(d => {
+      if (chartMetric === "cost") return +(d.cost * exchangeRate).toFixed(4);
+      if (chartMetric === "tokens") return d.tokens;
+      return d.calls;
+    });
+    const color = chartMetric === "cost" ? "#ef4444" : chartMetric === "tokens" ? "#22c55e" : "#3b82f6";
+    const label = chartMetric === "cost" ? (currency === "CNY" ? "¥" : "$") : "";
+    return {
+      tooltip: { trigger: "axis" as const, formatter: (params: { axisValue: string; value: number }[]) => {
+        const p = params[0];
+        return `${p.axisValue}<br/>${label}${typeof p.value === "number" ? p.value.toLocaleString() : p.value}`;
+      }},
+      grid: { left: 60, right: 20, top: 10, bottom: 30 },
+      xAxis: { type: "category" as const, data: dates, axisLabel: { fontSize: 11 } },
+      yAxis: { type: "value" as const, axisLabel: { fontSize: 11, formatter: (v: number) => label + (v >= 1000 ? (v / 1000).toFixed(0) + "k" : v) } },
+      series: [{ type: "bar" as const, data: values, itemStyle: { color, borderRadius: [4, 4, 0, 0] }, barMaxWidth: 32 }],
+    };
+  }, [dailyTrend, chartMetric, exchangeRate, currency]);
 
   useEffect(() => {
     setLoading(true);
@@ -185,6 +247,7 @@ export default function UsagePage() {
     if (filterStatus) parts.push(`status=${filterStatus}`);
     if (filterFrom) parts.push(`from=${filterFrom}`);
     if (filterTo) parts.push(`to=${filterTo}`);
+    if (filterKeyId) parts.push(`key_id=${filterKeyId}`);
     const url = `/api/v1/billing/usage?${parts.join('&')}`;
 
     fetch(url, { credentials: "include" })
@@ -193,19 +256,21 @@ export default function UsagePage() {
         return res.json();
       })
       .then(d => {
-        const logsData = d.data || [];
-        setLogs(logsData);
+        setLogs(d.data || []);
         setTotal(d.total || 0);
-        const totalTokens = logsData.reduce((s: number, l: UsageLog) => s + l.tokens_in + l.tokens_out, 0);
-        const totalCost = logsData.reduce((s: number, l: UsageLog) => s + l.cost, 0);
-        setSummary({ total_calls: logsData.length, total_tokens: totalTokens, total_cost: totalCost });
+        setSummary({
+          total_calls: d.total_calls || 0,
+          total_tokens: d.total_tokens || 0,
+          total_cost: d.total_cost || 0,
+        });
+        setDailyTrend(d.daily_trend || []);
         setLoading(false);
       })
       .catch(() => {
         setLogs([]);
         setLoading(false);
       });
-  }, [page, filterModel, filterStatus, filterFrom, filterTo]);
+  }, [page, filterModel, filterStatus, filterFrom, filterTo, filterKeyId]);
 
   const formatTokens = (n: number) => {
     return n.toLocaleString();
@@ -367,6 +432,30 @@ export default function UsagePage() {
         </Card>
       </div>
 
+      {/* Trend chart */}
+      {chartOption && (
+        <Card className="glass-card">
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <BarChart3 className="h-4 w-4" />{t.trend}
+              </CardTitle>
+              <div className="flex gap-1">
+                {(["cost", "tokens", "calls"] as const).map(m => (
+                  <button key={m} onClick={() => setChartMetric(m)}
+                    className={`px-2.5 py-1 text-xs rounded-md transition-colors ${chartMetric === m ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>
+                    {m === "cost" ? t.byCost : m === "tokens" ? t.byTokens : t.byCalls}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <ReactECharts option={chartOption} style={{ height: 220 }} opts={{ renderer: "svg" }} />
+          </CardContent>
+        </Card>
+      )}
+
       {/* Filter bar */}
       <div className="flex flex-wrap items-end gap-3 p-3 bg-muted/30 rounded-lg">
         <div className="flex-1 min-w-[150px]">
@@ -385,6 +474,16 @@ export default function UsagePage() {
             <option value="">{t.all}</option>
             <option value="success">{t.success}</option>
             <option value="failed">{t.failed}</option>
+          </select>
+        </div>
+        <div className="w-40">
+          <label className="text-xs text-muted-foreground block mb-1">{t.apiKey}</label>
+          <select value={inputKeyId} onChange={e => setInputKeyId(e.target.value)}
+            className="w-full h-8 px-2 rounded-md border border-input bg-background text-sm focus:border-primary focus:outline-none">
+            <option value="">{t.allKeys}</option>
+            {apiKeys.map(k => (
+              <option key={k.id} value={k.id}>{k.name || `Key #${k.id}`}</option>
+            ))}
           </select>
         </div>
         <div className="w-36">
@@ -414,6 +513,7 @@ export default function UsagePage() {
             filterStatus ? `status=${filterStatus}` : '',
             filterFrom ? `from=${filterFrom}` : '',
             filterTo ? `to=${filterTo}` : '',
+            filterKeyId ? `key_id=${filterKeyId}` : '',
           ].filter(Boolean).join('&');
           window.open(`/api/v1/billing/usage?${params}`, '_blank');
         }}

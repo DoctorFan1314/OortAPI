@@ -10,7 +10,7 @@ export function Toaster() {
   if (toasts.length === 0) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 flex flex-col gap-2" style={{ zIndex: "var(--z-toast)" }} aria-live="polite" role="status">
+    <div className="fixed bottom-20 right-4 flex flex-col gap-2" style={{ zIndex: "var(--z-toast)" }} aria-live="polite" role="status">
       {toasts.map((t) => (
         <div
           key={t.id}

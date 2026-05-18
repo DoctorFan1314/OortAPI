@@ -70,10 +70,15 @@ export default function BillingPage() {
                 <Gift className="h-4 w-4" />
                 {t.redeem}
               </Button>
-              <Button className="gap-2" disabled title={lang === "zh" ? "即将上线，请使用兑换码充值" : "Coming soon. Use redeem codes for now."}>
-                <Plus className="h-4 w-4" />
-                {t.recharge}
-              </Button>
+              <div>
+                <Button className="gap-2" disabled title={lang === "zh" ? "即将上线，请使用兑换码充值" : "Coming soon. Use redeem codes for now."}>
+                  <Plus className="h-4 w-4" />
+                  {t.recharge}
+                </Button>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {lang === "zh" ? "请使用兑换码充值" : "Use redeem codes to add balance"}
+                </p>
+              </div>
             </div>
           </div>
         </CardContent>

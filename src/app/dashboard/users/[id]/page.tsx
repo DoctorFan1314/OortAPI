@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { Activity, Coins, DollarSign, Key, Shield, TrendingUp, User } from "lucide-react";
+import { Activity, Coins, DollarSign, Key, Shield, TrendingUp, User, Clock } from "lucide-react";
 import Link from "next/link";
 
 interface UserDetail {
@@ -54,6 +54,16 @@ interface Subscription {
   current_period_end: string;
 }
 
+interface RecentActivity {
+  model: string;
+  tokens_in: number;
+  tokens_out: number;
+  cost: number;
+  success: number;
+  latency_ms: number | null;
+  created_at: string;
+}
+
 const LABELS = {
   zh: {
     title: "用户详情",
@@ -80,6 +90,8 @@ const LABELS = {
     noSub: "暂无订阅",
     status: "状态",
     registered: "注册时间",
+    recentActivity: "近期活动",
+    noActivity: "暂无调用记录",
   },
   en: {
     title: "User Details",
@@ -106,6 +118,8 @@ const LABELS = {
     noSub: "No subscription",
     status: "Status",
     registered: "Registered",
+    recentActivity: "Recent Activity",
+    noActivity: "No calls yet",
   },
 };
 
@@ -122,6 +136,7 @@ export default function UserDetailPage() {
   const [trend, setTrend] = useState<TrendDay[]>([]);
   const [keys, setKeys] = useState<KeyItem[]>([]);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
+  const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -134,6 +149,7 @@ export default function UserDetailPage() {
         setTrend(d.trend || []);
         setKeys(d.keys || []);
         setSubscription(d.subscription);
+        setRecentActivity(d.recentActivity || []);
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -332,6 +348,38 @@ export default function UserDetailPage() {
             </div>
           ) : (
             <p className="text-sm text-muted-foreground">{t.noSub}</p>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Recent Activity */}
+      <Card className="glass-card">
+        <CardHeader>
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Clock className="h-4 w-4" />
+            {t.recentActivity}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {recentActivity.length === 0 ? (
+            <p className="text-sm text-muted-foreground">{t.noActivity}</p>
+          ) : (
+            <div className="space-y-1">
+              {recentActivity.map((a, i) => (
+                <div key={i} className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-muted/30 text-xs">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className={a.success ? "text-green-500" : "text-red-500"}>{a.success ? "✓" : "✗"}</span>
+                    <code className="font-mono truncate">{a.model}</code>
+                  </div>
+                  <div className="flex items-center gap-3 text-muted-foreground shrink-0">
+                    <span>{(a.tokens_in + a.tokens_out).toLocaleString()} tok</span>
+                    <span>${a.cost.toFixed(4)}</span>
+                    {a.latency_ms && <span>{a.latency_ms}ms</span>}
+                    <span className="w-28 text-right">{new Date(a.created_at + "Z").toLocaleString()}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </CardContent>
       </Card>

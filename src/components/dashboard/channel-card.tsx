@@ -106,6 +106,24 @@ const LABELS = {
     successRate: "成功率",
     avgLatency: "平均延迟",
     calls24h: "24h调用",
+    search: "搜索渠道",
+    filterStatus: "状态筛选",
+    filterType: "类型筛选",
+    all: "全部",
+    batchEnable: "批量启用",
+    batchDisable: "批量禁用",
+    batchDelete: "批量删除",
+    selected: "已选 {count} 个",
+    batchConfirm: "确认批量操作",
+    batchDeleteMsg: "确定要删除选中的 {count} 个渠道吗？",
+    batchEnableMsg: "确定要启用选中的 {count} 个渠道吗？",
+    batchDisableMsg: "确定要禁用选中的 {count} 个渠道吗？",
+    batchSuccess: "批量操作成功",
+    routingMatrix: "路由矩阵",
+    routingDesc: "每个模型的可用渠道及其优先级",
+    noModels: "无模型数据",
+    showRouting: "显示路由",
+    hideRouting: "隐藏路由",
   },
   en: {
     title: "Channel Management",
@@ -157,6 +175,24 @@ const LABELS = {
     successRate: "Success",
     avgLatency: "Avg Latency",
     calls24h: "24h Calls",
+    search: "Search channels",
+    filterStatus: "Status",
+    filterType: "Type",
+    all: "All",
+    batchEnable: "Batch Enable",
+    batchDisable: "Batch Disable",
+    batchDelete: "Batch Delete",
+    selected: "{count} selected",
+    batchConfirm: "Confirm Batch Action",
+    batchDeleteMsg: "Delete {count} selected channels?",
+    batchEnableMsg: "Enable {count} selected channels?",
+    batchDisableMsg: "Disable {count} selected channels?",
+    batchSuccess: "Batch action completed",
+    routingMatrix: "Routing Matrix",
+    routingDesc: "Available channels and their priority for each model",
+    noModels: "No model data",
+    showRouting: "Show Routing",
+    hideRouting: "Hide Routing",
   },
 };
 
@@ -530,6 +566,12 @@ export function ChannelCard({ lang = "zh" }: { lang?: "zh" | "en" }) {
     success_rate_24h: number | null;
     avg_latency_24h: number | null;
   }>>({});
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
+  const [filterType, setFilterType] = useState("");
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [batchAction, setBatchAction] = useState<"enable" | "disable" | "delete" | null>(null);
+  const [showRouting, setShowRouting] = useState(false);
   const t = LABELS[lang];
 
   const fetchChannels = () => {
@@ -729,15 +771,105 @@ export function ChannelCard({ lang = "zh" }: { lang?: "zh" | "en" }) {
 
   if (loading) return <div className="h-48 animate-pulse bg-muted rounded-lg" />;
 
+  const filteredChannels = channels.filter(ch => {
+    if (searchQuery && !ch.name.toLowerCase().includes(searchQuery.toLowerCase()) && !ch.type.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+    if (filterStatus === "enabled" && !ch.enabled) return false;
+    if (filterStatus === "disabled" && ch.enabled) return false;
+    if (filterStatus === "online" && ch.status !== "online") return false;
+    if (filterStatus === "offline" && ch.status !== "offline") return false;
+    if (filterType && ch.type !== filterType) return false;
+    return true;
+  });
+
+  const toggleSelect = (id: number) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === filteredChannels.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filteredChannels.map(c => c.id)));
+    }
+  };
+
+  const executeBatch = async () => {
+    if (!batchAction) return;
+    const ids = Array.from(selectedIds);
+    if (batchAction === "delete") {
+      await Promise.all(ids.map(id =>
+        fetch("/api/dashboard/channels", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ id }),
+        })
+      ));
+    } else {
+      const enabled = batchAction === "enable";
+      await Promise.all(ids.map(id =>
+        fetch("/api/dashboard/channels", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ id, enabled }),
+        })
+      ));
+    }
+    setSelectedIds(new Set());
+    setBatchAction(null);
+    fetchChannels();
+    showToast(t.batchSuccess, "success");
+  };
+
+  const uniqueTypes = [...new Set(channels.map(c => c.type))];
+
+  // Build routing matrix: model -> channels that serve it
+  const routingMatrix = (() => {
+    const modelMap = new Map<string, Array<{ id: number; name: string; priority: number; weight: number; status: string; enabled: boolean }>>();
+    for (const ch of channels) {
+      let models: string[] = [];
+      try { models = JSON.parse(ch.models || "[]"); } catch { models = []; }
+      if (models.length === 0) {
+        // Empty models = serves all models (wildcard)
+        continue;
+      }
+      for (const model of models) {
+        if (!modelMap.has(model)) modelMap.set(model, []);
+        modelMap.get(model)!.push({ id: ch.id, name: ch.name, priority: ch.priority, weight: ch.weight, status: ch.status, enabled: !!ch.enabled });
+      }
+    }
+    // Sort by priority desc, then weight desc
+    for (const [, chans] of modelMap) {
+      chans.sort((a, b) => b.priority - a.priority || b.weight - a.weight);
+    }
+    return modelMap;
+  })();
+
   return (
     <>
       <Card className="glass-card">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-lg">{t.title}</CardTitle>
-          <Button size="sm" onClick={() => setShowForm(!showForm)}>
-            <Plus className="h-4 w-4 mr-1" />
-            {t.add}
-          </Button>
+          <div className="flex items-center gap-2">
+            {selectedIds.size > 0 && (
+              <>
+                <span className="text-xs text-muted-foreground">{t.selected.replace("{count}", String(selectedIds.size))}</span>
+                <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => setBatchAction("enable")}>{t.batchEnable}</Button>
+                <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => setBatchAction("disable")}>{t.batchDisable}</Button>
+                <Button size="sm" variant="outline" className="h-8 text-xs text-red-500 hover:text-red-600" onClick={() => setBatchAction("delete")}>{t.batchDelete}</Button>
+              </>
+            )}
+            <Button size="sm" onClick={() => setShowForm(!showForm)}>
+              <Plus className="h-4 w-4 mr-1" />
+              {t.add}
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           {showForm && (
@@ -769,8 +901,37 @@ export function ChannelCard({ lang = "zh" }: { lang?: "zh" | "en" }) {
               {t.noChannels}
             </div>
           ) : (
+            <>
+              <div className="flex flex-wrap items-center gap-2 mb-3">
+                <div className="relative flex-1 min-w-[180px]">
+                  <Input value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+                    placeholder={t.search} className="h-8 text-sm pl-3" />
+                </div>
+                <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
+                  className="h-8 px-2 rounded-md border border-input bg-background text-xs">
+                  <option value="">{t.filterStatus}: {t.all}</option>
+                  <option value="enabled">{t.enabled}</option>
+                  <option value="disabled">{t.disabled}</option>
+                  <option value="online">{t.online}</option>
+                  <option value="offline">{t.offline}</option>
+                </select>
+                <select value={filterType} onChange={e => setFilterType(e.target.value)}
+                  className="h-8 px-2 rounded-md border border-input bg-background text-xs">
+                  <option value="">{t.filterType}: {t.all}</option>
+                  {uniqueTypes.map(tp => (
+                    <option key={tp} value={tp}>{PROVIDER_LABELS[tp]?.[lang] || tp}</option>
+                  ))}
+                </select>
+                {filteredChannels.length > 0 && (
+                  <label className="flex items-center gap-1.5 text-xs text-muted-foreground cursor-pointer ml-auto">
+                    <input type="checkbox" checked={selectedIds.size === filteredChannels.length && filteredChannels.length > 0}
+                      onChange={toggleSelectAll} className="rounded" />
+                    {t.selectAll}
+                  </label>
+                )}
+              </div>
             <div className="space-y-3">
-              {channels.map((ch) => (
+              {filteredChannels.map((ch) => (
                 <div key={ch.id}>
                   {editingId === ch.id ? (
                     <div className="p-4 rounded-lg border border-primary/30 bg-primary/5">
@@ -797,6 +958,9 @@ export function ChannelCard({ lang = "zh" }: { lang?: "zh" | "en" }) {
                     </div>
                   ) : (
                     <div className="flex items-center gap-4 p-3 rounded-lg border border-border/50 hover:bg-muted/50 transition-colors">
+                      <input type="checkbox" checked={selectedIds.has(ch.id)}
+                        onChange={() => toggleSelect(ch.id)}
+                        className="rounded shrink-0" />
                       <Radio
                         className={`h-5 w-5 shrink-0 ${statusColor(ch.status)}`}
                       />
@@ -917,6 +1081,61 @@ export function ChannelCard({ lang = "zh" }: { lang?: "zh" | "en" }) {
                 </div>
               ))}
             </div>
+            </>
+          )}
+          {channels.length > 0 && (
+            <div className="mt-4">
+              <button onClick={() => setShowRouting(!showRouting)}
+                className="text-xs text-primary hover:underline flex items-center gap-1">
+                {showRouting ? t.hideRouting : t.showRouting}
+              </button>
+              {showRouting && (
+                <div className="mt-3 p-3 bg-muted/20 rounded-lg">
+                  <p className="text-xs text-muted-foreground mb-3">{t.routingDesc}</p>
+                  {routingMatrix.size === 0 ? (
+                    <p className="text-xs text-muted-foreground">{t.noModels}</p>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-xs">
+                        <thead>
+                          <tr className="border-b border-border/30">
+                            <th className="text-left py-1.5 px-2 text-muted-foreground font-medium sticky left-0 bg-muted/20">{t.channelModels}</th>
+                            {channels.map(ch => (
+                              <th key={ch.id} className="text-center py-1.5 px-2 text-muted-foreground font-medium min-w-[80px]">
+                                <span className={ch.enabled ? "" : "line-through opacity-50"}>{ch.name}</span>
+                              </th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {Array.from(routingMatrix.entries()).sort(([a], [b]) => a.localeCompare(b)).map(([model, chans]) => (
+                            <tr key={model} className="border-b border-border/10 hover:bg-muted/20">
+                              <td className="py-1.5 px-2 font-mono sticky left-0 bg-muted/20">{model}</td>
+                              {channels.map(ch => {
+                                const match = chans.find(c => c.id === ch.id);
+                                if (!match) return <td key={ch.id} className="py-1.5 px-2 text-center text-muted-foreground/30">-</td>;
+                                return (
+                                  <td key={ch.id} className="py-1.5 px-2 text-center">
+                                    <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] ${
+                                      !match.enabled ? "bg-muted text-muted-foreground" :
+                                      match.status === "online" ? "bg-green-500/10 text-green-500" :
+                                      match.status === "offline" ? "bg-red-500/10 text-red-500" :
+                                      "bg-yellow-500/10 text-yellow-500"
+                                    }`}>
+                                      P{match.priority} W{match.weight}
+                                    </span>
+                                  </td>
+                                );
+                              })}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           )}
         </CardContent>
       </Card>
@@ -945,6 +1164,31 @@ export function ChannelCard({ lang = "zh" }: { lang?: "zh" | "en" }) {
             <Button
               className="bg-red-600 text-white hover:bg-red-700"
               onClick={() => deleteTarget && deleteChannel(deleteTarget.id)}
+            >
+              {t.confirm}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Batch Action Confirmation Dialog */}
+      <Dialog open={batchAction !== null} onOpenChange={(open) => { if (!open) setBatchAction(null); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t.batchConfirm}</DialogTitle>
+            <DialogDescription>
+              {batchAction === "delete"
+                ? t.batchDeleteMsg.replace("{count}", String(selectedIds.size))
+                : batchAction === "enable"
+                ? t.batchEnableMsg.replace("{count}", String(selectedIds.size))
+                : t.batchDisableMsg.replace("{count}", String(selectedIds.size))}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setBatchAction(null)}>{t.cancel}</Button>
+            <Button
+              className={batchAction === "delete" ? "bg-red-600 text-white hover:bg-red-700" : ""}
+              onClick={executeBatch}
             >
               {t.confirm}
             </Button>

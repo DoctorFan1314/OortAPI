@@ -3,7 +3,7 @@
 import { useI18n } from "@/contexts/i18n-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useMemo, useState } from "react";
-import { Shield, Search } from "lucide-react";
+import { Shield, Search, Download } from "lucide-react";
 import useSWR from "swr";
 import { dashboardSWRConfig } from "@/lib/swr-fetcher";
 
@@ -39,6 +39,9 @@ const LABELS = {
     dateFrom: "开始日期",
     dateTo: "结束日期",
     total: "总记录",
+    exportCSV: "导出 CSV",
+    search: "搜索",
+    searchPlaceholder: "搜索操作或详情...",
   },
   en: {
     title: "Audit Logs",
@@ -59,6 +62,9 @@ const LABELS = {
     dateFrom: "From",
     dateTo: "To",
     total: "Total",
+    exportCSV: "Export CSV",
+    search: "Search",
+    searchPlaceholder: "Search actions or details...",
   },
 };
 
@@ -72,6 +78,7 @@ export default function AuditPage() {
   const [filterTarget, setFilterTarget] = useState("");
   const [filterFrom, setFilterFrom] = useState("");
   const [filterTo, setFilterTo] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const filterParams = [
     `limit=50&offset=${(page - 1) * 50}`,
@@ -79,6 +86,7 @@ export default function AuditPage() {
     filterTarget ? `target_type=${encodeURIComponent(filterTarget)}` : "",
     filterFrom ? `from=${filterFrom}` : "",
     filterTo ? `to=${filterTo}` : "",
+    searchQuery ? `search=${encodeURIComponent(searchQuery)}` : "",
   ].filter(Boolean).join("&");
 
   const { data, isLoading } = useSWR<{ logs: AuditLog[]; total: number; has_more: boolean }>(
@@ -113,14 +121,14 @@ export default function AuditPage() {
 
       {/* Filters */}
       <div className="flex flex-wrap items-end gap-3 p-3 bg-muted/30 rounded-lg">
-        <div className="flex-1 min-w-[150px]">
-          <label className="text-xs text-muted-foreground block mb-1">{t.filterAction}</label>
+        <div className="flex-1 min-w-[200px]">
+          <label className="text-xs text-muted-foreground block mb-1">{t.search}</label>
           <div className="relative">
             <Search className="absolute left-2.5 top-2 h-4 w-4 text-muted-foreground" />
             <input
-              value={filterAction}
-              onChange={e => { setFilterAction(e.target.value); setPage(1); }}
-              placeholder="user.update"
+              value={searchQuery}
+              onChange={e => { setSearchQuery(e.target.value); setPage(1); }}
+              placeholder={t.searchPlaceholder}
               className="w-full pl-8 pr-3 py-1.5 bg-background rounded-lg text-sm border border-border/50 focus:border-primary focus:outline-none"
             />
           </div>
@@ -156,14 +164,28 @@ export default function AuditPage() {
             className="w-full h-8 px-2 rounded-md border border-input bg-background text-sm focus:border-primary focus:outline-none"
           />
         </div>
-        {(filterAction || filterTarget || filterFrom || filterTo) && (
+        {(searchQuery || filterAction || filterTarget || filterFrom || filterTo) && (
           <button
-            onClick={() => { setFilterAction(""); setFilterTarget(""); setFilterFrom(""); setFilterTo(""); setPage(1); }}
+            onClick={() => { setSearchQuery(""); setFilterAction(""); setFilterTarget(""); setFilterFrom(""); setFilterTo(""); setPage(1); }}
             className="h-8 px-3 text-xs text-muted-foreground hover:text-foreground border border-border/50 rounded-md hover:bg-muted transition-colors"
           >
             {t.clearFilters}
           </button>
         )}
+        <button onClick={() => {
+          const params = [
+            'format=csv',
+            filterAction ? `action=${encodeURIComponent(filterAction)}` : "",
+            filterTarget ? `target_type=${encodeURIComponent(filterTarget)}` : "",
+            filterFrom ? `from=${filterFrom}` : "",
+            filterTo ? `to=${filterTo}` : "",
+            searchQuery ? `search=${encodeURIComponent(searchQuery)}` : "",
+          ].filter(Boolean).join('&');
+          window.open(`/api/dashboard/audit?${params}`, '_blank');
+        }}
+          className="h-8 px-3 text-xs border border-border/50 rounded-md hover:bg-muted transition-colors flex items-center gap-1.5 ml-auto">
+          <Download className="h-3.5 w-3.5" />{t.exportCSV}
+        </button>
       </div>
 
       <Card className="glass-card">

@@ -14,6 +14,8 @@ interface MultiplierRule {
   multiplier: number;
   enabled: number;
   description: string | null;
+  input_rate: number | null;
+  output_rate: number | null;
 }
 
 interface TimeSettings {
@@ -47,6 +49,15 @@ const LABELS = {
     enableTime: "启用时段倍率",
     timeDesc: "优先级高于常规倍率。设置白天和夜间的不同倍率，适用于按时段差异化定价。",
     regularDesc: "按模型设置固定倍率，最终价格 = 基础价格 × 倍率。",
+    effectiveInput: "生效输入价",
+    effectiveOutput: "生效输出价",
+    batchEdit: "批量编辑",
+    batchEditTitle: "批量修改倍率",
+    batchEditDesc: "为选中的规则设置新的倍率值",
+    selected: "已选 {count} 个",
+    newMultiplier: "新倍率",
+    apply: "应用",
+    cancel: "取消",
   },
   en: {
     title: "Multiplier Rules",
@@ -69,6 +80,15 @@ const LABELS = {
     enableTime: "Enable Time-based Multiplier",
     timeDesc: "Higher priority than regular rules. Set different multipliers for day and night periods.",
     regularDesc: "Set a fixed multiplier per model. Final price = base price × multiplier.",
+    effectiveInput: "Effective Input",
+    effectiveOutput: "Effective Output",
+    batchEdit: "Batch Edit",
+    batchEditTitle: "Batch Edit Multiplier",
+    batchEditDesc: "Set a new multiplier value for selected rules",
+    selected: "{count} selected",
+    newMultiplier: "New Multiplier",
+    apply: "Apply",
+    cancel: "Cancel",
   },
 };
 
@@ -85,6 +105,9 @@ export default function MultiplierPage() {
   const [newMultiplier, setNewMultiplier] = useState('1.0');
   const [newDesc, setNewDesc] = useState('');
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [selectedRules, setSelectedRules] = useState<Set<string>>(new Set());
+  const [batchMultValue, setBatchMultValue] = useState('1.0');
+  const [showBatchDialog, setShowBatchDialog] = useState(false);
 
   const fetchData = () => {
     fetch('/api/dashboard/multiplier', { credentials: 'include' })
@@ -147,6 +170,33 @@ export default function MultiplierPage() {
     }).then(res => { if (!res.ok) throw new Error(); return res.json(); })
       .then(() => showToast(lang === "zh" ? "已保存" : "Saved", "success"))
       .catch(() => showToast(lang === "zh" ? "保存失败" : "Failed to save", "error"));
+  };
+
+  const toggleRuleSelect = (name: string) => {
+    setSelectedRules(prev => {
+      const next = new Set(prev);
+      if (next.has(name)) next.delete(name);
+      else next.add(name);
+      return next;
+    });
+  };
+
+  const handleBatchEdit = async () => {
+    const mult = parseFloat(batchMultValue) || 1.0;
+    const promises = Array.from(selectedRules).map(name => {
+      const rule = rules.find(r => r.model_name === name);
+      return fetch('/api/dashboard/multiplier', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model_name: name, multiplier: mult, enabled: rule?.enabled ?? true, description: rule?.description }),
+      });
+    });
+    await Promise.all(promises);
+    setShowBatchDialog(false);
+    setSelectedRules(new Set());
+    fetchData();
+    showToast(lang === "zh" ? "批量更新成功" : "Batch update successful", "success");
   };
 
   if (loading) {
@@ -304,13 +354,29 @@ export default function MultiplierPage() {
           {rules.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground text-sm">{t.noRules}</div>
           ) : (
-            <div className="overflow-x-auto">
+            <>
+              {selectedRules.size > 0 && (
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-xs text-muted-foreground">{t.selected.replace("{count}", String(selectedRules.size))}</span>
+                  <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => setShowBatchDialog(true)}>{t.batchEdit}</Button>
+                </div>
+              )}
+              <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border/50">
+                    <th className="text-left py-2 px-2 w-8">
+                      <input type="checkbox" checked={selectedRules.size === rules.length && rules.length > 0}
+                        onChange={() => {
+                          if (selectedRules.size === rules.length) setSelectedRules(new Set());
+                          else setSelectedRules(new Set(rules.map(r => r.model_name)));
+                        }} className="rounded" />
+                    </th>
                     <th className="text-left py-2 px-3 text-muted-foreground font-medium">{t.model}</th>
                     <th className="text-right py-2 px-3 text-muted-foreground font-medium">{t.multiplier}</th>
-                    <th className="text-left py-2 px-3 text-muted-foreground font-medium">{t.description}</th>
+                    <th className="text-right py-2 px-3 text-muted-foreground font-medium">{t.effectiveInput}</th>
+                    <th className="text-right py-2 px-3 text-muted-foreground font-medium">{t.effectiveOutput}</th>
+                    <th className="text-left py-2 px-3 text-muted-foreground font-medium hidden md:table-cell">{t.description}</th>
                     <th className="text-center py-2 px-3 text-muted-foreground font-medium">{t.enabled}</th>
                     <th className="text-center py-2 px-3 text-muted-foreground font-medium">{t.actions}</th>
                   </tr>
@@ -318,9 +384,19 @@ export default function MultiplierPage() {
                 <tbody>
                   {rules.map(rule => (
                     <tr key={rule.id} className="border-b border-border/20 hover:bg-muted/30">
+                      <td className="py-2 px-2">
+                        <input type="checkbox" checked={selectedRules.has(rule.model_name)}
+                          onChange={() => toggleRuleSelect(rule.model_name)} className="rounded" />
+                      </td>
                       <td className="py-2 px-3 font-mono text-xs">{rule.model_name}</td>
                       <td className="py-2 px-3 text-right font-mono">{rule.multiplier}x</td>
-                      <td className="py-2 px-3 text-xs text-muted-foreground">{rule.description || "-"}</td>
+                      <td className="py-2 px-3 text-right font-mono text-xs">
+                        {rule.input_rate != null ? `$${(rule.input_rate * rule.multiplier).toFixed(4)}/1K` : "-"}
+                      </td>
+                      <td className="py-2 px-3 text-right font-mono text-xs">
+                        {rule.output_rate != null ? `$${(rule.output_rate * rule.multiplier).toFixed(4)}/1K` : "-"}
+                      </td>
+                      <td className="py-2 px-3 text-xs text-muted-foreground hidden md:table-cell">{rule.description || "-"}</td>
                       <td className="py-2 px-3 text-center">
                         <button
                           onClick={() => handleToggleRule(rule)}
@@ -342,7 +418,8 @@ export default function MultiplierPage() {
                   ))}
                 </tbody>
               </table>
-            </div>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
@@ -359,6 +436,29 @@ export default function MultiplierPage() {
           <div className="flex gap-2 justify-end pt-2">
             <Button variant="outline" onClick={() => setDeleteTarget(null)}>{lang === "zh" ? "取消" : "Cancel"}</Button>
             <Button onClick={confirmDeleteRule} className="bg-red-600 text-white hover:bg-red-700">{lang === "zh" ? "确认删除" : "Delete"}</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Batch Edit Dialog */}
+      <Dialog open={showBatchDialog} onOpenChange={setShowBatchDialog}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>{t.batchEditTitle}</DialogTitle>
+            <DialogDescription>{t.batchEditDesc}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <div>
+              <label className="text-xs text-muted-foreground block mb-1">{t.newMultiplier}</label>
+              <input type="number" step="0.01" min="0.01" max="100" value={batchMultValue}
+                onChange={e => setBatchMultValue(e.target.value)}
+                className="w-full px-3 py-2 bg-background rounded-lg text-sm border border-border/50 focus:border-primary focus:outline-none" />
+            </div>
+            <p className="text-xs text-muted-foreground">{t.selected.replace("{count}", String(selectedRules.size))}</p>
+          </div>
+          <div className="flex gap-2 justify-end">
+            <Button variant="outline" onClick={() => setShowBatchDialog(false)}>{t.cancel}</Button>
+            <Button onClick={handleBatchEdit}>{t.apply}</Button>
           </div>
         </DialogContent>
       </Dialog>

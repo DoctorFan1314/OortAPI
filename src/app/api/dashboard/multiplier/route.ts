@@ -11,7 +11,12 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
   }
 
-  const rules = db.prepare('SELECT * FROM multiplier_rules ORDER BY model_name').all();
+  const rules = db.prepare(
+    `SELECT m.*, r.input_rate, r.output_rate
+     FROM multiplier_rules m
+     LEFT JOIN model_rates r ON m.model_name = r.model_name
+     ORDER BY m.model_name`
+  ).all() as Array<{ id: number; model_name: string; multiplier: number; enabled: number; description: string | null; input_rate: number | null; output_rate: number | null }>;
   const timeSettings = db.prepare('SELECT * FROM time_multiplier_settings WHERE id = 1').get() || {
     id: 1, day_start: '08:00', day_end: '22:00', day_rate: 1.0, night_rate: 0.5, timezone: 'Asia/Shanghai', enabled: 0,
   };

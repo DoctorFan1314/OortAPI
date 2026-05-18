@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Fragment } from "react";
 import useSWR from "swr";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,6 +38,17 @@ const LABELS = {
     keyCreated: "API Key 创建成功",
     confirmDelete: "确定删除此 Key？",
     noKeys: "暂无 API Key，点击上方按钮创建",
+    rateLimit: "速率限制",
+    rpm: "次/分钟",
+    save: "保存",
+    cancel: "取消",
+    keyAnalytics: "Key 用量分析",
+    recentCalls: "近 7 天调用",
+    recentCost: "近 7 天费用",
+    recentTokens: "近 7 天 Tokens",
+    avgLatency: "平均延迟",
+    errorRate: "错误率",
+    noData: "暂无数据",
   },
   en: {
     title: "API Keys Management",
@@ -54,6 +65,17 @@ const LABELS = {
     keyCreated: "API Key created successfully",
     confirmDelete: "Delete this key?",
     noKeys: "No API keys yet. Click above to create one.",
+    rateLimit: "Rate Limit",
+    rpm: "RPM",
+    save: "Save",
+    cancel: "Cancel",
+    keyAnalytics: "Key Analytics",
+    recentCalls: "7d Calls",
+    recentCost: "7d Cost",
+    recentTokens: "7d Tokens",
+    avgLatency: "Avg Latency",
+    errorRate: "Error Rate",
+    noData: "No data",
   },
 };
 
@@ -65,6 +87,10 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
   const [creating, setCreating] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
   const [newKeyFull, setNewKeyFull] = useState<string | null>(null);
+  const [editingRateId, setEditingRateId] = useState<number | null>(null);
+  const [editRateValue, setEditRateValue] = useState("60");
+  const [expandedKeyId, setExpandedKeyId] = useState<number | null>(null);
+  const [keyStats, setKeyStats] = useState<Record<number, { calls_7d: number; cost_7d: number; tokens_7d: number; avg_latency: number | null; error_rate: number }>>({});
   const { toast: showToast } = useToast();
   const t = LABELS[lang];
 
@@ -112,6 +138,35 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
     });
     setDeleteTarget(null);
     mutate();
+  };
+
+  const saveRateLimit = async (id: number) => {
+    const val = Math.min(Math.max(Math.floor(Number(editRateValue) || 60), 1), 10000);
+    await fetch("/api/dashboard/keys", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ id, rate_limit: val }),
+    });
+    setEditingRateId(null);
+    mutate();
+  };
+
+  const toggleKeyAnalytics = async (id: number) => {
+    if (expandedKeyId === id) {
+      setExpandedKeyId(null);
+      return;
+    }
+    setExpandedKeyId(id);
+    if (!keyStats[id]) {
+      try {
+        const res = await fetch(`/api/dashboard/keys/${id}/stats`, { credentials: "include" });
+        if (res.ok) {
+          const data = await res.json();
+          setKeyStats(prev => ({ ...prev, [id]: data }));
+        }
+      } catch {}
+    }
   };
 
   const copyKey = (key: string) => {
@@ -163,10 +218,15 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
         ) : (
           <div className="space-y-3">
             {keys.map((k) => (
-              <div key={k.id} className="flex items-center gap-4 p-3 rounded-lg border border-border/50 hover:bg-muted/50 transition-colors">
+              <Fragment key={k.id}>
+              <div className="flex items-center gap-4 p-3 rounded-lg border border-border/50 hover:bg-muted/50 transition-colors">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="font-medium text-sm">{k.name}</span>
+                    <button onClick={() => toggleKeyAnalytics(k.id)}
+                      className={`text-xs px-1.5 py-0.5 rounded transition-colors ${expandedKeyId === k.id ? "bg-primary/20 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}>
+                      {t.keyAnalytics}
+                    </button>
                     <span className={`text-xs px-2 py-0.5 rounded-full ${k.enabled ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"}`}>
                       {k.enabled ? t.enabled : t.disabled}
                     </span>
@@ -186,6 +246,21 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
                 <div className="text-right text-xs text-muted-foreground shrink-0">
                   <div>{t.calls}: {k.total_calls}</div>
                   <div>{t.lastUsed}: {formatLastUsed(k.last_used_at)}</div>
+                  {editingRateId === k.id ? (
+                    <div className="flex items-center gap-1 mt-1">
+                      <Input type="number" value={editRateValue} onChange={e => setEditRateValue(e.target.value)}
+                        className="w-16 h-6 text-xs px-1" min={1} max={10000}
+                        onKeyDown={e => { if (e.key === 'Enter') saveRateLimit(k.id); if (e.key === 'Escape') setEditingRateId(null); }}
+                        autoFocus />
+                      <button onClick={() => saveRateLimit(k.id)} className="text-green-500 hover:text-green-400 text-xs">{t.save}</button>
+                      <button onClick={() => setEditingRateId(null)} className="text-muted-foreground hover:text-foreground text-xs">{t.cancel}</button>
+                    </div>
+                  ) : (
+                    <button onClick={() => { setEditingRateId(k.id); setEditRateValue(String(k.rate_limit)); }}
+                      className="mt-1 hover:text-foreground cursor-pointer" title={t.rateLimit}>
+                      {t.rateLimit}: {k.rate_limit} {t.rpm}
+                    </button>
+                  )}
                 </div>
                 <div className="flex items-center gap-1">
                   <button onClick={() => toggleKey(k.id, !k.enabled)} className="text-muted-foreground hover:text-foreground" aria-label={k.enabled ? t.disabled : t.enabled}>
@@ -196,6 +271,42 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
                   </button>
                 </div>
               </div>
+              {expandedKeyId === k.id && (
+                <div className="px-3 pb-3 pt-1">
+                  {keyStats[k.id] ? (() => {
+                    const s = keyStats[k.id];
+                    return (
+                    <div className="grid grid-cols-5 gap-3 p-3 bg-muted/30 rounded-lg text-xs">
+                      <div>
+                        <p className="text-muted-foreground">{t.recentCalls}</p>
+                        <p className="text-base font-bold font-mono">{s.calls_7d.toLocaleString()}</p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground">{t.recentCost}</p>
+                        <p className="text-base font-bold font-mono">${s.cost_7d.toFixed(4)}</p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground">{t.recentTokens}</p>
+                        <p className="text-base font-bold font-mono">{s.tokens_7d.toLocaleString()}</p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground">{t.avgLatency}</p>
+                        <p className="text-base font-bold font-mono">{s.avg_latency != null ? `${Math.round(s.avg_latency)}ms` : "-"}</p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground">{t.errorRate}</p>
+                        <p className={`text-base font-bold font-mono ${s.error_rate > 10 ? "text-red-500" : s.error_rate > 0 ? "text-amber-500" : "text-green-500"}`}>
+                          {s.error_rate}%
+                        </p>
+                      </div>
+                    </div>
+                    );
+                  })() : (
+                    <div className="h-16 animate-pulse bg-muted/30 rounded-lg" />
+                  )}
+                </div>
+              )}
+              </Fragment>
             ))}
           </div>
         )}

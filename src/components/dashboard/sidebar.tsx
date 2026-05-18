@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/contexts/i18n-context";
 import { useAuth } from "@/contexts/auth-context";
-import { LayoutDashboard, Key, BarChart3, Wallet, Radio, Settings, Shield, Users, Gift, Percent, Sparkles, ListChecks, ChevronDown, FileText, Webhook } from "lucide-react";
+import { LayoutDashboard, Key, BarChart3, Wallet, Radio, Settings, Shield, Users, Gift, Percent, Sparkles, ListChecks, ChevronDown, FileText, Webhook, Activity, Play } from "lucide-react";
 
 const NAV_ITEMS = [
   { href: "/dashboard", icon: LayoutDashboard, labelKey: "overview" as const },
@@ -20,7 +20,9 @@ const NAV_ITEMS = [
   { href: "/dashboard/users", icon: Users, labelKey: "users" as const, adminOnly: true },
   { href: "/dashboard/redeem", icon: Gift, labelKey: "redeem" as const, adminOnly: true },
   { href: "/dashboard/admin/audit", icon: FileText, labelKey: "audit" as const, adminOnly: true },
+  { href: "/dashboard/admin/monitor", icon: Activity, labelKey: "monitor" as const, adminOnly: true },
   { href: "/dashboard/admin/webhooks", icon: Webhook, labelKey: "webhooks" as const, adminOnly: true },
+  { href: "/dashboard/playground", icon: Play, labelKey: "playground" as const },
   { href: "/dashboard/settings", icon: Settings, labelKey: "settings" as const },
 ];
 
@@ -36,7 +38,9 @@ const LABELS: Record<string, { zh: string; en: string }> = {
   users: { zh: "用户管理", en: "Users" },
   redeem: { zh: "兑换码", en: "Redeem Codes" },
   audit: { zh: "审计日志", en: "Audit Logs" },
+  monitor: { zh: "系统监控", en: "System Monitor" },
   webhooks: { zh: "Webhook", en: "Webhooks" },
+  playground: { zh: "API 测试", en: "API Playground" },
   settings: { zh: "设置", en: "Settings" },
 };
 

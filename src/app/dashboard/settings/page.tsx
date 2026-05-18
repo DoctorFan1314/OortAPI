@@ -7,11 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import { useToast } from "@/contexts/toast-context";
-import { Loader2, Settings, Download, Upload } from "lucide-react";
+import { Loader2, Settings, Download, Upload, Wallet } from "lucide-react";
 
 const LABELS = {
-  zh: { apiEndpoint: "API 端点", copyEndpoint: "复制", systemSettings: "系统设置", timezone: "时区", currency: "默认货币", exchangeRate: "汇率", saveSystem: "保存系统设置", saved: "已保存" },
-  en: { apiEndpoint: "API Endpoint", copyEndpoint: "Copy", systemSettings: "System Settings", timezone: "Timezone", currency: "Default Currency", exchangeRate: "Exchange Rate", saveSystem: "Save System Settings", saved: "Saved" },
+  zh: { apiEndpoint: "API 端点", copyEndpoint: "复制", systemSettings: "系统设置", timezone: "时区", currency: "默认货币", exchangeRate: "汇率", saveSystem: "保存系统设置", saved: "已保存", budget: "预算管理", budgetDesc: "设置每月消费上限，接近阈值时将收到提醒", monthlyBudget: "月度预算上限", currentSpend: "本月已消费", noBudget: "未设置预算", saveBudget: "保存预算", budgetWarning: "预算提醒", budgetExceeded: "已超出预算！", budgetNear: "已接近预算上限", budgetOk: "预算正常" },
+  en: { apiEndpoint: "API Endpoint", copyEndpoint: "Copy", systemSettings: "System Settings", timezone: "Timezone", currency: "Default Currency", exchangeRate: "Exchange Rate", saveSystem: "Save System Settings", saved: "Saved", budget: "Budget Management", budgetDesc: "Set a monthly spending limit. You'll be notified when approaching the threshold.", monthlyBudget: "Monthly Budget Limit", currentSpend: "Current Month Spend", noBudget: "No budget set", saveBudget: "Save Budget", budgetWarning: "Budget Alert", budgetExceeded: "Budget exceeded!", budgetNear: "Approaching budget limit", budgetOk: "Within budget" },
 };
 
 export default function SettingsPage() {
@@ -25,20 +25,33 @@ export default function SettingsPage() {
   const [systemCurrency, setSystemCurrency] = useState("USD");
   const [exchangeRate, setExchangeRate] = useState("7.3");
   const [systemSaving, setSystemSaving] = useState(false);
+  const [monthlyBudget, setMonthlyBudget] = useState("");
+  const [currentSpend, setCurrentSpend] = useState(0);
+  const [budgetSaving, setBudgetSaving] = useState(false);
 
   useEffect(() => {
-    if (user?.role === "admin") {
-      fetch("/api/dashboard/settings", { credentials: "include" })
-        .then(r => r.json())
-        .then(d => {
-          if (d.settings) {
-            setTimezone(d.settings.timezone || "Asia/Shanghai");
-            setSystemCurrency(d.settings.currency || "USD");
-            setExchangeRate(d.settings.exchange_rate || "7.3");
-          }
-        })
-        .catch(() => {});
-    }
+    fetch("/api/dashboard/settings", { credentials: "include" })
+      .then(r => r.json())
+      .then(d => {
+        if (d.settings && user?.role === "admin") {
+          setTimezone(d.settings.timezone || "Asia/Shanghai");
+          setSystemCurrency(d.settings.currency || "USD");
+          setExchangeRate(d.settings.exchange_rate || "7.3");
+        }
+        if (d.preferences?.monthly_budget) {
+          setMonthlyBudget(String(d.preferences.monthly_budget));
+        }
+      })
+      .catch(() => {});
+    // Fetch current month spending
+    const now = new Date();
+    const from = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
+    fetch(`/api/v1/billing/usage?limit=1&from=${from}`, { credentials: "include" })
+      .then(r => r.json())
+      .then(d => {
+        setCurrentSpend(d.total_cost || 0);
+      })
+      .catch(() => {});
   }, [user]);
 
   const handleSaveSystem = async () => {
@@ -59,6 +72,25 @@ export default function SettingsPage() {
     setSystemSaving(false);
   };
 
+  const handleSaveBudget = async () => {
+    setBudgetSaving(true);
+    try {
+      const budget = monthlyBudget ? parseFloat(monthlyBudget) : null;
+      const res = await fetch("/api/dashboard/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ monthly_budget: budget }),
+      });
+      if (res.ok) showToast(t.saved, "success");
+    } catch { /* ignore */ }
+    setBudgetSaving(false);
+  };
+
+  const budgetLimit = monthlyBudget ? parseFloat(monthlyBudget) : 0;
+  const budgetPercent = budgetLimit > 0 ? (currentSpend / budgetLimit) * 100 : 0;
+  const budgetStatus = budgetLimit > 0 ? (budgetPercent >= 100 ? "exceeded" : budgetPercent >= 80 ? "near" : "ok") : "none";
+
   const endpoint = typeof window !== "undefined" ? `${window.location.origin}/api/v1` : "";
 
   return (
@@ -76,6 +108,63 @@ export default function SettingsPage() {
               {t.copyEndpoint}
             </Button>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Budget Management */}
+      <Card className="glass-card">
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Wallet className="h-5 w-5" />
+            {t.budget}
+          </CardTitle>
+          <p className="text-sm text-muted-foreground">{t.budgetDesc}</p>
+        </CardHeader>
+        <CardContent className="space-y-4 max-w-md">
+          <div>
+            <label className="text-sm text-muted-foreground">{t.monthlyBudget} ($)</label>
+            <Input
+              type="number"
+              step="1"
+              min="0"
+              value={monthlyBudget}
+              onChange={e => setMonthlyBudget(e.target.value)}
+              placeholder="100"
+              className="mt-1"
+            />
+          </div>
+          {budgetLimit > 0 && (
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">{t.currentSpend}</span>
+                <span className="font-mono">${currentSpend.toFixed(4)} / ${budgetLimit.toFixed(2)}</span>
+              </div>
+              <div className="h-2 bg-muted rounded-full overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all ${
+                    budgetStatus === "exceeded" ? "bg-red-500" :
+                    budgetStatus === "near" ? "bg-amber-500" :
+                    "bg-green-500"
+                  }`}
+                  style={{ width: `${Math.min(budgetPercent, 100)}%` }}
+                />
+              </div>
+              <p className={`text-xs ${
+                budgetStatus === "exceeded" ? "text-red-500" :
+                budgetStatus === "near" ? "text-amber-500" :
+                "text-green-500"
+              }`}>
+                {budgetStatus === "exceeded" ? t.budgetExceeded :
+                 budgetStatus === "near" ? t.budgetNear :
+                 t.budgetOk}
+                {budgetPercent > 0 && ` (${budgetPercent.toFixed(1)}%)`}
+              </p>
+            </div>
+          )}
+          <Button onClick={handleSaveBudget} disabled={budgetSaving}>
+            {budgetSaving ? <Loader2 className="h-4 w-4 animate-spin mr-1.5" /> : null}
+            {t.saveBudget}
+          </Button>
         </CardContent>
       </Card>
 
