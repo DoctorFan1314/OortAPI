@@ -510,12 +510,14 @@ export default function UsagePage() {
                 <BarChart3 className="h-4 w-4" />{t.trend}
               </CardTitle>
               <div className="flex gap-1">
-                {(["cost", "tokens", "calls"] as const).map(m => (
-                  <button key={m} onClick={() => setChartMetric(m)}
-                    className={`px-2.5 py-1 text-xs rounded-md transition-colors ${chartMetric === m ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>
-                    {m === "cost" ? t.byCost : m === "tokens" ? t.byTokens : t.byCalls}
-                  </button>
-                ))}
+                {(["cost", "tokens", "calls"] as const)
+                  .filter(m => !isCreditsUser || m !== "cost")
+                  .map(m => (
+                    <button key={m} onClick={() => setChartMetric(m)}
+                      className={`px-2.5 py-1 text-xs rounded-md transition-colors ${chartMetric === m ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>
+                      {m === "cost" ? t.byCost : m === "tokens" ? t.byTokens : t.byCalls}
+                    </button>
+                  ))}
               </div>
             </div>
           </CardHeader>
