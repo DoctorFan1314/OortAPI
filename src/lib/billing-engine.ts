@@ -173,12 +173,11 @@ export interface DeductCreditsResult {
 }
 
 export function calculateCredits(model: string, tokensIn: number, tokensOut: number, tokensInCache: number = 0): number {
-  const rate = db.prepare('SELECT credit_rate, input_rate, cache_rate FROM model_rates WHERE model_name = ? AND enabled = 1').get(model) as { credit_rate: number; input_rate: number; cache_rate: number } | undefined;
-  if (!rate) return Math.ceil((tokensIn + tokensOut) * 1.0);
-  // Cache hits consume credits at reduced rate (cache_rate / input_rate proportion)
-  const cacheRatio = rate.input_rate > 0 ? rate.cache_rate / rate.input_rate : 0.5;
-  const adjustedIn = (tokensIn - tokensInCache) + tokensInCache * cacheRatio;
-  return Math.ceil(Math.max(0, adjustedIn + tokensOut) * rate.credit_rate);
+  const rate = db.prepare('SELECT credit_rate FROM model_rates WHERE model_name = ? AND enabled = 1').get(model) as { credit_rate: number } | undefined;
+  const creditRate = rate?.credit_rate ?? 1.0;
+  // Cache hits charged at 50% discount (matching OpenAI's 0.5x cache ratio)
+  const adjustedIn = (tokensIn - tokensInCache) + tokensInCache * 0.5;
+  return Math.ceil(Math.max(0, adjustedIn + tokensOut) * creditRate);
 }
 
 export function deductCreditsOrBalance(
