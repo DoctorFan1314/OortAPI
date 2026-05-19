@@ -743,7 +743,7 @@ export default function UsagePage() {
                 <label className="flex items-center gap-1 text-xs text-muted-foreground">
                   {lang === "zh" ? "跳转" : "Go to"}
                   <input type="number" min={1} max={Math.ceil(total / 50) || 1}
-                    onKeyDown={e => { if (e.key === 'Enter') { const v = parseInt((e.target as HTMLInputElement).value); if (v > 0) setPage(v); } }}
+                    onKeyDown={e => { if (e.key === 'Enter') { const max = Math.ceil(total / 50) || 1; const v = Math.min(Math.max(1, parseInt((e.target as HTMLInputElement).value) || 1), max); setPage(v); } }}
                     className="w-12 h-7 px-1 rounded border border-border/50 bg-background text-xs text-center focus:border-primary focus:outline-none"
                   />
                 </label>

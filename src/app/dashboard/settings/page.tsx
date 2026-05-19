@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/contexts/toast-context";
 import { Loader2, Settings, Download, Upload, Wallet } from "lucide-react";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
@@ -63,12 +63,15 @@ export default function SettingsPage() {
       .catch(() => {});
   }, [user]);
 
-  // Budget alert on load
+  // Budget alert only when newly exceeded (not on every mount)
+  const prevExceeded = useRef(false);
   useEffect(() => {
-    if (budgetLimit > 0 && budgetPercent >= 100) {
-      showToast("Budget exceeded!", "error");
+    const isExceeded = budgetLimit > 0 && budgetPercent >= 100;
+    if (isExceeded && !prevExceeded.current) {
+      showToast(lang === "zh" ? "预算已超限！" : "Budget exceeded!", "error");
     }
-  }, [budgetLimit, budgetPercent]);
+    prevExceeded.current = isExceeded;
+  }, [budgetLimit, budgetPercent, lang]);
 
   const handleSaveSystem = async () => {
     if (exchangeRate !== initialExchangeRate) {

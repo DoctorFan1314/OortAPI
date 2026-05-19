@@ -384,7 +384,7 @@ export default function PlaygroundPage() {
               <ChevronDown className={cn("h-3 w-3 transition-transform", showParams && "rotate-180")} />
             </button>
             {showParams && (
-              <div className="grid md:grid-cols-3 gap-4 mt-3 p-4 rounded-lg bg-muted/20 border border-border/30">
+              <div className="grid md:grid-cols-3 gap-4 mt-3 p-4 rounded-lg bg-muted/20 border border-border/30 animate-slideDown">
                 <div>
                   <label className="text-xs text-muted-foreground block mb-1">{t.temperature}</label>
                   <div className="flex items-center gap-2">

@@ -98,7 +98,7 @@ export default function DashboardPage() {
         <div className="flex items-center gap-3">
           {lastUpdated && (
             <span className="text-xs text-muted-foreground">
-              {lang === "zh" ? "上次更新" : "Last updated"}: {lastUpdated.toLocaleTimeString()}
+              {lang === "zh" ? "上次更新" : "Last updated"}: {lastUpdated.toLocaleDateString()} {lastUpdated.toLocaleTimeString()}
             </span>
           )}
           <Button variant="outline" size="sm" onClick={handleRefresh} className="gap-1">

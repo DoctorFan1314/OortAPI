@@ -267,7 +267,7 @@ function deductCreditsOrBalance_fallback(
       'UPDATE user_subscriptions SET credits_remaining = credits_remaining - ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND credits_remaining >= ?'
     ).run(creditsCost, subscription.id, creditsCost);
     if (result.changes > 0) {
-      db.prepare('INSERT INTO subscription_usage_logs (subscription_id, user_id, model, credits_used, source) VALUES (?, ?, ?, ?, ?)').run(subscription.id, userId, 'unknown', creditsCost, 'credits');
+      db.prepare('INSERT INTO subscription_usage_logs (subscription_id, user_id, model, credits_used, source) VALUES (?, ?, ?, ?, ?)').run(subscription.id, userId, description.replace('API call: ', ''), creditsCost, 'credits');
       const updatedSub = db.prepare('SELECT credits_remaining FROM user_subscriptions WHERE id = ?').get(subscription.id) as { credits_remaining: number };
       return { success: true, source: 'credits', creditsRemaining: updatedSub.credits_remaining };
     }
@@ -284,7 +284,7 @@ function deductCreditsOrBalance_fallback(
   if (!deductResult.success) {
     return { success: false, source: 'blocked', error: deductResult.error, overageMultiplier };
   }
-  db.prepare('INSERT INTO subscription_usage_logs (subscription_id, user_id, model, credits_used, source) VALUES (?, ?, ?, ?, ?)').run(subscription.id, userId, 'unknown', 0, 'balance');
+  db.prepare('INSERT INTO subscription_usage_logs (subscription_id, user_id, model, credits_used, source) VALUES (?, ?, ?, ?, ?)').run(subscription.id, userId, description.replace('API call: ', ''), 0, 'balance');
   return { success: true, source: 'balance', newBalance: deductResult.newBalance, overageMultiplier };
 }
 
