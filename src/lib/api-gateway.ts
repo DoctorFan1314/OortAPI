@@ -2,7 +2,7 @@ import db from './db';
 import type { DBApiKey, DBUser } from './db';
 import { verifyToken, getTokenFromCookie, decrypt, hashApiKey } from './auth';
 import { checkRateLimit, type RateLimitResult } from './rate-limiter';
-import { deductBalance, deductCreditsOrBalance, calculateCost, logUsage, getEffectiveMultiplier, getActiveSubscription } from './billing-engine';
+import { deductBalance, deductCreditsOrBalance, calculateCost, logUsage, getEffectiveMultiplier, getActiveSubscription, dispatchWebhook } from './billing-engine';
 import { selectChannel, reportChannelFailure, reportChannelSuccess } from './channel-manager';
 
 export interface GatewayRequest {
@@ -147,6 +147,10 @@ export async function processGatewayRequest(
   const subInfo = getActiveSubscription(user.id);
   if (user.balance <= 0 && (!subInfo || subInfo.subscription.credits_remaining <= 0)) {
     return { success: false, error: 'Insufficient balance. Please recharge.', statusCode: 402, rateLimit: rateLimitInfo };
+  }
+  // Fire balance.low webhook if balance is below 1 USD
+  if (user.balance > 0 && user.balance < 1.0) {
+    dispatchWebhook('balance.low', { user_id: user.id, balance: user.balance });
   }
 
   // 3.5. Resolve model alias and check deprecation

@@ -336,6 +336,12 @@ export function processAutoRenewals(): { renewed: number; failed: number } {
       if (user.balance < renewCost) {
         // Insufficient balance — mark as expired
         db.prepare("UPDATE user_subscriptions SET status = 'expired', updated_at = CURRENT_TIMESTAMP WHERE id = ?").run(sub.id);
+        dispatchWebhook('subscription.renewal_failed', {
+          user_id: sub.user_id,
+          subscription_id: sub.id,
+          plan_name: sub.plan_name,
+          reason: 'insufficient_balance',
+        });
         failed++;
         continue;
       }
