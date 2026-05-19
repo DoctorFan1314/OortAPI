@@ -10,24 +10,37 @@ All notable changes to this project will be documented in this file.
 
 ### Beautification
 - **Dashboard layout** — Replaced outer `<div>` with semantic `<main>` tag
-- **Playground messages** — Removed `font-mono` for readable AI response rendering
+- **Dashboard** — `lastUpdated` timestamp shows date in addition to time
+- **Playground messages** — Removed `font-mono` for readable AI response rendering; each message has copy button
+- **Playground params** — Added slide-down animation when toggling parameter panel
 - **Channels health** — Changed illegible `text-[10px]` to `text-xs`
 - **Billing cards** — Added actionable "View Plans" / "Subscribe" / "Contact Us" links
+- **System Monitor** — Added pulsing green dot indicator for live auto-refresh
+- **Audit logs** — Added action type filter dropdown; details column has title tooltip
 
 ### Functionality
 - **Channel health** — Added loading skeleton and error state with retry button
 - **Models API** — DELETE now returns 404 for non-existent model rates
 - **Backup route** — Replaced `require('fs')` with ESM import
-- **Usage logs** — Filtered empty state shows "No matching records" hint
+- **Usage logs** — Filtered empty state shows "No matching records" hint; go-to-page clamped to valid range
+- **Usage logs** — Loading shows table-shaped skeleton (5 rows) instead of single pulse bar
 - **Playground** — `max_tokens` default 4096, max 131072; localStorage limited to 2MB
+- **Audit logs** — Pagination unified to total+page pattern; date range validation warning added
+- **Admin plans** — Price/credit inputs reject negative values; delete uses ConfirmDialog
+- **Webhooks** — Secret truncated display now has copy-full-value button
+- **Settings** — Budget toast fires only on transition (not every mount); budget can be cleared
 
 ### UX
 - **Webhook test** — Fixed catch block incorrectly showing "success" message
 - **Webhook delete** — Replaced raw Dialog with shared ConfirmDialog
 - **Register page** — Removed unfinished "More sign-in options coming soon" hint
 - **Settings page** — Removed duplicate "API Endpoint" title
-- **Playground** — Each message now has an individual copy button
-- **Channels** — Health data load failure now shows error toast instead of silent failure
+- **Channels** — Health data load failure shows error with retry instead of silent failure
+- **Profile** — Password inputs now have show/hide toggle button
+- **Billing engine** — Auto-renewal converts CNY prices to USD; fallback logs correct model name
+
+### Fixes
+- **Route 404** — Cleaned stale `.next` build cache that caused all `/api/` and `/login` routes to return 404
 
 ---
 
