@@ -167,6 +167,12 @@ export function StatsCards({ lang = "zh" }: { lang?: "zh" | "en" }) {
                 <span className="font-mono">{formatTokens(stats.month.tokens_out)}</span>
               </div>
             )}
+            {stats.month.tokens_in_cache > 0 && stats.month.tokens > 0 && (
+              <div className="flex justify-between pt-1 border-t border-border/10 mt-1">
+                <span className="text-muted-foreground">{lang === "zh" ? "缓存命中率" : "Cache Hit Rate"}</span>
+                <span className="font-mono text-emerald-400">{((stats.month.tokens_in_cache / stats.month.tokens) * 100).toFixed(1)}%</span>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>

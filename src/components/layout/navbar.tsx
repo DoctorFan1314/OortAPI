@@ -196,6 +196,7 @@ export function Navbar() {
                     <div className="px-4 py-3 border-b border-border">
                       <p className="text-sm font-medium text-foreground truncate">{user.username}</p>
                       <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                      <p className="text-xs text-yellow-500 font-mono mt-1">{lang === "zh" ? "余额" : "Balance"}: ${(user.balance ?? 0).toFixed(2)}</p>
                     </div>
                     <div className="py-1">
                       <Link href="/dashboard" role="menuitem" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors focus:bg-secondary focus:text-foreground focus-visible:outline-none">
