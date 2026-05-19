@@ -271,6 +271,9 @@ export default function ProfileClient() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
             <button
               type="button"
+              onDragOver={e => { e.preventDefault(); e.currentTarget.classList.add('border-primary'); }}
+              onDragLeave={e => { e.currentTarget.classList.remove('border-primary'); }}
+              onDrop={e => { e.preventDefault(); e.currentTarget.classList.remove('border-primary'); const file = e.dataTransfer.files?.[0]; if (file) { if (file.size > 5 * 1024 * 1024) { toast("File too large (max 5MB)", "error"); return; } const reader = new FileReader(); reader.onload = ev => setCropImage(ev.target?.result as string); reader.readAsDataURL(file); } }}
               onClick={() => {
                 const input = document.createElement("input");
                 input.type = "file";
