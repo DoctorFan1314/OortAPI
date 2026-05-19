@@ -101,6 +101,8 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
   const [creating, setCreating] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
   const [newKeyFull, setNewKeyFull] = useState<string | null>(null);
+  const [selectedKeys, setSelectedKeys] = useState<Set<number>>(new Set());
+  const [batchDeleting, setBatchDeleting] = useState(false);
   const [editingRateId, setEditingRateId] = useState<number | null>(null);
   const [editRateValue, setEditRateValue] = useState("60");
   const [expandedKeyId, setExpandedKeyId] = useState<number | null>(null);
@@ -189,6 +191,29 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
     }
   };
 
+  const toggleSelectKey = (id: number) => {
+    setSelectedKeys(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+  const toggleSelectAll = () => {
+    if (selectedKeys.size === filteredKeys.length) setSelectedKeys(new Set());
+    else setSelectedKeys(new Set(filteredKeys.map(k => k.id)));
+  };
+  const batchDelete = async () => {
+    if (selectedKeys.size === 0) return;
+    setBatchDeleting(true);
+    for (const id of selectedKeys) {
+      await fetch("/api/dashboard/keys", { method: "DELETE", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({ id }) });
+    }
+    setSelectedKeys(new Set());
+    setBatchDeleting(false);
+    mutate();
+    showToast(lang === "zh" ? `已删除 ${selectedKeys.size} 个 Key` : `Deleted ${selectedKeys.size} keys`, "success");
+  };
+
   const copyKey = (key: string) => {
     navigator.clipboard.writeText(key);
     showToast(t.copied, "success");
@@ -249,17 +274,29 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
           <div className="text-center py-8 text-muted-foreground text-sm">{t.noKeys}</div>
         ) : (
           <div className="space-y-3">
-            {keys.length > 5 && (
+            <div className="flex items-center gap-2 mb-2">
+              {filteredKeys.length > 0 && (
+                <>
+                  <input type="checkbox" checked={selectedKeys.size === filteredKeys.length && filteredKeys.length > 0}
+                    onChange={toggleSelectAll} className="rounded border-border" />
+                  {selectedKeys.size > 0 && (
+                    <Button size="sm" variant="outline" onClick={batchDelete} disabled={batchDeleting} className="text-red-500 text-xs h-7">
+                      {lang === "zh" ? `删除 ${selectedKeys.size} 个` : `Delete ${selectedKeys.size}`}
+                    </Button>
+                  )}
+                </>
+              )}
               <input value={keySearch} onChange={e => setKeySearch(e.target.value)}
                 placeholder={t.searchKeys}
-                className="w-full h-8 px-3 rounded-md border border-input bg-background text-sm" />
-            )}
+                className="flex-1 h-8 px-3 rounded-md border border-input bg-background text-sm ml-auto" />
+            </div>
             {filteredKeys.map((k) => {
               const isExpired = k.expires_at ? new Date(k.expires_at + 'T23:59:59') < new Date() : false;
               const calcDaysLeft = k.expires_at ? Math.ceil((new Date(k.expires_at + 'T23:59:59').getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) : null;
               return (
               <Fragment key={k.id}>
               <div className={`flex items-center gap-4 p-3 rounded-lg border transition-colors ${isExpired ? "border-red-500/30 bg-red-500/5" : "border-border/50 hover:bg-muted/50"}`}>
+                <input type="checkbox" checked={selectedKeys.has(k.id)} onChange={() => toggleSelectKey(k.id)} className="rounded border-border shrink-0" />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="font-medium text-sm">{k.name}</span>
