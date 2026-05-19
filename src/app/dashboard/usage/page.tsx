@@ -709,7 +709,7 @@ export default function UsagePage() {
                           <span className="text-xs text-muted-foreground">{t.balanceUser}</span>
                         )}
                       </td>
-                      <td className="py-2 px-3 text-right font-mono">{log.latency_ms ? `${log.latency_ms}ms` : "-"}</td>
+                      <td className={`py-2 px-3 text-right font-mono ${log.latency_ms ? (log.latency_ms < 1000 ? "text-green-500" : log.latency_ms < 5000 ? "text-yellow-500" : "text-red-500") : ""}`}>{log.latency_ms ? `${log.latency_ms}ms` : "-"}</td>
                       <td className="py-2 px-3 text-center">
                         <span className={`text-xs px-2 py-0.5 rounded-full ${log.success ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"}`}>
                           {log.success ? t.success : t.failed}
