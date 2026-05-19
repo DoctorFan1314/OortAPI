@@ -104,7 +104,7 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
   const [editingRateId, setEditingRateId] = useState<number | null>(null);
   const [editRateValue, setEditRateValue] = useState("60");
   const [expandedKeyId, setExpandedKeyId] = useState<number | null>(null);
-  const [keyStats, setKeyStats] = useState<Record<number, { calls_7d: number; cost_7d: number; tokens_7d: number; avg_latency: number | null; error_rate: number }>>({});
+  const [keyStats, setKeyStats] = useState<Record<number, { calls: number; cost: number; tokens: number; avg_latency: number | null; error_rate: number; by_model?: { model: string; calls: number; cost: number; tokens: number }[] }>>({});
   const { toast: showToast } = useToast();
   const [keySearch, setKeySearch] = useState("");
   const t = LABELS[lang];
@@ -323,19 +323,19 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
                 <div className="px-3 pb-3 pt-1">
                   {keyStats[k.id] ? (() => {
                     const s = keyStats[k.id];
-                    return (
+                    return (<>
                     <div className="grid grid-cols-5 gap-3 p-3 bg-muted/30 rounded-lg text-xs">
                       <div>
                         <p className="text-muted-foreground">{t.recentCalls}</p>
-                        <p className="text-base font-bold font-mono">{s.calls_7d.toLocaleString()}</p>
+                        <p className="text-base font-bold font-mono">{s.calls.toLocaleString()}</p>
                       </div>
                       <div>
                         <p className="text-muted-foreground">{t.recentCost}</p>
-                        <p className="text-base font-bold font-mono">${s.cost_7d.toFixed(4)}</p>
+                        <p className="text-base font-bold font-mono">${s.cost.toFixed(4)}</p>
                       </div>
                       <div>
                         <p className="text-muted-foreground">{t.recentTokens}</p>
-                        <p className="text-base font-bold font-mono">{s.tokens_7d.toLocaleString()}</p>
+                        <p className="text-base font-bold font-mono">{s.tokens.toLocaleString()}</p>
                       </div>
                       <div>
                         <p className="text-muted-foreground">{t.avgLatency}</p>
@@ -348,6 +348,20 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
                         </p>
                       </div>
                     </div>
+                    {s.by_model && s.by_model.length > 0 && (
+                      <div className="mt-2 pt-2 border-t border-border/20">
+                        <p className="text-xs text-muted-foreground mb-1">{lang === "zh" ? "按模型" : "By Model"}</p>
+                        <div className="space-y-1 max-h-24 overflow-y-auto">
+                          {s.by_model.slice(0, 5).map(m => (
+                            <div key={m.model} className="flex justify-between text-xs">
+                              <span className="font-mono text-muted-foreground truncate max-w-[120px]">{m.model}</span>
+                              <span className="font-mono shrink-0">{m.calls.toLocaleString()} calls · ${m.cost.toFixed(4)}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    </>
                     );
                   })() : (
                     <div className="h-16 animate-pulse bg-muted/30 rounded-lg" />

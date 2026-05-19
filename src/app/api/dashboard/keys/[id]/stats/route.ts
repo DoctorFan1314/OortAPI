@@ -21,24 +21,36 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const key = db.prepare('SELECT id FROM api_keys WHERE id = ? AND user_id = ?').get(keyId, auth.user.id);
     if (!key) return NextResponse.json({ error: 'Key not found' }, { status: 404 });
 
+    const searchParams = request.nextUrl.searchParams;
+    const from = searchParams.get('from') || `datetime('now', '-7 days')`;
+    const to = searchParams.get('to') || `datetime('now')`;
+
     const stats = db.prepare(
       `SELECT
-         COUNT(*) as calls_7d,
-         COALESCE(SUM(cost), 0) as cost_7d,
-         COALESCE(SUM(tokens_in + tokens_out), 0) as tokens_7d,
+         COUNT(*) as calls,
+         COALESCE(SUM(cost), 0) as cost,
+         COALESCE(SUM(tokens_in + tokens_out), 0) as tokens,
          COALESCE(AVG(CASE WHEN latency_ms > 0 THEN latency_ms END), null) as avg_latency,
          ROUND(CAST(SUM(CASE WHEN success = 0 THEN 1 ELSE 0 END) AS FLOAT) / MAX(COUNT(*), 1) * 100, 1) as error_rate
        FROM usage_logs
-       WHERE api_key_id = ? AND user_id = ? AND created_at >= datetime('now', '-7 days')`
-    ).get(keyId, auth.user.id) as {
-      calls_7d: number;
-      cost_7d: number;
-      tokens_7d: number;
+       WHERE api_key_id = ? AND user_id = ? AND created_at >= ? AND created_at <= ?`
+    ).get(keyId, auth.user.id, from, to) as {
+      calls: number;
+      cost: number;
+      tokens: number;
       avg_latency: number | null;
       error_rate: number;
     };
 
-    return NextResponse.json(stats);
+    // Per-model breakdown for this key
+    const byModel = db.prepare(
+      `SELECT model, COUNT(*) as calls, COALESCE(SUM(cost), 0) as cost, COALESCE(SUM(tokens_in + tokens_out), 0) as tokens
+       FROM usage_logs
+       WHERE api_key_id = ? AND user_id = ? AND created_at >= ? AND created_at <= ?
+       GROUP BY model ORDER BY calls DESC`
+    ).all(keyId, auth.user.id, from, to) as Array<{ model: string; calls: number; cost: number; tokens: number }>;
+
+    return NextResponse.json({ ...stats, by_model: byModel });
   } catch (error) {
     console.error('Key stats error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
