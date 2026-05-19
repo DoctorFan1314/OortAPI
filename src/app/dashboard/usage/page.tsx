@@ -164,6 +164,7 @@ function formatRate(rate: number | null | undefined, symbol: string, exchangeRat
 export default function UsagePage() {
   const { lang } = useI18n();
   const { currency, exchangeRate, formatPrice, symbol } = useCurrency();
+  useEffect(() => { document.title = `${lang === "zh" ? "调用日志" : "Call Logs"} — OortAPI`; }, [lang]);
   const [logs, setLogs] = useState<UsageLog[]>([]);
   const [summary, setSummary] = useState<UsageSummary>({ total_calls: 0, total_tokens: 0, total_cost: 0, total_tokens_in_noncached: 0, total_tokens_in_cache: 0, total_tokens_out: 0 });
   const [dailyTrend, setDailyTrend] = useState<DailyTrend[]>([]);
