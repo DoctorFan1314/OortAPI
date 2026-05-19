@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useState } from "react";
-import { Webhook, Plus, Trash2, ToggleLeft, ToggleRight, Pencil, Send } from "lucide-react";
+import { Webhook, Plus, Trash2, ToggleLeft, ToggleRight, Pencil, Send, Copy, CheckCheck } from "lucide-react";
 import useSWR from "swr";
 import { dashboardSWRConfig } from "@/lib/swr-fetcher";
 import { useToast } from "@/contexts/toast-context";
@@ -107,6 +107,7 @@ export default function WebhooksPage() {
   const [selectedEvents, setSelectedEvents] = useState<string[]>([]);
   const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
   const [testing, setTesting] = useState<number | null>(null);
+  const [copiedSecret, setCopiedSecret] = useState<number | null>(null);
 
   const openCreate = () => {
     setEditingId(null);
@@ -235,6 +236,9 @@ export default function WebhooksPage() {
                       </div>
                       <div className="text-xs text-muted-foreground mt-1">
                         {t.secret}: <code className="font-mono">{wh.secret.slice(0, 8)}...{wh.secret.slice(-4)}</code>
+                        <button onClick={() => { navigator.clipboard.writeText(wh.secret); setCopiedSecret(wh.id); setTimeout(() => setCopiedSecret(null), 2000); }} className="ml-1 align-middle text-muted-foreground hover:text-foreground" aria-label="Copy secret">
+                          {copiedSecret === wh.id ? <CheckCheck className="h-3 w-3 inline" /> : <Copy className="h-3 w-3 inline" />}
+                        </button>
                       </div>
                       <div className="text-xs mt-1">
                         {wh.last_triggered_at ? (

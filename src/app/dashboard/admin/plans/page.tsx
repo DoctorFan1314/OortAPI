@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Badge } from "@/components/ui/badge";
 import { useI18n } from "@/contexts/i18n-context";
 import { useAuth } from "@/contexts/auth-context";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { useToast } from "@/contexts/toast-context";
 import { AuthGuard } from "@/components/auth/auth-guard";
 import { Plus, Pencil, Trash2, Save, Loader2, Link as LinkIcon, Unlink, Users, DollarSign, TrendingUp } from "lucide-react";
@@ -385,12 +386,16 @@ function AdminPlansContent() {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Dialog */}
-      <Dialog open={!!deletePlan} onOpenChange={() => setDeletePlan(null)}>
-        <DialogContent><DialogHeader><DialogTitle>{lang === "zh" ? "删除" : "Delete"}</DialogTitle><DialogDescription>{lang === "zh" ? `确定要删除套餐「${deletePlan?.display_name}」吗？` : `Delete plan "${deletePlan?.display_name}"?`}</DialogDescription></DialogHeader>
-          <div className="flex justify-end gap-2"><Button variant="outline" onClick={() => setDeletePlan(null)}>{lang === "zh" ? "取消" : "Cancel"}</Button><Button className="bg-red-600 text-white hover:bg-red-700" onClick={handleDelete} disabled={deleteLoading}>{deleteLoading ? <Loader2 className="h-4 w-4 animate-spin mr-1.5" /> : null}{lang === "zh" ? "确定" : "Confirm"}</Button></div>
-        </DialogContent>
-      </Dialog>
+      <ConfirmDialog
+        open={!!deletePlan}
+        onOpenChange={() => setDeletePlan(null)}
+        title={lang === "zh" ? "删除套餐" : "Delete Plan"}
+        message={deletePlan ? (lang === "zh" ? `确定要删除「${deletePlan.display_name}」吗？` : `Delete "${deletePlan.display_name}"?`) : ""}
+        onConfirm={handleDelete}
+        confirmLabel={lang === "zh" ? "确认删除" : "Delete"}
+        variant="danger"
+        loading={deleteLoading}
+      />
 
       {/* Models Dialog */}
       <Dialog open={!!modelDialogPlan} onOpenChange={() => setModelDialogPlan(null)}>
