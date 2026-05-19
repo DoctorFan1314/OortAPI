@@ -60,6 +60,7 @@ interface AnalyticsData {
   total: { calls: number; cost: number; tokens: number; tokens_in_noncached: number; tokens_in_cache: number; tokens_cache_creation: number; tokens_out: number };
   cache?: { cache_hit_rate: number; total_cache_hits: number; total_non_cached: number };
   prev_period?: { calls: number; cost: number; tokens: number } | null;
+  model_stats?: Array<{ model: string; avg_latency: number | null; error_rate: number }>;
 }
 
 const LABELS = {
@@ -504,6 +505,55 @@ export function ModelAnalytics() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Model latency & error rate cards */}
+      {data?.model_stats && data.model_stats.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Card className="glass-card">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <BarChart3 className="h-4 w-4 text-blue-500" />{lang === "zh" ? "模型延迟对比" : "Model Latency"}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {data.model_stats.filter(m => m.avg_latency != null).slice(0, 8).map(m => (
+                  <div key={m.model} className="flex items-center gap-2 text-xs">
+                    <span className="font-mono text-muted-foreground truncate flex-1 max-w-[150px]">{m.model}</span>
+                    <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                      <div className="h-full bg-blue-500 rounded-full" style={{ width: `${Math.min((m.avg_latency || 0) / 50, 100)}%` }} />
+                    </div>
+                    <span className="font-mono w-16 text-right">{Math.round(m.avg_latency || 0)}ms</span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="glass-card">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <BarChart3 className="h-4 w-4 text-red-500" />{lang === "zh" ? "模型错误率" : "Error Rate"}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {data.model_stats.map(m => (
+                  <div key={m.model} className="flex items-center gap-2 text-xs">
+                    <span className="font-mono text-muted-foreground truncate flex-1 max-w-[150px]">{m.model}</span>
+                    <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                      <div className={`h-full rounded-full ${m.error_rate > 5 ? "bg-red-500" : m.error_rate > 1 ? "bg-yellow-500" : "bg-green-500"}`}
+                        style={{ width: `${Math.min(m.error_rate * 5, 100)}%` }} />
+                    </div>
+                    <span className={`font-mono w-12 text-right ${m.error_rate > 5 ? "text-red-500" : m.error_rate > 1 ? "text-yellow-500" : "text-green-500"}`}>
+                      {m.error_rate}%
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }

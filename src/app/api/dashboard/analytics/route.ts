@@ -55,6 +55,16 @@ export async function GET(request: NextRequest) {
       `).all(userId) as Array<{ hour: string; model: string; calls: number; cost: number; tokens: number; tokens_in_noncached: number; tokens_in_cache: number; tokens_out: number }>;
     }
 
+    // Per-model latency & error rate
+    const modelStats = db.prepare(`
+      SELECT model,
+        AVG(CASE WHEN latency_ms > 0 THEN latency_ms END) as avg_latency,
+        ROUND(CAST(SUM(CASE WHEN success = 0 THEN 1 ELSE 0 END) AS FLOAT) / MAX(COUNT(*), 1) * 100, 1) as error_rate
+      FROM usage_logs
+      WHERE user_id = ? AND created_at >= DATE('now', ?)
+      GROUP BY model ORDER BY avg_latency DESC
+    `).all(userId, dateFilter) as Array<{ model: string; avg_latency: number | null; error_rate: number }>;
+
     // Call distribution by model (for pie chart)
     const modelDistribution = db.prepare(`
       SELECT
@@ -132,6 +142,7 @@ export async function GET(request: NextRequest) {
       model_by_day: modelByDay,
       model_by_hour: modelByHour,
       model_distribution: modelDistribution,
+      model_stats: modelStats,
       daily_trend: dailyTrend,
       rpm: lastHourStats.calls || 0,
       tpm: lastHourStats.tokens || 0,
