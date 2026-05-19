@@ -6,6 +6,37 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [v3.3.4.14] — 2026-05-19
+
+### Analytics & Statistics
+- **Period comparison** — Stats API returns yesterday/last-month data; dashboard cards show delta badges (↑↓%)
+- **Analytics API** — Previous period comparison (7d vs prev 7d); cache hit rate stats
+- **Key analytics** — Custom time range support (from/to params); per-model breakdown per key
+- **Model latency** — New latency comparison bars (per-model average, horizontal bars)
+- **Error rate** — New per-model error rate cards with color-coded thresholds
+- **Cache hit rate** — New card showing period cache hit % with hit/miss counts
+- **Cost trend chart** — New dual-axis bar+line chart (daily cost + calls overlay)
+- **Model consumption** — Stacked bar chart now shows input/output split in tooltips
+
+### Billing
+- **Bill search** — Billing records API now supports type/from/to filtering
+- **CSV export** — Billing records CSV export (up to 10,000 rows)
+- **Monthly trend** — 12-month cost trend data returned from billing API
+- **Webhook events** — `subscription.cancelled` dispatched on cancel; `balance.low` when balance < $1; `renewal.failed` on auto-renew failure
+
+### UX
+- **Usage table** — First column (channel) is now sticky; latency values color-coded (green/yellow/red)
+- **Table skeleton** — Loading state shows 5-row table structure instead of single pulse bar
+- **Login page** — Email field auto-focuses on mount
+- **Page titles** — Dashboard sub-pages set document.title dynamically
+- **Timezone selector** — Expanded from 6 to 15 timezone options with UTC offset labels
+- **Navbar** — User dropdown shows current balance
+- **API Keys** — Batch select/delete with checkboxes, select-all, and count feedback
+- **Channel batch** — Batch enable/disable/delete already existed in ChannelCard
+- **Avatar upload** — Drag-and-drop support added to avatar area
+
+---
+
 ## [v3.3.4.13] — 2026-05-18
 
 ### Beautification
@@ -17,30 +48,6 @@ All notable changes to this project will be documented in this file.
 - **Billing cards** — Added actionable "View Plans" / "Subscribe" / "Contact Us" links
 - **System Monitor** — Added pulsing green dot indicator for live auto-refresh
 - **Audit logs** — Added action type filter dropdown; details column has title tooltip
-
-### Functionality
-- **Channel health** — Added loading skeleton and error state with retry button
-- **Models API** — DELETE now returns 404 for non-existent model rates
-- **Backup route** — Replaced `require('fs')` with ESM import
-- **Usage logs** — Filtered empty state shows "No matching records" hint; go-to-page clamped to valid range
-- **Usage logs** — Loading shows table-shaped skeleton (5 rows) instead of single pulse bar
-- **Playground** — `max_tokens` default 4096, max 131072; localStorage limited to 2MB
-- **Audit logs** — Pagination unified to total+page pattern; date range validation warning added
-- **Admin plans** — Price/credit inputs reject negative values; delete uses ConfirmDialog
-- **Webhooks** — Secret truncated display now has copy-full-value button
-- **Settings** — Budget toast fires only on transition (not every mount); budget can be cleared
-
-### UX
-- **Webhook test** — Fixed catch block incorrectly showing "success" message
-- **Webhook delete** — Replaced raw Dialog with shared ConfirmDialog
-- **Register page** — Removed unfinished "More sign-in options coming soon" hint
-- **Settings page** — Removed duplicate "API Endpoint" title
-- **Channels** — Health data load failure shows error with retry instead of silent failure
-- **Profile** — Password inputs now have show/hide toggle button
-- **Billing engine** — Auto-renewal converts CNY prices to USD; fallback logs correct model name
-
-### Fixes
-- **Route 404** — Cleaned stale `.next` build cache that caused all `/api/` and `/login` routes to return 404
 
 ---
 
