@@ -97,6 +97,24 @@ export async function GET(request: NextRequest) {
       WHERE user_id = ? AND created_at >= datetime('now', '-1 hour')
     `).get(userId) as { calls: number; tokens: number };
 
+    // Cache analytics
+    const cacheStats = db.prepare(`
+      SELECT
+        SUM(tokens_in_cache) as total_cache_hits,
+        SUM(tokens_in - tokens_in_cache) as total_non_cached,
+        CASE WHEN SUM(tokens_in) > 0 THEN ROUND(CAST(SUM(tokens_in_cache) AS FLOAT) / SUM(tokens_in) * 100, 1) ELSE 0 END as cache_hit_rate
+      FROM usage_logs
+      WHERE user_id = ? AND created_at >= DATE('now', ?)
+    `).get(userId, dateFilter) as { total_cache_hits: number; total_non_cached: number; cache_hit_rate: number };
+
+    // Previous period comparison
+    const prevDateFilter = `-${daysBack * 2} days`;
+    const prevPeriod = range === '7d' ? db.prepare(`
+      SELECT COUNT(*) as calls, SUM(cost) as cost, SUM(tokens_in + tokens_out) as tokens
+      FROM usage_logs WHERE user_id = ? AND created_at >= DATE('now', ?) AND created_at < DATE('now', ?)
+    `).get(userId, prevDateFilter, dateFilter) as { calls: number; cost: number; tokens: number }
+    : null;
+
     // Historical total
     const totalStats = db.prepare(`
       SELECT
@@ -115,8 +133,14 @@ export async function GET(request: NextRequest) {
       model_by_hour: modelByHour,
       model_distribution: modelDistribution,
       daily_trend: dailyTrend,
-      rpm: lastHourStats.calls || 0,  // approx RPM
-      tpm: lastHourStats.tokens || 0, // approx TPM
+      rpm: lastHourStats.calls || 0,
+      tpm: lastHourStats.tokens || 0,
+      cache: {
+        cache_hit_rate: cacheStats.cache_hit_rate || 0,
+        total_cache_hits: cacheStats.total_cache_hits || 0,
+        total_non_cached: cacheStats.total_non_cached || 0,
+      },
+      prev_period: prevPeriod || null,
       total: {
         calls: totalStats.total_calls || 0,
         cost: totalStats.total_cost || 0,

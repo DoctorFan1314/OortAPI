@@ -58,6 +58,8 @@ interface AnalyticsData {
   rpm: number;
   tpm: number;
   total: { calls: number; cost: number; tokens: number; tokens_in_noncached: number; tokens_in_cache: number; tokens_cache_creation: number; tokens_out: number };
+  cache?: { cache_hit_rate: number; total_cache_hits: number; total_non_cached: number };
+  prev_period?: { calls: number; cost: number; tokens: number } | null;
 }
 
 const LABELS = {
@@ -110,7 +112,7 @@ function generateHourSlots(): string[] {
 
 export function ModelAnalytics() {
   const { lang } = useI18n();
-  const { formatPrice } = useCurrency();
+  const { formatPrice, exchangeRate, symbol } = useCurrency();
   const t = LABELS[lang];
 
   const [range, setRange] = useState<7 | 14 | 30>(7);
@@ -257,6 +259,27 @@ export function ModelAnalytics() {
       series,
     };
   }, [timeSource, models, colorMap, xLabels, lang]);
+  const costOption = useMemo(() => {
+    if (!data?.daily_trend?.length) return {};
+    const dates = data.daily_trend.map(d => d.date);
+    const costData = data.daily_trend.map(d => +(d.cost * exchangeRate).toFixed(4));
+    const callsData = data.daily_trend.map(d => d.calls);
+    return {
+      tooltip: { trigger: "axis" as const },
+      legend: { data: [lang === "zh" ? "费用" : "Cost", lang === "zh" ? "调用" : "Calls"], bottom: 0, textStyle: { fontSize: 11 } },
+      grid: { left: 60, right: 20, top: 10, bottom: 40 },
+      xAxis: { type: "category" as const, data: dates, axisLabel: { fontSize: 11 } },
+      yAxis: [
+        { type: "value" as const, name: symbol, axisLabel: { fontSize: 11 } },
+        { type: "value" as const, name: lang === "zh" ? "次数" : "Calls", axisLabel: { fontSize: 11 } },
+      ],
+      series: [
+        { name: lang === "zh" ? "费用" : "Cost", type: "bar", data: costData, itemStyle: { color: "#8b5cf6", borderRadius: [4, 4, 0, 0] }, barMaxWidth: 24 },
+        { name: lang === "zh" ? "调用" : "Calls", type: "line", yAxisIndex: 1, data: callsData, smooth: true, lineStyle: { color: "#22c55e", width: 2 }, itemStyle: { color: "#22c55e" } },
+      ],
+    };
+  }, [data, exchangeRate, symbol, lang]);
+
   const pieOption = useMemo(() => {
     if (!data?.model_distribution?.length) return {};
     return {
@@ -446,6 +469,41 @@ export function ModelAnalytics() {
           <ReactECharts option={trendOption} style={{ height: 300 }} opts={{ renderer: "canvas" }} notMerge />
         </CardContent>
       </Card>
+
+      {/* Cost chart + Cache rate */}
+      <div className="grid lg:grid-cols-3 gap-4">
+        <Card className="glass-card lg:col-span-2">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base flex items-center gap-2">
+              <TrendingUp className="h-4 w-4" />{lang === "zh" ? "消费趋势" : "Cost Trend"}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ReactECharts option={costOption} style={{ height: 300 }} opts={{ renderer: "canvas" }} notMerge />
+          </CardContent>
+        </Card>
+        <Card className="glass-card">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base flex items-center gap-2">
+              <PieIcon className="h-4 w-4" />{lang === "zh" ? "缓存命中率" : "Cache Rate"}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col items-center justify-center h-[300px]">
+            {data?.cache ? (
+              <div className="text-center">
+                <div className="text-5xl font-bold font-mono text-emerald-400">{data.cache.cache_hit_rate}%</div>
+                <p className="text-xs text-muted-foreground mt-2">{lang === "zh" ? "周期内缓存命中率" : "Period cache hit rate"}</p>
+                <div className="flex gap-4 mt-3 text-xs text-muted-foreground">
+                  <span>{lang === "zh" ? "命中" : "Hit"}: <span className="font-mono text-foreground">{data.cache.total_cache_hits.toLocaleString()}</span></span>
+                  <span>{lang === "zh" ? "未命中" : "Miss"}: <span className="font-mono text-foreground">{data.cache.total_non_cached.toLocaleString()}</span></span>
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">{lang === "zh" ? "暂无数据" : "No data"}</p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
