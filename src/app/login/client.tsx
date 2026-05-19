@@ -71,7 +71,7 @@ export default function LoginClient() {
           <form className="space-y-5" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="email" className="text-sm text-foreground mb-1.5 block">{t.auth.email}</label>
-              <Input id="email" type="email" autoComplete="email" placeholder="your@email.com" value={email} onChange={(e) => { setEmail(e.target.value); setFieldErrors(e => ({ ...e, email: undefined })); }} className="bg-secondary border-border text-foreground placeholder:text-muted-foreground/50" />
+              <Input id="email" type="email" autoComplete="email" placeholder="your@email.com" value={email} onChange={(e) => { setEmail(e.target.value); setFieldErrors(e => ({ ...e, email: undefined })); }} className="bg-secondary border-border text-foreground placeholder:text-muted-foreground/50" autoFocus />
               {fieldErrors.email && <p className="text-xs text-red-400 mt-1">{fieldErrors.email}</p>}
             </div>
             <div>
