@@ -325,7 +325,13 @@ export function processAutoRenewals(): { renewed: number; failed: number } {
       const user = db.prepare('SELECT balance FROM users WHERE id = ?').get(sub.user_id) as { balance: number } | undefined;
       if (!user) { failed++; continue; }
 
-      const renewCost = sub.billing_cycle === 'yearly' ? sub.yearly_price : sub.monthly_price;
+      const plan = db.prepare('SELECT * FROM subscription_plans WHERE id = ?').get(sub.plan_id) as DBSubscriptionPlan | undefined;
+      if (!plan) { failed++; continue; }
+
+      const basePrice = sub.billing_cycle === 'yearly' ? plan.yearly_price : plan.monthly_price;
+      const exchangeRateSetting = db.prepare("SELECT value FROM system_settings WHERE key = 'exchange_rate'").get() as { value: string } | undefined;
+      const rate = parseFloat(exchangeRateSetting?.value || '7.3');
+      const renewCost = plan.currency === 'CNY' ? basePrice / rate : basePrice;
 
       if (user.balance < renewCost) {
         // Insufficient balance — mark as expired
