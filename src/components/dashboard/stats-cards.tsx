@@ -14,6 +14,11 @@ interface StatsData {
     tokens: number;
     avg_latency: number;
   };
+  yesterday: {
+    calls: number;
+    cost: number;
+    tokens: number;
+  };
   month: {
     calls: number;
     cost: number;
@@ -22,6 +27,11 @@ interface StatsData {
     tokens_in_cache: number;
     tokens_cache_creation: number;
     tokens_out: number;
+  };
+  last_month: {
+    calls: number;
+    cost: number;
+    tokens: number;
   };
   active_keys: number;
   balance: number;
@@ -92,10 +102,21 @@ export function StatsCards({ lang = "zh" }: { lang?: "zh" | "en" }) {
   const avgRPM = (avgDailyCalls / 1440).toFixed(2); // 1440 min/day
   const avgTPM = Math.round(avgDailyTokens / 1440);
 
+  // Compute deltas
+  const costDelta = stats.last_month?.cost ? ((stats.month.cost - stats.last_month.cost) / stats.last_month.cost * 100).toFixed(1) : null;
+  const callsDelta = stats.last_month?.calls ? ((stats.month.calls - stats.last_month.calls) / stats.last_month.calls * 100).toFixed(1) : null;
+  const todayCostDelta = stats.yesterday?.cost && stats.today.cost ? ((stats.today.cost - stats.yesterday.cost) / stats.yesterday.cost * 100).toFixed(1) : null;
+
+  const DeltaBadge = ({ delta }: { delta: string | null }) => {
+    if (delta == null) return null;
+    const isUp = parseFloat(delta) >= 0;
+    return <span className={`text-[10px] ml-1 ${isUp ? 'text-red-400' : 'text-green-400'}`}>{isUp ? '↑' : '↓'}{Math.abs(parseFloat(delta)).toFixed(1)}%</span>;
+  };
+
   const cards = [
     { icon: Wallet, label: t.balance, value: formatPrice(stats.balance), color: "text-yellow-500", bgColor: "bg-yellow-500/10" },
-    { icon: TrendingDown, label: t.monthlyCost, value: formatPrice(stats.month?.cost || 0), color: "text-red-500", bgColor: "bg-red-500/10" },
-    { icon: Activity, label: t.monthlyCalls, value: (stats.month?.calls || 0).toLocaleString(), color: "text-blue-500", bgColor: "bg-blue-500/10" },
+    { icon: TrendingDown, label: t.monthlyCost, value: formatPrice(stats.month?.cost || 0), color: "text-red-500", bgColor: "bg-red-500/10", delta: costDelta },
+    { icon: Activity, label: t.monthlyCalls, value: (stats.month?.calls || 0).toLocaleString(), color: "text-blue-500", bgColor: "bg-blue-500/10", delta: callsDelta },
     { icon: Gauge, label: t.rpm, value: avgRPM, color: "text-purple-500", bgColor: "bg-purple-500/10" },
     { icon: Cpu, label: t.tpm, value: formatTokens(avgTPM), color: "text-cyan-500", bgColor: "bg-cyan-500/10" },
   ];
@@ -110,6 +131,7 @@ export function StatsCards({ lang = "zh" }: { lang?: "zh" | "en" }) {
                 <card.icon className={`h-3.5 w-3.5 ${card.color}`} />
               </div>
               <span className="text-xs text-muted-foreground">{card.label}</span>
+              {'delta' in card && card.delta && <DeltaBadge delta={card.delta} />}
             </div>
             <div className="text-xl font-bold font-mono">{card.value}</div>
           </CardContent>

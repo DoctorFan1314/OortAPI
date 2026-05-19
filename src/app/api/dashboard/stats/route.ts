@@ -46,6 +46,31 @@ export async function GET(request: NextRequest) {
       WHERE user_id = ? AND created_at >= ?
     `).get(userId, monthStart.toISOString()) as Record<string, number | null>;
 
+    // Yesterday's stats (for comparison)
+    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+    const yesterdayStats = db.prepare(`
+      SELECT
+        COUNT(*) as total_calls,
+        SUM(cost) as total_cost,
+        SUM(tokens_in + tokens_out) as total_tokens
+      FROM usage_logs
+      WHERE user_id = ? AND DATE(created_at) = ?
+    `).get(userId, yesterday) as Record<string, number | null>;
+
+    // Last month's stats (for comparison)
+    const lastMonthStart = new Date();
+    lastMonthStart.setDate(1);
+    lastMonthStart.setHours(0, 0, 0, 0);
+    lastMonthStart.setMonth(lastMonthStart.getMonth() - 1);
+    const lastMonthEnd = new Date();
+    lastMonthEnd.setDate(1);
+    lastMonthEnd.setHours(0, 0, 0, 0);
+    const lastMonthStats = db.prepare(`
+      SELECT COUNT(*) as total_calls, SUM(cost) as total_cost, SUM(tokens_in + tokens_out) as total_tokens
+      FROM usage_logs
+      WHERE user_id = ? AND created_at >= ? AND created_at < ?
+    `).get(userId, lastMonthStart.toISOString(), lastMonthEnd.toISOString()) as Record<string, number | null>;
+
     // Recent 7 days usage for chart
     const dailyUsage = db.prepare(`
       SELECT
@@ -77,6 +102,11 @@ export async function GET(request: NextRequest) {
         tokens: todayStats?.total_tokens || 0,
         avg_latency: Math.round(todayStats?.avg_latency || 0),
       },
+      yesterday: {
+        calls: yesterdayStats?.total_calls || 0,
+        cost: yesterdayStats?.total_cost || 0,
+        tokens: yesterdayStats?.total_tokens || 0,
+      },
       month: {
         calls: monthStats?.total_calls || 0,
         cost: monthStats?.total_cost || 0,
@@ -85,6 +115,11 @@ export async function GET(request: NextRequest) {
         tokens_in_cache: monthStats?.tokens_in_cache || 0,
         tokens_cache_creation: monthStats?.tokens_cache_creation || 0,
         tokens_out: monthStats?.tokens_out || 0,
+      },
+      last_month: {
+        calls: lastMonthStats?.total_calls || 0,
+        cost: lastMonthStats?.total_cost || 0,
+        tokens: lastMonthStats?.total_tokens || 0,
       },
       active_keys: activeKeys.count,
       daily_usage: dailyUsage,
