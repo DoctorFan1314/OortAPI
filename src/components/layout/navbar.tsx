@@ -148,7 +148,8 @@ export function Navbar() {
             size="icon-sm"
             onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
             className="text-muted-foreground hover:text-foreground"
-            aria-label={resolvedTheme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            aria-label="Toggle theme"
+            suppressHydrationWarning
           >
             <Sun className="h-4 w-4 hidden dark:block" />
             <Moon className="h-4 w-4 block dark:hidden" />
