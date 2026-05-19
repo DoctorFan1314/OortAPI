@@ -12,15 +12,18 @@
 
 | Dependency | Minimum Version |
 |------------|-----------------|
-| Node.js | >= 18.0 |
+| Node.js | >= 18.0, **推荐 v20 LTS** |
 | npm | >= 9.0 |
+| C++ Build Tools | Windows: [VS Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) (勾选 "Desktop development with C++")<br>macOS: `xcode-select --install`<br>Linux: `build-essential` / `python3` / `make` / `g++` |
+
+> **💡 推荐使用 Docker（无需编译环境）：** 见下方 Docker 部署。
 
 ### 2. Install & Run
 
 ```bash
 # Clone the repo
-git clone https://github.com/yourname/oortapi.git
-cd oortapi
+git clone https://github.com/DoctorFan1314/OortAPI.git
+cd OortAPI
 
 # Install dependencies
 npm install
@@ -30,6 +33,8 @@ npm run dev
 ```
 
 Open http://localhost:3000 in your browser.
+
+> **Windows 编译问题：** 如果 `better-sqlite3` 安装失败（`node-gyp` 报错），请先安装 [Visual Studio Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/)，勾选 "Desktop development with C++"。或者使用 Node.js 20 LTS（会自动使用预编译二进制，无需编译工具）。
 
 ### 3. Production Build
 
