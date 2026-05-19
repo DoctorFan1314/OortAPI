@@ -69,6 +69,7 @@ const LABELS = {
 };
 
 const TARGET_TYPES = ["user", "channel", "plan", "redeem", "key", "model", "settings", "webhook"];
+const ACTION_TYPES = ["create", "update", "delete", "toggle", "adjust", "reset", "import", "export"];
 
 export default function AuditPage() {
   const { lang } = useI18n();
@@ -142,6 +143,14 @@ export default function AuditPage() {
             />
           </div>
         </div>
+        <div className="w-36">
+          <label className="text-xs text-muted-foreground block mb-1">{t.filterAction}</label>
+          <select value={filterAction} onChange={e => { setFilterAction(e.target.value); setPage(1); }}
+            className="w-full h-8 px-2 rounded-md border border-input bg-background text-sm focus:border-primary focus:outline-none">
+            <option value="">{t.all}</option>
+            {ACTION_TYPES.map(a => <option key={a} value={a}>{a}</option>)}
+          </select>
+        </div>
         <div className="w-40">
           <label className="text-xs text-muted-foreground block mb-1">{t.filterTarget}</label>
           <select
@@ -173,6 +182,9 @@ export default function AuditPage() {
             className="w-full h-8 px-2 rounded-md border border-input bg-background text-sm focus:border-primary focus:outline-none"
           />
         </div>
+        {filterFrom && filterTo && filterFrom > filterTo && (
+          <p className="w-full text-xs text-destructive">{lang === "zh" ? "开始日期不能晚于结束日期" : "Start cannot be after end"}</p>
+        )}
         {(searchQuery || filterAction || filterTarget || filterFrom || filterTo) && (
           <button
             onClick={() => { setSearchQuery(""); setFilterAction(""); setFilterTarget(""); setFilterFrom(""); setFilterTo(""); setPage(1); }}
@@ -232,7 +244,7 @@ export default function AuditPage() {
                         </span>
                       </td>
                       <td className="py-2 px-3 text-xs font-mono hidden md:table-cell">{formatTarget(log)}</td>
-                      <td className="py-2 px-3 text-xs text-muted-foreground max-w-[300px] truncate hidden lg:table-cell">
+                      <td className="py-2 px-3 text-xs text-muted-foreground max-w-[300px] truncate hidden lg:table-cell" title={parseDetails(log.details)}>
                         {parseDetails(log.details)}
                       </td>
                       <td className="py-2 px-3 text-xs text-muted-foreground text-right font-mono hidden lg:table-cell">
@@ -248,7 +260,7 @@ export default function AuditPage() {
           {(page > 1 || hasMore) && (
             <div className="flex items-center justify-between pt-3 border-t border-border/20">
               <span className="text-xs text-muted-foreground">
-                {t.showing} {logs.length} / {data?.total || 0}
+                {lang === "zh" ? "第" : "Page"} {page} / {Math.ceil((data?.total || 0) / 50)} ({t.showing} {logs.length} / {data?.total || 0})
               </span>
               <div className="flex gap-2">
                 {page > 1 && (
@@ -256,7 +268,7 @@ export default function AuditPage() {
                     {t.prev}
                   </button>
                 )}
-                {hasMore && (
+                {(data?.total || 0) > page * 50 && (
                   <button onClick={() => setPage(p => p + 1)} className="px-3 py-1 text-xs rounded-md bg-muted hover:bg-muted/80">
                     {t.next}
                   </button>

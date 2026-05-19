@@ -118,7 +118,7 @@ export default function SettingsPage() {
         body: JSON.stringify({ monthly_budget: budget || null }),
       });
       if (res.ok) {
-        setSavedBudget(budget);
+        setSavedBudget(budget || 0);
         showToast(t.saved, "success");
       } else {
         showToast(lang === "zh" ? "保存失败" : "Save failed", "error");
