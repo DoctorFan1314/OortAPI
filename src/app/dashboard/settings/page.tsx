@@ -223,12 +223,21 @@ export default function SettingsPage() {
                 value={timezone}
                 onChange={e => setTimezone(e.target.value)}
               >
-                <option value="Asia/Shanghai">Asia/Shanghai (北京时间)</option>
-                <option value="Asia/Tokyo">Asia/Tokyo (东京时间)</option>
-                <option value="America/New_York">America/New_York (纽约时间)</option>
-                <option value="America/Los_Angeles">America/Los_Angeles (洛杉矶时间)</option>
-                <option value="Europe/London">Europe/London (伦敦时间)</option>
-                <option value="UTC">UTC</option>
+                <option value="Asia/Shanghai">Asia/Shanghai (UTC+8 北京时间)</option>
+                <option value="Asia/Tokyo">Asia/Tokyo (UTC+9 东京)</option>
+                <option value="Asia/Hong_Kong">Asia/Hong_Kong (UTC+8 香港)</option>
+                <option value="Asia/Singapore">Asia/Singapore (UTC+8 新加坡)</option>
+                <option value="Asia/Seoul">Asia/Seoul (UTC+9 首尔)</option>
+                <option value="Asia/Taipei">Asia/Taipei (UTC+8 台北)</option>
+                <option value="America/New_York">America/New_York (UTC-5 纽约)</option>
+                <option value="America/Chicago">America/Chicago (UTC-6 芝加哥)</option>
+                <option value="America/Los_Angeles">America/Los_Angeles (UTC-8 洛杉矶)</option>
+                <option value="Europe/London">Europe/London (UTC+0 伦敦)</option>
+                <option value="Europe/Berlin">Europe/Berlin (UTC+1 柏林)</option>
+                <option value="Europe/Paris">Europe/Paris (UTC+1 巴黎)</option>
+                <option value="Australia/Sydney">Australia/Sydney (UTC+11 悉尼)</option>
+                <option value="Pacific/Auckland">Pacific/Auckland (UTC+12 奥克兰)</option>
+                <option value="UTC">UTC (协调世界时)</option>
               </select>
             </div>
             <div>

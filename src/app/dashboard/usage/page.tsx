@@ -637,7 +637,7 @@ export default function UsagePage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border/50">
-                    <th scope="col" className="text-left py-2 px-3 text-muted-foreground font-medium">{t.channel}</th>
+                    <th scope="col" className="text-left py-2 px-3 text-muted-foreground font-medium sticky left-0 bg-background z-10">{t.channel}</th>
                     <th scope="col" className="text-left py-2 px-3 text-muted-foreground font-medium">{t.model}</th>
                     <th scope="col" className="text-right py-2 px-3 text-muted-foreground font-medium cursor-pointer hover:text-foreground select-none"
                       onClick={() => { setSortKey('tokens_in'); setSortDir(d => d === 'asc' ? 'desc' : 'asc'); }}>
@@ -677,7 +677,7 @@ export default function UsagePage() {
                   {sortedLogs.map((log) => (
                     <Fragment key={log.id}>
                     <tr className="border-b border-border/20 hover:bg-muted/30">
-                      <td className="py-2 px-3 text-xs text-muted-foreground">{log.channel_name || t.noChannel}</td>
+                      <td className="py-2 px-3 text-xs text-muted-foreground sticky left-0 bg-card z-10">{log.channel_name || t.noChannel}</td>
                       <td className="py-2 px-3 font-mono text-xs">{log.model}</td>
                       <td className="py-2 px-3 text-right font-mono">{Math.max(0, log.tokens_in - log.tokens_in_cache).toLocaleString()}</td>
                       <td className="py-2 px-3 text-right font-mono">{log.tokens_in_cache > 0 ? log.tokens_in_cache.toLocaleString() : "0"}</td>
