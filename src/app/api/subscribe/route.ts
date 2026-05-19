@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { validateUserFromCookie } from '@/lib/api-gateway';
-import { deductBalance } from '@/lib/billing-engine';
+import { deductBalance, dispatchWebhook } from '@/lib/billing-engine';
 import type { DBSubscriptionPlan, DBUserSubscription } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
@@ -119,6 +119,12 @@ export async function POST(request: NextRequest) {
 
       // Cancel old subscription
       db.prepare("UPDATE user_subscriptions SET status = 'cancelled', auto_renew = 0, updated_at = CURRENT_TIMESTAMP WHERE id = ?").run(activeSub.id);
+      dispatchWebhook('subscription.cancelled', {
+        user_id: user.id,
+        plan_id: activeSub.plan_id,
+        billing_cycle: activeSub.billing_cycle,
+        action,
+      });
 
     } else {
       // New subscription

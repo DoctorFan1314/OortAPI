@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { validateUserFromCookie } from '@/lib/api-gateway';
+import { dispatchWebhook } from '@/lib/billing-engine';
 import type { DBUserSubscription, DBSubscriptionPlan } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
@@ -94,6 +95,12 @@ export async function PATCH(request: NextRequest) {
         db.prepare("UPDATE user_subscriptions SET status = 'cancelled', auto_renew = 0, updated_at = CURRENT_TIMESTAMP WHERE id = ?").run(subscription_id);
       });
       txn();
+
+      dispatchWebhook('subscription.cancelled', {
+        user_id: userId,
+        subscription_id,
+        refund: refundAmount,
+      });
 
       return NextResponse.json({
         success: true,
