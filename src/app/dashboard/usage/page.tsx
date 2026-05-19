@@ -612,7 +612,22 @@ export default function UsagePage() {
               <button onClick={applyFilters} className="text-xs text-primary hover:underline">{lang === "zh" ? "重试" : "Retry"}</button>
             </div>
           ) : loading && logs.length === 0 ? (
-            <div className="h-48 animate-pulse bg-muted rounded-lg" />
+            <div className="animate-pulse space-y-2 p-4">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="flex gap-4">
+                  <div className="h-4 bg-muted rounded w-16" />
+                  <div className="h-4 bg-muted rounded w-32" />
+                  <div className="h-4 bg-muted rounded w-20" />
+                  <div className="h-4 bg-muted rounded w-12" />
+                  <div className="h-4 bg-muted rounded w-20" />
+                  <div className="h-4 bg-muted rounded w-16" />
+                  <div className="h-4 bg-muted rounded w-24" />
+                  <div className="h-4 bg-muted rounded w-16" />
+                  <div className="h-4 bg-muted rounded w-16" />
+                  <div className="h-4 bg-muted rounded w-12" />
+                </div>
+              ))}
+            </div>
           ) : logs.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground text-sm">{hasActiveFilters ? (lang === "zh" ? "无匹配记录，请调整筛选条件" : "No matching records. Adjust your filters.") : t.noLogs}</div>
           ) : (

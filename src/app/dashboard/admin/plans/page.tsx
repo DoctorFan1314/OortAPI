@@ -277,11 +277,11 @@ function AdminPlansContent() {
             </div>
             <div><label className="text-sm text-muted-foreground mb-1.5 block">{lang === "zh" ? "标语" : "Tagline"}</label><Input value={createForm.tagline} onChange={e => setCreateForm({ ...createForm, tagline: e.target.value })} placeholder={lang === "zh" ? "尝鲜入门" : "Great for getting started"} className="h-10" /></div>
             <div className="grid grid-cols-2 gap-4">
-              <div><label className="text-sm text-muted-foreground mb-1.5 block">{lang === "zh" ? "月付价格" : "Monthly Price"}</label><Input type="number" step="0.01" value={createForm.monthly_price} onChange={e => setCreateForm({ ...createForm, monthly_price: +e.target.value || 0 })} className="h-10" /></div>
-              <div><label className="text-sm text-muted-foreground mb-1.5 block">{lang === "zh" ? "年付价格" : "Yearly Price"}</label><Input type="number" step="0.01" value={createForm.yearly_price} onChange={e => setCreateForm({ ...createForm, yearly_price: +e.target.value || 0 })} className="h-10" /></div>
+              <div><label className="text-sm text-muted-foreground mb-1.5 block">{lang === "zh" ? "月付价格" : "Monthly Price"}</label><Input type="number" step="0.01" value={createForm.monthly_price} onChange={e => setCreateForm({ ...createForm, monthly_price: Math.max(0, +e.target.value || 0) })} className="h-10" /></div>
+              <div><label className="text-sm text-muted-foreground mb-1.5 block">{lang === "zh" ? "年付价格" : "Yearly Price"}</label><Input type="number" step="0.01" value={createForm.yearly_price} onChange={e => setCreateForm({ ...createForm, yearly_price: Math.max(0, +e.target.value || 0) })} className="h-10" /></div>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div><label className="text-sm text-muted-foreground mb-1.5 block">{lang === "zh" ? "月 Credits" : "Monthly Credits"}</label><Input type="number" value={createForm.monthly_credits} onChange={e => setCreateForm({ ...createForm, monthly_credits: +e.target.value || 0 })} className="h-10" /></div>
+              <div><label className="text-sm text-muted-foreground mb-1.5 block">{lang === "zh" ? "月 Credits" : "Monthly Credits"}</label><Input type="number" value={createForm.monthly_credits} onChange={e => setCreateForm({ ...createForm, monthly_credits: Math.max(0, +e.target.value || 0) })} className="h-10" /></div>
               <div><label className="text-sm text-muted-foreground mb-1.5 block">{lang === "zh" ? "最大并发" : "Max Concurrency"}</label><Input type="number" value={createForm.max_concurrency} onChange={e => setCreateForm({ ...createForm, max_concurrency: +e.target.value || 10 })} className="h-10" /></div>
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -327,11 +327,11 @@ function AdminPlansContent() {
                       <option value="USD">USD ($)</option>
                     </select>
                   </div>
-                  <div><label className="text-sm text-muted-foreground mb-1.5 block">{lang === "zh" ? "月 Credits" : "Monthly Credits"}</label><Input type="number" value={editPlan.monthly_credits} onChange={e => setEditPlan({ ...editPlan, monthly_credits: +e.target.value || 0 })} className="h-10" /></div>
+                  <div><label className="text-sm text-muted-foreground mb-1.5 block">{lang === "zh" ? "月 Credits" : "Monthly Credits"}</label><Input type="number" value={editPlan.monthly_credits} onChange={e => setEditPlan({ ...editPlan, monthly_credits: Math.max(0, +e.target.value || 0) })} className="h-10" /></div>
                 </div>
                 <div className="grid grid-cols-2 gap-4 mt-4">
-                  <div><label className="text-sm text-muted-foreground mb-1.5 block">{lang === "zh" ? `月付价格 (${sym(editPlan.currency)})` : `Monthly (${sym(editPlan.currency)})`}</label><Input type="number" step="0.01" value={editPlan.monthly_price} onChange={e => setEditPlan({ ...editPlan, monthly_price: +e.target.value || 0 })} className="h-10" /></div>
-                  <div><label className="text-sm text-muted-foreground mb-1.5 block">{lang === "zh" ? `年付价格 (${sym(editPlan.currency)})` : `Yearly (${sym(editPlan.currency)})`}</label><Input type="number" step="0.01" value={editPlan.yearly_price} onChange={e => setEditPlan({ ...editPlan, yearly_price: +e.target.value || 0 })} className="h-10" /></div>
+                  <div><label className="text-sm text-muted-foreground mb-1.5 block">{lang === "zh" ? `月付价格 (${sym(editPlan.currency)})` : `Monthly (${sym(editPlan.currency)})`}</label><Input type="number" step="0.01" value={editPlan.monthly_price} onChange={e => setEditPlan({ ...editPlan, monthly_price: Math.max(0, +e.target.value || 0) })} className="h-10" /></div>
+                  <div><label className="text-sm text-muted-foreground mb-1.5 block">{lang === "zh" ? `年付价格 (${sym(editPlan.currency)})` : `Yearly (${sym(editPlan.currency)})`}</label><Input type="number" step="0.01" value={editPlan.yearly_price} onChange={e => setEditPlan({ ...editPlan, yearly_price: Math.max(0, +e.target.value || 0) })} className="h-10" /></div>
                 </div>
               </div>
 
