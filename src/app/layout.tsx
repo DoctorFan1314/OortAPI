@@ -83,7 +83,9 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col bg-background">
+        {/* Subtle dot-grid background — adapts to dark/light mode via currentColor */}
+        <div className="fixed inset-0 pointer-events-none -z-10 text-foreground" style={{ backgroundImage: "radial-gradient(circle, currentColor 1px, transparent 1px)", backgroundSize: "32px 32px", opacity: 0.06 }} aria-hidden="true" />
         <ToastProvider>
           <ThemeProvider>
             <I18nProvider>

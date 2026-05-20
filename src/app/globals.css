@@ -4,19 +4,6 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Subtle dot-grid background — works in dark + light mode */
-:root {
-  --dot-color: 0 0 0;
-  --dot-opacity: 0.05;
-}
-.dark {
-  --dot-color: 255 255 255;
-  --dot-opacity: 0.03;
-}
-body {
-  background-image: radial-gradient(circle, rgb(var(--dot-color) / var(--dot-opacity)) 1px, transparent 1px);
-  background-size: 32px 32px;
-}
 
 @theme inline {
   --color-background: var(--background);
