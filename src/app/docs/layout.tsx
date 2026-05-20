@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { DocsSidebar } from "@/components/docs/sidebar";
 import { EditThisPage } from "@/components/docs/edit-this-page";
 import { LastUpdated } from "@/components/docs/last-updated";
+import { TableOfContents } from "@/components/docs/table-of-contents";
 
 export const metadata: Metadata = {
   title: "API Documentation — OortAPI",
@@ -20,6 +21,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
             <LastUpdated />
           </div>
         </main>
+        <TableOfContents />
       </div>
     </div>
   );
