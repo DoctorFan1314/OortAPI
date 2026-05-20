@@ -61,9 +61,9 @@ export function TableOfContents() {
         <p className="text-xs font-medium text-muted-foreground mb-3 uppercase tracking-wider">
           On this page
         </p>
-        {items.map((item) => (
+        {items.map((item, i) => (
           <button
-            key={item.id}
+            key={`${item.id}-${i}`}
             onClick={() => scrollTo(item.id)}
             className={cn(
               "block w-full text-left text-xs transition-colors py-1 border-l-2",
