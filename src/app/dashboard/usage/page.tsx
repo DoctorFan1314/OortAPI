@@ -559,20 +559,23 @@ export default function UsagePage() {
             </CardHeader>
             <CardContent className="pt-0">
               <ReactECharts option={(() => {
+                const warmColors = ['#ef4444','#f97316','#f59e0b','#eab308','#ec4899','#d946ef','#a855f7','#8b5cf6','#f43f5e','#fb923c','#facc15'];
                 const items = modelStats.map(m => ({ name: m.model, value: isCreditsUser ? m.credits_used : m.cost })).filter(x => x.value > 0);
                 items.sort((a, b) => b.value - a.value);
                 const top = items.slice(0, 10);
                 const other = items.slice(10).reduce((s, x) => s + x.value, 0);
-                const data = top.map(({ name, value }) => ({ name, value }));
-                if (other > 0) data.push({ name: lang === "zh" ? "其他" : "Other", value: other });
+                const data = top.map(({ name, value }, i) => ({ name, value, itemStyle: { color: warmColors[i % warmColors.length] } }));
+                if (other > 0) data.push({ name: lang === "zh" ? "其他" : "Other", value: other, itemStyle: { color: '#94a3b8' } });
                 return {
+                  color: warmColors,
+                  legend: { type: 'scroll', bottom: 0, textStyle: { fontSize: 10 }, pageTextStyle: { fontSize: 9 } },
                   tooltip: { trigger: "item", formatter: (p: any) => {
                     const val = isCreditsUser ? `${p.value.toLocaleString()} credits` : formatPrice(p.value);
                     return `${p.name}: ${val}`;
                   } },
-                  series: [{ type: "pie", radius: ["30%", "60%"], center: ["50%", "50%"], data, label: { show: true, formatter: (p: any) => `${p.name}\n${(p.percent as number).toFixed(0)}%`, fontSize: 10 }, itemStyle: { borderRadius: 4 } }],
+                  series: [{ type: "pie", radius: ["28%", "55%"], center: ["50%", "45%"], data, label: { show: false }, emphasis: { label: { show: true, fontSize: 10 } }, itemStyle: { borderRadius: 4 } }],
                 };
-              })()} style={{ height: 200 }} opts={{ renderer: "svg" }} />
+              })()} style={{ height: 280 }} opts={{ renderer: "svg" }} />
             </CardContent>
           </Card>
           <Card className="glass-card">
@@ -583,6 +586,7 @@ export default function UsagePage() {
             </CardHeader>
             <CardContent className="pt-0">
               <ReactECharts option={(() => {
+                const coolColors = ['#3b82f6','#06b6d4','#22c55e','#10b981','#14b8a6','#0ea5e9','#6366f1','#2dd4bf','#34d399','#60a5fa','#67e8f9'];
                 const items = modelStats.map(m => ({
                   name: m.model,
                   total: m.tokens_in + m.tokens_out,
@@ -593,10 +597,12 @@ export default function UsagePage() {
                 items.sort((a, b) => b.total - a.total);
                 const top = items.slice(0, 10);
                 const otherTotal = items.slice(10).reduce((s, x) => s + x.total, 0);
-                const data = top.map(({ name, total }) => ({ name, value: total }));
-                if (otherTotal > 0) data.push({ name: lang === "zh" ? "其他" : "Other", value: otherTotal });
+                const data = top.map(({ name, total }, i) => ({ name, value: total, itemStyle: { color: coolColors[i % coolColors.length] } }));
+                if (otherTotal > 0) data.push({ name: lang === "zh" ? "其他" : "Other", value: otherTotal, itemStyle: { color: '#94a3b8' } });
                 const detailMap = Object.fromEntries(top.map(x => [x.name, x]));
                 return {
+                  color: coolColors,
+                  legend: { type: 'scroll', bottom: 0, textStyle: { fontSize: 10 }, pageTextStyle: { fontSize: 9 } },
                   tooltip: { trigger: "item", formatter: (p: any) => {
                     const d = detailMap[p.name];
                     if (d) {
@@ -604,9 +610,9 @@ export default function UsagePage() {
                     }
                     return `${p.name}: ${p.value.toLocaleString()} tokens`;
                   } },
-                  series: [{ type: "pie", radius: ["30%", "60%"], center: ["50%", "50%"], data, label: { show: true, formatter: (p: any) => `${p.name}\n${(p.percent as number).toFixed(0)}%`, fontSize: 10 }, itemStyle: { borderRadius: 4 } }],
+                  series: [{ type: "pie", radius: ["28%", "55%"], center: ["50%", "45%"], data, label: { show: false }, emphasis: { label: { show: true, fontSize: 10 } }, itemStyle: { borderRadius: 4 } }],
                 };
-              })()} style={{ height: 200 }} opts={{ renderer: "svg" }} />
+              })()} style={{ height: 280 }} opts={{ renderer: "svg" }} />
             </CardContent>
           </Card>
         </div>
