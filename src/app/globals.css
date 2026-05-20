@@ -99,6 +99,15 @@
   --glow-purple: rgba(139, 92, 246, 0.1);
   --spotlight-color: rgba(8, 145, 178, 0.06);
   --noise-opacity: 0.02;
+  /* Plan card gradients */
+  --plan-spark-from: #667eea;
+  --plan-spark-to: #764ba2;
+  --plan-flare-from: #48bb78;
+  --plan-flare-to: #38a169;
+  --plan-pulse-from: #f6ad55;
+  --plan-pulse-to: #ed8936;
+  --plan-nova-from: #9f7aea;
+  --plan-nova-to: #7c3aed;
 }
 
 /* ===== DARK THEME ===== */
@@ -142,6 +151,15 @@
   --glow-purple: rgba(139, 92, 246, 0.04);
   --spotlight-color: rgba(0, 212, 255, 0.08);
   --noise-opacity: 0.025;
+  /* Plan card gradients */
+  --plan-spark-from: #7b8ff7;
+  --plan-spark-to: #8b5cf6;
+  --plan-flare-from: #4ade80;
+  --plan-flare-to: #2dd4a0;
+  --plan-pulse-from: #fbbf24;
+  --plan-pulse-to: #f59e0b;
+  --plan-nova-from: #a78bfa;
+  --plan-nova-to: #7c3aed;
 }
 
 /* ===== BASE ===== */
@@ -319,10 +337,14 @@
   .animate-slideDown { animation: slideDown 0.15s ease-out; }
 
   /* Plan card gradients */
-  .gradient-spark { background: linear-gradient(135deg, var(--plan-spark-from), var(--plan-spark-to)); }
-  .gradient-flare { background: linear-gradient(135deg, var(--plan-flare-from), var(--plan-flare-to)); }
-  .gradient-pulse { background: linear-gradient(135deg, var(--plan-pulse-from), var(--plan-pulse-to)); }
-  .gradient-nova { background: linear-gradient(135deg, var(--plan-nova-from), var(--plan-nova-to)); }
+  .gradient-spark, .dark .gradient-spark { background: linear-gradient(135deg, #667eea, #764ba2); }
+  .gradient-flare, .dark .gradient-flare { background: linear-gradient(135deg, #48bb78, #38a169); }
+  .gradient-pulse, .dark .gradient-pulse { background: linear-gradient(135deg, #f6ad55, #ed8936); }
+  .gradient-nova, .dark .gradient-nova { background: linear-gradient(135deg, #9f7aea, #7c3aed); }
+  .dark .gradient-spark { background: linear-gradient(135deg, #7b8ff7, #8b5cf6); }
+  .dark .gradient-flare { background: linear-gradient(135deg, #4ade80, #2dd4a0); }
+  .dark .gradient-pulse { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+  .dark .gradient-nova { background: linear-gradient(135deg, #a78bfa, #7c3aed); }
 }
 
 /* ===== KEYFRAMES ===== */

@@ -196,9 +196,7 @@ export default function TokenPlanPage() {
                       {lang === "zh" ? "功能" : "Feature"}
                     </th>
                     {plans.map((plan) => {
-                      const thClass = plan.popular === 1
-                        ? `gradient-${plan.name}`
-                        : "bg-muted/50";
+                      const thClass = `gradient-${plan.name}`;
                       return (
                         <th key={plan.id} className={`p-3.5 text-center font-semibold whitespace-nowrap text-white ${thClass}`}>
                           <div className="flex items-center justify-center gap-1.5">
