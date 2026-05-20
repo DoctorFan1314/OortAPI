@@ -50,7 +50,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <AuthGuard>
       <div className="max-w-[1600px] mx-auto px-4 lg:px-8 py-6">
-        {breadcrumbItems.length > 0 && <Breadcrumb items={breadcrumbItems} />}
+        {breadcrumbItems.length > 1 && <Breadcrumb items={breadcrumbItems} />}
         <div className="flex flex-col lg:flex-row gap-6">
           <DashboardSidebar />
           <main className="flex-1 min-w-0">
