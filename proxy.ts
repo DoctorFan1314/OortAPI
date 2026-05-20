@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { TOKEN_NAME } from "@/lib/auth";
 
 const protectedPaths = ["/dashboard", "/profile", "/api/dashboard"];
 const authPaths = ["/login", "/register", "/forgot-password", "/reset-password"];
@@ -25,7 +26,7 @@ export function proxy(request: NextRequest) {
   }
 
   // Check for auth cookie
-  const authCookie = request.cookies.get("token")?.value;
+  const authCookie = request.cookies.get(TOKEN_NAME)?.value;
 
   // Redirect authenticated users away from auth pages
   if (authCookie && authPaths.some(p => pathname.startsWith(p))) {
