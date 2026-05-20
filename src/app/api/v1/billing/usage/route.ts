@@ -123,7 +123,7 @@ export async function GET(request: NextRequest) {
                 COALESCE(SUM(u.tokens_in_cache), 0) as tokens_in_cache,
                 COALESCE(SUM(u.tokens_out), 0) as tokens_out
          FROM usage_logs u WHERE ${whereClause}
-         GROUP BY DATE(created_at) ORDER BY date ASC`
+         GROUP BY DATE(created_at) ORDER BY date DESC LIMIT 60`
       ).all(...params) as TrendRow[];
     }
 

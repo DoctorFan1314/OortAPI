@@ -5,7 +5,7 @@ import { useCurrency } from "@/contexts/currency-context";
 import { useToast } from "@/contexts/toast-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Fragment, useEffect, useState, useMemo } from "react";
-import { Activity, Coins, DollarSign, X, Search, Download, Filter, BarChart3 } from "lucide-react";
+import { Activity, Coins, DollarSign, X, Search, Download, Filter, BarChart3, AlertTriangle } from "lucide-react";
 import dynamic from "next/dynamic";
 
 const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false });
@@ -180,14 +180,16 @@ export default function UsagePage() {
   // Input state (form fields) — does NOT trigger API calls
   const [inputModel, setInputModel] = useState("");
   const [inputStatus, setInputStatus] = useState("");
-  const [inputFrom, setInputFrom] = useState("");
-  const [inputTo, setInputTo] = useState("");
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const defaultFrom = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
+  const [inputFrom, setInputFrom] = useState(defaultFrom);
+  const [inputTo, setInputTo] = useState(todayStr);
   const [inputKeyId, setInputKeyId] = useState("");
   // Applied filter state — triggers API calls only when "Filter" button is clicked
   const [filterModel, setFilterModel] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
-  const [filterFrom, setFilterFrom] = useState("");
-  const [filterTo, setFilterTo] = useState("");
+  const [filterFrom, setFilterFrom] = useState(defaultFrom);
+  const [filterTo, setFilterTo] = useState(todayStr);
   const [filterKeyId, setFilterKeyId] = useState("");
   // API keys & models for filter dropdowns
   const [apiKeys, setApiKeys] = useState<{ id: number; name: string }[]>([]);
@@ -225,13 +227,13 @@ export default function UsagePage() {
   const clearFilters = () => {
     setInputModel("");
     setInputStatus("");
-    setInputFrom("");
-    setInputTo("");
+    setInputFrom(defaultFrom);
+    setInputTo(todayStr);
     setInputKeyId("");
     setFilterModel("");
     setFilterStatus("");
-    setFilterFrom("");
-    setFilterTo("");
+    setFilterFrom(defaultFrom);
+    setFilterTo(todayStr);
     setFilterKeyId("");
     setPage(1);
   };
@@ -300,7 +302,9 @@ export default function UsagePage() {
           total_tokens_out: d.total_tokens_out || 0,
           total_credits_used: d.total_credits_used || 0,
         });
-        setDailyTrend(d.daily_trend || []);
+        const trend = d.daily_trend || [];
+        trend.reverse(); // API returns DESC (LIMIT 60), frontend expects ASC
+        setDailyTrend(trend);
         setModelStats(d.model_stats || []);
         setLoading(false);
       })
@@ -523,6 +527,14 @@ export default function UsagePage() {
           </Card>
         )}
       </div>
+
+      {/* Date range warning */}
+      {filterFrom && filterTo && ((new Date(filterTo).getTime() - new Date(filterFrom).getTime()) / 86400000) > 60 && (
+        <div className="text-xs text-amber-500 bg-amber-500/10 px-3 py-2 rounded-lg flex items-center gap-2">
+          <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+          {lang === "zh" ? "数据范围超过 60 天，趋势仅显示最近 60 天的数据" : "Range exceeds 60 days. Trend shows the last 60 days only."}
+        </div>
+      )}
 
       {/* Trend chart */}
       {chartOption && (
