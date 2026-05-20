@@ -203,8 +203,8 @@ export function ModelAnalytics() {
       showSymbol: false,
       emphasis: { focus: "series" as const },
       itemStyle: { color: colorMap[model] },
-      areaStyle: { color: colorMap[model] + "60" },
-      lineStyle: { width: 0 },
+      areaStyle: { color: colorMap[model] + "45" },
+      lineStyle: { color: colorMap[model], width: 1.5 },
       data: slots.map(slot => byModelTokens[model]?.[slot] || 0),
     }));
     const fmt = (n: number) => n.toLocaleString();
@@ -220,8 +220,11 @@ export function ModelAnalytics() {
           const idx = params[0]?.dataIndex ?? 0;
           const slot = slots[idx] || "";
           let html = `<div style="font-size:12px;font-weight:600;margin-bottom:4px;white-space:nowrap;color:var(--foreground)">${xLabels[idx] || slot}</div>`;
+          let count = 0;
           for (const p of params) {
             const val = byModelTokens[p.seriesName]?.[slot] || 0;
+            if (val <= 0) continue;
+            count++;
             const color = (colorMap as Record<string, string>)[p.seriesName] || "#888";
             html += `<div style="font-size:11px;font-weight:500;margin-top:2px;white-space:nowrap;color:var(--foreground)"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};margin-right:6px"></span> ${p.seriesName}: <span style="font-family:var(--font-geist-mono,monospace)">${fmt(val)}</span></div>`;
             const brk = byModelBreakdown[p.seriesName]?.[slot];
@@ -231,6 +234,7 @@ export function ModelAnalytics() {
               if (brk.out > 0) html += `<div style="font-size:10px;padding-left:18px;color:var(--muted-foreground);white-space:nowrap">↳ ${lang === "zh" ? "输出" : "Output"}: <span style="font-family:var(--font-geist-mono,monospace)">${fmt(brk.out)}</span></div>`;
             }
           }
+          if (count === 0) html += `<div style="font-size:11px;color:var(--muted-foreground);white-space:nowrap">${lang === "zh" ? "无消耗" : "No consumption"}</div>`;
           return html;
         },
         extraCssText: "max-width:800px;white-space:nowrap;overflow:visible;border:1px solid var(--border);border-radius:8px;background:var(--card);backdrop-filter:blur(12px)",
@@ -443,16 +447,16 @@ export function ModelAnalytics() {
         </div>
       )}
 
-      {/* Charts grid: bar + pie */}
-      <div className="grid lg:grid-cols-3 gap-4">
-        <Card className="glass-card lg:col-span-2">
+      {/* Charts grid: stacked area + pie (stacked vertically) */}
+      <div className="space-y-4">
+        <Card className="glass-card">
           <CardHeader className="pb-2">
             <CardTitle className="text-base flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />{t.modelConsumption}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ReactECharts option={stackedAreaOption} style={{ height: 360 }} opts={{ renderer: "canvas" }} notMerge />
+            <ReactECharts option={stackedAreaOption} style={{ height: 400 }} opts={{ renderer: "canvas" }} notMerge />
           </CardContent>
         </Card>
         <Card className="glass-card">
@@ -463,7 +467,7 @@ export function ModelAnalytics() {
           </CardHeader>
           <CardContent>
             {data?.model_distribution?.length ? (
-              <ReactECharts option={pieOption} style={{ height: 360 }} opts={{ renderer: "canvas" }} notMerge />
+              <ReactECharts option={pieOption} style={{ height: 400 }} opts={{ renderer: "canvas" }} notMerge />
             ) : (
               <div className="h-64 flex items-center justify-center text-muted-foreground text-sm">{t.noData}</div>
             )}
