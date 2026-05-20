@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import useSWR from "swr";
 import dynamic from "next/dynamic";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useI18n } from "@/contexts/i18n-context";
 import { useCurrency } from "@/contexts/currency-context";
+import { useTheme } from "@/contexts/theme-context";
 import { BarChart3, TrendingUp, PieChart as PieIcon } from "lucide-react";
 import { dashboardSWRConfig } from "@/lib/swr-fetcher";
 
@@ -111,10 +112,20 @@ function generateHourSlots(): string[] {
   return Array.from({ length: 24 }, (_, i) => String(i).padStart(2, "0") + ":00");
 }
 
+/** Read a CSS variable at runtime — called each render so ECharts picks up theme changes */
+function cssVar(name: string, fallback = "#888") {
+  if (typeof window === "undefined") return fallback;
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
+}
+
 export function ModelAnalytics() {
   const { lang } = useI18n();
   const { formatPrice, exchangeRate, symbol } = useCurrency();
+  const { resolvedTheme } = useTheme();
   const t = LABELS[lang];
+  // Resolve CSS vars + force re-render on theme change via resolvedTheme dep
+  const fg = cssVar("--foreground");
+  const mg = cssVar("--muted-foreground");
 
   const [range, setRange] = useState<7 | 14 | 30>(7);
   const [timeMode, setTimeMode] = useState<"day" | "hour">("day");
@@ -195,18 +206,20 @@ export function ModelAnalytics() {
   // ======== Stacked Area Chart (Tokens) ========
   const stackedAreaOption = useMemo(() => {
     const { slots, byModelTokens, byModelBreakdown } = timeSource;
-    const series = models.map(model => ({
-      name: model,
-      type: "line" as const,
-      stack: "total",
-      smooth: true,
-      showSymbol: false,
-      emphasis: { focus: "series" as const },
-      itemStyle: { color: colorMap[model] },
-      areaStyle: { color: colorMap[model] + "45" },
-      lineStyle: { color: colorMap[model], width: 1.5 },
-      data: slots.map(slot => byModelTokens[model]?.[slot] || 0),
-    }));
+    const series = models.map(model => {
+      const c = colorMap[model] || "#888";
+      return {
+        name: model,
+        type: "line" as const,
+        smooth: true,
+        showSymbol: false,
+        emphasis: { focus: "series" as const },
+        itemStyle: { color: c },
+        areaStyle: { color: c + "25" },
+        lineStyle: { color: c, width: 2 },
+        data: slots.map(slot => byModelTokens[model]?.[slot] || 0),
+      };
+    });
     const fmt = (n: number) => n.toLocaleString();
     return {
       backgroundColor: "transparent",
@@ -239,19 +252,19 @@ export function ModelAnalytics() {
         },
         extraCssText: "max-width:800px;white-space:nowrap;overflow:visible;border:1px solid var(--border);border-radius:8px;background:var(--card);backdrop-filter:blur(12px)",
       },
-      legend: { type: "scroll" as const, bottom: 0, textStyle: { fontSize: 11, color: "var(--muted-foreground)" }, pageTextStyle: { fontSize: 11, color: "var(--muted-foreground)" } },
+      legend: { type: "scroll" as const, bottom: 0, textStyle: { fontSize: 11, color: mg }, pageTextStyle: { fontSize: 11, color: mg } },
       grid: { left: 70, right: 24, top: 20, bottom: 56 },
-      xAxis: { type: "category" as const, data: xLabels, axisLabel: { fontSize: 11, color: "var(--muted-foreground)" }, axisLine: { show: false }, axisTick: { show: false }, splitLine: { show: false } },
+      xAxis: { type: "category" as const, data: xLabels, axisLabel: { fontSize: 11, color: fg }, axisLine: { show: false }, axisTick: { show: false }, splitLine: { show: false } },
       yAxis: {
         type: "value" as const,
         name: t.yAxisUnit || undefined,
-        nameTextStyle: { fontSize: 10, color: "var(--muted-foreground)" },
-        axisLabel: { fontSize: 10, color: "var(--muted-foreground)" },
+        nameTextStyle: { fontSize: 10, color: mg },
+        axisLabel: { fontSize: 10, color: mg },
         splitLine: { lineStyle: { color: "rgba(128,128,128,0.06)", type: "dashed" as const } },
       },
       series,
     };
-  }, [timeSource, models, colorMap, xLabels, t.yAxisUnit, lang]);
+  }, [timeSource, models, colorMap, xLabels, t.yAxisUnit, lang, fg, mg, resolvedTheme]);
 
   // ======== Trend Line Chart (Calls, per-model, same colors as bar) ========
   const trendOption = useMemo(() => {
@@ -268,13 +281,13 @@ export function ModelAnalytics() {
     return {
       backgroundColor: "transparent",
       tooltip: { trigger: "axis" as const, extraCssText: "border:1px solid var(--border);border-radius:8px;background:var(--card);backdrop-filter:blur(12px)" },
-      legend: { type: "scroll" as const, bottom: 0, textStyle: { fontSize: 11, color: "var(--muted-foreground)" }, pageTextStyle: { fontSize: 11, color: "var(--muted-foreground)" } },
+      legend: { type: "scroll" as const, bottom: 0, textStyle: { fontSize: 11, color: mg }, pageTextStyle: { fontSize: 11, color: mg } },
       grid: { left: 60, right: 20, top: 20, bottom: 56 },
-      xAxis: { type: "category" as const, data: xLabels, axisLabel: { fontSize: 11, color: "var(--muted-foreground)" }, axisLine: { show: false }, axisTick: { show: false } },
-      yAxis: { type: "value" as const, name: lang === "zh" ? "次" : "", nameTextStyle: { fontSize: 10, color: "var(--muted-foreground)" }, axisLabel: { fontSize: 10, color: "var(--muted-foreground)" }, splitLine: { lineStyle: { color: "rgba(128,128,128,0.06)", type: "dashed" as const } } },
+      xAxis: { type: "category" as const, data: xLabels, axisLabel: { fontSize: 11, color: fg }, axisLine: { show: false }, axisTick: { show: false } },
+      yAxis: { type: "value" as const, name: lang === "zh" ? "次" : "", nameTextStyle: { fontSize: 10, color: mg }, axisLabel: { fontSize: 10, color: mg }, splitLine: { lineStyle: { color: "rgba(128,128,128,0.06)", type: "dashed" as const } } },
       series,
     };
-  }, [timeSource, models, colorMap, xLabels, lang]);
+  }, [timeSource, models, colorMap, xLabels, lang, fg, mg, resolvedTheme]);
   const costOption = useMemo(() => {
     if (!data?.daily_trend?.length) return {};
     const dates = data.daily_trend.map(d => d.date);
@@ -283,19 +296,19 @@ export function ModelAnalytics() {
     return {
       backgroundColor: "transparent",
       tooltip: { trigger: "axis" as const, extraCssText: "border:1px solid var(--border);border-radius:8px;background:var(--card);backdrop-filter:blur(12px)" },
-      legend: { data: [lang === "zh" ? "费用" : "Cost", lang === "zh" ? "调用" : "Calls"], bottom: 0, textStyle: { fontSize: 11, color: "var(--muted-foreground)" } },
+      legend: { data: [lang === "zh" ? "费用" : "Cost", lang === "zh" ? "调用" : "Calls"], bottom: 0, textStyle: { fontSize: 11, color: mg } },
       grid: { left: 60, right: 60, top: 10, bottom: 40 },
-      xAxis: { type: "category" as const, data: dates, axisLabel: { fontSize: 11, color: "var(--muted-foreground)" }, axisLine: { show: false }, axisTick: { show: false } },
+      xAxis: { type: "category" as const, data: dates, axisLabel: { fontSize: 11, color: fg }, axisLine: { show: false }, axisTick: { show: false } },
       yAxis: [
-        { type: "value" as const, name: symbol, axisLabel: { fontSize: 10, color: "var(--muted-foreground)" }, splitLine: { lineStyle: { color: "rgba(128,128,128,0.06)", type: "dashed" as const } } },
-        { type: "value" as const, name: lang === "zh" ? "次数" : "Calls", axisLabel: { fontSize: 10, color: "var(--muted-foreground)" }, splitLine: { show: false } },
+        { type: "value" as const, name: symbol, axisLabel: { fontSize: 10, color: mg }, splitLine: { lineStyle: { color: "rgba(128,128,128,0.06)", type: "dashed" as const } } },
+        { type: "value" as const, name: lang === "zh" ? "次数" : "Calls", axisLabel: { fontSize: 10, color: mg }, splitLine: { show: false } },
       ],
       series: [
         { name: lang === "zh" ? "费用" : "Cost", type: "bar", data: costData, itemStyle: { color: "#8b5cf6", borderRadius: [4, 4, 0, 0] }, barMaxWidth: 20 },
         { name: lang === "zh" ? "调用" : "Calls", type: "line", yAxisIndex: 1, data: callsData, smooth: true, lineStyle: { color: "#22c55e", width: 2 }, itemStyle: { color: "#22c55e" } },
       ],
     };
-  }, [data, exchangeRate, symbol, lang]);
+  }, [data, exchangeRate, symbol, lang, fg, mg, resolvedTheme]);
 
   const pieOption = useMemo(() => {
     if (!data?.model_distribution?.length) return {};
@@ -310,18 +323,18 @@ export function ModelAnalytics() {
         bottom: 0,
         left: "center",
         type: "scroll" as const,
-        textStyle: { fontSize: 11 },
+        textStyle: { fontSize: 11, color: fg },
         itemWidth: 10,
         itemHeight: 10,
         itemGap: 12,
-        pageTextStyle: { fontSize: 11 },
+        pageTextStyle: { fontSize: 11, color: mg },
       },
       series: [{
         type: "pie",
         radius: ["35%", "65%"],
         center: ["50%", "42%"],
         avoidLabelOverlap: true,
-        itemStyle: { borderRadius: 6, borderColor: "hsl(var(--card))", borderWidth: 2 },
+        itemStyle: { borderRadius: 4 },
         label: {
           show: true,
           formatter: "{b}\n{d}%",
@@ -344,7 +357,7 @@ export function ModelAnalytics() {
         })),
       }],
     };
-  }, [data, colorMap]);
+  }, [data, colorMap, fg, mg, resolvedTheme]);
 
   if (isLoading && !data) {
     return (
