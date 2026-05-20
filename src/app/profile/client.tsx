@@ -201,15 +201,20 @@ export default function ProfileClient() {
     totalCost: usageData?.total_cost || logs.reduce((s, l) => s + l.cost, 0),
   }), [usageData, logs]);
 
-  const handleSaveProfile = () => {
+  const handleSaveProfile = async () => {
     if (!username.trim()) {
       toast(t.usernameRequired, "error");
       return;
     }
     setSaving(true);
-    updateProfile({ username: username.trim(), bio: bio.trim() });
-    toast(t.profileUpdated, "success");
-    setSaving(false);
+    try {
+      await updateProfile({ username: username.trim(), bio: bio.trim() });
+      toast(t.profileUpdated, "success");
+    } catch {
+      toast(lang === "zh" ? "保存失败" : "Save failed", "error");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleCropComplete = (dataUrl: string) => {

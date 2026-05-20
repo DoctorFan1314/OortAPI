@@ -14,6 +14,8 @@ import {
   Server,
   RefreshCw,
   BarChart3,
+  Search,
+  ArrowUpDown,
 } from "lucide-react";
 import useSWR from "swr";
 import { dashboardSWRConfig } from "@/lib/swr-fetcher";
@@ -139,6 +141,9 @@ export default function MonitorPage() {
   const t = LABELS[lang];
   const [trendMetric, setTrendMetric] = useState<"calls" | "error" | "latency">("calls");
   const [lastUpdated, setLastUpdated] = useState<string>("");
+  const [providerSearch, setProviderSearch] = useState("");
+  const [sortField, setSortField] = useState<"calls" | "error_rate" | "avg_latency" | "">("");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
   const { data, isLoading, mutate } = useSWR<MonitorData>(
     "/api/dashboard/admin/monitor",
@@ -185,6 +190,36 @@ export default function MonitorPage() {
       }],
     };
   }, [data?.hourly_trend, trendMetric]);
+
+  const toggleSort = (field: "calls" | "error_rate" | "avg_latency") => {
+    if (sortField === field) {
+      setSortDir(d => d === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDir("desc");
+    }
+  };
+
+  const sortedProviders = useMemo(() => {
+    let list = data?.providers || [];
+    if (providerSearch.trim()) {
+      const q = providerSearch.toLowerCase();
+      list = list.filter(p => p.provider.toLowerCase().includes(q));
+    }
+    if (sortField) {
+      list = [...list].sort((a, b) => {
+        const aVal = a[sortField] as number;
+        const bVal = b[sortField] as number;
+        return sortDir === "asc" ? aVal - bVal : bVal - aVal;
+      });
+    }
+    return list;
+  }, [data, providerSearch, sortField, sortDir]);
+
+  const sortIndicator = (field: string) => {
+    if (sortField !== field) return null;
+    return <span className="ml-1">{sortDir === "asc" ? "↑" : "↓"}</span>;
+  };
 
   if (isLoading && !data) {
     return (
@@ -348,7 +383,18 @@ export default function MonitorPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {data.providers.length === 0 ? (
+          {/* Provider search */}
+          <div className="relative mb-3 w-56">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+            <input
+              type="text"
+              value={providerSearch}
+              onChange={e => setProviderSearch(e.target.value)}
+              placeholder={lang === "zh" ? "搜索渠道..." : "Search providers..."}
+              className="w-full h-8 pl-8 pr-3 rounded-md border border-input bg-background text-xs focus:border-primary focus:outline-none"
+            />
+          </div>
+          {sortedProviders.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground text-sm">
               {t.noData}
             </div>
@@ -360,19 +406,19 @@ export default function MonitorPage() {
                     <th scope="col" className="text-left py-2 px-3 text-muted-foreground font-medium">
                       {t.provider}
                     </th>
-                    <th scope="col" className="text-right py-2 px-3 text-muted-foreground font-medium">
-                      {t.calls}
+                    <th scope="col" className="text-right py-2 px-3 text-muted-foreground font-medium cursor-pointer hover:text-foreground select-none" onClick={() => toggleSort("calls")}>
+                      {t.calls}{sortIndicator("calls")}
                     </th>
-                    <th scope="col" className="text-right py-2 px-3 text-muted-foreground font-medium">
-                      {t.errorRate}
+                    <th scope="col" className="text-right py-2 px-3 text-muted-foreground font-medium cursor-pointer hover:text-foreground select-none" onClick={() => toggleSort("error_rate")}>
+                      {t.errorRate}{sortIndicator("error_rate")}
                     </th>
-                    <th scope="col" className="text-right py-2 px-3 text-muted-foreground font-medium">
-                      {t.avgLatency}
+                    <th scope="col" className="text-right py-2 px-3 text-muted-foreground font-medium cursor-pointer hover:text-foreground select-none" onClick={() => toggleSort("avg_latency")}>
+                      {t.avgLatency}{sortIndicator("avg_latency")}
                     </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {data.providers.map((p) => (
+                  {sortedProviders.map((p) => (
                     <tr
                       key={p.provider}
                       className="border-b border-border/20 hover:bg-muted/30"

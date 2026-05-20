@@ -25,13 +25,13 @@ function resolveTheme(theme: Theme): "dark" | "light" {
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(() => {
     if (typeof window !== "undefined") {
-      return (localStorage.getItem(STORAGE_KEYS.theme) as Theme) || "dark";
+      return (localStorage.getItem(STORAGE_KEYS.theme) as Theme) || getSystemTheme();
     }
     return "dark";
   });
   const [resolvedTheme, setResolvedTheme] = useState<"dark" | "light">(() => {
     if (typeof window !== "undefined") {
-      const stored = (localStorage.getItem(STORAGE_KEYS.theme) as Theme) || "dark";
+      const stored = (localStorage.getItem(STORAGE_KEYS.theme) as Theme) || getSystemTheme();
       return resolveTheme(stored);
     }
     return "dark";

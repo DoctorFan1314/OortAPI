@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/auth-context";
 import { useToast } from "@/contexts/toast-context";
 import { useI18n } from "@/contexts/i18n-context";
-import { Loader2 } from "lucide-react";
+import { Loader2, Eye, EyeOff } from "lucide-react";
 
 function safeReturnUrl(url: string | null): string {
   if (!url || !url.startsWith("/") || url.includes("://")) return "/";
@@ -23,6 +23,8 @@ export default function RegisterClient() {
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<{ username?: string; email?: string; password?: string; confirmPassword?: string }>({});
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { register } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
@@ -110,7 +112,12 @@ export default function RegisterClient() {
             </div>
             <div>
               <label htmlFor="password" className="text-sm text-foreground mb-1.5 block">{t.auth.password}</label>
-              <Input id="password" type="password" autoComplete="new-password" placeholder={t.auth.passwordPlaceholder} value={password} onChange={(e) => { setPassword(e.target.value); setFieldErrors(f => ({ ...f, password: undefined })); }} className="bg-secondary border-border text-foreground placeholder:text-muted-foreground/50" />
+              <div className="relative">
+                <Input id="password" type={showPassword ? "text" : "password"} autoComplete="new-password" placeholder={t.auth.passwordPlaceholder} value={password} onChange={(e) => { setPassword(e.target.value); setFieldErrors(f => ({ ...f, password: undefined })); }} className="bg-secondary border-border text-foreground placeholder:text-muted-foreground/50 pr-10" />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors" aria-label={showPassword ? (lang === "zh" ? "隐藏密码" : "Hide password") : (lang === "zh" ? "显示密码" : "Show password")} tabIndex={-1}>
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
               {fieldErrors.password && <p className="text-xs text-red-400 mt-1">{fieldErrors.password}</p>}
               <p className="mt-1 text-xs text-muted-foreground">{lang === "zh" ? "至少 8 个字符" : "At least 8 characters"}</p>
               {passwordStrength && (
@@ -133,7 +140,12 @@ export default function RegisterClient() {
             </div>
             <div>
               <label htmlFor="confirmPassword" className="text-sm text-foreground mb-1.5 block">{t.auth.confirmPassword}</label>
-              <Input id="confirmPassword" type="password" autoComplete="new-password" placeholder={t.auth.confirmPasswordPlaceholder} value={confirmPassword} onChange={(e) => { setConfirmPassword(e.target.value); setFieldErrors(f => ({ ...f, confirmPassword: undefined })); }} className="bg-secondary border-border text-foreground placeholder:text-muted-foreground/50" />
+              <div className="relative">
+                <Input id="confirmPassword" type={showConfirmPassword ? "text" : "password"} autoComplete="new-password" placeholder={t.auth.confirmPasswordPlaceholder} value={confirmPassword} onChange={(e) => { setConfirmPassword(e.target.value); setFieldErrors(f => ({ ...f, confirmPassword: undefined })); }} className="bg-secondary border-border text-foreground placeholder:text-muted-foreground/50 pr-10" />
+                <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors" aria-label={showConfirmPassword ? (lang === "zh" ? "隐藏密码" : "Hide password") : (lang === "zh" ? "显示密码" : "Show password")} tabIndex={-1}>
+                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
               {fieldErrors.confirmPassword && <p className="text-xs text-red-400 mt-1">{fieldErrors.confirmPassword}</p>}
             </div>
             {error && <p role="alert" className="text-sm text-red-400 text-center">{error}</p>}

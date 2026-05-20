@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import useSWR from "swr";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowUpRight, ArrowDownLeft, RefreshCw, Gift } from "lucide-react";
+import { ArrowUpRight, ArrowDownLeft, RefreshCw, Gift, Search, X } from "lucide-react";
 import { useCurrency } from "@/contexts/currency-context";
 import { dashboardSWRConfig } from "@/lib/swr-fetcher";
+import { Input } from "@/components/ui/input";
 
 interface BillingRecord {
   id: number;
@@ -23,35 +24,80 @@ const TYPE_CONFIG: Record<string, { icon: typeof ArrowUpRight; color: string; zh
   gift: { icon: Gift, color: "text-yellow-500", zh: "赠送", en: "Gift" },
 };
 
+const TYPE_OPTIONS = ["all", "recharge", "deduct", "refund", "gift"];
+
 const LABELS = {
-  zh: { title: "账单记录", noRecords: "暂无账单记录", balance: "余额", prev: "上一页", next: "下一页", showing: "显示" },
-  en: { title: "Billing History", noRecords: "No billing records yet", balance: "Balance", prev: "Previous", next: "Next", showing: "Showing" },
+  zh: { title: "账单记录", noRecords: "暂无账单记录", balance: "余额", prev: "上一页", next: "下一页", showing: "显示", search: "搜索描述...", allTypes: "全部类型", type: "类型" },
+  en: { title: "Billing History", noRecords: "No billing records yet", balance: "Balance", prev: "Previous", next: "Next", showing: "Showing", search: "Search description...", allTypes: "All types", type: "Type" },
 };
 
 export function BillingHistory({ lang = "zh" }: { lang?: "zh" | "en" }) {
   const [page, setPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [typeFilter, setTypeFilter] = useState("all");
   const { data, isValidating } = useSWR<{ records: BillingRecord[]; total: number; has_more: boolean }>(
-    `/api/dashboard/billing?limit=20&offset=${(page - 1) * 20}`,
+    `/api/dashboard/billing?limit=50&offset=${(page - 1) * 50}`,
     dashboardSWRConfig,
   );
-  const records = data?.records || [];
-  const hasMore = data?.has_more || false;
   const { formatPrice } = useCurrency();
   const t = LABELS[lang];
+
+  const filtered = useMemo(() => {
+    let list = data?.records || [];
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      list = list.filter(r => (r.description || "").toLowerCase().includes(q));
+    }
+    if (typeFilter !== "all") {
+      list = list.filter(r => r.type === typeFilter);
+    }
+    return list;
+  }, [data, searchQuery, typeFilter]);
+
+  const hasMore = data?.has_more || false;
 
   if (!data && isValidating) return <div className="h-48 animate-pulse bg-muted rounded-lg" />;
 
   return (
     <Card className="glass-card">
       <CardHeader>
-        <CardTitle className="text-lg">{t.title}</CardTitle>
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <CardTitle className="text-lg">{t.title}</CardTitle>
+          <div className="flex items-center gap-2">
+            <div className="relative w-44">
+              <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground pointer-events-none" />
+              <Input
+                placeholder={t.search}
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="h-8 pl-7 pr-7 text-xs bg-secondary border-border"
+              />
+              {searchQuery && (
+                <button onClick={() => setSearchQuery("")} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                  <X className="h-3 w-3" />
+                </button>
+              )}
+            </div>
+            <select
+              value={typeFilter}
+              onChange={e => setTypeFilter(e.target.value)}
+              className="h-8 px-2 rounded-md border border-border bg-secondary text-xs text-foreground appearance-none cursor-pointer"
+              aria-label={t.type}
+            >
+              <option value="all">{t.allTypes}</option>
+              {TYPE_OPTIONS.filter(o => o !== "all").map(type => (
+                <option key={type} value={type}>{TYPE_CONFIG[type]?.[lang] || type}</option>
+              ))}
+            </select>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
-        {records.length === 0 ? (
+        {filtered.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground text-sm">{t.noRecords}</div>
         ) : (
           <div className="space-y-2">
-            {records.map((r) => {
+            {filtered.map((r) => {
               const config = TYPE_CONFIG[r.type] || TYPE_CONFIG.deduct;
               const Icon = config.icon;
               return (
@@ -78,7 +124,7 @@ export function BillingHistory({ lang = "zh" }: { lang?: "zh" | "en" }) {
         {(page > 1 || hasMore) && (
           <div className="flex items-center justify-between pt-3 border-t border-border/20">
             <span className="text-xs text-muted-foreground">
-              {t.showing} {records.length} / {data?.total || 0}
+              {t.showing} {filtered.length} / {data?.total || 0}
             </span>
             <div className="flex gap-2">
               {page > 1 && (

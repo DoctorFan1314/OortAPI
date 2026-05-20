@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useI18n } from "@/contexts/i18n-context";
 import { useAuth } from "@/contexts/auth-context";
 import { useCurrency } from "@/contexts/currency-context";
-import { Pencil, Save, X, RefreshCw, Search, Cpu, Check, Zap, ArrowUpDown, ExternalLink } from "lucide-react";
+import { Pencil, Save, X, RefreshCw, Search, Cpu, Check, Zap, ArrowUpDown, ExternalLink, LayoutGrid, List } from "lucide-react";
 import Link from "next/link";
 
 interface ChannelModel {
@@ -101,6 +101,35 @@ const LABELS = {
   },
 };
 
+function SortDropdown({ value, onChange, options, lang }: { value: string; onChange: (v: string) => void; options: { value: string; label: string }[]; lang: string }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
+  const current = options.find(o => o.value === value);
+  return (
+    <div ref={ref} className="relative">
+      <button onClick={() => setOpen(!open)} aria-haspopup="listbox" aria-expanded={open} className="flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-medium border border-border bg-background text-foreground hover:bg-muted transition-colors cursor-pointer">
+        <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground" />
+        <span>{current?.label || options[0]?.label}</span>
+      </button>
+      {open && (
+        <div role="listbox" className="absolute right-0 top-full mt-1 w-44 bg-card border border-border rounded-lg shadow-xl z-50 py-1 overflow-hidden">
+          {options.map(opt => (
+            <button key={opt.value} role="option" aria-selected={value === opt.value} onClick={() => { onChange(opt.value); setOpen(false); }} className={`w-full text-left px-3 py-2 text-xs transition-colors ${value === opt.value ? "bg-primary/10 text-primary font-medium" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}>
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function ModelsPage() {
   const { lang } = useI18n();
   const { user } = useAuth();
@@ -116,6 +145,7 @@ export default function ModelsPage() {
   const [providerFilter, setProviderFilter] = useState("all");
   const [tagFilter, setTagFilter] = useState("all");
   const [sortBy, setSortBy] = useState<string>("name");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [syncing, setSyncing] = useState(false);
   const [visibleCount, setVisibleCount] = useState(20);
 
@@ -331,20 +361,23 @@ export default function ModelsPage() {
             )}
             {/* Sort dropdown */}
             <div className="relative">
-              <ArrowUpDown className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                aria-label="Sort models"
-                className="h-9 pl-8 pr-3 rounded-lg text-xs font-medium border border-border bg-background text-foreground appearance-none cursor-pointer"
-              >
-                <option value="name">{t.sortName}</option>
-                <option value="name_desc">{t.sortNameDesc}</option>
-                <option value="input_asc">{t.sortInputAsc}</option>
-                <option value="input_desc">{t.sortInputDesc}</option>
-                <option value="output_asc">{t.sortOutputAsc}</option>
-                <option value="output_desc">{t.sortOutputDesc}</option>
-              </select>
+              <SortDropdown value={sortBy} onChange={setSortBy} options={[
+                { value: "name", label: t.sortName },
+                { value: "name_desc", label: t.sortNameDesc },
+                { value: "input_asc", label: t.sortInputAsc },
+                { value: "input_desc", label: t.sortInputDesc },
+                { value: "output_asc", label: t.sortOutputAsc },
+                { value: "output_desc", label: t.sortOutputDesc },
+              ]} lang={lang} />
+            </div>
+            {/* View toggle */}
+            <div className="flex items-center border border-border rounded-lg overflow-hidden">
+              <button onClick={() => setViewMode("grid")} className={`p-2 transition-colors ${viewMode === "grid" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`} aria-label={lang === "zh" ? "网格视图" : "Grid view"}>
+                <LayoutGrid className="h-3.5 w-3.5" />
+              </button>
+              <button onClick={() => setViewMode("list")} className={`p-2 transition-colors ${viewMode === "list" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`} aria-label={lang === "zh" ? "列表视图" : "List view"}>
+                <List className="h-3.5 w-3.5" />
+              </button>
             </div>
           </div>
         </div>
@@ -376,6 +409,7 @@ export default function ModelsPage() {
           </div>
         ) : (
           <>
+          {viewMode === "grid" ? (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {filtered.slice(0, visibleCount).map((m) => {
               const c = pc(m.provider);
@@ -523,6 +557,48 @@ export default function ModelsPage() {
               );
             })}
           </div>
+          ) : (
+          <div className="rounded-lg border border-border overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-muted/50 border-b border-border">
+                  <th className="text-left px-4 py-2.5 text-xs text-muted-foreground font-medium">{lang === "zh" ? "模型" : "Model"}</th>
+                  <th className="text-left px-4 py-2.5 text-xs text-muted-foreground font-medium">{lang === "zh" ? "提供商" : "Provider"}</th>
+                  <th className="text-right px-4 py-2.5 text-xs text-muted-foreground font-medium">{t.inputPrice}</th>
+                  <th className="text-right px-4 py-2.5 text-xs text-muted-foreground font-medium">{t.outputPrice}</th>
+                  <th className="text-right px-4 py-2.5 text-xs text-muted-foreground font-medium">{t.cacheRead}</th>
+                  <th className="text-right px-4 py-2.5 text-xs text-muted-foreground font-medium">{lang === "zh" ? "渠道" : "Channel"}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.slice(0, visibleCount).map((m) => {
+                  const c = pc(m.provider);
+                  return (
+                    <tr key={`${m.model_name}-${m.channel_id}`} className={`border-b border-border hover:bg-muted/30 transition-colors ${!m.enabled ? "opacity-50" : ""}`}>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          {m.tags?.length > 0 && (
+                            <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${c.bg} ${c.text} border ${c.border}`}>
+                              {m.tags[0]}
+                            </span>
+                          )}
+                          <span className="font-medium text-foreground text-sm">{m.display_name || m.model_name}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-medium ${c.bg} ${c.text} border ${c.border}`}>{m.provider?.toUpperCase()}</span>
+                      </td>
+                      <td className="px-4 py-3 text-right font-mono text-xs">{m.rate_id ? fmtPrice(m.input_rate) : "-"}</td>
+                      <td className="px-4 py-3 text-right font-mono text-xs">{m.rate_id ? fmtPrice(m.output_rate) : "-"}</td>
+                      <td className="px-4 py-3 text-right font-mono text-xs">{m.rate_id ? fmtPrice(m.cache_rate) : "-"}</td>
+                      <td className="px-4 py-3 text-right text-xs text-muted-foreground">{m.channel_name}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          )}
           {visibleCount < filtered.length && (
             <div className="flex justify-center mt-6">
               <button

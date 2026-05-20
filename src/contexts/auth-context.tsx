@@ -95,6 +95,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await fetch("/api/auth/me", { method: "DELETE", credentials: "include" });
     } catch { /* ignore */ }
     setUser(null);
+    window.location.href = "/";
   }, []);
 
   const refreshUser = useCallback(async () => {

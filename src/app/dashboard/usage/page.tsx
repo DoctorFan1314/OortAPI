@@ -2,6 +2,7 @@
 
 import { useI18n } from "@/contexts/i18n-context";
 import { useCurrency } from "@/contexts/currency-context";
+import { useToast } from "@/contexts/toast-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Fragment, useEffect, useState, useMemo } from "react";
 import { Activity, Coins, DollarSign, X, Search, Download, Filter, BarChart3 } from "lucide-react";
@@ -200,7 +201,13 @@ export default function UsagePage() {
       .catch(() => {});
   }, []);
 
+  const { toast: showToast } = useToast();
+
   const applyFilters = () => {
+    if (inputFrom && inputTo && inputFrom > inputTo) {
+      showToast(lang === "zh" ? "开始日期不能晚于结束日期" : "Start date cannot be after end date", "error");
+      return;
+    }
     setFilterModel(inputModel);
     setFilterStatus(inputStatus);
     setFilterFrom(inputFrom);
@@ -586,7 +593,7 @@ export default function UsagePage() {
             {t.clearFilters}
           </button>
         )}
-        <button onClick={() => {
+        <button onClick={async () => {
           const params = [
             'format=csv',
             filterModel ? `model=${encodeURIComponent(filterModel)}` : '',
@@ -595,12 +602,57 @@ export default function UsagePage() {
             filterTo ? `to=${filterTo}` : '',
             filterKeyId ? `key_id=${filterKeyId}` : '',
           ].filter(Boolean).join('&');
-          window.open(`/api/v1/billing/usage?${params}`, '_blank');
+          showToast(lang === "zh" ? "正在导出..." : "Exporting...", "info");
+          try {
+            const res = await fetch(`/api/v1/billing/usage?${params}`, { credentials: "include" });
+            if (!res.ok) throw new Error("Export failed");
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `usage-export-${new Date().toISOString().slice(0, 10)}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast(lang === "zh" ? "导出成功" : "Exported successfully", "success");
+          } catch {
+            showToast(lang === "zh" ? "导出失败" : "Export failed", "error");
+          }
         }}
           className="h-8 px-3 text-xs border border-border/50 rounded-md hover:bg-muted transition-colors flex items-center gap-1.5 ml-auto">
           <Download className="h-3.5 w-3.5" />{t.exportCSV}
         </button>
       </div>
+
+      {/* Cost by model chart */}
+      {logs.length > 0 && (
+        <Card className="glass-card">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm flex items-center gap-2">
+              <BarChart3 className="h-4 w-4" />{lang === "zh" ? "费用按模型分布" : "Cost by Model"}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <ReactECharts option={(() => {
+              const modelCost: Record<string, number> = {};
+              logs.forEach(l => {
+                const cost = Math.abs(isCreditsUser ? (l.credits_used || 0) : l.cost);
+                if (cost > 0) modelCost[l.model] = (modelCost[l.model] || 0) + cost;
+              });
+              const sorted = Object.entries(modelCost).sort((a, b) => b[1] - a[1]);
+              const top = sorted.slice(0, 10);
+              const other = sorted.slice(10).reduce((s, [, c]) => s + c, 0);
+              const data = top.map(([name, value]) => ({ name, value }));
+              if (other > 0) data.push({ name: lang === "zh" ? "其他" : "Other", value: other });
+              return {
+                tooltip: { trigger: "item", formatter: (p: any) => `${p.name}: ${formatPrice(p.value)}` },
+                series: [{ type: "pie", radius: ["30%", "60%"], center: ["50%", "50%"], data, label: { show: true, formatter: (p: any) => `${p.name}\n${(p.percent as number).toFixed(0)}%`, fontSize: 10 }, itemStyle: { borderRadius: 4 } }],
+              };
+            })()} style={{ height: 220 }} opts={{ renderer: "svg" }} />
+          </CardContent>
+        </Card>
+      )}
 
       <Card className="glass-card">
         <CardHeader>

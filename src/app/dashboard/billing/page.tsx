@@ -10,8 +10,17 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useAuth } from "@/contexts/auth-context";
 import { useToast } from "@/contexts/toast-context";
-import { Wallet, Plus, Gift, Loader2, RefreshCw } from "lucide-react";
+import { Wallet, Plus, Gift, Loader2, RefreshCw, TrendingUp, Calendar } from "lucide-react";
 import { useState } from "react";
+import useSWR from "swr";
+import { DeltaBadge } from "@/components/shared/delta-badge";
+import { dashboardSWRConfig } from "@/lib/swr-fetcher";
+
+interface UsageAggregate {
+  total_cost: number;
+  month_cost?: number;
+  last_month_cost?: number;
+}
 
 const LABELS = {
   zh: { title: "账单中心", balance: "当前余额", recharge: "充值", pricing: "定价说明", free: "免费层", freeDesc: "注册赠送 $10 余额", pro: "按量付费", proDesc: "按实际 Token 用量扣费", enterprise: "企业定制", enterpriseDesc: "联系客服获取专属方案", redeem: "兑换码", redeemTitle: "使用兑换码", redeemDesc: "输入兑换码为账户充值", code: "兑换码", redeemBtn: "兑换", cancel: "取消", redeemSuccess: "兑换成功！", redeemAmount: "充值金额", newBalance: "新余额" },
@@ -56,6 +65,33 @@ export default function BillingPage() {
     setRedeemLoading(false);
   }
 
+  // Fetch monthly usage data for forecast and trend
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
+  const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString().slice(0, 10);
+  const thisMonthEnd = now.toISOString().slice(0, 10);
+  const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0).toISOString().slice(0, 10);
+
+  const { data: thisMonthData } = useSWR<UsageAggregate>(
+    `/api/v1/billing/usage?from=${monthStart}&to=${thisMonthEnd}&limit=1`,
+    dashboardSWRConfig,
+  );
+  const { data: lastMonthData } = useSWR<UsageAggregate>(
+    `/api/v1/billing/usage?from=${lastMonthStart}&to=${lastMonthEnd}&limit=1`,
+    dashboardSWRConfig,
+  );
+
+  const thisMonthCost = thisMonthData?.total_cost || 0;
+  const lastMonthCost = lastMonthData?.total_cost || 0;
+
+  // Calculate projected monthly spend
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  const daysPassed = now.getDate();
+  const projectedCost = daysPassed > 0 ? (thisMonthCost / daysPassed) * daysInMonth : 0;
+  const costDelta = lastMonthCost > 0 ? ((thisMonthCost - lastMonthCost) / lastMonthCost * 100).toFixed(1) : null;
+
+  const [showRedeemTooltip, setShowRedeemTooltip] = useState(false);
+
   async function handleRefreshBalance() {
     setRefreshingBalance(true);
     await refreshUser();
@@ -92,19 +128,60 @@ export default function BillingPage() {
                 <Gift className="h-4 w-4" />
                 {t.redeem}
               </Button>
-              <div className="relative group">
+              <div className="relative" onMouseEnter={() => setShowRedeemTooltip(true)} onMouseLeave={() => setShowRedeemTooltip(false)}>
                 <Button className="gap-2" disabled>
                   <Plus className="h-4 w-4" />
                   {t.recharge}
                 </Button>
-                <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg bg-popover border border-border text-xs text-muted-foreground whitespace-nowrap opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity pointer-events-none shadow-lg">
-                  {lang === "zh" ? "即将上线，请使用兑换码充值" : "Coming soon. Use redeem codes."}
-                </div>
+                {showRedeemTooltip && (
+                  <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg bg-popover border border-border text-xs text-muted-foreground whitespace-nowrap shadow-lg z-10">
+                    {lang === "zh" ? "请使用兑换码充值" : "Please use redeem codes to add balance"}
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </CardContent>
       </Card>
+
+      {/* Spend forecast & monthly trend */}
+      <div className="grid md:grid-cols-2 gap-4">
+        <Card className="glass-card">
+          <CardContent className="p-5">
+            <div className="flex items-center gap-2 mb-2">
+              <TrendingUp className="h-4 w-4 text-primary" />
+              <span className="text-sm text-muted-foreground">{lang === "zh" ? "本月已消费" : "Month-to-Date Spend"}</span>
+              {costDelta && <DeltaBadge delta={costDelta} reverse />}
+            </div>
+            <div className="text-2xl font-bold font-mono">{formatPrice(thisMonthCost)}</div>
+            <div className="mt-2 text-xs text-muted-foreground">
+              {lang === "zh" ? `上月 ${formatPrice(lastMonthCost)}` : `Last month ${formatPrice(lastMonthCost)}`}
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="glass-card">
+          <CardContent className="p-5">
+            <div className="flex items-center gap-2 mb-2">
+              <Calendar className="h-4 w-4 text-blue-500" />
+              <span className="text-sm text-muted-foreground">{lang === "zh" ? "预计月消费" : "Projected Monthly Spend"}</span>
+            </div>
+            <div className="text-2xl font-bold font-mono">{formatPrice(projectedCost)}</div>
+            <div className="mt-2">
+              <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-primary rounded-full transition-all"
+                  style={{ width: `${Math.min((thisMonthCost / (projectedCost || 1)) * 100, 100)}%` }}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {lang === "zh"
+                  ? `基于 ${daysPassed}/${daysInMonth} 天的消耗速率`
+                  : `Based on ${daysPassed}/${daysInMonth} days consumption rate`}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       <div className="grid md:grid-cols-3 gap-4">
         <Card className="glass-card flex flex-col">

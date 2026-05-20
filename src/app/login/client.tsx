@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/auth-context";
 import { useToast } from "@/contexts/toast-context";
 import { useI18n } from "@/contexts/i18n-context";
-import { Loader2 } from "lucide-react";
+import { Loader2, Eye, EyeOff } from "lucide-react";
 
 function safeReturnUrl(url: string | null): string {
   if (!url || !url.startsWith("/") || url.includes("://")) return "/";
@@ -21,6 +21,7 @@ export default function LoginClient() {
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string }>({});
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const { login } = useAuth();
   const { toast } = useToast();
@@ -76,7 +77,12 @@ export default function LoginClient() {
             </div>
             <div>
               <label htmlFor="password" className="text-sm text-foreground mb-1.5 block">{t.auth.password}</label>
-              <Input id="password" type="password" autoComplete="current-password" placeholder="••••••••" value={password} onChange={(e) => { setPassword(e.target.value); setFieldErrors(e => ({ ...e, password: undefined })); }} className="bg-secondary border-border text-foreground placeholder:text-muted-foreground/50" />
+              <div className="relative">
+                <Input id="password" type={showPassword ? "text" : "password"} autoComplete="current-password" placeholder="••••••••" value={password} onChange={(e) => { setPassword(e.target.value); setFieldErrors(e => ({ ...e, password: undefined })); }} className="bg-secondary border-border text-foreground placeholder:text-muted-foreground/50 pr-10" />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors" aria-label={showPassword ? (lang === "zh" ? "隐藏密码" : "Hide password") : (lang === "zh" ? "显示密码" : "Show password")} tabIndex={-1}>
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
               {fieldErrors.password && <p className="text-xs text-red-400 mt-1">{fieldErrors.password}</p>}
               <div className="flex justify-end mt-1">
                 <Link href="/forgot-password" className="text-xs text-primary hover:underline">{t.auth.forgotPassword}</Link>

@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { CopyButton } from "@/components/shared/copy-button";
+import { MarkdownRenderer } from "@/components/shared/markdown-renderer";
 import { Play, Send, Bot, User, Loader2, Square, Zap, Settings2, ChevronDown, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -458,7 +459,7 @@ export default function PlaygroundPage() {
                   "rounded-lg px-4 py-2.5 max-w-[80%] text-sm leading-relaxed relative",
                   msg.role === "assistant" ? "bg-muted/30 border border-border/30" : "bg-primary/10"
                 )}>
-                  <pre className="whitespace-pre-wrap break-words text-xs">{msg.content}</pre>
+                  <div className="text-xs"><MarkdownRenderer content={msg.content} /></div>
                   <CopyButton text={msg.content} className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-md hover:bg-muted text-muted-foreground" />
                 </div>
               </div>
@@ -471,7 +472,7 @@ export default function PlaygroundPage() {
                   <Bot className="h-4 w-4" />
                 </div>
                 <div className="rounded-lg px-4 py-2.5 max-w-[80%] bg-muted/30 border border-border/30 relative">
-                  <pre className="whitespace-pre-wrap break-words text-xs">{response}</pre>
+                  <div className="text-xs"><MarkdownRenderer content={response} /></div>
                 </div>
               </div>
             )}

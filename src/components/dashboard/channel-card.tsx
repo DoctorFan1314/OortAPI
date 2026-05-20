@@ -29,6 +29,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { useToast } from "@/contexts/toast-context";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 
 interface Channel {
   id: number;
@@ -1165,60 +1166,30 @@ export function ChannelCard({ lang = "zh" }: { lang?: "zh" | "en" }) {
       </Card>
 
       {/* Delete Confirmation Dialog */}
-      <Dialog
+      <ConfirmDialog
         open={!!deleteTarget}
-        onOpenChange={(open) => {
-          if (!open) setDeleteTarget(null);
-        }}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{t.deleteConfirm}</DialogTitle>
-            <DialogDescription>
-              {t.deleteMsg.replace("{name}", deleteTarget?.name || "")}
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setDeleteTarget(null)}
-            >
-              {t.cancel}
-            </Button>
-            <Button
-              className="bg-red-600 text-white hover:bg-red-700"
-              onClick={() => deleteTarget && deleteChannel(deleteTarget.id)}
-            >
-              {t.confirm}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}
+        title={t.deleteConfirm}
+        message={t.deleteMsg.replace("{name}", deleteTarget?.name || "")}
+        onConfirm={() => deleteTarget && deleteChannel(deleteTarget.id)}
+        confirmLabel={t.confirm}
+        variant="danger"
+      />
 
       {/* Batch Action Confirmation Dialog */}
-      <Dialog open={batchAction !== null} onOpenChange={(open) => { if (!open) setBatchAction(null); }}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{t.batchConfirm}</DialogTitle>
-            <DialogDescription>
-              {batchAction === "delete"
-                ? t.batchDeleteMsg.replace("{count}", String(selectedIds.size))
-                : batchAction === "enable"
-                ? t.batchEnableMsg.replace("{count}", String(selectedIds.size))
-                : t.batchDisableMsg.replace("{count}", String(selectedIds.size))}
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setBatchAction(null)}>{t.cancel}</Button>
-            <Button
-              className={batchAction === "delete" ? "bg-red-600 text-white hover:bg-red-700" : ""}
-              onClick={executeBatch}
-            >
-              {t.confirm}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ConfirmDialog
+        open={batchAction !== null}
+        onOpenChange={(open) => { if (!open) setBatchAction(null); }}
+        title={t.batchConfirm}
+        message={batchAction === "delete"
+          ? t.batchDeleteMsg.replace("{count}", String(selectedIds.size))
+          : batchAction === "enable"
+          ? t.batchEnableMsg.replace("{count}", String(selectedIds.size))
+          : t.batchDisableMsg.replace("{count}", String(selectedIds.size))}
+        onConfirm={executeBatch}
+        confirmLabel={t.confirm}
+        variant={batchAction === "delete" ? "danger" : "default"}
+      />
     </>
   );
 }

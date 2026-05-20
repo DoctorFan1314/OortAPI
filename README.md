@@ -276,8 +276,8 @@ After registering, users get access to a full dashboard:
 - **Plans** — Admin: manage subscription plans at `/dashboard/admin/plans` with currency toggle and plan-model bindings
 - **Multiplier** — Admin: per-model and time-based pricing multiplier rules with effective price display and batch edit
 - **System Monitor** — Admin: real-time platform health at `/dashboard/admin/monitor` (QPS, error rate, P50/P95 latency, per-provider stats)
-- **API Playground** — Interactive API testing at `/dashboard/playground` with model selector, streaming response
-- **Budget** — Monthly spending limit with progress bar and threshold alerts
+- **API Playground** — Interactive testing at `/dashboard/playground` with model selector, streaming response, Markdown rendering, and conversation export
+- **Budget** — Monthly spending limit with progress bar, threshold alerts, and projected spend forecast
 - **Audit Logs** — Admin: full-text search, CSV export, date range filtering
 
 ---

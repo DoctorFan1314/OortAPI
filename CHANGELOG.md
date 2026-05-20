@@ -6,6 +6,38 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [v3.3.4.15] — 2026-05-20
+
+### Beautification & UX
+- **Error boundaries** — Added error.tsx fallbacks for all dashboard sub-routes
+- **Loading states** — Added loading.tsx skeletons for billing, keys, playground, settings pages
+- **Shared components** — Extracted DeltaBadge component; added spinner to ConfirmDialog
+- **Accessibility** — Sidebar now includes `aria-current="page"` on active links
+- **Channel management** — Replaced raw Dialogs with reusable ConfirmDialog
+- **Profile fix** — Fixed missing `await` in handleSaveProfile (could not catch save errors)
+- **Password toggle** — Added show/hide password buttons on login and register forms
+- **Logout redirect** — Auth context now redirects to home after logout
+- **Usage validation** — Client-side date validation (from must be before to)
+- **Model market** — Custom sort dropdown replaces native `<select>`; added list/compact view toggle
+- **Playground** — AI responses now render Markdown instead of plain `<pre>` text
+- **Theme default** — Default theme respects `prefers-color-scheme` instead of hardcoded "dark"
+- **Recharge button** — Updated tooltip text on disabled recharge button
+
+### Billing & Analytics
+- **Billing history** — Added search by description and type filter (recharge/deduct/refund/gift)
+- **Spend forecast** — New "Projected Monthly Spend" card with progress bar
+- **Monthly trend** — New "Month-to-Date Spend" card with vs-last-month DeltaBadge
+- **Cost by model** — New ECharts pie chart on usage page showing cost distribution by model
+- **CSV export** — Changed from window.open to fetch+blob with success/error toast feedback
+- **Monitor table** — Admin monitor provider table now supports column sorting and text search
+
+### New Features
+- **EmptyState component** — New reusable empty-state component for consistent UI across pages
+- **Proxy (Middleware)** — Added Next.js 16 proxy.ts for server-side route protection (dashboard/profile)
+- **Error retry limit** — Error page now limits retry to 3 attempts, then disables button
+
+---
+
 ## [v3.3.4.14] — 2026-05-19
 
 ### Analytics & Statistics
