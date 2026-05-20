@@ -47,12 +47,12 @@ export async function GET(request: NextRequest) {
       conditions.push('success = 0');
     }
     if (from) {
-      conditions.push('created_at >= ?');
+      conditions.push('u.created_at >= ?');
       params.push(from);
     }
     if (to) {
       // Add one day to include all records on the 'to' date
-      conditions.push("created_at < date(?, '+1 day')");
+      conditions.push("u.created_at < date(?, '+1 day')");
       params.push(to);
     }
     if (keyId) {

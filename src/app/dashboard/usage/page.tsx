@@ -189,8 +189,9 @@ export default function UsagePage() {
   const [filterFrom, setFilterFrom] = useState("");
   const [filterTo, setFilterTo] = useState("");
   const [filterKeyId, setFilterKeyId] = useState("");
-  // API keys for filter dropdown
+  // API keys & models for filter dropdowns
   const [apiKeys, setApiKeys] = useState<{ id: number; name: string }[]>([]);
+  const [filterModels, setFilterModels] = useState<string[]>([]);
   const [sortKey, setSortKey] = useState<string>("created_at");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const t = LABELS[lang];
@@ -199,6 +200,10 @@ export default function UsagePage() {
     fetch("/api/dashboard/keys", { credentials: "include" })
       .then(r => r.ok ? r.json() : null)
       .then(d => { if (d?.keys) setApiKeys(d.keys); })
+      .catch(() => {});
+    fetch("/api/v1/models")
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d?.data) setFilterModels(d.data.map((m: any) => m.id).sort()); })
       .catch(() => {});
   }, []);
 
@@ -618,86 +623,91 @@ export default function UsagePage() {
         </div>
       )}
 
+
       {/* Filter bar */}
-      <div className="flex flex-wrap items-end gap-3 p-3 bg-muted/30 rounded-lg">
-        <div className="flex-1 min-w-[150px]">
-          <label className="text-xs text-muted-foreground block mb-1">{t.filterModel}</label>
-          <div className="relative">
-            <Search className="absolute left-2.5 top-2 h-4 w-4 text-muted-foreground" />
-            <input value={inputModel} onChange={e => setInputModel(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter') applyFilters(); }}
-              placeholder="gpt-4o" className="w-full pl-8 pr-3 py-1.5 bg-background rounded-lg text-sm border border-border/50 focus:border-primary focus:outline-none" />
+      <div className="flex flex-wrap items-start justify-between gap-3 p-3 bg-muted/30 rounded-lg">
+        <div className="flex flex-wrap items-end gap-3">
+          <div className="w-44">
+            <label className="text-xs text-muted-foreground block mb-1">{t.filterModel}</label>
+            <select value={inputModel} onChange={e => setInputModel(e.target.value)}
+              className="w-full h-8 px-2 rounded-md border border-input bg-background text-sm focus:border-primary focus:outline-none">
+              <option value="">{t.all}</option>
+              {filterModels.map(m => <option key={m} value={m}>{m}</option>)}
+            </select>
           </div>
-        </div>
-        <div className="w-32">
-          <label className="text-xs text-muted-foreground block mb-1">{t.filterStatus}</label>
-          <select value={inputStatus} onChange={e => setInputStatus(e.target.value)}
-            className="w-full h-8 px-2 rounded-md border border-input bg-background text-sm focus:border-primary focus:outline-none">
-            <option value="">{t.all}</option>
-            <option value="success">{t.success}</option>
-            <option value="failed">{t.failed}</option>
-          </select>
-        </div>
-        <div className="w-40">
-          <label className="text-xs text-muted-foreground block mb-1">{t.apiKey}</label>
-          <select value={inputKeyId} onChange={e => setInputKeyId(e.target.value)}
-            className="w-full h-8 px-2 rounded-md border border-input bg-background text-sm focus:border-primary focus:outline-none">
-            <option value="">{t.allKeys}</option>
-            {apiKeys.map(k => (
-              <option key={k.id} value={k.id}>{k.name || `Key #${k.id}`}</option>
-            ))}
-          </select>
-        </div>
-        <div className="w-36">
-          <label className="text-xs text-muted-foreground block mb-1">{t.dateFrom}</label>
-          <input type="date" value={inputFrom} onChange={e => setInputFrom(e.target.value)}
-            className="w-full h-8 px-2 rounded-md border border-input bg-background text-sm focus:border-primary focus:outline-none" />
-        </div>
-        <div className="w-36">
-          <label className="text-xs text-muted-foreground block mb-1">{t.dateTo}</label>
-          <input type="date" value={inputTo} onChange={e => setInputTo(e.target.value)}
-            className="w-full h-8 px-2 rounded-md border border-input bg-background text-sm focus:border-primary focus:outline-none" />
-        </div>
-        <button onClick={applyFilters}
-          className="h-8 px-4 text-xs bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors flex items-center gap-1.5">
-          <Filter className="h-3.5 w-3.5" />{t.filterBtn}
-        </button>
-        {hasActiveFilters && (
-          <button onClick={clearFilters}
-            className="h-8 px-3 text-xs text-muted-foreground hover:text-foreground border border-border/50 rounded-md hover:bg-muted transition-colors">
-            {t.clearFilters}
+          <div className="w-32">
+            <label className="text-xs text-muted-foreground block mb-1">{t.filterStatus}</label>
+            <select value={inputStatus} onChange={e => setInputStatus(e.target.value)}
+              className="w-full h-8 px-2 rounded-md border border-input bg-background text-sm focus:border-primary focus:outline-none">
+              <option value="">{t.all}</option>
+              <option value="success">{t.success}</option>
+              <option value="failed">{t.failed}</option>
+            </select>
+          </div>
+          <div className="w-40">
+            <label className="text-xs text-muted-foreground block mb-1">{t.apiKey}</label>
+            <select value={inputKeyId} onChange={e => setInputKeyId(e.target.value)}
+              className="w-full h-8 px-2 rounded-md border border-input bg-background text-sm focus:border-primary focus:outline-none">
+              <option value="">{t.allKeys}</option>
+              {apiKeys.map(k => (
+                <option key={k.id} value={k.id}>{k.name || `Key #${k.id}`}</option>
+              ))}
+            </select>
+          </div>
+          <div className="w-36">
+            <label className="text-xs text-muted-foreground block mb-1">{t.dateFrom}</label>
+            <input type="date" value={inputFrom} onChange={e => setInputFrom(e.target.value)}
+              className="w-full h-8 px-2 rounded-md border border-input bg-background text-sm focus:border-primary focus:outline-none" />
+          </div>
+          <div className="w-36">
+            <label className="text-xs text-muted-foreground block mb-1">{t.dateTo}</label>
+            <input type="date" value={inputTo} onChange={e => setInputTo(e.target.value)}
+              className="w-full h-8 px-2 rounded-md border border-input bg-background text-sm focus:border-primary focus:outline-none" />
+          </div>
+          <button onClick={applyFilters}
+            className="h-8 px-4 text-xs bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors flex items-center gap-1.5">
+            <Filter className="h-3.5 w-3.5" />{t.filterBtn}
           </button>
-        )}
-        <button onClick={async () => {
-          const params = [
-            'format=csv',
-            filterModel ? `model=${encodeURIComponent(filterModel)}` : '',
-            filterStatus ? `status=${filterStatus}` : '',
-            filterFrom ? `from=${filterFrom}` : '',
-            filterTo ? `to=${filterTo}` : '',
-            filterKeyId ? `key_id=${filterKeyId}` : '',
-          ].filter(Boolean).join('&');
-          showToast(lang === "zh" ? "正在导出..." : "Exporting...", "info");
-          try {
-            const res = await fetch(`/api/v1/billing/usage?${params}`, { credentials: "include" });
-            if (!res.ok) throw new Error("Export failed");
-            const blob = await res.blob();
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `usage-export-${new Date().toISOString().slice(0, 10)}.csv`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            showToast(lang === "zh" ? "导出成功" : "Exported successfully", "success");
-          } catch {
-            showToast(lang === "zh" ? "导出失败" : "Export failed", "error");
-          }
-        }}
-          className="h-8 px-3 text-xs border border-border/50 rounded-md hover:bg-muted transition-colors flex items-center gap-1.5 ml-auto">
-          <Download className="h-3.5 w-3.5" />{t.exportCSV}
-        </button>
+          {hasActiveFilters && (
+            <button onClick={clearFilters}
+              className="h-8 px-3 text-xs text-muted-foreground hover:text-foreground border border-border/50 rounded-md hover:bg-muted transition-colors">
+              {t.clearFilters}
+            </button>
+          )}
+        </div>
+        <div>
+          <label className="text-xs text-transparent block mb-1">&nbsp;</label>
+          <button onClick={async () => {
+            const params = [
+              'format=csv',
+              filterModel ? `model=${encodeURIComponent(filterModel)}` : '',
+              filterStatus ? `status=${filterStatus}` : '',
+              filterFrom ? `from=${filterFrom}` : '',
+              filterTo ? `to=${filterTo}` : '',
+              filterKeyId ? `key_id=${filterKeyId}` : '',
+            ].filter(Boolean).join('&');
+            showToast(lang === "zh" ? "正在导出..." : "Exporting...", "info");
+            try {
+              const res = await fetch(`/api/v1/billing/usage?${params}`, { credentials: "include" });
+              if (!res.ok) throw new Error("Export failed");
+              const blob = await res.blob();
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = `usage-export-${new Date().toISOString().slice(0, 10)}.csv`;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              URL.revokeObjectURL(url);
+              showToast(lang === "zh" ? "导出成功" : "Exported successfully", "success");
+            } catch {
+              showToast(lang === "zh" ? "导出失败" : "Export failed", "error");
+            }
+          }}
+            className="h-8 px-3 text-xs border border-border/50 rounded-md hover:bg-muted transition-colors flex items-center gap-1.5">
+            <Download className="h-3.5 w-3.5" />{t.exportCSV}
+          </button>
+        </div>
       </div>
 
       <Card className="glass-card">
