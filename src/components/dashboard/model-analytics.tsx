@@ -213,14 +213,13 @@ export function ModelAnalytics() {
       tooltip: {
         trigger: "axis" as const,
         axisPointer: {
-          type: "cross" as const,
-          crossStyle: { color: "var(--muted-foreground)" },
-          lineStyle: { type: "dashed" as const, color: "rgba(128,128,128,0.15)", width: 1 },
-          label: { backgroundColor: "var(--card)", color: "var(--foreground)", fontSize: 10 },
+          type: "line" as const,
+          lineStyle: { color: "rgba(128,128,128,0.12)", width: 1, type: "dashed" as const },
         },
-        formatter: (params: { seriesName: string; dataIndex: number; axisValue: string }[]) => {
-          const slot = params[0]?.axisValue || slots[params[0]?.dataIndex ?? 0] || "";
-          let html = `<div style="font-size:12px;font-weight:600;margin-bottom:4px;white-space:nowrap;color:var(--foreground)">${slot}</div>`;
+        formatter: (params: { seriesName: string; dataIndex: number }[]) => {
+          const idx = params[0]?.dataIndex ?? 0;
+          const slot = slots[idx] || "";
+          let html = `<div style="font-size:12px;font-weight:600;margin-bottom:4px;white-space:nowrap;color:var(--foreground)">${xLabels[idx] || slot}</div>`;
           for (const p of params) {
             const val = byModelTokens[p.seriesName]?.[slot] || 0;
             const color = (colorMap as Record<string, string>)[p.seriesName] || "#888";
@@ -449,7 +448,7 @@ export function ModelAnalytics() {
         <Card className="glass-card lg:col-span-2">
           <CardHeader className="pb-2">
             <CardTitle className="text-base flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />{t.modelConsumption} <span className="text-xs text-muted-foreground font-normal">(stacked area — tokens per model)</span>
+              <BarChart3 className="h-4 w-4" />{t.modelConsumption}
             </CardTitle>
           </CardHeader>
           <CardContent>

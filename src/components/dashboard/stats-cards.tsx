@@ -84,7 +84,7 @@ export function StatsCards({ lang = "zh" }: { lang?: "zh" | "en" }) {
 
   if (!stats) {
     return (
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
         {Array.from({ length: 6 }).map((_, i) => (
           <Card key={i} className="bg-muted/30 animate-pulse">
             <CardContent className="p-4">
@@ -113,17 +113,19 @@ export function StatsCards({ lang = "zh" }: { lang?: "zh" | "en" }) {
   const dailyCosts = sparkData.map(d => d.cost);
   const dailyCalls = sparkData.map(d => d.calls);
   const dailyTokens = sparkData.map(d => d.tokens);
+  const dailyRPM = sparkData.map(d => +(d.calls / 1440).toFixed(2));
+  const dailyTPM = sparkData.map(d => Math.round(d.tokens / 1440));
 
   const cards = [
     { icon: Wallet, label: t.balance, value: formatPrice(stats.balance), color: "text-yellow-500", bgColor: "bg-yellow-500/10", hex: "#eab308" },
     { icon: TrendingDown, label: t.monthlyCost, value: formatPrice(stats.month?.cost || 0), color: "text-red-500", bgColor: "bg-red-500/10", delta: costDelta, hex: "#ef4444", sparkData: dailyCosts },
     { icon: Activity, label: t.monthlyCalls, value: (stats.month?.calls || 0).toLocaleString(), color: "text-blue-500", bgColor: "bg-blue-500/10", delta: callsDelta, hex: "#3b82f6", sparkData: dailyCalls },
-    { icon: Gauge, label: t.rpm, value: avgRPM, color: "text-purple-500", bgColor: "bg-purple-500/10", hex: "#a855f7" },
-    { icon: Cpu, label: t.tpm, value: formatTokens(avgTPM), color: "text-cyan-500", bgColor: "bg-cyan-500/10", hex: "#06b6d4" },
+    { icon: Gauge, label: t.rpm, value: avgRPM, color: "text-purple-500", bgColor: "bg-purple-500/10", hex: "#a855f7", sparkData: dailyCalls },
+    { icon: Cpu, label: t.tpm, value: formatTokens(avgTPM), color: "text-cyan-500", bgColor: "bg-cyan-500/10", hex: "#06b6d4", sparkData: dailyTokens },
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
       {cards.map((card, i) => (
         <Card key={i} className="glass-card overflow-hidden">
           <CardContent className="p-4">
@@ -136,8 +138,8 @@ export function StatsCards({ lang = "zh" }: { lang?: "zh" | "en" }) {
             </div>
             <div className="flex items-center justify-between">
               <div className="text-xl font-bold font-mono">{card.value}</div>
-              {'sparkData' in card && card.sparkData && (
-                <Sparkline data={card.sparkData} color={card.hex} gradientId={`s-${card.label}`} width={64} height={20} />
+              {'sparkData' in card && card.sparkData && Math.max(...card.sparkData) > 0 && (
+                <Sparkline data={card.sparkData} color={card.hex} width={64} height={20} />
               )}
             </div>
           </CardContent>
