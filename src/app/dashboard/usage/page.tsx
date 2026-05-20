@@ -169,6 +169,7 @@ export default function UsagePage() {
   const [logs, setLogs] = useState<UsageLog[]>([]);
   const [summary, setSummary] = useState<UsageSummary>({ total_calls: 0, total_tokens: 0, total_cost: 0, total_tokens_in_noncached: 0, total_tokens_in_cache: 0, total_tokens_out: 0 });
   const [dailyTrend, setDailyTrend] = useState<DailyTrend[]>([]);
+  const [modelStats, setModelStats] = useState<Array<{ model: string; cost: number; credits_used: number; tokens_in: number; tokens_out: number; tokens_in_cache: number }>>([]);
   const [isCreditsUser, setIsCreditsUser] = useState(false);
   const [chartMetric, setChartMetric] = useState<"cost" | "tokens" | "calls">("cost");
   const [loading, setLoading] = useState(true);
@@ -295,6 +296,7 @@ export default function UsagePage() {
           total_credits_used: d.total_credits_used || 0,
         });
         setDailyTrend(d.daily_trend || []);
+        setModelStats(d.model_stats || []);
         setLoading(false);
       })
       .catch(() => {
@@ -543,6 +545,73 @@ export default function UsagePage() {
         </Card>
       )}
 
+
+      {/* Cost & Tokens by model charts — uses full-period API aggregation */}
+      {modelStats.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Card className="glass-card">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <BarChart3 className="h-4 w-4" />{isCreditsUser
+                  ? (lang === "zh" ? "额度按模型分布" : "Credits by Model")
+                  : (lang === "zh" ? "费用按模型分布" : "Cost by Model")}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <ReactECharts option={(() => {
+                const items = modelStats.map(m => ({ name: m.model, value: isCreditsUser ? m.credits_used : m.cost })).filter(x => x.value > 0);
+                items.sort((a, b) => b.value - a.value);
+                const top = items.slice(0, 10);
+                const other = items.slice(10).reduce((s, x) => s + x.value, 0);
+                const data = top.map(({ name, value }) => ({ name, value }));
+                if (other > 0) data.push({ name: lang === "zh" ? "其他" : "Other", value: other });
+                return {
+                  tooltip: { trigger: "item", formatter: (p: any) => {
+                    const val = isCreditsUser ? `${p.value.toLocaleString()} credits` : formatPrice(p.value);
+                    return `${p.name}: ${val}`;
+                  } },
+                  series: [{ type: "pie", radius: ["30%", "60%"], center: ["50%", "50%"], data, label: { show: true, formatter: (p: any) => `${p.name}\n${(p.percent as number).toFixed(0)}%`, fontSize: 10 }, itemStyle: { borderRadius: 4 } }],
+                };
+              })()} style={{ height: 200 }} opts={{ renderer: "svg" }} />
+            </CardContent>
+          </Card>
+          <Card className="glass-card">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <BarChart3 className="h-4 w-4" />{lang === "zh" ? "Token 按模型分布" : "Tokens by Model"}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <ReactECharts option={(() => {
+                const items = modelStats.map(m => ({
+                  name: m.model,
+                  total: m.tokens_in + m.tokens_out,
+                  noncached: m.tokens_in - m.tokens_in_cache,
+                  cache_hit: m.tokens_in_cache,
+                  output: m.tokens_out,
+                })).filter(x => x.total > 0);
+                items.sort((a, b) => b.total - a.total);
+                const top = items.slice(0, 10);
+                const otherTotal = items.slice(10).reduce((s, x) => s + x.total, 0);
+                const data = top.map(({ name, total }) => ({ name, value: total }));
+                if (otherTotal > 0) data.push({ name: lang === "zh" ? "其他" : "Other", value: otherTotal });
+                const detailMap = Object.fromEntries(top.map(x => [x.name, x]));
+                return {
+                  tooltip: { trigger: "item", formatter: (p: any) => {
+                    const d = detailMap[p.name];
+                    if (d) {
+                      return `${p.name}<br/>  ${p.value.toLocaleString()} tokens<br/>  ■ ${lang === "zh" ? "输入(未命中缓存)" : "Input(non-cached)"}: ${d.noncached.toLocaleString()}<br/>  ■ ${lang === "zh" ? "输入(命中缓存)" : "Input(cache hit)"}: ${d.cache_hit.toLocaleString()}<br/>  ■ ${lang === "zh" ? "输出" : "Output"}: ${d.output.toLocaleString()}`;
+                    }
+                    return `${p.name}: ${p.value.toLocaleString()} tokens`;
+                  } },
+                  series: [{ type: "pie", radius: ["30%", "60%"], center: ["50%", "50%"], data, label: { show: true, formatter: (p: any) => `${p.name}\n${(p.percent as number).toFixed(0)}%`, fontSize: 10 }, itemStyle: { borderRadius: 4 } }],
+                };
+              })()} style={{ height: 200 }} opts={{ renderer: "svg" }} />
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       {/* Filter bar */}
       <div className="flex flex-wrap items-end gap-3 p-3 bg-muted/30 rounded-lg">
         <div className="flex-1 min-w-[150px]">
@@ -624,35 +693,6 @@ export default function UsagePage() {
           <Download className="h-3.5 w-3.5" />{t.exportCSV}
         </button>
       </div>
-
-      {/* Cost by model chart */}
-      {logs.length > 0 && (
-        <Card className="glass-card">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />{lang === "zh" ? "费用按模型分布" : "Cost by Model"}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <ReactECharts option={(() => {
-              const modelCost: Record<string, number> = {};
-              logs.forEach(l => {
-                const cost = Math.abs(isCreditsUser ? (l.credits_used || 0) : l.cost);
-                if (cost > 0) modelCost[l.model] = (modelCost[l.model] || 0) + cost;
-              });
-              const sorted = Object.entries(modelCost).sort((a, b) => b[1] - a[1]);
-              const top = sorted.slice(0, 10);
-              const other = sorted.slice(10).reduce((s, [, c]) => s + c, 0);
-              const data = top.map(([name, value]) => ({ name, value }));
-              if (other > 0) data.push({ name: lang === "zh" ? "其他" : "Other", value: other });
-              return {
-                tooltip: { trigger: "item", formatter: (p: any) => `${p.name}: ${formatPrice(p.value)}` },
-                series: [{ type: "pie", radius: ["30%", "60%"], center: ["50%", "50%"], data, label: { show: true, formatter: (p: any) => `${p.name}\n${(p.percent as number).toFixed(0)}%`, fontSize: 10 }, itemStyle: { borderRadius: 4 } }],
-              };
-            })()} style={{ height: 220 }} opts={{ renderer: "svg" }} />
-          </CardContent>
-        </Card>
-      )}
 
       <Card className="glass-card">
         <CardHeader>
