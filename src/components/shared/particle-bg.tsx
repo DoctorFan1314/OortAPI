@@ -2,6 +2,10 @@
 
 import { useEffect, useRef } from "react";
 
+/**
+ * Ultra-minimalist starfield particle system.
+ * Slow, faint particles like distant stars — no connection lines.
+ */
 export function ParticleBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -15,40 +19,14 @@ export function ParticleBackground() {
     let paused = false;
     const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     if (motionQuery.matches) return;
-    function onMotionChange(e: MediaQueryListEvent) {
-      if (e.matches) {
-        paused = true;
-        cancelAnimationFrame(animationId);
-      } else {
-        paused = false;
-        animate();
-      }
-    }
-    motionQuery.addEventListener("change", onMotionChange);
-    const isMobile = window.innerWidth < 768;
-    const particles: { x: number; y: number; vx: number; vy: number; size: number; opacity: number }[] = [];
-    const count = isMobile ? 15 : 30;
-    const connectionDist = 150;
-    const connectionDistSq = connectionDist * connectionDist;
 
-    // Cache the primary color — re-read only when theme changes
-    let cachedPrimary: [number, number, number] | null = null;
-    function readPrimaryRGB(): [number, number, number] {
-      const style = getComputedStyle(document.documentElement);
-      const hex = style.getPropertyValue("--primary").trim();
-      if (!hex || !hex.startsWith("#")) return [0, 212, 255];
-      const r = parseInt(hex.slice(1, 3), 16);
-      const g = parseInt(hex.slice(3, 5), 16);
-      const b = parseInt(hex.slice(5, 7), 16);
-      return [r, g, b];
+    const isMobile = window.innerWidth < 768;
+    const particles: { x: number; y: number; vx: number; vy: number; size: number }[] = [];
+    const count = isMobile ? 8 : 20;
+
+    function readTheme(): "dark" | "light" {
+      return document.documentElement.classList.contains("dark") ? "dark" : "light";
     }
-    function getCachedPrimary(): [number, number, number] {
-      if (!cachedPrimary) cachedPrimary = readPrimaryRGB();
-      return cachedPrimary;
-    }
-    // Invalidate cache when theme class changes on <html>
-    const themeObserver = new MutationObserver(() => { cachedPrimary = null; });
-    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
 
     function resize() {
       if (!canvas) return;
@@ -63,45 +41,35 @@ export function ParticleBackground() {
         particles.push({
           x: Math.random() * canvas.width,
           y: Math.random() * canvas.height,
-          vx: (Math.random() - 0.5) * 0.3,
-          vy: (Math.random() - 0.5) * 0.3,
-          size: Math.random() * 2 + 0.5,
-          opacity: Math.random() * 0.3 + 0.05,
+          vx: (Math.random() - 0.5) * 0.08,
+          vy: (Math.random() - 0.5) * 0.08,
+          size: Math.random() * 0.8 + 0.3,
         });
       }
     }
 
     function animate() {
-      if (paused) return;
-      if (!canvas || !ctx) return;
-      const [r, g, b] = getCachedPrimary();
+      if (paused || !canvas || !ctx) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const theme = readTheme();
+      const baseOpacity = theme === "dark" ? 0.2 : 0.08;
+      const color = theme === "dark" ? "180, 200, 255" : "59, 130, 246";
+
       for (const p of particles) {
         p.x += p.vx;
         p.y += p.vy;
-        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+        if (p.x < 0) p.x = canvas.width;
+        if (p.x > canvas.width) p.x = 0;
+        if (p.y < 0) p.y = canvas.height;
+        if (p.y > canvas.height) p.y = 0;
+
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${p.opacity})`;
+        ctx.fillStyle = `rgba(${color}, ${baseOpacity})`;
         ctx.fill();
       }
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const distSq = dx * dx + dy * dy;
-          if (distSq < connectionDistSq) {
-            const dist = Math.sqrt(distSq);
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${0.03 * (1 - dist / connectionDist)})`;
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
-          }
-        }
-      }
+
       animationId = requestAnimationFrame(animate);
     }
 
@@ -121,14 +89,20 @@ export function ParticleBackground() {
     const onResize = () => { resize(); init(); };
     window.addEventListener("resize", onResize);
     document.addEventListener("visibilitychange", onVisibilityChange);
+
+    // Re-animate on theme toggle
+    const themeObserver = new MutationObserver(() => {
+      if (!paused) { cancelAnimationFrame(animationId); animate(); }
+    });
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+
     return () => {
       cancelAnimationFrame(animationId);
       window.removeEventListener("resize", onResize);
       document.removeEventListener("visibilitychange", onVisibilityChange);
-      motionQuery.removeEventListener("change", onMotionChange);
       themeObserver.disconnect();
     };
   }, []);
 
-  return <canvas ref={canvasRef} aria-hidden="true" className="fixed inset-0 pointer-events-none z-0" style={{ opacity: 0.6 }} />;
+  return <canvas ref={canvasRef} aria-hidden="true" className="fixed inset-0 pointer-events-none" style={{ zIndex: 0 }} />;
 }

@@ -84,8 +84,12 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col bg-background">
-        {/* Subtle dot-grid background — adapts to dark/light mode via currentColor */}
-        <div className="fixed inset-0 pointer-events-none -z-10 text-foreground" style={{ backgroundImage: "radial-gradient(circle, currentColor 1px, transparent 1px)", backgroundSize: "32px 32px", opacity: 0.06 }} aria-hidden="true" />
+        {/* ===== Background Layer System ===== */}
+        {/* 1. Ambient glow — top-left blue, bottom-right purple */}
+        <div className="fixed top-[-20%] left-[-10%] w-[60%] h-[60%] pointer-events-none -z-10" aria-hidden="true" style={{ background: "radial-gradient(ellipse at center, var(--glow-blue) 0%, transparent 70%)" }} />
+        <div className="fixed bottom-[-20%] right-[-10%] w-[60%] h-[60%] pointer-events-none -z-10" aria-hidden="true" style={{ background: "radial-gradient(ellipse at center, var(--glow-purple) 0%, transparent 70%)" }} />
+        {/* 2. Subtle grid lines — dark uses white, light uses black */}
+        <div className="fixed inset-0 pointer-events-none -z-10 dark:opacity-100 opacity-[0.4]" aria-hidden="true" style={{ backgroundImage: "linear-gradient(rgba(128,128,128,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(128,128,128,0.04) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
         <ToastProvider>
           <ThemeProvider>
             <I18nProvider>

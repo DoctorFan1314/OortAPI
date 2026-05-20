@@ -56,11 +56,11 @@
   --z-command: 120;
 }
 
-/* Light theme (default) */
+/* Light theme — refined background, glass cards, subtle dot-grid */
 :root:not(.dark) {
-  --background: #ffffff;
+  --background: #f8fafc;
   --foreground: #1a1a2e;
-  --card: #f8fafc;
+  --card: rgba(255, 255, 255, 0.7);
   --card-foreground: #1a1a2e;
   --popover: #ffffff;
   --popover-foreground: #1a1a2e;
@@ -73,8 +73,8 @@
   --accent: #e2e8f0;
   --accent-foreground: #1a1a2e;
   --destructive: #ef4444;
-  --border: rgba(0, 0, 0, 0.08);
-  --input: rgba(0, 0, 0, 0.08);
+  --border: rgba(0, 0, 0, 0.07);
+  --input: rgba(0, 0, 0, 0.07);
   --ring: #0891b2;
   --chart-1: #0891b2;
   --chart-2: #7c3aed;
@@ -82,14 +82,19 @@
   --chart-4: #f59e0b;
   --chart-5: #ef4444;
   --radius: 0.75rem;
-  --sidebar: #f8fafc;
+  --sidebar: rgba(248, 250, 252, 0.8);
   --sidebar-foreground: #1a1a2e;
   --sidebar-primary: #0891b2;
   --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #e2e8f0;
   --sidebar-accent-foreground: #1a1a2e;
-  --sidebar-border: rgba(0, 0, 0, 0.08);
+  --sidebar-border: rgba(0, 0, 0, 0.07);
   --sidebar-ring: #0891b2;
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(0, 0, 0, 0.06);
+  --glass-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+  --glow-blue: rgba(59, 130, 246, 0.3);
+  --glow-purple: rgba(139, 92, 246, 0.2);
   /* Plan card brand gradients */
   --plan-spark-from: #667eea;
   --plan-spark-to: #764ba2;
@@ -101,11 +106,11 @@
   --plan-nova-to: #7c3aed;
 }
 
-/* Dark theme */
+/* Dark theme — deep tech-black, ambient glows, cyan accents */
 .dark {
-  --background: #000000;
+  --background: #09090b;
   --foreground: #e6edf3;
-  --card: #0d1117;
+  --card: rgba(15, 23, 42, 0.65);
   --card-foreground: #e6edf3;
   --popover: #0d1117;
   --popover-foreground: #e6edf3;
@@ -118,8 +123,8 @@
   --accent: #1c2333;
   --accent-foreground: #e6edf3;
   --destructive: #f85149;
-  --border: rgba(255, 255, 255, 0.08);
-  --input: rgba(255, 255, 255, 0.08);
+  --border: rgba(255, 255, 255, 0.07);
+  --input: rgba(255, 255, 255, 0.07);
   --ring: #00d4ff;
   --chart-1: #00d4ff;
   --chart-2: #7c3aed;
@@ -127,14 +132,19 @@
   --chart-4: #f59e0b;
   --chart-5: #ef4444;
   --radius: 0.75rem;
-  --sidebar: #0d1117;
+  --sidebar: rgba(13, 17, 23, 0.8);
   --sidebar-foreground: #e6edf3;
   --sidebar-primary: #00d4ff;
   --sidebar-primary-foreground: #000000;
   --sidebar-accent: #1c2333;
   --sidebar-accent-foreground: #e6edf3;
-  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-border: rgba(255, 255, 255, 0.07);
   --sidebar-ring: #00d4ff;
+  --glass-bg: rgba(15, 23, 42, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --glow-blue: rgba(59, 130, 246, 0.08);
+  --glow-purple: rgba(139, 92, 246, 0.05);
   /* Plan card brand gradients (dark theme: slightly brighter) */
   --plan-spark-from: #7b8ff7;
   --plan-spark-to: #8b5cf6;
@@ -159,9 +169,6 @@
     @apply bg-background text-foreground;
     min-height: 100vh;
   }
-  .dark body {
-    background: linear-gradient(180deg, #0a0e1a 0%, #000000 100%);
-  }
   ::selection {
     background: color-mix(in srgb, var(--primary) 20%, transparent);
     color: var(--foreground);
@@ -169,19 +176,14 @@
 }
 
 @layer utilities {
+  /* ===== Enhanced Glass Card ===== */
   .glass-card {
-    backdrop-filter: blur(16px);
+    background: var(--glass-bg, rgba(255, 255, 255, 0.7));
+    backdrop-filter: blur(16px) saturate(1.1);
+    -webkit-backdrop-filter: blur(16px) saturate(1.1);
+    border: 1px solid var(--glass-border, rgba(0, 0, 0, 0.06));
+    box-shadow: var(--glass-shadow, 0 4px 24px rgba(0, 0, 0, 0.04));
     border-radius: 1rem;
-  }
-  :root:not(.dark) .glass-card {
-    background: rgba(248, 250, 252, 0.8);
-    border: 1px solid rgba(0, 0, 0, 0.06);
-    backdrop-filter: blur(16px);
-  }
-  .dark .glass-card {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(0, 212, 255, 0.12);
-    backdrop-filter: blur(16px);
   }
   .glass-card-hover {
     transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
@@ -197,6 +199,26 @@
     border-color: rgba(8, 145, 178, 0.3);
     box-shadow: 0 8px 32px rgba(8, 145, 178, 0.1);
   }
+
+  /* ===== Glow Border card ===== */
+  .glass-card-glow {
+    position: relative;
+  }
+  .glass-card-glow::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, var(--primary), rgba(139, 92, 246, 0.5), transparent);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  /* ===== Stable same for reduced motion ===== */
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
       animation-duration: 0.01ms !important;
@@ -212,6 +234,7 @@
     .hero-animate-1, .hero-animate-2, .hero-animate-3, .hero-animate-4 { animation: none; }
     .tab-panel-enter { animation: none; }
   }
+
   .glow-text {
     text-shadow: 0 0 10px hsl(var(--primary) / 0.5);
   }
@@ -265,29 +288,22 @@
   to { opacity: 1; }
 }
 
-/* Focus visible global styles */
+/* Focus visible */
 @layer base {
   :focus-visible {
     outline: 2px solid var(--ring);
     outline-offset: 2px;
-    /* box-shadow fallback for overflow-hidden parents that clip outline */
     box-shadow: 0 0 0 2px var(--ring);
   }
 }
 
-/* Star rating keyboard focus */
 .star-rating-btn:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
   border-radius: 2px;
 }
 
-/* Light mode subtle gradient */
-:root:not(.dark) body {
-  background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
-}
-
-/* Prose dark mode overrides using project design tokens */
+/* Prose */
 .prose {
   --tw-prose-body: var(--foreground);
   --tw-prose-headings: var(--foreground);
@@ -297,7 +313,7 @@
   --tw-prose-pre-bg: var(--muted);
 }
 
-/* Print styles */
+/* Print */
 @media print {
   .glass-card, .glass-card-hover {
     background: white !important;
@@ -308,10 +324,7 @@
   header, footer, .fixed, [data-no-print] {
     display: none !important;
   }
-  body {
-    background: white !important;
-    color: black !important;
-  }
+  body { background: white !important; color: black !important; }
   a { text-decoration: underline; }
 }
 
@@ -325,51 +338,31 @@
 .hero-animate-3 { animation: heroSlideUp 0.6s ease-out 0.4s both; }
 .hero-animate-4 { animation: heroSlideUp 0.6s ease-out 0.55s both; }
 
-/* Marquee scroll animation */
+/* Marquee */
 @keyframes marquee {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
-.marquee-animate {
-  animation: marquee 90s linear infinite;
-}
-.marquee-animate-reverse {
-  animation: marquee 110s linear infinite reverse;
-}
+.marquee-animate { animation: marquee 90s linear infinite; }
+.marquee-animate-reverse { animation: marquee 110s linear infinite reverse; }
 
-/* Scroll-in animation */
+/* Scroll-in */
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
-.scroll-in {
-  opacity: 0;
-}
-.scroll-in.visible {
-  animation: fadeInUp 0.6s ease-out both;
-}
+.scroll-in { opacity: 0; }
+.scroll-in.visible { animation: fadeInUp 0.6s ease-out both; }
 
 /* Tab crossfade */
 @keyframes tabFadeIn {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
-.tab-panel-enter {
-  animation: tabFadeIn 0.25s ease-out;
-}
+.tab-panel-enter { animation: tabFadeIn 0.25s ease-out; }
 
-/* Dark mode scrollbar styling */
-.dark ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-.dark ::-webkit-scrollbar-track {
-  background: transparent;
-}
-.dark ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
-}
-.dark ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
+/* Dark mode scrollbar */
+.dark ::-webkit-scrollbar { width: 8px; height: 8px; }
+.dark ::-webkit-scrollbar-track { background: transparent; }
+.dark ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 4px; }
+.dark ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
