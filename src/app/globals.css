@@ -162,6 +162,50 @@
   }
 }
 
+/* ===== GLOBAL MOUSE TRACKING ===== */
+:root {
+  --mouse-x: 0.5;
+  --mouse-y: 0.5;
+}
+
+/* Parallax grid — moves opposite cursor */
+.tech-grid {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -9;
+  background-image:
+    linear-gradient(rgba(128,128,128,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(128,128,128,0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  transition: transform 0.1s ease-out;
+  transform: translate(
+    calc((var(--mouse-x, 0.5) - 0.5) * 8px),
+    calc((var(--mouse-y, 0.5) - 0.5) * 8px)
+  );
+}
+.dark .tech-grid {
+  opacity: 1;
+}
+:root:not(.dark) .tech-grid {
+  opacity: 0.4;
+}
+
+/* Full-screen spotlight — follows cursor */
+.global-spotlight {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -8;
+  background: radial-gradient(
+    800px circle at
+    calc(var(--mouse-x, 0.5) * 100%)
+    calc(var(--mouse-y, 0.5) * 100%),
+    var(--spotlight-color),
+    transparent 50%
+  );
+}
+
 /* ===== SVG NOISE OVERLAY ===== */
 /* Physical grain texture via SVG feTurbulence, layered above the ambient glow */
 .noise-overlay {
