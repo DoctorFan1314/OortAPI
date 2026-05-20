@@ -9,13 +9,21 @@ export function MockTerminal() {
   const [output, setOutput] = useState("");
   const [usage, setUsage] = useState<{ prompt_tokens: number; completion_tokens: number; total_tokens: number } | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
+  const idxRef = useRef(0);
+  const linesRef = useRef<string[]>([]);
   const snippet = CODE_SNIPPETS[tab];
+
+  const stopStream = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    setRunning(false);
+  }, []);
 
   const handleRun = useCallback(() => {
     if (running) {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-      setRunning(false);
+      stopStream();
       return;
     }
 
@@ -23,22 +31,24 @@ export function MockTerminal() {
     setOutput("");
     setUsage(null);
 
-    const lines = snippet.response.split("\n");
-    let idx = 0;
+    idxRef.current = 0;
+    linesRef.current = snippet.response.split("\n");
 
     intervalRef.current = setInterval(() => {
+      const idx = idxRef.current;
+      const lines = linesRef.current;
+
       if (idx < lines.length) {
         setOutput(prev => prev + (prev ? "\n" : "") + lines[idx]);
-        idx++;
+        idxRef.current = idx + 1;
       } else {
         if (intervalRef.current) clearInterval(intervalRef.current);
-        setRunning(false);
-        // Show final token usage
-        setUsage(snippet.usage);
         intervalRef.current = null;
+        setRunning(false);
+        setUsage(snippet.usage);
       }
     }, 80);
-  }, [running, snippet]);
+  }, [running, snippet, stopStream]);
 
   return (
     <div className="rounded-xl overflow-hidden border border-border shadow-2xl bg-zinc-950 dark:bg-zinc-950">
@@ -57,7 +67,7 @@ export function MockTerminal() {
         {(["curl", "python", "node"] as const).map(lang => (
           <button
             key={lang}
-            onClick={() => { if (!running) setTab(lang); }}
+            onClick={() => { if (!running) { setTab(lang); } }}
             className={`px-4 py-2 text-xs font-mono transition-colors ${
               tab === lang
                 ? "text-white border-b-2 border-primary bg-zinc-800/50"
@@ -72,19 +82,16 @@ export function MockTerminal() {
       {/* Content area */}
       <div className="relative">
         {!running && !output ? (
-          /* Code display */
           <pre className="p-4 text-xs font-mono text-zinc-300 leading-relaxed overflow-x-auto max-h-[360px] scrollbar-hide">
             {snippet.code}
           </pre>
         ) : (
-          /* Streaming output */
           <pre className="p-4 text-xs font-mono text-emerald-400 leading-relaxed overflow-x-auto max-h-[360px] scrollbar-hide whitespace-pre-wrap">
             {output}
             {running && <span className="terminal-cursor" />}
           </pre>
         )}
 
-        {/* Token usage footer */}
         {usage && (
           <div className="border-t border-zinc-800 px-4 py-2 flex items-center gap-4 text-[10px] font-mono text-zinc-500 bg-zinc-900/50">
             <span>prompt: <span className="text-zinc-300">{usage.prompt_tokens}</span></span>
@@ -93,7 +100,6 @@ export function MockTerminal() {
           </div>
         )}
 
-        {/* Run / Stop button */}
         <button
           onClick={handleRun}
           className={`absolute bottom-3 right-3 px-3 py-1.5 rounded-lg text-[11px] font-mono font-medium transition-all ${

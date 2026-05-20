@@ -77,10 +77,10 @@ export function Features({ lang = "zh" }: { lang?: "zh" | "en" }) {
           <h2 className="text-3xl font-bold mb-3">
             {lang === "zh" ? "核心功能" : "Core Features"}
           </h2>
-          <p className="text-muted-foreground max-w-xl mx-auto text-sm">
+          <p className="text-muted-foreground max-w-xl mx-auto text-base">
             {lang === "zh"
-              ? "为 AI 应用提供统一的基础设施"
-              : "Unified infrastructure for AI applications"}
+              ? "为 AI 应用提供统一的基础设施，让开发者专注于业务逻辑"
+              : "Unified infrastructure for AI applications — focus on your business logic"}
           </p>
         </div>
 
