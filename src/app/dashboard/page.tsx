@@ -4,6 +4,7 @@ import { useI18n } from "@/contexts/i18n-context";
 import { useAuth } from "@/contexts/auth-context";
 import { StatsCards } from "@/components/dashboard/stats-cards";
 import { ModelAnalytics } from "@/components/dashboard/model-analytics";
+import { ActivityFeed } from "@/components/dashboard/activity-feed";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Code, Key, CreditCard, ArrowRight, Sparkles, Copy, Check, AlertTriangle, RefreshCw } from "lucide-react";
@@ -211,8 +212,14 @@ export default function DashboardPage() {
         </Card>
       )}
 
-      <StatsCards lang={lang} />
-      <ModelAnalytics />
+      <div className="flex flex-col lg:flex-row gap-6">
+        <div className="flex-1 min-w-0 space-y-6">
+          <StatsCards lang={lang} />
+          <ModelAnalytics />
+        </div>
+        <div className="w-full lg:w-80 shrink-0">
+          <div className="lg:sticky lg:top-20 space-y-4">
+            <ActivityFeed lang={lang} />
 
       {baseUrl && (
       <Card className="glass-card">
@@ -249,6 +256,9 @@ export default function DashboardPage() {
         </CardContent>
       </Card>
       )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

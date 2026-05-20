@@ -186,49 +186,65 @@ export function ModelAnalytics() {
     return timeSource.slots.map(s => s.slice(5)); // "01-15"
   }, [timeSource.slots, timeMode]);
 
-  // ======== Stacked Bar Chart (Tokens) ========
-  const stackedBarOption = useMemo(() => {
+  // ECharts shared dark-aware config
+  const chartTheme = useMemo(() => ({
+    backgroundColor: "transparent",
+    textStyle: { color: "var(--muted-foreground, #8b949e)" },
+  }), []);
+
+  // ======== Stacked Area Chart (Tokens) ========
+  const stackedAreaOption = useMemo(() => {
     const { slots, byModelTokens, byModelBreakdown } = timeSource;
     const series = models.map(model => ({
       name: model,
-      type: "bar" as const,
+      type: "line" as const,
       stack: "total",
+      smooth: true,
+      showSymbol: false,
       emphasis: { focus: "series" as const },
       itemStyle: { color: colorMap[model] },
+      areaStyle: { color: colorMap[model] + "60" },
+      lineStyle: { width: 0 },
       data: slots.map(slot => byModelTokens[model]?.[slot] || 0),
     }));
     const fmt = (n: number) => n.toLocaleString();
     return {
+      backgroundColor: "transparent",
       tooltip: {
         trigger: "axis" as const,
-        axisPointer: { type: "shadow" as const },
-        formatter: (params: { seriesName: string; dataIndex: number }[]) => {
-          const slot = slots[params[0]?.dataIndex ?? 0];
-          if (!slot) return "";
-          let html = `<div style="font-size:12px;font-weight:600;margin-bottom:4px;white-space:nowrap">${slot}</div>`;
+        axisPointer: {
+          type: "cross" as const,
+          crossStyle: { color: "var(--muted-foreground)" },
+          lineStyle: { type: "dashed" as const, color: "rgba(128,128,128,0.15)", width: 1 },
+          label: { backgroundColor: "var(--card)", color: "var(--foreground)", fontSize: 10 },
+        },
+        formatter: (params: { seriesName: string; dataIndex: number; axisValue: string }[]) => {
+          const slot = params[0]?.axisValue || slots[params[0]?.dataIndex ?? 0] || "";
+          let html = `<div style="font-size:12px;font-weight:600;margin-bottom:4px;white-space:nowrap;color:var(--foreground)">${slot}</div>`;
           for (const p of params) {
             const val = byModelTokens[p.seriesName]?.[slot] || 0;
             const color = (colorMap as Record<string, string>)[p.seriesName] || "#888";
-            html += `<div style="font-size:12px;font-weight:500;margin-top:3px;white-space:nowrap"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${color};margin-right:4px"></span> ${p.seriesName}: ${fmt(val)} tokens</div>`;
+            html += `<div style="font-size:11px;font-weight:500;margin-top:2px;white-space:nowrap;color:var(--foreground)"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};margin-right:6px"></span> ${p.seriesName}: <span style="font-family:var(--font-geist-mono,monospace)">${fmt(val)}</span></div>`;
             const brk = byModelBreakdown[p.seriesName]?.[slot];
             if (brk) {
-              if (brk.inNoncached > 0) html += `<div style="font-size:11px;padding-left:16px;color:#888;white-space:nowrap">${lang === "zh" ? "输入(未命中缓存)" : "Input(non-cached)"}: ${fmt(brk.inNoncached)}</div>`;
-              if (brk.inCache > 0) html += `<div style="font-size:11px;padding-left:16px;color:#888;white-space:nowrap">${lang === "zh" ? "输入(命中缓存)" : "Input(cache hit)"}: ${fmt(brk.inCache)}</div>`;
-              if (brk.out > 0) html += `<div style="font-size:11px;padding-left:16px;color:#888;white-space:nowrap">${lang === "zh" ? "输出" : "Output"}: ${fmt(brk.out)}</div>`;
+              if (brk.inNoncached > 0) html += `<div style="font-size:10px;padding-left:18px;color:var(--muted-foreground);white-space:nowrap">↳ ${lang === "zh" ? "输入(未命中缓存)" : "Input(non-cached)"}: <span style="font-family:var(--font-geist-mono,monospace)">${fmt(brk.inNoncached)}</span></div>`;
+              if (brk.inCache > 0) html += `<div style="font-size:10px;padding-left:18px;color:var(--muted-foreground);white-space:nowrap">↳ ${lang === "zh" ? "输入(命中缓存)" : "Input(cache hit)"}: <span style="font-family:var(--font-geist-mono,monospace)">${fmt(brk.inCache)}</span></div>`;
+              if (brk.out > 0) html += `<div style="font-size:10px;padding-left:18px;color:var(--muted-foreground);white-space:nowrap">↳ ${lang === "zh" ? "输出" : "Output"}: <span style="font-family:var(--font-geist-mono,monospace)">${fmt(brk.out)}</span></div>`;
             }
           }
           return html;
         },
-        extraCssText: "max-width:800px;white-space:nowrap;overflow:visible",
+        extraCssText: "max-width:800px;white-space:nowrap;overflow:visible;border:1px solid var(--border);border-radius:8px;background:var(--card);backdrop-filter:blur(12px)",
       },
-      legend: { type: "scroll" as const, bottom: 0, textStyle: { fontSize: 11 } },
-      grid: { left: 70, right: 20, top: 20, bottom: 60 },
-      xAxis: { type: "category" as const, data: xLabels, axisLabel: { fontSize: 11 } },
+      legend: { type: "scroll" as const, bottom: 0, textStyle: { fontSize: 11, color: "var(--muted-foreground)" }, pageTextStyle: { fontSize: 11, color: "var(--muted-foreground)" } },
+      grid: { left: 70, right: 24, top: 20, bottom: 56 },
+      xAxis: { type: "category" as const, data: xLabels, axisLabel: { fontSize: 11, color: "var(--muted-foreground)" }, axisLine: { show: false }, axisTick: { show: false }, splitLine: { show: false } },
       yAxis: {
         type: "value" as const,
         name: t.yAxisUnit || undefined,
-        nameTextStyle: { fontSize: 11, color: "hsl(var(--muted-foreground))" },
-        axisLabel: { fontSize: 11 },
+        nameTextStyle: { fontSize: 10, color: "var(--muted-foreground)" },
+        axisLabel: { fontSize: 10, color: "var(--muted-foreground)" },
+        splitLine: { lineStyle: { color: "rgba(128,128,128,0.06)", type: "dashed" as const } },
       },
       series,
     };
@@ -247,16 +263,12 @@ export function ModelAnalytics() {
       data: slots.map(slot => byModelCalls[model]?.[slot] || 0),
     }));
     return {
-      tooltip: { trigger: "axis" as const },
-      legend: { type: "scroll" as const, bottom: 0, textStyle: { fontSize: 11 } },
-      grid: { left: 60, right: 20, top: 20, bottom: 60 },
-      xAxis: { type: "category" as const, data: xLabels, axisLabel: { fontSize: 11 } },
-      yAxis: {
-        type: "value" as const,
-        name: lang === "zh" ? "次" : "",
-        nameTextStyle: { fontSize: 11, color: "hsl(var(--muted-foreground))" },
-        axisLabel: { fontSize: 11 },
-      },
+      backgroundColor: "transparent",
+      tooltip: { trigger: "axis" as const, extraCssText: "border:1px solid var(--border);border-radius:8px;background:var(--card);backdrop-filter:blur(12px)" },
+      legend: { type: "scroll" as const, bottom: 0, textStyle: { fontSize: 11, color: "var(--muted-foreground)" }, pageTextStyle: { fontSize: 11, color: "var(--muted-foreground)" } },
+      grid: { left: 60, right: 20, top: 20, bottom: 56 },
+      xAxis: { type: "category" as const, data: xLabels, axisLabel: { fontSize: 11, color: "var(--muted-foreground)" }, axisLine: { show: false }, axisTick: { show: false } },
+      yAxis: { type: "value" as const, name: lang === "zh" ? "次" : "", nameTextStyle: { fontSize: 10, color: "var(--muted-foreground)" }, axisLabel: { fontSize: 10, color: "var(--muted-foreground)" }, splitLine: { lineStyle: { color: "rgba(128,128,128,0.06)", type: "dashed" as const } } },
       series,
     };
   }, [timeSource, models, colorMap, xLabels, lang]);
@@ -266,16 +278,17 @@ export function ModelAnalytics() {
     const costData = data.daily_trend.map(d => +(d.cost * exchangeRate).toFixed(4));
     const callsData = data.daily_trend.map(d => d.calls);
     return {
-      tooltip: { trigger: "axis" as const },
-      legend: { data: [lang === "zh" ? "费用" : "Cost", lang === "zh" ? "调用" : "Calls"], bottom: 0, textStyle: { fontSize: 11 } },
-      grid: { left: 60, right: 20, top: 10, bottom: 40 },
-      xAxis: { type: "category" as const, data: dates, axisLabel: { fontSize: 11 } },
+      backgroundColor: "transparent",
+      tooltip: { trigger: "axis" as const, extraCssText: "border:1px solid var(--border);border-radius:8px;background:var(--card);backdrop-filter:blur(12px)" },
+      legend: { data: [lang === "zh" ? "费用" : "Cost", lang === "zh" ? "调用" : "Calls"], bottom: 0, textStyle: { fontSize: 11, color: "var(--muted-foreground)" } },
+      grid: { left: 60, right: 60, top: 10, bottom: 40 },
+      xAxis: { type: "category" as const, data: dates, axisLabel: { fontSize: 11, color: "var(--muted-foreground)" }, axisLine: { show: false }, axisTick: { show: false } },
       yAxis: [
-        { type: "value" as const, name: symbol, axisLabel: { fontSize: 11 } },
-        { type: "value" as const, name: lang === "zh" ? "次数" : "Calls", axisLabel: { fontSize: 11 } },
+        { type: "value" as const, name: symbol, axisLabel: { fontSize: 10, color: "var(--muted-foreground)" }, splitLine: { lineStyle: { color: "rgba(128,128,128,0.06)", type: "dashed" as const } } },
+        { type: "value" as const, name: lang === "zh" ? "次数" : "Calls", axisLabel: { fontSize: 10, color: "var(--muted-foreground)" }, splitLine: { show: false } },
       ],
       series: [
-        { name: lang === "zh" ? "费用" : "Cost", type: "bar", data: costData, itemStyle: { color: "#8b5cf6", borderRadius: [4, 4, 0, 0] }, barMaxWidth: 24 },
+        { name: lang === "zh" ? "费用" : "Cost", type: "bar", data: costData, itemStyle: { color: "#8b5cf6", borderRadius: [4, 4, 0, 0] }, barMaxWidth: 20 },
         { name: lang === "zh" ? "调用" : "Calls", type: "line", yAxisIndex: 1, data: callsData, smooth: true, lineStyle: { color: "#22c55e", width: 2 }, itemStyle: { color: "#22c55e" } },
       ],
     };
@@ -436,11 +449,11 @@ export function ModelAnalytics() {
         <Card className="glass-card lg:col-span-2">
           <CardHeader className="pb-2">
             <CardTitle className="text-base flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />{t.modelConsumption}
+              <BarChart3 className="h-4 w-4" />{t.modelConsumption} <span className="text-xs text-muted-foreground font-normal">(stacked area — tokens per model)</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ReactECharts option={stackedBarOption} style={{ height: 360 }} opts={{ renderer: "canvas" }} notMerge />
+            <ReactECharts option={stackedAreaOption} style={{ height: 360 }} opts={{ renderer: "canvas" }} notMerge />
           </CardContent>
         </Card>
         <Card className="glass-card">
