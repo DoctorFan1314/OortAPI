@@ -330,7 +330,10 @@
   to { transform: translateX(-50%); }
 }
 .marquee-animate {
-  animation: marquee 40s linear infinite;
+  animation: marquee 50s linear infinite;
+}
+.marquee-animate-reverse {
+  animation: marquee 60s linear infinite reverse;
 }
 
 /* Scroll-in animation */

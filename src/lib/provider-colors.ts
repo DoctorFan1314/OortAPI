@@ -27,6 +27,11 @@ export function getModelColor(modelName: string) {
   return COLOR_MAP.find(c => c.match(modelName)) || DEFAULT_COLOR;
 }
 
+/** Returns true if no keyword match — caller should assign a random color */
+export function isDefaultColor(color: { text: string }) {
+  return color.text === DEFAULT_COLOR.text;
+}
+
 /** Format provider name nicely: "openai" → "OpenAI", "deepseek" → "DeepSeek" */
 export function formatProviderName(name: string): string {
   const SPECIAL: Record<string, string> = {

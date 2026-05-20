@@ -24,7 +24,7 @@ export function Features({ lang = "zh" }: { lang?: "zh" | "en" }) {
   const features = lang === "zh" ? FEATURES_ZH : FEATURES_EN;
 
   return (
-    <section className="py-20 px-4">
+    <section className="py-16 px-4">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold mb-4">

@@ -6,7 +6,7 @@ import { Sparkles, Coins, Route, ArrowRight } from "lucide-react";
 
 export function TokenPlanSummary({ lang = "zh" }: { lang?: "zh" | "en" }) {
   return (
-    <section className="py-20 px-4 border-t border-border/30">
+    <section className="py-16 px-4">
       <div className="max-w-5xl mx-auto text-center">
         <h2 className="text-3xl font-bold mb-4">
           {lang === "zh" ? "Token Plan 订阅方案" : "Token Plan Subscriptions"}

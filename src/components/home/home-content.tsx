@@ -18,6 +18,12 @@ function ScrollSection({ children, className = "" }: { children: React.ReactNode
   );
 }
 
+function GradientDivider() {
+  return (
+    <div className="h-12 bg-gradient-to-b from-background via-muted/[0.03] to-background pointer-events-none select-none" aria-hidden="true" />
+  );
+}
+
 export function HomeContent() {
   const { lang } = useI18n();
 
@@ -25,9 +31,13 @@ export function HomeContent() {
     <>
       <Hero />
       <ScrollSection><Features lang={lang} /></ScrollSection>
+      <GradientDivider />
       <ScrollSection><ModelWall lang={lang} /></ScrollSection>
+      <GradientDivider />
       <ScrollSection><WhyOortapi lang={lang} /></ScrollSection>
+      <GradientDivider />
       <ScrollSection><TokenPlanSummary lang={lang} /></ScrollSection>
+      <GradientDivider />
       <ScrollSection><CTASection lang={lang} /></ScrollSection>
     </>
   );

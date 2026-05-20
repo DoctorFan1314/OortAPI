@@ -6,7 +6,7 @@ import { Zap, FileText, ArrowRight } from "lucide-react";
 
 export function CTASection({ lang = "zh" }: { lang?: "zh" | "en" }) {
   return (
-    <section className="py-24 px-4 relative overflow-hidden">
+    <section className="py-20 px-4 relative overflow-hidden">
       {/* Background gradient — uses CSS vars for dark/light mode */}
       <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent pointer-events-none" aria-hidden="true" />
       <div className="absolute top-1/2 right-0 w-96 h-96 bg-primary/10 rounded-full blur-[100px] pointer-events-none" aria-hidden="true" />
