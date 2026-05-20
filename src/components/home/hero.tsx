@@ -2,13 +2,55 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Zap, ArrowRight, Terminal, Shield, Gauge, Globe, ChevronDown } from "lucide-react";
+import { Zap, ArrowRight, Terminal, Shield, Gauge, Globe, ChevronDown, Activity, CheckCircle, Clock } from "lucide-react";
 import { useI18n } from "@/contexts/i18n-context";
 import { useAuth } from "@/contexts/auth-context";
+import { useState, useEffect, useRef } from "react";
+import useSWR from "swr";
+import { dashboardSWRConfig } from "@/lib/swr-fetcher";
+
+interface StatsData {
+  totalCalls: number;
+  totalModels: number;
+  uptime: string;
+  avgLatency: string;
+}
+
+function useCountUp(target: number, duration = 1500): number {
+  const [value, setValue] = useState(0);
+  const started = useRef(false);
+
+  useEffect(() => {
+    if (started.current || target === 0) return;
+    started.current = true;
+    const startTime = Date.now();
+    const tick = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // Ease-out cubic
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setValue(Math.round(target * eased));
+      if (progress < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }, [target, duration]);
+
+  return value;
+}
+
+function formatCompact(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
+  return String(n);
+}
 
 export function Hero() {
   const { lang } = useI18n();
   const { user } = useAuth();
+  const { data: stats } = useSWR<StatsData>("/api/stats", { ...dashboardSWRConfig, refreshInterval: 60000 });
+
+  const calls = useCountUp(stats?.totalCalls || 0);
+  const models = useCountUp(stats?.totalModels || 0);
 
   return (
     <section id="hero-section" aria-labelledby="hero-heading" className="relative overflow-hidden">
@@ -59,23 +101,46 @@ export function Hero() {
               </Button>
             </Link>
           </div>
-          {/* Trust stats */}
-          <ul className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-muted-foreground/60 hero-animate-4" aria-label="Platform stats">
-            <li className="flex items-center gap-2">
-              <Globe className="h-4 w-4 text-primary/60" />
-              {lang === "zh" ? "30+ AI 模型" : "30+ AI Models"}
-            </li>
-            <li className="hidden sm:block text-muted-foreground/20" aria-hidden="true">·</li>
-            <li className="flex items-center gap-2">
-              <Gauge className="h-4 w-4 text-primary/60" />
-              {lang === "zh" ? "< 200ms 延迟" : "< 200ms Latency"}
-            </li>
-            <li className="hidden sm:block text-muted-foreground/20" aria-hidden="true">·</li>
-            <li className="flex items-center gap-2">
-              <Shield className="h-4 w-4 text-primary/60" />
-              {lang === "zh" ? "99.9% 可用率" : "99.9% Uptime"}
-            </li>
-          </ul>
+
+          {/* Live platform stats — real-time with count-up animation */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto hero-animate-4">
+            <div className="text-center">
+              <Activity className="h-5 w-5 text-primary mx-auto mb-2" />
+              <div className="text-2xl sm:text-3xl font-bold font-mono text-foreground">
+                {formatCompact(calls)}+
+              </div>
+              <div className="text-xs text-muted-foreground mt-1">
+                {lang === "zh" ? "总调用量" : "Total Calls"}
+              </div>
+            </div>
+            <div className="text-center">
+              <Globe className="h-5 w-5 text-primary mx-auto mb-2" />
+              <div className="text-2xl sm:text-3xl font-bold font-mono text-foreground">
+                {formatCompact(models)}+
+              </div>
+              <div className="text-xs text-muted-foreground mt-1">
+                {lang === "zh" ? "在线模型" : "Available Models"}
+              </div>
+            </div>
+            <div className="text-center">
+              <Clock className="h-5 w-5 text-primary mx-auto mb-2" />
+              <div className="text-2xl sm:text-3xl font-bold font-mono text-foreground">
+                {stats?.avgLatency || "<200ms"}
+              </div>
+              <div className="text-xs text-muted-foreground mt-1">
+                {lang === "zh" ? "平均延迟" : "Avg Latency"}
+              </div>
+            </div>
+            <div className="text-center">
+              <Shield className="h-5 w-5 text-primary mx-auto mb-2" />
+              <div className="text-2xl sm:text-3xl font-bold font-mono text-foreground">
+                {stats?.uptime || "99.9%"}
+              </div>
+              <div className="text-xs text-muted-foreground mt-1">
+                {lang === "zh" ? "可用率" : "Uptime"}
+              </div>
+            </div>
+          </div>
 
           {/* Scroll indicator */}
           <div className="mt-12 animate-bounce" aria-hidden="true">

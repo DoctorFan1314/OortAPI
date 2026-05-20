@@ -324,6 +324,27 @@
 .hero-animate-3 { animation: heroSlideUp 0.6s ease-out 0.4s both; }
 .hero-animate-4 { animation: heroSlideUp 0.6s ease-out 0.55s both; }
 
+/* Marquee scroll animation */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee-animate {
+  animation: marquee 40s linear infinite;
+}
+
+/* Scroll-in animation */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.scroll-in {
+  opacity: 0;
+}
+.scroll-in.visible {
+  animation: fadeInUp 0.6s ease-out both;
+}
+
 /* Tab crossfade */
 @keyframes tabFadeIn {
   from { opacity: 0; transform: translateY(8px); }

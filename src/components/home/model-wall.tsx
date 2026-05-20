@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { getProviderColor } from "@/lib/provider-colors";
 
 interface ModelInfo {
   id: string;
@@ -10,23 +11,25 @@ interface ModelInfo {
 
 export function ModelWall({ lang = "zh" }: { lang?: "zh" | "en" }) {
   const [providers, setProviders] = useState<{ name: string; models: string[] }[]>([]);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetch("/api/v1/models")
       .then((r) => r.json())
       .then((data) => {
         const models: ModelInfo[] = data.data || [];
-        // Group models by provider
         const grouped: Record<string, string[]> = {};
         for (const m of models) {
           const provider = m.owned_by || "unknown";
           if (!grouped[provider]) grouped[provider] = [];
           const label = m.display_name || m.id;
-          if (!grouped[provider].includes(label)) grouped[provider].push(label);
+          if (!grouped[provider].includes(label) && grouped[provider].length < 4) {
+            grouped[provider].push(label);
+          }
         }
         const list = Object.entries(grouped).map(([name, modelList]) => ({
           name: name.charAt(0).toUpperCase() + name.slice(1),
-          models: modelList.slice(0, 4), // Show top 4 models per provider
+          models: modelList,
         }));
         if (list.length > 0) setProviders(list);
       })
@@ -34,6 +37,9 @@ export function ModelWall({ lang = "zh" }: { lang?: "zh" | "en" }) {
   }, []);
 
   if (providers.length === 0) return null;
+
+  // Duplicate providers for seamless marquee
+  const marqueeItems = [...providers, ...providers];
 
   return (
     <section className="py-20 px-4 bg-muted/30">
@@ -49,13 +55,30 @@ export function ModelWall({ lang = "zh" }: { lang?: "zh" | "en" }) {
             }
           </p>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          {providers.map((p) => (
-            <div key={p.name} className="glass-card p-4 rounded-xl text-center hover:border-primary/30 transition-colors">
-              <div className="text-lg font-bold mb-1">{p.name}</div>
-              <div className="text-xs text-muted-foreground truncate">{p.models.join(", ")}</div>
-            </div>
-          ))}
+
+        {/* Marquee scroll — pauses on hover */}
+        <div className="overflow-hidden" ref={scrollRef}>
+          <div
+            className="flex gap-4 marquee-animate hover:[animation-play-state:paused]"
+            style={{ width: "max-content" }}
+          >
+            {marqueeItems.map((p, i) => {
+              const c = getProviderColor(p.name);
+              return (
+                <div
+                  key={`${p.name}-${i}`}
+                  className="glass-card p-4 rounded-xl shrink-0 w-48 hover:border-primary/30 transition-colors"
+                >
+                  <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${c.text} ${c.bg} ${c.border} border mb-2`}>
+                    {p.name}
+                  </span>
+                  <div className="text-xs text-muted-foreground truncate mt-1">
+                    {p.models.join(", ")}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </section>
