@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { CopyButton } from "@/components/shared/copy-button";
 import { MarkdownRenderer } from "@/components/shared/markdown-renderer";
-import { Play, Send, Bot, User, Loader2, Square, Zap, Settings2, ChevronDown, Trash2 } from "lucide-react";
+import { Play, Send, Bot, User, Loader2, Square, Zap, Settings2, ChevronDown, Trash2, Download, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Model {
@@ -63,10 +63,12 @@ const LABELS = {
     maxTokens: "最大 Tokens (max_tokens)",
     topP: "Top P",
     clear: "清空对话",
+    export: "导出对话",
     copy: "复制",
     conversation: "对话历史",
     systemPrompt: "系统提示词",
     systemPromptPlaceholder: "可选：设置系统提示词（system message）",
+    refresh: "刷新",
   },
   en: {
     title: "API Playground",
@@ -90,10 +92,12 @@ const LABELS = {
     maxTokens: "Max Tokens",
     topP: "Top P",
     clear: "Clear Conversation",
+    export: "Export",
     copy: "Copy",
     conversation: "Conversation",
     systemPrompt: "System Prompt",
     systemPromptPlaceholder: "Optional: Set a system prompt",
+    refresh: "Refresh",
   },
 };
 
@@ -318,6 +322,42 @@ export default function PlaygroundPage() {
     }
   }, []);
 
+  const handleRefresh = useCallback(() => {
+    fetch("/api/v1/models")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (d?.data) setModels(d.data); })
+      .catch(() => {});
+    fetch("/api/dashboard/keys", { credentials: "include" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (d?.keys) setKeys(d.keys.filter((k: ApiKey) => k.enabled === 1)); })
+      .catch(() => {});
+  }, []);
+
+  const handleExport = useCallback(() => {
+    const lines: string[] = [];
+    lines.push(`# Playground Export — ${new Date().toLocaleString()}`);
+    lines.push("");
+    if (systemPrompt.trim()) {
+      lines.push("## System Prompt");
+      lines.push(systemPrompt.trim());
+      lines.push("");
+    }
+    for (const msg of chatHistory) {
+      lines.push(`### ${msg.role === "user" ? "User" : "Assistant"}`);
+      lines.push(msg.content);
+      lines.push("");
+    }
+    const blob = new Blob([lines.join("\n")], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `playground-${new Date().toISOString().slice(0, 10)}.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, [chatHistory, systemPrompt]);
+
   const handleClear = () => {
     setChatHistory([]);
     setResponse("");
@@ -345,7 +385,12 @@ export default function PlaygroundPage() {
         <CardContent className="p-6 space-y-4">
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm text-muted-foreground mb-1.5 block">{t.selectModel}</label>
+              <label className="text-sm text-muted-foreground mb-1.5 block flex items-center gap-2">
+                {t.selectModel}
+                <button onClick={handleRefresh} className="p-0.5 rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" aria-label={t.refresh}>
+                  <RefreshCw className="h-3 w-3" />
+                </button>
+              </label>
               <select
                 className="w-full h-9 px-3 rounded-md border border-input bg-background text-sm focus:border-primary focus:outline-none"
                 value={selectedModel}
@@ -362,7 +407,12 @@ export default function PlaygroundPage() {
               </select>
             </div>
             <div>
-              <label className="text-sm text-muted-foreground mb-1.5 block">{t.selectKey}</label>
+              <label className="text-sm text-muted-foreground mb-1.5 block flex items-center gap-2">
+                {t.selectKey}
+                <button onClick={handleRefresh} className="p-0.5 rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" aria-label={t.refresh}>
+                  <RefreshCw className="h-3 w-3" />
+                </button>
+              </label>
               <select
                 className="w-full h-9 px-3 rounded-md border border-input bg-background text-sm focus:border-primary focus:outline-none"
                 value={selectedKeyId ?? ""}
@@ -433,10 +483,16 @@ export default function PlaygroundPage() {
             {isSending && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
           </CardTitle>
           {chatHistory.length > 0 && (
-            <Button variant="outline" size="sm" onClick={handleClear} className="gap-1 text-xs h-7">
-              <Trash2 className="h-3.5 w-3.5" />
-              {t.clear}
-            </Button>
+            <div className="flex gap-1.5">
+              <Button variant="outline" size="sm" onClick={handleExport} className="gap-1 text-xs h-7">
+                <Download className="h-3.5 w-3.5" />
+                {t.export}
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleClear} className="gap-1 text-xs h-7">
+                <Trash2 className="h-3.5 w-3.5" />
+                {t.clear}
+              </Button>
+            </div>
           )}
         </CardHeader>
         <CardContent className="space-y-4">

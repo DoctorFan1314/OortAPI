@@ -7,6 +7,8 @@ import { cn } from "@/lib/utils";
 import { useI18n } from "@/contexts/i18n-context";
 import { useAuth } from "@/contexts/auth-context";
 import { LayoutDashboard, Key, BarChart3, Wallet, Radio, Settings, Shield, Users, Gift, Percent, Sparkles, ListChecks, ChevronDown, FileText, Webhook, Activity, Play } from "lucide-react";
+import useSWR from "swr";
+import { dashboardSWRConfig } from "@/lib/swr-fetcher";
 
 const NAV_ITEMS = [
   { href: "/dashboard", icon: LayoutDashboard, labelKey: "overview" as const },
@@ -50,6 +52,17 @@ export function DashboardSidebar() {
   const { user } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
 
+  // Fetch badge counts
+  const { data: keysData } = useSWR<{ keys: Array<{ enabled: number }> }>(
+    user ? "/api/dashboard/keys" : null, dashboardSWRConfig
+  );
+  const activeKeys = keysData?.keys?.filter(k => k.enabled === 1).length ?? 0;
+
+  const getBadge = (href: string): number | null => {
+    if (href === "/dashboard/keys" && activeKeys > 0) return activeKeys;
+    return null;
+  };
+
   const items = NAV_ITEMS.filter(item => !item.adminOnly || user?.role === "admin");
 
   return (
@@ -80,9 +93,14 @@ export function DashboardSidebar() {
               )}
             >
               <Icon className="h-4 w-4 shrink-0" />
-              <span>{LABELS[item.labelKey][lang]}</span>
+              <span className="flex-1">{LABELS[item.labelKey][lang]}</span>
+              {getBadge(item.href) !== null && (
+                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-mono font-medium min-w-[18px] text-center">
+                  {getBadge(item.href)}
+                </span>
+              )}
               {item.adminOnly && (
-                <Shield className="h-3 w-3 ml-auto text-yellow-500" />
+                <Shield className="h-3 w-3 text-yellow-500" />
               )}
             </Link>
           );

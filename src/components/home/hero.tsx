@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Zap, ArrowRight, Terminal, Shield, Gauge, Globe } from "lucide-react";
+import { Zap, ArrowRight, Terminal, Shield, Gauge, Globe, ChevronDown } from "lucide-react";
 import { useI18n } from "@/contexts/i18n-context";
 import { useAuth } from "@/contexts/auth-context";
 
@@ -76,6 +76,11 @@ export function Hero() {
               {lang === "zh" ? "99.9% 可用率" : "99.9% Uptime"}
             </li>
           </ul>
+
+          {/* Scroll indicator */}
+          <div className="mt-12 animate-bounce" aria-hidden="true">
+            <ChevronDown className="h-5 w-5 text-muted-foreground/30 mx-auto" />
+          </div>
         </div>
       </div>
     </section>

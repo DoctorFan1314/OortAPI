@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { DocsSidebar } from "@/components/docs/sidebar";
+import { EditThisPage } from "@/components/docs/edit-this-page";
+import { LastUpdated } from "@/components/docs/last-updated";
 
 export const metadata: Metadata = {
   title: "API Documentation — OortAPI",
@@ -13,6 +15,10 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
         <DocsSidebar />
         <main className="flex-1 min-w-0 max-w-5xl">
           {children}
+          <div className="mt-12 pt-6 border-t border-border flex items-center justify-between">
+            <EditThisPage />
+            <LastUpdated />
+          </div>
         </main>
       </div>
     </div>

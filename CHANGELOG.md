@@ -36,6 +36,16 @@ All notable changes to this project will be documented in this file.
 - **Proxy (Middleware)** — Added Next.js 16 proxy.ts for server-side route protection (dashboard/profile)
 - **Error retry limit** — Error page now limits retry to 3 attempts, then disables button
 
+### Phase 2 — Additional Enhancements
+- **Playground export** — Conversation export to Markdown file; refresh button for model/key lists
+- **Sidebar badges** — API Keys menu item shows active key count badge
+- **Budget fix** — Fixed double-fire budget exceeded notification in StrictMode
+- **404 page** — Dynamic content loading with fallback to hardcoded data
+- **Resources page** — Added search filter and live section counts
+- **Docs** — Added "Edit this page" link and "Last updated" date to documentation
+- **Homepage** — Integrated FeaturedSection (skills/prompts tabs) and Testimonials; new PricingSection with 3 tiers; scroll indicator on Hero
+- **Proxy fix** — Fixed cookie name mismatch (token → oortapi_token)
+
 ---
 
 ## [v3.3.4.14] — 2026-05-19

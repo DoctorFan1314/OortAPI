@@ -63,13 +63,16 @@ export default function SettingsPage() {
       .catch(() => {});
   }, [user]);
 
-  // Budget alert only when newly exceeded (not on every mount)
+  // Budget alert only when newly exceeded (not on every mount, guard against StrictMode double-fire)
   const prevExceeded = useRef(false);
+  const hasNotifiedRef = useRef(false);
   useEffect(() => {
     const isExceeded = budgetLimit > 0 && budgetPercent >= 100;
-    if (isExceeded && !prevExceeded.current) {
+    if (isExceeded && !prevExceeded.current && !hasNotifiedRef.current) {
       showToast(lang === "zh" ? "预算已超限！" : "Budget exceeded!", "error");
+      hasNotifiedRef.current = true;
     }
+    if (!isExceeded) hasNotifiedRef.current = false;
     prevExceeded.current = isExceeded;
   }, [budgetLimit, budgetPercent, lang]);
 
