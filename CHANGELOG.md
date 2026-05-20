@@ -6,6 +6,35 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [v3.3.4.16] — 2026-05-20
+
+### Visual Overhaul — Glassmorphism & Dark/Light Theme
+- **Glass card system** — All cards use semi-transparent bg + `backdrop-blur-xl`; `glass-card-glow` utility with gradient pseudo-border
+- **Card spotlight** — `useSpotlight` hook tracks cursor per-card; `--spotlight-x/y` CSS vars drive radial glow on hover
+- **Global background** — SVG `feTurbulence` grain noise overlay (2-2.5% opacity); ambient blue/purple radial glows; parallax grid lines (40px spacing, shift opposite cursor)
+- **Global mouse spotlight** — 800px radial gradient follows cursor across entire page
+- **Particles** — Reduced 50%, slower, star-like, theme-aware colors, no connection lines
+- **Macro typography** — `.label-upper` (10px uppercase tracking), `.font-mono-force` for API paths/keys
+- **Plan gradient fix** — Hardcoded light/dark hex values (CSS var cascading was lost during CSS refactor)
+- **Noise overlay** — `mix-blend-mode: overlay` with SVG filter for physical grain texture
+
+### Dashboard Analytics Overhaul
+- **Sparklines** — SVG area sparklines on stat cards (30-day cost, calls, RPM, TPM trends)
+- **Stacked area chart** — Replaced bar chart with smooth stacked area; per-model lines + 15% opacity fill; tooltip shows model breakdown with input/output split
+- **Dark-mode ECharts** — Transparent bg, resolved CSS vars via `getComputedStyle`, `useTheme` triggers re-render on theme toggle
+- **Pie chart** — Full-width layout, removed slice borders, foreground-colored labels
+- **Layout** — Left 2/3 charts + right 1/3 sticky activity timeline
+- **Activity feed** — Timeline layout with 4-line call detail (model/tokens, input split, cache rate badge, output/time); links to usage page
+
+### Bug Fixes & Polish
+- **Token plan gradients** — All table headers use theme gradient (not just popular)
+- **Section backgrounds** — Unified page-level gradient instead of per-section bg-muted
+- **CTA section** — Removed background box, blends into page
+- **Docs sidebar** — Changed from solid bg-background to glass card
+- **Grid layout** — 2x3 stat cards layout (was 1x6 too cramped)
+
+---
+
 ## [v3.3.4.15] — 2026-05-20
 
 ### Beautification & UX

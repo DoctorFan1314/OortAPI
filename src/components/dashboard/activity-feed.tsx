@@ -111,7 +111,7 @@ export function ActivityFeed({ lang = "zh" }: { lang?: "zh" | "en" }) {
                           ? "text-yellow-500 bg-yellow-500/10"
                           : "text-muted-foreground bg-muted"
                     }`}>
-                      {cacheRate}%
+                      {lang === "zh" ? "缓存命中率" : "cache hit"} {cacheRate}%
                     </span>
                   ) : <span />}
                 </div>
