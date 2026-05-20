@@ -206,7 +206,7 @@
   opacity: 1;
 }
 :root:not(.dark) .tech-grid {
-  opacity: 0.8;
+  opacity: 0.5;
 }
 
 /* Full-screen spotlight — follows cursor */
