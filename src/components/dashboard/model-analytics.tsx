@@ -232,19 +232,19 @@ export function ModelAnalytics() {
         formatter: (params: { seriesName: string; dataIndex: number }[]) => {
           const idx = params[0]?.dataIndex ?? 0;
           const slot = slots[idx] || "";
-          let html = `<div style="font-size:12px;font-weight:600;margin-bottom:4px;white-space:nowrap;color:var(--foreground)">${xLabels[idx] || slot}</div>`;
+          let html = `<div style="font-size:13px;font-weight:600;margin-bottom:6px;white-space:nowrap;color:var(--foreground)">${xLabels[idx] || slot}</div>`;
           let count = 0;
           for (const p of params) {
             const val = byModelTokens[p.seriesName]?.[slot] || 0;
             if (val <= 0) continue;
             count++;
             const color = (colorMap as Record<string, string>)[p.seriesName] || "#888";
-            html += `<div style="font-size:11px;font-weight:500;margin-top:2px;white-space:nowrap;color:var(--foreground)"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};margin-right:6px"></span> ${p.seriesName}: <span style="font-family:var(--font-geist-mono,monospace)">${fmt(val)}</span></div>`;
+            html += `<div style="font-size:12px;font-weight:500;margin-top:3px;white-space:nowrap;color:var(--foreground)"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};margin-right:6px"></span> ${p.seriesName}: <span style="font-family:var(--font-geist-mono,monospace)">${fmt(val)}</span></div>`;
             const brk = byModelBreakdown[p.seriesName]?.[slot];
             if (brk) {
-              if (brk.inNoncached > 0) html += `<div style="font-size:10px;padding-left:18px;color:var(--muted-foreground);white-space:nowrap">↳ ${lang === "zh" ? "输入(未命中缓存)" : "Input(non-cached)"}: <span style="font-family:var(--font-geist-mono,monospace)">${fmt(brk.inNoncached)}</span></div>`;
-              if (brk.inCache > 0) html += `<div style="font-size:10px;padding-left:18px;color:var(--muted-foreground);white-space:nowrap">↳ ${lang === "zh" ? "输入(命中缓存)" : "Input(cache hit)"}: <span style="font-family:var(--font-geist-mono,monospace)">${fmt(brk.inCache)}</span></div>`;
-              if (brk.out > 0) html += `<div style="font-size:10px;padding-left:18px;color:var(--muted-foreground);white-space:nowrap">↳ ${lang === "zh" ? "输出" : "Output"}: <span style="font-family:var(--font-geist-mono,monospace)">${fmt(brk.out)}</span></div>`;
+              if (brk.inNoncached > 0) html += `<div style="font-size:11px;padding-left:20px;color:var(--muted-foreground);white-space:nowrap">↳ ${lang === "zh" ? "输入(未命中缓存)" : "Input(non-cached)"}: <span style="font-family:var(--font-geist-mono,monospace)">${fmt(brk.inNoncached)}</span></div>`;
+              if (brk.inCache > 0) html += `<div style="font-size:11px;padding-left:20px;color:var(--muted-foreground);white-space:nowrap">↳ ${lang === "zh" ? "输入(命中缓存)" : "Input(cache hit)"}: <span style="font-family:var(--font-geist-mono,monospace)">${fmt(brk.inCache)}</span></div>`;
+              if (brk.out > 0) html += `<div style="font-size:11px;padding-left:20px;color:var(--muted-foreground);white-space:nowrap">↳ ${lang === "zh" ? "输出" : "Output"}: <span style="font-family:var(--font-geist-mono,monospace)">${fmt(brk.out)}</span></div>`;
             }
           }
           if (count === 0) html += `<div style="font-size:11px;color:var(--muted-foreground);white-space:nowrap">${lang === "zh" ? "无消耗" : "No consumption"}</div>`;
@@ -252,7 +252,7 @@ export function ModelAnalytics() {
         },
         extraCssText: "max-width:800px;white-space:nowrap;overflow:visible;border:1px solid var(--border);border-radius:8px;background:var(--card);backdrop-filter:blur(12px)",
       },
-      legend: { type: "scroll" as const, bottom: 0, textStyle: { fontSize: 11, color: mg }, pageTextStyle: { fontSize: 11, color: mg } },
+      legend: { type: "scroll" as const, bottom: 0, textStyle: { fontSize: 11, color: fg }, pageTextStyle: { fontSize: 10, color: mg } },
       grid: { left: 70, right: 24, top: 20, bottom: 56 },
       xAxis: { type: "category" as const, data: xLabels, axisLabel: { fontSize: 11, color: fg }, axisLine: { show: false }, axisTick: { show: false }, splitLine: { show: false } },
       yAxis: {
@@ -281,7 +281,7 @@ export function ModelAnalytics() {
     return {
       backgroundColor: "transparent",
       tooltip: { trigger: "axis" as const, extraCssText: "border:1px solid var(--border);border-radius:8px;background:var(--card);backdrop-filter:blur(12px)" },
-      legend: { type: "scroll" as const, bottom: 0, textStyle: { fontSize: 11, color: mg }, pageTextStyle: { fontSize: 11, color: mg } },
+      legend: { type: "scroll" as const, bottom: 0, textStyle: { fontSize: 11, color: fg }, pageTextStyle: { fontSize: 10, color: mg } },
       grid: { left: 60, right: 20, top: 20, bottom: 56 },
       xAxis: { type: "category" as const, data: xLabels, axisLabel: { fontSize: 11, color: fg }, axisLine: { show: false }, axisTick: { show: false } },
       yAxis: { type: "value" as const, name: lang === "zh" ? "次" : "", nameTextStyle: { fontSize: 10, color: mg }, axisLabel: { fontSize: 10, color: mg }, splitLine: { lineStyle: { color: "rgba(128,128,128,0.06)", type: "dashed" as const } } },
@@ -296,7 +296,7 @@ export function ModelAnalytics() {
     return {
       backgroundColor: "transparent",
       tooltip: { trigger: "axis" as const, extraCssText: "border:1px solid var(--border);border-radius:8px;background:var(--card);backdrop-filter:blur(12px)" },
-      legend: { data: [lang === "zh" ? "费用" : "Cost", lang === "zh" ? "调用" : "Calls"], bottom: 0, textStyle: { fontSize: 11, color: mg } },
+      legend: { data: [lang === "zh" ? "费用" : "Cost", lang === "zh" ? "调用" : "Calls"], bottom: 0, textStyle: { fontSize: 11, color: fg } },
       grid: { left: 60, right: 60, top: 10, bottom: 40 },
       xAxis: { type: "category" as const, data: dates, axisLabel: { fontSize: 11, color: fg }, axisLine: { show: false }, axisTick: { show: false } },
       yAxis: [
@@ -340,12 +340,14 @@ export function ModelAnalytics() {
           formatter: "{b}\n{d}%",
           fontSize: 10,
           lineHeight: 14,
+          color: fg,
         },
         labelLine: {
           show: true,
           length: 12,
           length2: 8,
           smooth: true,
+          lineStyle: { color: mg },
         },
         emphasis: {
           label: { show: true, fontSize: 13, fontWeight: "bold" },
