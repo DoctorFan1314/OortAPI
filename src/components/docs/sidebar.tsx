@@ -176,7 +176,7 @@ export function DocsSidebar() {
       <aside className={cn(
         "w-64 shrink-0",
         mobileOpen
-          ? "fixed inset-y-0 left-0 z-50 bg-background border-r border-border p-4 overflow-y-auto lg:relative lg:inset-auto lg:z-auto lg:border-none"
+          ? "fixed inset-y-0 left-0 z-50 bg-card/80 backdrop-blur-xl border-r border-border p-4 overflow-y-auto lg:relative lg:inset-auto lg:z-auto lg:border-none"
           : "hidden lg:block lg:sticky lg:top-20 lg:h-[calc(100vh-5rem)] lg:overflow-y-auto"
       )}>
         {sidebarContent}

@@ -47,7 +47,7 @@ export default function DocsLandingPage() {
   return (
     <div className="min-h-screen">
       {/* Hero */}
-      <div className="border-b border-border bg-gradient-to-b from-background via-background to-muted/20">
+      <div>
         <div className="max-w-5xl mx-auto px-4 lg:px-0 py-12 text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium mb-6">
             <Zap className="h-3 w-3" />
