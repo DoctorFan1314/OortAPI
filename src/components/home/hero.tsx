@@ -54,8 +54,6 @@ export function Hero() {
 
   return (
     <section id="hero-section" aria-labelledby="hero-heading" className="relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-primary/8 via-primary/3 to-transparent pointer-events-none" aria-hidden="true" />
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-full max-w-[800px] h-[600px] bg-primary/10 rounded-full blur-[120px] pointer-events-none" aria-hidden="true" />
       <div className="relative mx-auto max-w-7xl px-4 py-20 lg:py-32 lg:px-8">
         <div className="text-center max-w-4xl mx-auto">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm mb-8 hero-animate-1">

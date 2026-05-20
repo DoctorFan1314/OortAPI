@@ -19,26 +19,31 @@ function ScrollSection({ children, className = "" }: { children: React.ReactNode
 }
 
 function GradientDivider() {
-  return (
-    <div className="h-12 bg-gradient-to-b from-background via-muted/[0.03] to-background pointer-events-none select-none" aria-hidden="true" />
-  );
+  return <div className="h-8 pointer-events-none select-none" aria-hidden="true" />;
 }
 
 export function HomeContent() {
   const { lang } = useI18n();
 
   return (
-    <>
-      <Hero />
-      <ScrollSection><Features lang={lang} /></ScrollSection>
-      <GradientDivider />
-      <ScrollSection><ModelWall lang={lang} /></ScrollSection>
-      <GradientDivider />
-      <ScrollSection><WhyOortapi lang={lang} /></ScrollSection>
-      <GradientDivider />
-      <ScrollSection><TokenPlanSummary lang={lang} /></ScrollSection>
-      <GradientDivider />
-      <ScrollSection><CTASection lang={lang} /></ScrollSection>
-    </>
+    <div className="relative">
+      {/* Persistent page-level gradient background matching Hero style */}
+      <div className="absolute inset-0 bg-gradient-to-b from-primary/[0.04] via-transparent to-transparent pointer-events-none" aria-hidden="true" />
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-full max-w-[1000px] h-[600px] bg-primary/[0.06] rounded-full blur-[150px] pointer-events-none" aria-hidden="true" />
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-primary/[0.03] rounded-full blur-[100px] pointer-events-none" aria-hidden="true" />
+
+      <div className="relative">
+        <Hero />
+        <ScrollSection><Features lang={lang} /></ScrollSection>
+        <GradientDivider />
+        <ScrollSection><ModelWall lang={lang} /></ScrollSection>
+        <GradientDivider />
+        <ScrollSection><WhyOortapi lang={lang} /></ScrollSection>
+        <GradientDivider />
+        <ScrollSection><TokenPlanSummary lang={lang} /></ScrollSection>
+        <GradientDivider />
+        <ScrollSection><CTASection lang={lang} /></ScrollSection>
+      </div>
+    </div>
   );
 }
