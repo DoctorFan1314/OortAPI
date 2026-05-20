@@ -6,6 +6,7 @@ import { useCurrency } from "@/contexts/currency-context";
 import { Wallet, TrendingDown, Activity, Coins, Gauge, Cpu } from "lucide-react";
 import { dashboardSWRConfig } from "@/lib/swr-fetcher";
 import { DeltaBadge } from "@/components/shared/delta-badge";
+import { Sparkline } from "@/components/shared/sparkline";
 
 interface StatsData {
   today: {
@@ -108,12 +109,17 @@ export function StatsCards({ lang = "zh" }: { lang?: "zh" | "en" }) {
   const callsDelta = stats.last_month?.calls ? ((stats.month.calls - stats.last_month.calls) / stats.last_month.calls * 100).toFixed(1) : null;
   const todayCostDelta = stats.yesterday?.cost && stats.today.cost ? ((stats.today.cost - stats.yesterday.cost) / stats.yesterday.cost * 100).toFixed(1) : null;
 
+  const sparkData = stats.daily_usage?.slice(-30) || [];
+  const dailyCosts = sparkData.map(d => d.cost);
+  const dailyCalls = sparkData.map(d => d.calls);
+  const dailyTokens = sparkData.map(d => d.tokens);
+
   const cards = [
-    { icon: Wallet, label: t.balance, value: formatPrice(stats.balance), color: "text-yellow-500", bgColor: "bg-yellow-500/10" },
-    { icon: TrendingDown, label: t.monthlyCost, value: formatPrice(stats.month?.cost || 0), color: "text-red-500", bgColor: "bg-red-500/10", delta: costDelta },
-    { icon: Activity, label: t.monthlyCalls, value: (stats.month?.calls || 0).toLocaleString(), color: "text-blue-500", bgColor: "bg-blue-500/10", delta: callsDelta },
-    { icon: Gauge, label: t.rpm, value: avgRPM, color: "text-purple-500", bgColor: "bg-purple-500/10" },
-    { icon: Cpu, label: t.tpm, value: formatTokens(avgTPM), color: "text-cyan-500", bgColor: "bg-cyan-500/10" },
+    { icon: Wallet, label: t.balance, value: formatPrice(stats.balance), color: "text-yellow-500", bgColor: "bg-yellow-500/10", hex: "#eab308" },
+    { icon: TrendingDown, label: t.monthlyCost, value: formatPrice(stats.month?.cost || 0), color: "text-red-500", bgColor: "bg-red-500/10", delta: costDelta, hex: "#ef4444", sparkData: dailyCosts },
+    { icon: Activity, label: t.monthlyCalls, value: (stats.month?.calls || 0).toLocaleString(), color: "text-blue-500", bgColor: "bg-blue-500/10", delta: callsDelta, hex: "#3b82f6", sparkData: dailyCalls },
+    { icon: Gauge, label: t.rpm, value: avgRPM, color: "text-purple-500", bgColor: "bg-purple-500/10", hex: "#a855f7" },
+    { icon: Cpu, label: t.tpm, value: formatTokens(avgTPM), color: "text-cyan-500", bgColor: "bg-cyan-500/10", hex: "#06b6d4" },
   ];
 
   return (
@@ -128,7 +134,12 @@ export function StatsCards({ lang = "zh" }: { lang?: "zh" | "en" }) {
               <span className="text-xs text-muted-foreground">{card.label}</span>
               {'delta' in card && card.delta && <DeltaBadge delta={card.delta} reverse={card.label === t.monthlyCost} />}
             </div>
-            <div className="text-xl font-bold font-mono">{card.value}</div>
+            <div className="flex items-center justify-between">
+              <div className="text-xl font-bold font-mono">{card.value}</div>
+              {'sparkData' in card && card.sparkData && (
+                <Sparkline data={card.sparkData} color={card.hex} gradientId={`s-${card.label}`} width={64} height={20} />
+              )}
+            </div>
           </CardContent>
         </Card>
       ))}
