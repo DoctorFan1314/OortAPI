@@ -385,6 +385,54 @@
 }
 .tab-panel-enter { animation: tabFadeIn 0.25s ease-out; }
 
+/* Border beam — rotating conic-gradient border */
+@keyframes rotate-beam {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.border-beam {
+  position: relative;
+  overflow: hidden;
+}
+.border-beam::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(from 0deg, transparent, hsl(var(--primary) / 0.4), transparent, hsl(var(--primary) / 0.6), transparent);
+  animation: rotate-beam 4s linear infinite;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* SVG dash flow for feature flow diagrams */
+@keyframes dash-flow {
+  to { stroke-dashoffset: -24; }
+}
+.flow-line {
+  stroke-dasharray: 4 4;
+  animation: dash-flow 0.8s linear infinite;
+}
+.flow-line-fast {
+  stroke-dasharray: 3 6;
+  animation: dash-flow 0.4s linear infinite;
+}
+
+/* Terminal cursor blink */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.terminal-cursor::after {
+  content: "█";
+  animation: blink 1s step-end infinite;
+  color: hsl(var(--primary));
+}
+
 /* ===== FOCUS VISIBLE ===== */
 @layer base {
   :focus-visible {
