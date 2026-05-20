@@ -6,12 +6,8 @@ import { Zap, FileText, ArrowRight } from "lucide-react";
 
 export function CTASection({ lang = "zh" }: { lang?: "zh" | "en" }) {
   return (
-    <section className="py-20 px-4 relative overflow-hidden">
-      {/* Background gradient — uses CSS vars for dark/light mode */}
-      <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent pointer-events-none" aria-hidden="true" />
-      <div className="absolute top-1/2 right-0 w-96 h-96 bg-primary/10 rounded-full blur-[100px] pointer-events-none" aria-hidden="true" />
-
-      <div className="relative max-w-3xl mx-auto text-center">
+    <section className="py-20 px-4">
+      <div className="max-w-3xl mx-auto text-center">
         <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
           {lang === "zh" ? "开始使用 OortAPI" : "Get Started with OortAPI"}
         </h2>
