@@ -46,6 +46,14 @@ All notable changes to this project will be documented in this file.
 - **Homepage** — Integrated FeaturedSection (skills/prompts tabs) and Testimonials; new PricingSection with 3 tiers; scroll indicator on Hero
 - **Proxy fix** — Fixed cookie name mismatch (token → oortapi_token)
 
+### Bug Fixes & Polish
+- **Model pie charts** — Now use full-period API aggregation (not current page); distinct warm/cool color palettes; scrollable legends; credits vs cost correctly separated
+- **Filter bar** — Model filter changed from text input to dropdown (syncs with model market); layout uses justify-between to fill row width
+- **API SQL fix** — Fixed ambiguous column error (created_at missing u. prefix)
+- **Default date range** — Usage page defaults to last 30 days; clear resets to 30-day range
+- **API 60-day cap** — Daily trend limited to 60 most recent days; warning banner when range exceeds 60 days
+- **Docs ToC** — New table of contents sidebar on doc pages (xl+ screens) with scroll tracking
+
 ---
 
 ## [v3.3.4.14] — 2026-05-19
