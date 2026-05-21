@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { CopyButton } from "@/components/shared/copy-button";
 import { MarkdownRenderer } from "@/components/shared/markdown-renderer";
-import { Play, Send, Bot, User, Loader2, Square, Zap, Settings2, Trash2, Download, RefreshCw, Plus, MessageSquare, X, Image, Link2, Brain, Wrench, Search, Copy, Quote } from "lucide-react";
+import { Play, Send, Bot, User, Loader2, Square, Zap, Settings2, Trash2, Download, RefreshCw, Plus, MessageSquare, X, Image, Link2, Brain, Wrench, Search, Copy, Check, Quote } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BUILTIN_TOOLS, getEnabledToolDefinitions, loadToolConfig, saveToolConfig, getModelCaps, saveModelCaps, loadModelCaps, type ToolConfig, type ToolDefinition, type ToolCall, type ModelCapabilities } from "@/lib/playground-tools";
 
@@ -148,6 +148,7 @@ export default function PlaygroundPage() {
   const [linkLoading, setLinkLoading] = useState(false);
   const [reasoningContent, setReasoningContent] = useState("");
   const [quoteMessage, setQuoteMessage] = useState<ChatMessage | null>(null);
+  const [copiedIdx, setCopiedIdx] = useState(-1);
     const [showCapEdit, setShowCapEdit] = useState(false);
   const [capsDraft, setCapsDraft] = useState<{ vision: boolean; reasoning: boolean; tools: boolean }>({ vision: false, reasoning: false, tools: false });
 
@@ -603,7 +604,7 @@ export default function PlaygroundPage() {
                     {msg.role === "assistant" && (
                       <button onClick={() => handleRegenerate(msg)} className="text-sm text-muted-foreground/50 hover:text-foreground transition-colors w-7 h-7 rounded hover:bg-muted/50 flex items-center justify-center" title="重新生成">↻</button>
                     )}
-                    <button onClick={() => navigator.clipboard.writeText(flatContent(msg.content))} className="text-xs text-muted-foreground/50 hover:text-foreground transition-colors w-6 h-6 rounded hover:bg-muted/50 flex items-center justify-center opacity-100" title="复制"><Copy className="h-3.5 w-3.5" /></button>
+                    <button onClick={() => { navigator.clipboard.writeText(flatContent(msg.content)); setCopiedIdx(i); setTimeout(() => setCopiedIdx(-1), 1500); }} className="text-xs text-muted-foreground/50 hover:text-foreground transition-colors w-6 h-6 rounded hover:bg-muted/50 flex items-center justify-center opacity-100" title="复制">{copiedIdx === i ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5" />}</button>
                   </div>
                   {msg.role === "assistant" && msg.usage && (
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-0.5 px-1 text-[11px] text-muted-foreground/60 font-mono">
