@@ -237,36 +237,44 @@ export default function PlaygroundPage() {
     }
   }, [sessions, currentSessionId]);
 
-  // ── Smart auto-scroll ──
+  // ── Auto-scroll (always follow new content) ──
   const prevMsgLen = useRef(0);
   useEffect(() => {
     const el = msgContainerRef.current;
     if (!el) return;
     const len = chatHistory.length;
     const hasNew = len > 0 && len > (prevMsgLen.current || 0);
-    const hasResp = !!(response && response.length > 0);
-    const hasReason = !!(reasoningContent && reasoningContent.length > 10);
-    if (!hasNew && !hasResp && !hasReason) { prevMsgLen.current = len; return; }
-    prevMsgLen.current = len;
-    requestAnimationFrame(() => {
-      if (el.scrollHeight - el.scrollTop - el.clientHeight < 80) {
+    const hasContent = !!(response && response.length > 0) || !!(reasoningContent && reasoningContent.length > 10);
+    if (hasNew) {
+      el.scrollTop = el.scrollHeight;
+    } else if (hasContent) {
+      if (!userScrolledUpRef.current) {
         el.scrollTop = el.scrollHeight;
       }
-    });
+    }
+    prevMsgLen.current = len;
   }, [chatHistory, response, reasoningContent]);
 
-  // Scroll listener: detect user scroll-up
+  // Track user scroll direction
   useEffect(() => {
     const el = msgContainerRef.current;
     if (!el) return;
-    const onScroll = () => {
-      userScrolledUpRef.current = el.scrollHeight - el.scrollTop - el.clientHeight > 80;
+    const onWheel = (e: WheelEvent) => {
+      if (e.deltaY < 0) userScrolledUpRef.current = true;
     };
+    const onScroll = () => {
+      const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+      if (atBottom) userScrolledUpRef.current = false;
+    };
+    el.addEventListener("wheel", onWheel, { passive: true });
     el.addEventListener("scroll", onScroll, { passive: true });
-    return () => el.removeEventListener("scroll", onScroll);
+    return () => {
+      el.removeEventListener("wheel", onWheel);
+      el.removeEventListener("scroll", onScroll);
+    };
   }, []);
 
-  // ── Build messages ──
+  // ── Build messages ──// ── Build messages ──
   const buildMessages = () => {
     const msgs: Array<{ role: string; content: string | ContentPart[]; tool_call_id?: string; name?: string; tool_calls?: ToolCall[] }> = [];
     if (systemPrompt.trim() && endpoint === "openai") msgs.push({ role: "system", content: systemPrompt.trim() });
