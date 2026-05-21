@@ -62,7 +62,7 @@ function wordCount(text: string): number {
 function genId(): string { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
 
 const DEFAULT_PARAMS: PlaygroundParams = {
-  temperature: 0.7, max_tokens: 4096, top_p: 1,
+  temperature: 0.7, max_tokens: 32768, top_p: 1,
   response_format: "text", stop: "", seed: -1,
   frequency_penalty: 0, presence_penalty: 0,
 };
