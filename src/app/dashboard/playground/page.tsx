@@ -347,6 +347,7 @@ export default function PlaygroundPage() {
     const decoder = new TextDecoder();
     let buffer = "";
     let fullText = "";
+    let streamDone = false;
 
     while (true) {
       const { done, value } = await reader.read();
@@ -359,7 +360,7 @@ export default function PlaygroundPage() {
         const trimmed = line.trim();
         if (!trimmed || !trimmed.startsWith("data: ")) continue;
         const data = trimmed.slice(6);
-        if (data === "[DONE]") break;
+        if (data === "[DONE]") { streamDone = true; continue; }
         try {
           const parsed = JSON.parse(data);
           const delta = parsed.choices?.[0]?.delta?.content;
@@ -369,6 +370,7 @@ export default function PlaygroundPage() {
           }
         } catch { /* skip */ }
       }
+      if (streamDone) break;
     }
 
     if (fullText) {
@@ -385,6 +387,7 @@ export default function PlaygroundPage() {
     const decoder = new TextDecoder();
     let buffer = "";
     let fullText = "";
+    let streamDone = false;
     let inputTokens = 0;
     let outputTokens = 0;
 
