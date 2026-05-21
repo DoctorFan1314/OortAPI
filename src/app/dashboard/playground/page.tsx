@@ -69,6 +69,7 @@ export default function PlaygroundPage() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [concurrencyCount, setConcurrencyCount] = useState(5);
   const [isConcurrencyTesting, setIsConcurrencyTesting] = useState(false);
+  const [concurrencyResults, setConcurrencyResults] = useState<{ index: number; status: "success" | "error"; latencyMs: number; snippet: string }[]>([]);
 
   const abortRef = useRef<AbortController | null>(null);
   const msgContainerRef = useRef<HTMLDivElement>(null);
@@ -290,21 +291,28 @@ export default function PlaygroundPage() {
   const handleConcurrencyTest = useCallback(async () => {
     if (!selectedModel || !selectedKey || isConcurrencyTesting) return;
     setIsConcurrencyTesting(true);
+    setConcurrencyResults([]);
     const testMsg = message.trim() || (lang === "zh" ? "你好" : "Hello");
-    const startTime = performance.now();
-    let completed = 0, totalLatency = 0, totalTokens = 0;
-    const promises = Array.from({ length: concurrencyCount }, async () => {
+    const results: { index: number; status: "success" | "error"; latencyMs: number; snippet: string }[] = [];
+    const promises = Array.from({ length: concurrencyCount }, async (_, i) => {
       const reqStart = performance.now();
       try {
         const u = endpoint === "openai" ? "/api/v1/chat/completions" : "/api/v1/messages";
         const b = endpoint === "openai" ? { model: selectedModel, messages: [{ role: "user", content: testMsg }], stream: false, max_tokens: 100 } : { model: selectedModel, messages: [{ role: "user", content: testMsg }], max_tokens: 100, stream: false };
         const res = await fetch(u, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${selectedKey.key_value}`, ...(endpoint === "anthropic" ? { "anthropic-version": "2023-06-01" } : {}) }, body: JSON.stringify(b) });
-        totalLatency += performance.now() - reqStart;
-        if (res.ok) { const data = await res.json(); totalTokens += estimateTokens(data?.choices?.[0]?.message?.content || data?.content?.[0]?.text || ""); }
-      } catch { /* ignore */ }
-      completed++;
+        const latency = Math.round(performance.now() - reqStart);
+        if (res.ok) {
+          const data = await res.json();
+          const content = data?.choices?.[0]?.message?.content || data?.content?.[0]?.text || "";
+          results.push({ index: i + 1, status: "success", latencyMs: latency, snippet: content.slice(0, 60) });
+        } else {
+          results.push({ index: i + 1, status: "error", latencyMs: latency, snippet: `HTTP ${res.status}` });
+        }
+      } catch { results.push({ index: i + 1, status: "error", latencyMs: Math.round(performance.now() - reqStart), snippet: "Network error" }); }
+      setConcurrencyResults([...results]);
     });
     await Promise.allSettled(promises);
+    setConcurrencyResults([...results]);
     setIsConcurrencyTesting(false);
   }, [selectedModel, selectedKey?.key_value, concurrencyCount, message, endpoint, lang, isConcurrencyTesting]);
 
@@ -410,6 +418,23 @@ export default function PlaygroundPage() {
                   {isConcurrencyTesting ? <><Loader2 className="h-3 w-3 animate-spin" />{t.concurrencyRunning}</> : <><GanttChart className="h-3 w-3" />{t.concurrencyGo}</>}
                 </Button>
               </div>
+              {concurrencyResults.length > 0 && (
+                <div className="rounded-lg border border-border/50 overflow-hidden max-h-[200px] overflow-y-auto">
+                  <table className="w-full text-[11px]">
+                    <thead><tr className="bg-muted/30 text-muted-foreground"><th className="p-1.5 text-left font-medium">#</th><th className="p-1.5 text-left font-medium">{lang === "zh" ? "状态" : "Status"}</th><th className="p-1.5 text-left font-medium">{lang === "zh" ? "延迟" : "Latency"}</th><th className="p-1.5 text-left font-medium">{lang === "zh" ? "响应" : "Response"}</th></tr></thead>
+                    <tbody className="divide-y divide-border/30">
+                      {concurrencyResults.map((r) => (
+                        <tr key={r.index} className={r.status === "success" ? "" : "bg-destructive/5"}>
+                          <td className="p-1.5 font-mono text-muted-foreground">{r.index}</td>
+                          <td className="p-1.5"><span className={r.status === "success" ? "text-emerald-500" : "text-red-500"}>{r.status === "success" ? "✓" : "✗"}</span></td>
+                          <td className="p-1.5 font-mono text-foreground">{r.latencyMs}ms</td>
+                          <td className="p-1.5 text-muted-foreground truncate max-w-[120px]">{r.snippet}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           )}
         </div>
