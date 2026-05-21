@@ -242,7 +242,7 @@ async function executeChannelRequest(
       method: 'POST',
       headers,
       body: JSON.stringify(upstreamBody),
-      signal: AbortSignal.timeout(180_000), // 3 min timeout for LLM requests
+      signal: AbortSignal.timeout(600_000), // 10 min timeout for LLM requests (local models at ~20 tok/s)
     });
 
     const latencyMs = Date.now() - startTime;

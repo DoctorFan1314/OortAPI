@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { CopyButton } from "@/components/shared/copy-button";
 import { MarkdownRenderer } from "@/components/shared/markdown-renderer";
-import { Play, Send, Bot, User, Loader2, Square, Zap, Settings2, Trash2, Download, RefreshCw, Plus, MessageSquare, X, Image, Link2, Brain, Wrench, Search } from "lucide-react";
+import { Play, Send, Bot, User, Loader2, Square, Zap, Settings2, Trash2, Download, RefreshCw, Plus, MessageSquare, X, Image, Link2, Brain, Wrench, Search, Copy, Quote } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BUILTIN_TOOLS, getEnabledToolDefinitions, loadToolConfig, saveToolConfig, getModelCaps, saveModelCaps, loadModelCaps, type ToolConfig, type ToolDefinition, type ToolCall, type ModelCapabilities } from "@/lib/playground-tools";
 
@@ -27,6 +27,7 @@ interface ChatMessage {
   tool_calls?: ToolCall[];
   tool_call_id?: string;
   reasoningContent?: string;
+  quote?: { content: string; role: string };
   name?: string;
 }
 
@@ -146,6 +147,7 @@ export default function PlaygroundPage() {
   const [linkUrl, setLinkUrl] = useState("");
   const [linkLoading, setLinkLoading] = useState(false);
   const [reasoningContent, setReasoningContent] = useState("");
+  const [quoteMessage, setQuoteMessage] = useState<ChatMessage | null>(null);
     const [showCapEdit, setShowCapEdit] = useState(false);
   const [capsDraft, setCapsDraft] = useState<{ vision: boolean; reasoning: boolean; tools: boolean }>({ vision: false, reasoning: false, tools: false });
 
@@ -491,6 +493,22 @@ export default function PlaygroundPage() {
   }, []);
   const handleKeyDown = (e: React.KeyboardEvent) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } };
 
+  const handleRegenerate = useCallback(async (assistantMsg: ChatMessage) => {
+    const idx = chatHistory.indexOf(assistantMsg);
+    if (idx < 1) return;
+    const userMsg = chatHistory[idx - 1];
+    if (userMsg.role !== "user") return;
+    const text = flatContent(userMsg.content);
+    if (!text.trim() || !selectedModel || !selectedKey || isSending) return;
+    setIsSending(true); setError(""); setUsage(null); setResponse(""); setReasoningContent("");
+    sentMsgRef.current = text;
+    updateSession((s) => ({ ...s, messages: [...s.messages, { role: "user", content: text, createdAt: nowHHMM() }] }));
+    const firstMsgs = buildMessages();
+    const lastMsg = text;
+    setMessage("");
+    await sendWithTools(firstMsgs);
+  }, [chatHistory, selectedModel, selectedKey?.key_value, isSending, endpoint]); // eslint-disable-line
+
   const handleClear = () => {
     updateSession((s) => ({ ...s, messages: [] }));
     setResponse(""); setError(""); setUsage(null); setAttachedImages([]); setReasoningContent("");
@@ -577,9 +595,16 @@ export default function PlaygroundPage() {
                   )}
                   <div className={cn("glass-card rounded-lg px-4 py-2.5 text-sm leading-relaxed relative", msg.role === "assistant" ? "" : msg.role === "tool" ? "bg-amber-500/5 border-amber-500/20" : "bg-primary/10 border-0")}>
                     {msg.role === "tool" ? <pre className="text-[11px] font-mono text-muted-foreground whitespace-pre-wrap max-h-[200px] overflow-y-auto">{msg.content as string}</pre> : <div className="text-xs">{renderContent(msg.content)}</div>}
-                    <CopyButton text={flatContent(msg.content)} className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-md hover:bg-muted text-muted-foreground" />
                   </div>
-                  <div className="flex items-center gap-2 mt-1 px-1 text-[10px] text-muted-foreground/60 font-mono"><span>{wordCount(flatContent(msg.content))} words</span><span>·</span><span>{msg.createdAt || nowHHMM()}</span></div>
+                  <div className="flex items-center gap-1.5 mt-1 px-1">
+                    <span className="text-[10px] text-muted-foreground/60 font-mono">{wordCount(flatContent(msg.content))} words · {msg.createdAt || nowHHMM()}</span>
+                    <span className="flex-1" />
+                    <button onClick={() => setQuoteMessage(msg)} className="text-sm text-muted-foreground/70 hover:text-foreground transition-colors w-7 h-7 rounded hover:bg-muted/50 flex items-center justify-center" title="引用"><Quote className="h-3 w-3" /></button>
+                    {msg.role === "assistant" && (
+                      <button onClick={() => handleRegenerate(msg)} className="text-sm text-muted-foreground/50 hover:text-foreground transition-colors w-7 h-7 rounded hover:bg-muted/50 flex items-center justify-center" title="重新生成">↻</button>
+                    )}
+                    <button onClick={() => navigator.clipboard.writeText(flatContent(msg.content))} className="text-xs text-muted-foreground/50 hover:text-foreground transition-colors w-6 h-6 rounded hover:bg-muted/50 flex items-center justify-center opacity-100" title="复制"><Copy className="h-3.5 w-3.5" /></button>
+                  </div>
                   {msg.role === "assistant" && msg.usage && (
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-0.5 px-1 text-[11px] text-muted-foreground/60 font-mono">
                       <span className="text-primary/70">{t.usage}:</span>
@@ -612,7 +637,11 @@ export default function PlaygroundPage() {
                 <div className="p-1.5 rounded-lg bg-primary/10 shrink-0"><Bot className="h-4 w-4" /></div>
                 <div className="max-w-[80%]">
                   <div className="glass-card rounded-lg px-4 py-3"><div className="text-sm"><MarkdownRenderer content={response} /></div></div>
-                  <div className="flex items-center gap-2 mt-1 px-1 text-[11px] text-muted-foreground/60 font-mono"><span>{wordCount(response)} words</span><span>·</span><span>{nowHHMM()}</span></div>
+                  <div className="flex items-center gap-1.5 mt-1 px-1">
+                    <span className="text-[11px] text-muted-foreground/60 font-mono">{wordCount(response)} words · {nowHHMM()}</span>
+                    <span className="flex-1" />
+                    <CopyButton text={response} className="text-[11px] text-muted-foreground/50 hover:text-foreground transition-colors p-0.5 rounded hover:bg-muted/50" />
+                  </div>
                   {usage && (
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-0.5 px-1 text-[11px] text-muted-foreground/60 font-mono">
                       <span className="text-primary/70">{t.usage}:</span>
@@ -645,6 +674,14 @@ export default function PlaygroundPage() {
 
           {/* Input */}
           <div className="p-4 bg-background border-t border-border/90">
+            {/* Quote bar */}
+            {quoteMessage && (
+              <div className="flex items-center gap-2 px-3 py-2 mb-2 rounded-md bg-primary/[0.03] border-l-2 border-primary/40 border border-border/40">
+                <Quote className="h-3.5 w-3.5 text-primary shrink-0" />
+                <span className="flex-1 text-xs text-foreground/80 truncate font-medium">{flatContent(quoteMessage.content)}</span>
+                <button onClick={() => setQuoteMessage(null)} className="p-0.5 rounded hover:bg-destructive/20 shrink-0"><X className="h-3.5 w-3.5 text-destructive/70 hover:text-destructive" /></button>
+              </div>
+            )}
             <div className="flex gap-2 items-start">
               {/* "+" button */}
               <div className="relative pt-1.5">
