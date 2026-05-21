@@ -14,7 +14,6 @@ All notable changes to this project will be documented in this file.
 - **Stream truncation fix** — `[DONE]` marker no longer breaks the for-loop immediately; uses `streamDone` flag to finish processing the current chunk, fixing content loss
 - **Streaming render optimization** — 65ms throttled `setResponse` + `await new Promise(r => setTimeout(r, 0))` yield every 5 lines to prevent UI freezes
 - **CJK-aware helpers** — `estimateTokens` and `wordCount` now handle Chinese characters (CJK at ~1.5 tok/char, ASCII at ~0.25 tok/char)
-- **Model path sanitization** — Local file paths cleaned to `[Local] name` format
 - **Endpoint toggle** — OpenAI / Anthropic format switch
 - **Preset questions** — 7 common test phrases with click-to-fill
 - **Concurrency test drawer** — Collapsible panel, configurable concurrency (1-50), fires parallel non-streaming requests

@@ -37,12 +37,6 @@ function wordCount(text: string): number {
   return cjk + nonCjk;
 }
 
-function sanitizeModelName(m: Model): string {
-  const n = m.display_name || m.id;
-  if (n.includes("\\") || n.includes("/")) { const p = n.split(/[\\/]/).filter(Boolean); return `[Local] ${p[p.length - 1]}`; }
-  return n;
-}
-
 function genId(): string { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
 
 const DEFAULT_PARAMS: PlaygroundParams = { temperature: 0.7, max_tokens: 4096, top_p: 1 };
@@ -438,7 +432,7 @@ export default function PlaygroundPage() {
           <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-1.5 block flex items-center gap-2">{t.selectModel}<button onClick={handleRefresh} className="p-0.5 rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"><RefreshCw className="h-3 w-3" /></button></label>
           <select className="w-full h-8 px-2.5 rounded-md border border-input bg-background text-xs font-mono focus:border-primary focus:outline-none" value={selectedModel} onChange={(e) => { updateSession((s) => ({ ...s, selectedModel: e.target.value })); }}>
             {models.length === 0 && <option value="">{t.noModels}</option>}
-            {Object.entries(models.reduce<Record<string, Model[]>>((acc, m) => { const g = m.owned_by || "unknown"; if (!acc[g]) acc[g] = []; acc[g].push(m); return acc; }, {})).map(([group, gmodels]) => (<optgroup key={group} label={group}>{gmodels.map((m) => (<option key={m.id} value={m.id}>{sanitizeModelName(m)}</option>))}</optgroup>))}
+            {Object.entries(models.reduce<Record<string, Model[]>>((acc, m) => { const g = m.owned_by || "unknown"; if (!acc[g]) acc[g] = []; acc[g].push(m); return acc; }, {})).map(([group, gmodels]) => (<optgroup key={group} label={group}>{gmodels.map((m) => (<option key={m.id} value={m.id}>{m.display_name || m.id}</option>))}</optgroup>))}
           </select>
         </div>
         {/* Key */}

@@ -14,7 +14,6 @@
 - **流式截断修复** — `[DONE]` 不再立即 break for 循环，改用 `streamDone` 标记处理完当前 chunk 所有行后再退出，修复内容丢失
 - **节流渲染优化** — 65ms 节流 `setResponse` + 每 5 行 `await new Promise(r => setTimeout(r, 0))` 释放主线程
 - **CJK 智能估算** — `estimateTokens` 和 `wordCount` 支持中文字符（CJK ~1.5 tok/字，ASCII ~0.25 tok/字）
-- **模型路径清洗** — 本地路径自动格式化为 `[Local] 名称`
 - **端点切换** — OpenAI / Anthropic 格式切换
 - **常用语预设** — 7 条测试短语，点击填充输入框
 - **并发测试抽屉** — 可折叠面板，可配并发数 (1-50)，并行发送非流式请求
