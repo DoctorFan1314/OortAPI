@@ -3,6 +3,17 @@
 import { memo } from "react";
 import dynamic from "next/dynamic";
 import { CopyButton } from "@/components/shared/copy-button";
+import katex from "katex";
+import "katex/dist/katex.min.css";
+
+function LatexInline({ formula }: { formula: string }) {
+  try {
+    const html = katex.renderToString(formula, { throwOnError: false, displayMode: false });
+    return <span className="px-0.5" dangerouslySetInnerHTML={{ __html: html }} />;
+  } catch {
+    return <code className="px-1 py-0.5 bg-muted/20 rounded text-[11px] font-mono text-primary/70">{formula}</code>;
+  }
+}
 
 const LazySyntaxHighlighter = dynamic(
   () => import("./lazy-syntax-highlighter"),
@@ -35,12 +46,18 @@ export const lightCodeTheme: Record<string, React.CSSProperties> = {
 
 
 function InlineMarkdown({ text }: { text: string }) {
-  const parts = text.split(/(\*\*.*?\*\*|`[^`]+`)/g);
+  const parts = text.split(/(\$\$[^$]+?\$\$|\$[^$]+?\$|\*\*.*?\*\*|`[^`]+`)/g);
   return (
     <>
       {parts.map((part, i) => {
         if (part.startsWith("**") && part.endsWith("**")) {
           return <strong key={i} className="text-foreground">{part.slice(2, -2)}</strong>;
+        }
+        if (part.startsWith("$$") && part.endsWith("$$")) {
+          return <LatexInline key={i} formula={part.slice(2, -2)} />;
+        }
+        if (part.startsWith("$") && part.endsWith("$") && part.length > 2 && !part.startsWith("$$")) {
+          return <LatexInline key={i} formula={part.slice(1, -1)} />;
         }
         if (part.startsWith("`") && part.endsWith("`")) {
           return <code key={i} className="px-1.5 py-0.5 bg-secondary rounded text-xs font-mono text-foreground">{part.slice(1, -1)}</code>;
@@ -138,15 +155,24 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({ content }: { co
     const headingText = line.replace(/^#+\s+/, "");
     const headingId = headingText.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-");
 
-    if (line.startsWith("### ")) {
+    if (line.startsWith("###### ")){
+	      flushTable();
+	      elements.push(<h6 key={i} id={headingId} className="text-xs font-semibold text-muted-foreground mt-3 mb-1 scroll-mt-20 uppercase tracking-wider"><InlineMarkdown text={headingText} /></h6>);
+	    } else if (line.startsWith("##### ")) {
+	      flushTable();
+	      elements.push(<h5 key={i} id={headingId} className="text-sm font-semibold text-foreground mt-3 mb-1 scroll-mt-20"><InlineMarkdown text={headingText} /></h5>);
+	    } else if (line.startsWith("#### ")) {
+	      flushTable();
+	      elements.push(<h4 key={i} id={headingId} className="text-sm font-semibold text-foreground mt-3 mb-2 scroll-mt-20"><InlineMarkdown text={headingText} /></h4>);
+	    } else if (line.startsWith("### ")) {
       flushTable();
-      elements.push(<h3 key={i} id={headingId} className="text-base font-semibold text-foreground mt-4 mb-2 scroll-mt-20">{headingText}</h3>);
+      elements.push(<h3 key={i} id={headingId} className="text-base font-semibold text-foreground mt-4 mb-2 scroll-mt-20"><InlineMarkdown text={headingText} /></h3>);
     } else if (line.startsWith("## ")) {
       flushTable();
-      elements.push(<h2 key={i} id={headingId} className="text-lg font-semibold text-foreground mt-6 mb-3 scroll-mt-20">{headingText}</h2>);
+      elements.push(<h2 key={i} id={headingId} className="text-lg font-semibold text-foreground mt-6 mb-3 scroll-mt-20"><InlineMarkdown text={headingText} /></h2>);
     } else if (line.startsWith("# ")) {
       flushTable();
-      elements.push(<h1 key={i} id={headingId} className="text-2xl font-bold text-foreground mt-6 mb-3 scroll-mt-20">{headingText}</h1>);
+      elements.push(<h1 key={i} id={headingId} className="text-2xl font-bold text-foreground mt-6 mb-3 scroll-mt-20"><InlineMarkdown text={headingText} /></h1>);
     } else if (line.startsWith("| ") || line.startsWith("|")) {
       if (isTableSeparator(line)) {
         continue;
@@ -175,6 +201,9 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({ content }: { co
     } else if (line.startsWith("`") && line.endsWith("`")) {
       flushTable();
       elements.push(<code key={i} className="block my-1 px-3 py-1.5 bg-secondary rounded text-sm font-mono text-foreground">{line.slice(1, -1)}</code>);
+    } else if (line.trim() === "---" || line.trim() === "***" || line.trim() === "___") {
+      flushTable();
+      elements.push(<hr key={i} className="my-4 border-border/50" />);
     } else if (line.trim() === "") {
       flushTable();
       elements.push(<div key={i} className="h-2" />);

@@ -146,7 +146,7 @@ export default function PlaygroundPage() {
   const [linkUrl, setLinkUrl] = useState("");
   const [linkLoading, setLinkLoading] = useState(false);
   const [reasoningContent, setReasoningContent] = useState("");
-  const [showCapEdit, setShowCapEdit] = useState(false);
+    const [showCapEdit, setShowCapEdit] = useState(false);
   const [capsDraft, setCapsDraft] = useState<{ vision: boolean; reasoning: boolean; tools: boolean }>({ vision: false, reasoning: false, tools: false });
 
   const abortRef = useRef<AbortController | null>(null);
@@ -168,9 +168,9 @@ export default function PlaygroundPage() {
   const presets = lang === "zh" ? PRESETS_ZH : PRESETS_EN;
   const modelCaps = getModelCaps(selectedModel);
 
-  // ── Reset thinking mode on model switch if no reasoning ──
+  // ── Force reset thinking mode on every model switch ──
   useEffect(() => {
-    if (!modelCaps.reasoning) setThinkingMode(false);
+    setThinkingMode(false);
   }, [selectedModel, modelCaps.reasoning]);
 
   // ── Session management ──
@@ -178,7 +178,7 @@ export default function PlaygroundPage() {
     const id = genId();
     setSessions((prev) => [...prev, { id, title: lang === "zh" ? "新会话" : "New Chat", messages: [], selectedModel: selectedModel || models[0]?.id || "", selectedKeyId: selectedKeyId ?? keys.find((k) => k.enabled === 1)?.id ?? null, systemPrompt: "", params: { ...DEFAULT_PARAMS } }]);
     setCurrentSessionId(id);
-    setMessage(""); setResponse(""); setError(""); setUsage(null); setAttachedImages([]); setReasoningContent("");
+    setMessage(""); setResponse(""); setError(""); setUsage(null); setAttachedImages([]); setReasoningContent(""); 
   }, [lang, selectedModel, selectedKeyId, models, keys]);
 
   const switchSession = useCallback((id: string) => { setCurrentSessionId(id); setMessage(""); setResponse(""); setError(""); setUsage(null); setAttachedImages([]); setReasoningContent(""); }, []);
@@ -388,12 +388,12 @@ export default function PlaygroundPage() {
               if (before) { fullText += before; textBuf += before; }
               if (after) { fullText += after; textBuf += after; }
             } else if (content.includes("<think>") && !content.includes("</think>")) {
-              inThink = true;
+              inThink = true; 
               const before = content.slice(0, content.indexOf("<think>"));
               if (before) { fullText += before; textBuf += before; }
               reasoning += content.slice(content.indexOf("<think>") + 7);
             } else if (inThink && content.includes("</think>")) {
-              inThink = false;
+              inThink = false; 
               reasoning += content.slice(0, content.indexOf("</think>"));
               const after = content.slice(content.indexOf("</think>") + 8);
               if (after) { fullText += after; textBuf += after; }
@@ -411,7 +411,7 @@ export default function PlaygroundPage() {
             }
           }
 
-          if (delta?.reasoning_content) { reasoning += delta.reasoning_content; setReasoningContent(reasoning); }
+          if (delta?.reasoning_content) { reasoning += delta.reasoning_content; setReasoningContent(reasoning);  }
           if (parsed.usage) setUsage(parsed.usage);
         } catch { /* skip */ }
         lineCount++;
@@ -426,7 +426,7 @@ export default function PlaygroundPage() {
   // ── handleSend ──
   const handleSend = useCallback(async () => {
     if (!message.trim() || !selectedModel || !selectedKey || isSending) return;
-    setIsSending(true); setError(""); setUsage(null); setResponse(""); setReasoningContent("");
+    setIsSending(true); setError(""); setUsage(null); setResponse(""); setReasoningContent(""); 
     sentMsgRef.current = message;
 
     const userMsg: ChatMessage = { role: "user", content: message, createdAt: nowHHMM() };
@@ -541,9 +541,7 @@ export default function PlaygroundPage() {
           <div className="flex items-center justify-between px-5 py-2.5 border-b border-border/90 bg-muted/30 shrink-0">
             <div className="flex items-center gap-2">
               {selectedModel && <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-primary/10 backdrop-blur-sm border border-primary/20 text-[11px] font-mono text-primary"><Zap className="h-3 w-3" />{selectedModel}</span>}
-              {isSending && <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />}
               {thinkingMode && <span className="text-[11px] text-muted-foreground font-mono"><Brain className="h-3 w-3 inline mr-1" />{t.thinkingOn}</span>}
-              {reasoningContent && !response && <span className="text-[11px] text-muted-foreground font-mono animate-pulse"><Brain className="h-3 w-3 inline mr-1" />{t.reasoning}...</span>}
             </div>
             <div className="flex-1" />
           </div>
@@ -570,7 +568,12 @@ export default function PlaygroundPage() {
                     </div>
                   )}
                   {msg.reasoningContent && (
-                    <details className="mb-1"><summary className="text-[11px] text-muted-foreground/60 font-mono cursor-pointer hover:text-foreground transition-colors"><Brain className="h-3 w-3 inline mr-1" />{t.reasoning}</summary><div className="mt-1 p-2 rounded-md bg-muted/20 border border-border/40 text-[11px] text-muted-foreground italic leading-relaxed">{msg.reasoningContent}</div></details>
+                    <div className="rounded-lg px-4 py-3 mb-2 border border-amber-500/20 bg-amber-500/[0.02]">
+                      <details open>
+                        <summary className="text-sm font-semibold text-amber-500 font-mono cursor-pointer hover:opacity-80 transition-opacity select-none"><Brain className="h-4 w-4 inline mr-1.5" />{t.reasoning}</summary>
+                        <div className="mt-2 pt-2 border-t border-amber-500/10 text-[12px] text-muted-foreground/90 [&_p]:!text-[12px] [&_li]:!text-[12px] [&_strong]:!text-[12px] [&_em]:!text-[12px] [&_h1]:!text-sm [&_h2]:!text-sm [&_h3]:!text-xs"><MarkdownRenderer content={msg.reasoningContent} /></div>
+                      </details>
+                    </div>
                   )}
                   <div className={cn("glass-card rounded-lg px-4 py-2.5 text-sm leading-relaxed relative", msg.role === "assistant" ? "" : msg.role === "tool" ? "bg-amber-500/5 border-amber-500/20" : "bg-primary/10 border-0")}>
                     {msg.role === "tool" ? <pre className="text-[11px] font-mono text-muted-foreground whitespace-pre-wrap max-h-[200px] overflow-y-auto">{msg.content as string}</pre> : <div className="text-xs">{renderContent(msg.content)}</div>}
@@ -578,7 +581,7 @@ export default function PlaygroundPage() {
                   </div>
                   <div className="flex items-center gap-2 mt-1 px-1 text-[10px] text-muted-foreground/60 font-mono"><span>{wordCount(flatContent(msg.content))} words</span><span>·</span><span>{msg.createdAt || nowHHMM()}</span></div>
                   {msg.role === "assistant" && msg.usage && (
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-0.5 px-1 text-[10px] text-muted-foreground/60 font-mono">
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-0.5 px-1 text-[11px] text-muted-foreground/60 font-mono">
                       <span className="text-primary/70">{t.usage}:</span>
                       <span>{t.inputNonCached} <span className="text-foreground/80">{msg.usage.prompt_tokens - (msg.usage.tokens_in_cache || 0)}</span></span>
                       <span>{t.inputCached} <span className="text-foreground/80">{msg.usage.tokens_in_cache || 0}</span></span>
@@ -590,17 +593,28 @@ export default function PlaygroundPage() {
               </div>
             ))}
 
+            {/* Reasoning bubble — shows independently the moment reasoning content arrives */}
+            {reasoningContent && reasoningContent.length > 5 && !chatHistory.some((m) => m.reasoningContent === reasoningContent) && (
+              <div className="flex gap-3">
+                <div className="p-1.5 rounded-lg bg-amber-500/10 shrink-0"><Brain className="h-4 w-4 text-amber-500" /></div>
+                <div className="max-w-[80%]">
+                  <div className="rounded-lg px-4 py-3 border border-amber-500/20 bg-amber-500/[0.02]">
+                    <details open>
+                      <summary className="text-sm font-semibold text-amber-500 font-mono cursor-pointer hover:opacity-80 transition-opacity select-none"><Brain className="h-4 w-4 inline mr-1.5" />{t.reasoning}</summary>
+                      <div className="mt-2 pt-2 border-t border-amber-500/10 text-[12px] text-muted-foreground/90 [&_p]:!text-[12px] [&_li]:!text-[12px] [&_strong]:!text-[12px] [&_em]:!text-[12px] [&_h1]:!text-sm [&_h2]:!text-sm [&_h3]:!text-xs"><MarkdownRenderer content={reasoningContent} /></div>
+                    </details>
+                  </div>
+                </div>
+              </div>
+            )}
             {response && (
               <div className="flex gap-3">
                 <div className="p-1.5 rounded-lg bg-primary/10 shrink-0"><Bot className="h-4 w-4" /></div>
                 <div className="max-w-[80%]">
-                  {reasoningContent && reasoningContent.length > 5 && (
-                    <details className="mb-1" open><summary className="text-[11px] text-muted-foreground/60 font-mono cursor-pointer hover:text-foreground transition-colors"><Brain className="h-3 w-3 inline mr-1" />{t.reasoning}</summary><div className="mt-1 p-2 rounded-md bg-muted/20 border border-border/40 text-[11px] text-muted-foreground italic leading-relaxed">{reasoningContent}</div></details>
-                  )}
-                  <div className="glass-card rounded-lg px-4 py-2.5 relative"><div className="text-xs"><MarkdownRenderer content={response} /></div></div>
-                  <div className="flex items-center gap-2 mt-1 px-1 text-[10px] text-muted-foreground/60 font-mono"><span>{wordCount(response)} words</span><span>·</span><span>{nowHHMM()}</span></div>
+                  <div className="glass-card rounded-lg px-4 py-3"><div className="text-sm"><MarkdownRenderer content={response} /></div></div>
+                  <div className="flex items-center gap-2 mt-1 px-1 text-[11px] text-muted-foreground/60 font-mono"><span>{wordCount(response)} words</span><span>·</span><span>{nowHHMM()}</span></div>
                   {usage && (
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-0.5 px-1 text-[10px] text-muted-foreground/60 font-mono">
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-0.5 px-1 text-[11px] text-muted-foreground/60 font-mono">
                       <span className="text-primary/70">{t.usage}:</span>
                       <span>{t.inputNonCached} <span className="text-foreground/80">{usage.prompt_tokens - (usage.tokens_in_cache || 0)}</span></span>
                       <span>{t.inputCached} <span className="text-foreground/80">{usage.tokens_in_cache || 0}</span></span>
@@ -668,7 +682,7 @@ export default function PlaygroundPage() {
                     </button>
                   )}
                   <div className="flex gap-1.5">
-                    {isSending ? <button onClick={handleStop} className="w-10 h-full min-h-[2.5rem] rounded-md border border-destructive/30 bg-destructive/10 text-destructive flex items-center justify-center shrink-0 hover:bg-destructive/20 transition-colors"><Square className="h-5 w-5" /></button> : <button onClick={handleSend} disabled={!message.trim() || !selectedModel || !selectedKey} className="w-10 h-full min-h-[2.5rem] rounded-md border border-primary/30 bg-primary/10 text-primary flex items-center justify-center shrink-0 hover:bg-primary/20 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"><Send className="h-5 w-5" /></button>}
+                    {isSending ? <button onClick={handleStop} className="w-10 h-full min-h-[2.5rem] rounded-md border border-destructive/30 bg-destructive/10 text-destructive flex items-center justify-center shrink-0 hover:bg-destructive/20 transition-colors"><Loader2 className="h-5 w-5 animate-spin" /></button> : <button onClick={handleSend} disabled={!message.trim() || !selectedModel || !selectedKey} className="w-10 h-full min-h-[2.5rem] rounded-md border border-primary/30 bg-primary/10 text-primary flex items-center justify-center shrink-0 hover:bg-primary/20 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"><Send className="h-5 w-5" /></button>}
                   </div>
                 </div>
               )}

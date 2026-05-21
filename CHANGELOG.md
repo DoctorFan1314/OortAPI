@@ -6,6 +6,22 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [v3.3.4.18] — 2026-05-21
+
+### Playground UX Polish & LaTeX Math Rendering
+- **Input layout fix** — `items-end` → `items-start` with `pt-1.5` for `+` button alignment; send button enlarged to `w-10 h-full min-h-[2.5rem]`
+- **Thinking mode toggle** — Independent `Brain` toggle outside `+` menu; auto-reset on model switch; replaced all 🧠 emoji with `<Brain />` SVG
+- **Image preview instant clear** — `setAttachedImages([])` moved to before `sendWithTools`
+- **User-configured model capabilities** — localStorage-based `Record<string, {vision, reasoning, tools}>` per model; conditional gating for image/thinking/tools buttons
+- **MCP-style tool panel** — Card-based layout with toggle switches; Tavily API Key input; custom MCP server placeholder; removed Bing support
+- **URL scraper** — Server-side proxy at `/api/playground/tools` bypasses CORS; 15000-char limit with truncation notice; loading indicator
+- **Reasoning content display** — Independent amber-tinted collapsible bubble appearing as soon as reasoning arrives; separate from response bubble
+- **LaTeX math rendering** — KaTeX integration for `$...$` and `$$...$$` in both reasoning and response markdown
+- **MarkdownRenderer upgrades** — Added `####`/`#####`/`######` headings, `*` bullet lists, `---`/`***`/`___` horizontal rules, `*italic*` support, `$...$` LaTeX
+- **Send button spinner** — Removed status bar spinner, added `Loader2` animation inside stop button
+- **Reasoning font** — `text-[12px] text-muted-foreground/90` for visual distinction from response body
+- **Persistent token usage** — `usage` field stored in each `ChatMessage` for per-message display across sessions
+
 ## [v3.3.4.17] — 2026-05-21
 
 ### Playground 4-Column Workspace & Stream Truncation Fix
