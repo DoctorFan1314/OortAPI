@@ -155,6 +155,7 @@ export default function PlaygroundPage() {
   const abortRef = useRef<AbortController | null>(null);
   const msgContainerRef = useRef<HTMLDivElement>(null);
   const msgEndRef = useRef<HTMLDivElement>(null);
+  const userScrolledUpRef = useRef(false);
   const sentMsgRef = useRef("");
   const imageInputRef = useRef<HTMLInputElement>(null);
   const toolConfigRef = useRef(toolConfig);
@@ -236,15 +237,34 @@ export default function PlaygroundPage() {
     }
   }, [sessions, currentSessionId]);
 
-  // ── Auto-scroll ──
-  const scrollToBottom = useCallback(() => { msgContainerRef.current?.scrollTo({ top: msgContainerRef.current.scrollHeight, behavior: "smooth" }); }, []);
+  // ── Smart auto-scroll ──
   const prevMsgLen = useRef(0);
   useEffect(() => {
+    const el = msgContainerRef.current;
+    if (!el) return;
     const len = chatHistory.length;
-    if (len > 0 && len > prevMsgLen.current) scrollToBottom();
-    if (response && len > 0) scrollToBottom();
+    const hasNew = len > 0 && len > (prevMsgLen.current || 0);
+    const hasResp = !!(response && response.length > 0);
+    const hasReason = !!(reasoningContent && reasoningContent.length > 10);
+    if (!hasNew && !hasResp && !hasReason) { prevMsgLen.current = len; return; }
     prevMsgLen.current = len;
-  }, [chatHistory, response, scrollToBottom]);
+    requestAnimationFrame(() => {
+      if (el.scrollHeight - el.scrollTop - el.clientHeight < 80) {
+        el.scrollTop = el.scrollHeight;
+      }
+    });
+  }, [chatHistory, response, reasoningContent]);
+
+  // Scroll listener: detect user scroll-up
+  useEffect(() => {
+    const el = msgContainerRef.current;
+    if (!el) return;
+    const onScroll = () => {
+      userScrolledUpRef.current = el.scrollHeight - el.scrollTop - el.clientHeight > 80;
+    };
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
+  }, []);
 
   // ── Build messages ──
   const buildMessages = () => {
