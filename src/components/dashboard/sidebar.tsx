@@ -123,16 +123,16 @@ export function DashboardSidebar() {
         <ChevronDown className={cn("h-4 w-4 transition-transform", collapsed && "-rotate-90")} />
       </button>
 
-      {/* Desktop: sticky + full-height flex column */}
+      {/* Desktop: normal flow, natural height */}
       <div
         className={cn(
-          "lg:sticky lg:top-24 lg:h-[calc(100vh-8rem)] flex flex-col",
+          "flex flex-col",
           collapsed && "hidden lg:flex",
         )}
       >
-        {/* Scrollable groups */}
+        {/* Groups */}
         <nav
-          className="flex-1 overflow-y-auto scrollbar-hide space-y-1"
+          className="space-y-1"
           role="navigation"
           aria-label="Dashboard navigation"
         >

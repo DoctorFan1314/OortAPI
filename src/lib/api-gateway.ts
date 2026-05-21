@@ -80,6 +80,18 @@ export function validateApiKey(authHeader: string | null): { valid: boolean; api
     }
   }
 
+  // Second fallback: key was already migrated (value masked), find by prefix
+  if (!apiKey) {
+    const prefix = keyValue.slice(0, 10);
+    apiKey = db.prepare('SELECT * FROM api_keys WHERE key_value LIKE ? AND enabled = 1').get(prefix + '%') as DBApiKey | undefined;
+    if (apiKey) {
+      // Re-hash with correct algorithm
+      try {
+        db.prepare('UPDATE api_keys SET key_hash = ? WHERE id = ?').run(keyHash, apiKey.id);
+      } catch { /* ignore */ }
+    }
+  }
+
   if (!apiKey) {
     return { valid: false, error: 'Invalid or disabled API key' };
   }
