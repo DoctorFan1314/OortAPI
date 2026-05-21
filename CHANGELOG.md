@@ -6,9 +6,18 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [v3.3.4.16] — 2026-05-20
+## [v3.3.4.16] — 2026-05-21
 
-### Visual Overhaul — Glassmorphism & Dark/Light Theme
+### Visual Overhaul — Dark Industrial Homepage & Terminal Animation
+- **Hero redesign** — Asymmetric 12-column grid layout (6+6), dark industrial micro-label (`bg-zinc-900`, `text-cyan-400 uppercase font-mono`), extra-bold gradient heading with tighter tracking
+- **Inline terminal mock** — Self-contained `TerminalMock` component with 4-phase state machine: character-by-character curl typing (0-3s), auth header typing (3-4s), streaming color-coded JSON (4-8s, sky/amber/emerald syntax highlight), cursor blink & loop restart (8-11s)
+- **Theme-adaptive terminal** — Dark bg in dark mode (`bg-zinc-900`), light frosted bg in light mode (`bg-white/90 backdrop-blur-xl`), all text and JSON colors adapt via `dark:` variants
+- **Compact stats dashboard** — 2×2 grid below CTA buttons, `font-mono-force tabular-nums` numbers, `text-[10px] uppercase` labels, `border-border` divider
+- **Glow & depth** — Terminal has subtle cyan glow in dark mode (`shadow-[0_0_60px_rgba(0,212,255,0.07)]`), visible white border in light mode
+- **Timer safety** — All `setTimeout` handle stored in ref array, effect cleanup clears all pending timers on unmount/restart; functional `setDisplayChars(prev => prev + char)` prevents stale closures
+- **Overflow protection** — Terminal `<pre>` uses `overflow-y-auto scrollbar-hide` to contain long output
+
+### Glassmorphism & Dark/Light Theme
 - **Glass card system** — All cards use semi-transparent bg + `backdrop-blur-xl`; `glass-card-glow` utility with gradient pseudo-border
 - **Card spotlight** — `useSpotlight` hook tracks cursor per-card; `--spotlight-x/y` CSS vars drive radial glow on hover
 - **Global background** — SVG `feTurbulence` grain noise overlay (2-2.5% opacity); ambient blue/purple radial glows; parallax grid lines (40px spacing, shift opposite cursor)

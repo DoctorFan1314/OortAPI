@@ -172,6 +172,7 @@ Supports full `tool_use` / `tool_result` conversion between Anthropic and OpenAI
 - **Security headers** — HSTS, X-Frame-Options, X-Content-Type-Options, CORS support
 - **OpenAPI spec** — `GET /api/v1/openapi` for full API documentation
 - **Health check** — `GET /api/health` for monitoring and uptime
+- **Interactive terminal demo** — Homepage inline terminal with 4-phase auto-play animation: curl typing, auth header, color-coded JSON streaming, infinite loop; theme-adaptive (dark/light)
 - **Real-time stats** — Homepage shows live platform metrics (calls, uptime, latency, models)
 - **Smart channel selection** — Latency-aware load balancing, automatically prefers faster channels
 - **Subscription auto-renew** — Auto-renews expired subscriptions when balance is sufficient

@@ -6,9 +6,18 @@
 
 ---
 
-## [v3.3.4.16] — 2026-05-20
+## [v3.3.4.16] — 2026-05-21
 
-### 全局视觉重构 — 玻璃拟态 & 日夜主题
+### 视觉重构 — 暗黑工业风首页 & 终端打字机动画
+- **Hero 重构** — 12 列非对称网格（左 6 右 6），暗黑工业微型标签（`bg-zinc-900`、`text-cyan-400 uppercase font-mono`），特粗字重渐变标题
+- **内联终端模拟器** — 4 相位状态机组件：逐字敲入 curl 命令(0-3s)、逐字敲入请求头(3-4s)、流式喷吐彩色 JSON(4-8s)、光标闪烁后循环(8-11s)
+- **终端双主题自适应** — 暗色模式深色背景（`bg-zinc-900`），亮色模式白色磨砂背景（`bg-white/90 backdrop-blur-xl`），文字和 JSON 颜色通过 `dark:` 变体适配
+- **紧凑数据看板** — CTA 按钮下方 2×2 网格，数字强制 `font-mono-force tabular-nums`，标签 `text-[10px] uppercase`
+- **终端光晕** — 暗色模式微弱青色外发光（`shadow-[0_0_60px_rgba(0,212,255,0.07)]`），亮色模式白色边框
+- **Timer 安全** — 所有 setTimeout 句柄存入 ref 数组，useEffect return 清理全部待执行定时器；函数式 setDisplayChars 防过期闭包
+- **溢出保护** — `<pre>` 使用 `overflow-y-auto scrollbar-hide` 防止内容超出终端外壳
+
+### 玻璃拟态 & 日夜主题
 - **玻璃卡片系统** — 全站 Card 使用半透明背景 + `backdrop-blur-xl`；`glass-card-glow` 渐变外发光边框
 - **鼠标聚光灯** — `useSpotlight` Hook 追踪鼠标位置；`--spotlight-x/y` CSS 变量驱动每张卡片的径向光晕
 - **全局背景** — SVG `feTurbulence` 晶粒噪声纹理（2-2.5% 透明度）；蓝紫环境光晕；视差网格线（40px 间距，随鼠标反向位移）

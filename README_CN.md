@@ -172,6 +172,7 @@ curl https://your-domain.com/api/v1/messages \
 - **安全响应头** — HSTS、X-Frame-Options、X-Content-Type-Options、CORS 支持
 - **OpenAPI 规范** — `GET /api/v1/openapi` 返回完整 API 文档
 - **健康检查** — `GET /api/health` 用于监控和可用性检测
+- **终端交互演示** — 首页内联 4 相位自动播放终端：curl 敲入、请求头输入、彩色 JSON 流式喷吐、无限循环；自适应日/夜模式
 - **实时统计** — 首页展示真实平台指标（调用量、可用率、延迟、模型数）
 - **智能渠道选择** — 延迟感知负载均衡，自动优先选择低延迟渠道
 - **订阅自动续费** — 到期订阅自动续费（余额充足时）
