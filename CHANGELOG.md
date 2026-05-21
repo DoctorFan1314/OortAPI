@@ -6,9 +6,12 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [v3.3.4.18] — 2026-05-21
+## [v3.3.4.18] — 2026-05-22
 
 ### Playground UX Polish & LaTeX Math Rendering
+- **Auto-scroll fix** — Wheel event detection for user scroll-up instead of `scrollHeight` delta; user messages always scroll to bottom; streaming only scrolls if user hasn't explicitly scrolled up
+- **Custom scrollbar** — Native webkit scrollbar styled with `playground-scrollbar` class; `6px` width, theme-aware colors (dark thumb in light mode, light thumb in dark mode), hover darkening
+- **Scrollbar visibility** — Track at `rgba(0,0,0,0.05)` / `rgba(255,255,255,0.05)`, thumb at `rgba(0,0,0,0.2)` / `rgba(255,255,255,0.2)` for both modes
 - **Input layout fix** — `items-end` → `items-start` with `pt-1.5` for `+` button alignment; send button enlarged to `w-10 h-full min-h-[2.5rem]`
 - **Thinking mode toggle** — Independent `Brain` toggle outside `+` menu; auto-reset on model switch; replaced all 🧠 emoji with `<Brain />` SVG
 - **Image preview instant clear** — `setAttachedImages([])` moved to before `sendWithTools`

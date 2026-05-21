@@ -594,7 +594,7 @@ export default function PlaygroundPage() {
           </div>
 
           {/* Messages */}
-          <div ref={msgContainerRef} className="flex-1 overflow-y-auto p-6 space-y-4 scrollbar-hide">
+          <div ref={msgContainerRef} className="flex-1 overflow-y-auto p-6 space-y-4 playground-scrollbar">
             {chatHistory.length === 0 && !response && !error && (
               <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
                 <Bot className="h-12 w-12 mb-3 opacity-20" /><p className="text-sm">{t.noResponse}</p>
