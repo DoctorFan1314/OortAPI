@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { CopyButton } from "@/components/shared/copy-button";
 import { MarkdownRenderer } from "@/components/shared/markdown-renderer";
-import { Play, Send, Bot, User, Loader2, Square, Zap, Settings2, ChevronDown, ChevronUp, Trash2, Download, RefreshCw, GanttChart, Beaker, Plus, MessageSquare, X } from "lucide-react";
+import { Play, Send, Bot, User, Loader2, Square, Zap, Settings2, Trash2, Download, RefreshCw, Plus, MessageSquare, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // ─── Types ─────────────────────────────────────────────────
@@ -46,8 +46,8 @@ const PRESETS_ZH = ["请你详细介绍你自己", "用 Python 写一个快速�
 const PRESETS_EN = ["Tell me about yourself in detail", "Write a quicksort algorithm in Python", "Explain quantum computing in simple terms", "Write a poem about autumn", "What is 1+1? Think step by step", "Explain the difference between HTTP, TCP, and IP", "Write a formal business email template"];
 
 const LABELS = {
-  zh: { title: "API 测试场", send: "发送", sending: "发送中...", stop: "停止", noResponse: "发送消息以查看响应", error: "错误", usage: "Token 用量", inputNonCached: "输入(未命中缓存)", inputCached: "输入(命中缓存)", outputTokens: "输出", totalTokensLabel: "总", noKeys: "暂无 API Key，请先创建", noModels: "暂无可用模型", params: "参数设置", temperature: "温度 (temperature)", maxTokens: "最大 Tokens (max_tokens)", topP: "Top P", systemPrompt: "系统提示词", systemPromptPH: "可选：设置系统提示词", refresh: "刷新", endpoint: "API 接口", openai: "OpenAI 格式", anthropic: "Anthropic 格式", presets: "常用语", selectModel: "选择模型", selectKey: "API Key", newSession: "新建会话", concurrency: "并发压测", concurrencyCount: "并发数", concurrencyGo: "开始压测", concurrencyRunning: "压测中...", concurrencyQps: "QPS", concurrencyTtft: "平均首字延迟", concurrencyTokenThroughput: "Token 吞吐" },
-  en: { title: "API Playground", send: "Send", sending: "Sending...", stop: "Stop", noResponse: "Send a message to see the response", error: "Error", usage: "Token Usage", inputNonCached: "Input(non-cached)", inputCached: "Input(cached)", outputTokens: "Output", totalTokensLabel: "Total", noKeys: "No API keys found.", noModels: "No models available", params: "Parameters", temperature: "Temperature", maxTokens: "Max Tokens", topP: "Top P", systemPrompt: "System Prompt", systemPromptPH: "Optional: Set a system prompt", refresh: "Refresh", endpoint: "API Endpoint", openai: "OpenAI Format", anthropic: "Anthropic Format", presets: "Presets", selectModel: "Select Model", selectKey: "API Key", newSession: "New Session", concurrency: "Concurrency Test", concurrencyCount: "Concurrency", concurrencyGo: "Start", concurrencyRunning: "Testing...", concurrencyQps: "QPS", concurrencyTtft: "Avg TTFT", concurrencyTokenThroughput: "Token/s" },
+  zh: { title: "API 测试场", send: "发送", sending: "发送中...", stop: "停止", noResponse: "发送消息以查看响应", error: "错误", usage: "Token 用量", inputNonCached: "输入(未命中缓存)", inputCached: "输入(命中缓存)", outputTokens: "输出", totalTokensLabel: "总", noKeys: "暂无 API Key，请先创建", noModels: "暂无可用模型", params: "参数设置", temperature: "温度 (temperature)", maxTokens: "最大 Tokens (max_tokens)", topP: "Top P", systemPrompt: "系统提示词", systemPromptPH: "可选：设置系统提示词", refresh: "刷新", endpoint: "API 接口", openai: "OpenAI 格式", anthropic: "Anthropic 格式", presets: "常用语", selectModel: "选择模型", selectKey: "API Key", newSession: "新建会话" },
+  en: { title: "API Playground", send: "Send", sending: "Sending...", stop: "Stop", noResponse: "Send a message to see the response", error: "Error", usage: "Token Usage", inputNonCached: "Input(non-cached)", inputCached: "Input(cached)", outputTokens: "Output", totalTokensLabel: "Total", noKeys: "No API keys found.", noModels: "No models available", params: "Parameters", temperature: "Temperature", maxTokens: "Max Tokens", topP: "Top P", systemPrompt: "System Prompt", systemPromptPH: "Optional: Set a system prompt", refresh: "Refresh", endpoint: "API Endpoint", openai: "OpenAI Format", anthropic: "Anthropic Format", presets: "Presets", selectModel: "Select Model", selectKey: "API Key", newSession: "New Session" },
 };
 
 // ─── Component ─────────────────────────────────────────────
@@ -66,10 +66,6 @@ export default function PlaygroundPage() {
   const [usage, setUsage] = useState<Usage | null>(null);
   const [isSending, setIsSending] = useState(false);
   const [endpoint, setEndpoint] = useState<ApiEndpoint>("openai");
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [concurrencyCount, setConcurrencyCount] = useState(5);
-  const [isConcurrencyTesting, setIsConcurrencyTesting] = useState(false);
-  const [concurrencyResults, setConcurrencyResults] = useState<{ index: number; status: "success" | "error"; latencyMs: number; snippet: string }[]>([]);
 
   const abortRef = useRef<AbortController | null>(null);
   const msgContainerRef = useRef<HTMLDivElement>(null);
@@ -280,41 +276,13 @@ export default function PlaygroundPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [message, selectedModel, selectedKey?.key_value, isSending, chatHistory, systemPrompt, params, endpoint]);
 
-  // ── Stop / Refresh / Concurrency ──
+  // ── Stop / Refresh ──
   const handleStop = useCallback(() => { if (abortRef.current) { abortRef.current.abort(); abortRef.current = null; setIsSending(false); } }, []);
   const handleRefresh = useCallback(() => {
     fetch("/api/v1/models").then((r) => (r.ok ? r.json() : null)).then((d) => { if (d?.data) setModels(d.data); }).catch(() => {});
     fetch("/api/dashboard/keys", { credentials: "include" }).then((r) => (r.ok ? r.json() : null)).then((d) => { if (d?.keys) setKeys(d.keys.filter((k: ApiKey) => k.enabled === 1)); }).catch(() => {});
   }, []);
   const handleKeyDown = (e: React.KeyboardEvent) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } };
-
-  const handleConcurrencyTest = useCallback(async () => {
-    if (!selectedModel || !selectedKey || isConcurrencyTesting) return;
-    setIsConcurrencyTesting(true);
-    setConcurrencyResults([]);
-    const testMsg = message.trim() || (lang === "zh" ? "你好" : "Hello");
-    const results: { index: number; status: "success" | "error"; latencyMs: number; snippet: string }[] = [];
-    const promises = Array.from({ length: concurrencyCount }, async (_, i) => {
-      const reqStart = performance.now();
-      try {
-        const u = endpoint === "openai" ? "/api/v1/chat/completions" : "/api/v1/messages";
-        const b = endpoint === "openai" ? { model: selectedModel, messages: [{ role: "user", content: testMsg }], stream: false, max_tokens: 100 } : { model: selectedModel, messages: [{ role: "user", content: testMsg }], max_tokens: 100, stream: false };
-        const res = await fetch(u, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${selectedKey.key_value}`, ...(endpoint === "anthropic" ? { "anthropic-version": "2023-06-01" } : {}) }, body: JSON.stringify(b) });
-        const latency = Math.round(performance.now() - reqStart);
-        if (res.ok) {
-          const data = await res.json();
-          const content = data?.choices?.[0]?.message?.content || data?.content?.[0]?.text || "";
-          results.push({ index: i + 1, status: "success", latencyMs: latency, snippet: content.slice(0, 60) });
-        } else {
-          results.push({ index: i + 1, status: "error", latencyMs: latency, snippet: `HTTP ${res.status}` });
-        }
-      } catch { results.push({ index: i + 1, status: "error", latencyMs: Math.round(performance.now() - reqStart), snippet: "Network error" }); }
-      setConcurrencyResults([...results]);
-    });
-    await Promise.allSettled(promises);
-    setConcurrencyResults([...results]);
-    setIsConcurrencyTesting(false);
-  }, [selectedModel, selectedKey?.key_value, concurrencyCount, message, endpoint, lang, isConcurrencyTesting]);
 
   // ── Render ──
   return (
@@ -342,9 +310,7 @@ export default function PlaygroundPage() {
             {selectedModel && <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-primary/10 backdrop-blur-sm border border-primary/20 text-[11px] font-mono text-primary"><Zap className="h-3 w-3" />{selectedModel}</span>}
             {isSending && <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />}
           </div>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground font-mono">
-            {usage && <span className="flex items-center gap-2"><Zap className="h-3 w-3" /><span>{t.usage}: {t.inputNonCached} {usage.prompt_tokens - (usage.tokens_in_cache || 0)} {t.inputCached} {usage.tokens_in_cache || 0} {t.outputTokens} {usage.completion_tokens} {t.totalTokensLabel} {usage.total_tokens}</span></span>}
-          </div>
+          <div className="flex-1" />
         </div>
 
         {/* Messages */}
@@ -402,42 +368,6 @@ export default function PlaygroundPage() {
         {/* Error */}
         {error && <div className="mx-5 mb-2 rounded-lg border border-destructive/30 bg-destructive/10 p-3"><p className="text-xs font-medium text-destructive mb-0.5">{t.error}</p><p className="text-xs text-destructive/80 font-mono">{error}</p></div>}
 
-        {/* Concurrency drawer */}
-        <div className="border-t border-border/90">
-          <button onClick={() => setDrawerOpen(!drawerOpen)} className="flex items-center gap-2 w-full px-5 py-2 text-xs text-muted-foreground hover:text-foreground transition-colors">
-            <Beaker className="h-3.5 w-3.5" /><span>{t.concurrency}</span>
-            {drawerOpen ? <ChevronDown className="h-3 w-3 ml-auto" /> : <ChevronUp className="h-3 w-3 ml-auto" />}
-          </button>
-          {drawerOpen && (
-            <div className="px-5 pb-3 space-y-3">
-              <div className="flex items-center gap-3">
-                <span className="text-xs text-muted-foreground">{t.concurrencyCount}:</span>
-                <input type="number" min={1} max={50} value={concurrencyCount} onChange={(e) => setConcurrencyCount(Math.min(50, Math.max(1, parseInt(e.target.value) || 1)))} className="w-16 h-7 px-2 rounded-md border border-input bg-background text-xs font-mono text-center" />
-                <span className="text-[11px] text-muted-foreground">{lang === "zh" ? "使用当前输入框中的消息" : "Uses current input message"}</span>
-                <Button variant="outline" size="sm" onClick={handleConcurrencyTest} disabled={isConcurrencyTesting || !selectedModel || !selectedKey} className="gap-1.5 text-xs h-7 ml-auto">
-                  {isConcurrencyTesting ? <><Loader2 className="h-3 w-3 animate-spin" />{t.concurrencyRunning}</> : <><GanttChart className="h-3 w-3" />{t.concurrencyGo}</>}
-                </Button>
-              </div>
-              {concurrencyResults.length > 0 && (
-                <div className="rounded-lg border border-border/50 overflow-hidden max-h-[200px] overflow-y-auto">
-                  <table className="w-full text-[11px]">
-                    <thead><tr className="bg-muted/30 text-muted-foreground"><th className="p-1.5 text-left font-medium">#</th><th className="p-1.5 text-left font-medium">{lang === "zh" ? "状态" : "Status"}</th><th className="p-1.5 text-left font-medium">{lang === "zh" ? "延迟" : "Latency"}</th><th className="p-1.5 text-left font-medium">{lang === "zh" ? "响应" : "Response"}</th></tr></thead>
-                    <tbody className="divide-y divide-border/30">
-                      {concurrencyResults.map((r) => (
-                        <tr key={r.index} className={r.status === "success" ? "" : "bg-destructive/5"}>
-                          <td className="p-1.5 font-mono text-muted-foreground">{r.index}</td>
-                          <td className="p-1.5"><span className={r.status === "success" ? "text-emerald-500" : "text-red-500"}>{r.status === "success" ? "✓" : "✗"}</span></td>
-                          <td className="p-1.5 font-mono text-foreground">{r.latencyMs}ms</td>
-                          <td className="p-1.5 text-muted-foreground truncate max-w-[120px]">{r.snippet}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
 
         {/* Input */}
         <div className="p-4 bg-background border-t border-border/90">
