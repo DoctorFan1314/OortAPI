@@ -2,153 +2,58 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useI18n } from "@/contexts/i18n-context";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { CopyButton } from "@/components/shared/copy-button";
 import { MarkdownRenderer } from "@/components/shared/markdown-renderer";
-import { Play, Send, Bot, User, Loader2, Square, Zap, Settings2, ChevronDown, Trash2, Download, RefreshCw, GanttChart, Beaker } from "lucide-react";
+import { Play, Send, Bot, User, Loader2, Square, Zap, Settings2, ChevronDown, ChevronUp, Trash2, Download, RefreshCw, GanttChart, Beaker, Plus, MessageSquare, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // ─── Types ─────────────────────────────────────────────────
 
-interface Model {
-  id: string;
-  owned_by: string;
-  display_name?: string;
-}
-
-interface ApiKey {
-  id: number;
-  name: string;
-  key_value: string;
-  enabled: number;
-}
-
-interface Usage {
-  prompt_tokens: number;
-  completion_tokens: number;
-  total_tokens: number;
-}
-
-interface ChatMessage {
-  role: "user" | "assistant";
-  content: string;
-}
-
-interface PlaygroundParams {
-  temperature: number;
-  max_tokens: number;
-  top_p: number;
-}
-
-interface ConcurrencyResult {
-  index: number;
-  status: "success" | "error";
-  latencyMs: number;
-  responseSnippet: string;
-  errorMessage?: string;
-}
-
+interface Model { id: string; owned_by: string; display_name?: string; }
+interface ApiKey { id: number; name: string; key_value: string; enabled: number; }
+interface Usage { prompt_tokens: number; completion_tokens: number; total_tokens: number; tokens_in_cache?: number; }
+interface ChatMessage { role: "user" | "assistant"; content: string; createdAt: string; usage?: Usage; }
+interface PlaygroundParams { temperature: number; max_tokens: number; top_p: number; }
+interface ChatSession { id: string; title: string; messages: ChatMessage[]; selectedModel: string; selectedKeyId: number | null; systemPrompt: string; params: PlaygroundParams; }
 type ApiEndpoint = "openai" | "anthropic";
 
-// ─── Constants ─────────────────────────────────────────────
+// ─── Helpers ───────────────────────────────────────────────
 
-const PRESETS_ZH = [
-  "请你详细介绍你自己",
-  "用 Python 写一个快速排序算法",
-  "解释一下什么是量子计算",
-  "写一首关于秋天的诗",
-  "1+1 等于几？请一步一步思考",
-  "用通俗的语言解释 HTTP、TCP、IP 三者的关系",
-  "帮我写一封正式的商务邮件模板",
-];
+const CJK_RE = /[一-鿿㐀-䶿豈-﫿]/g;
 
-const PRESETS_EN = [
-  "Tell me about yourself in detail",
-  "Write a quicksort algorithm in Python",
-  "Explain quantum computing in simple terms",
-  "Write a poem about autumn",
-  "What is 1+1? Think step by step",
-  "Explain the difference between HTTP, TCP, and IP",
-  "Write a formal business email template",
-];
+function estimateTokens(text: string): number {
+  const cjk = (text.match(CJK_RE) || []).length;
+  const ascii = text.length - cjk;
+  return Math.max(1, Math.ceil(cjk * 1.5 + ascii * 0.25));
+}
+
+function nowHHMM(): string { return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }); }
+
+function wordCount(text: string): number {
+  const cjk = (text.match(CJK_RE) || []).length;
+  const nonCjk = text.replace(CJK_RE, " ").split(/\s+/).filter(Boolean).length;
+  return cjk + nonCjk;
+}
+
+function sanitizeModelName(m: Model): string {
+  const n = m.display_name || m.id;
+  if (n.includes("\\") || n.includes("/")) { const p = n.split(/[\\/]/).filter(Boolean); return `[Local] ${p[p.length - 1]}`; }
+  return n;
+}
+
+function genId(): string { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+
+const DEFAULT_PARAMS: PlaygroundParams = { temperature: 0.7, max_tokens: 4096, top_p: 1 };
+const STORAGE_KEY = "oortapi-playground-v2";
+
+const PRESETS_ZH = ["请你详细介绍你自己", "用 Python 写一个快速排序算法", "解释一下什么是量子计算", "写一首关于秋天的诗", "1+1 等于几？请一步一步思考", "用通俗的语言解释 HTTP、TCP、IP 三者的关系", "帮我写一封正式的商务邮件模板"];
+const PRESETS_EN = ["Tell me about yourself in detail", "Write a quicksort algorithm in Python", "Explain quantum computing in simple terms", "Write a poem about autumn", "What is 1+1? Think step by step", "Explain the difference between HTTP, TCP, and IP", "Write a formal business email template"];
 
 const LABELS = {
-  zh: {
-    title: "API 测试场",
-    selectModel: "选择模型",
-    selectKey: "API Key",
-    send: "发送",
-    sending: "发送中...",
-    noResponse: "发送消息以查看响应",
-    error: "错误",
-    stop: "停止",
-    usage: "Token 用量",
-    promptTokens: "输入",
-    completionTokens: "输出",
-    totalTokens: "总计",
-    noKeys: "暂无 API Key，请先创建",
-    noModels: "暂无可用模型",
-    params: "参数设置",
-    temperature: "温度 (temperature)",
-    maxTokens: "最大 Tokens (max_tokens)",
-    topP: "Top P",
-    clear: "清空对话",
-    export: "导出对话",
-    conversation: "对话历史",
-    systemPrompt: "系统提示词",
-    systemPromptPlaceholder: "可选：设置系统提示词",
-    refresh: "刷新",
-    endpoint: "API 接口",
-    openai: "OpenAI 格式",
-    anthropic: "Anthropic 格式",
-    presets: "常用语",
-    concurrency: "并发测试",
-    concurrencyCount: "并发数",
-    concurrencyGo: "开始测试",
-    concurrencyRunning: "测试中...",
-    concurrencyStatus: "状态",
-    concurrencyLatency: "延迟",
-    concurrencyResponse: "响应片段",
-  },
-  en: {
-    title: "API Playground",
-    selectModel: "Select Model",
-    selectKey: "API Key",
-    send: "Send",
-    sending: "Sending...",
-    noResponse: "Send a message to see the response",
-    error: "Error",
-    stop: "Stop",
-    usage: "Token Usage",
-    promptTokens: "Input",
-    completionTokens: "Output",
-    totalTokens: "Total",
-    noKeys: "No API keys found. Create one first.",
-    noModels: "No models available",
-    params: "Parameters",
-    temperature: "Temperature",
-    maxTokens: "Max Tokens",
-    topP: "Top P",
-    clear: "Clear Conversation",
-    export: "Export",
-    conversation: "Conversation",
-    systemPrompt: "System Prompt",
-    systemPromptPlaceholder: "Optional: Set a system prompt",
-    refresh: "Refresh",
-    endpoint: "API Endpoint",
-    openai: "OpenAI Format",
-    anthropic: "Anthropic Format",
-    presets: "Presets",
-    concurrency: "Concurrency Test",
-    concurrencyCount: "Concurrency",
-    concurrencyGo: "Start",
-    concurrencyRunning: "Testing...",
-    concurrencyStatus: "Status",
-    concurrencyLatency: "Latency",
-    concurrencyResponse: "Response",
-  },
+  zh: { title: "API 测试场", send: "发送", sending: "发送中...", stop: "停止", noResponse: "发送消息以查看响应", error: "错误", usage: "Token 用量", inputNonCached: "输入(未命中缓存)", inputCached: "输入(命中缓存)", outputTokens: "输出", totalTokensLabel: "总", noKeys: "暂无 API Key，请先创建", noModels: "暂无可用模型", params: "参数设置", temperature: "温度 (temperature)", maxTokens: "最大 Tokens (max_tokens)", topP: "Top P", systemPrompt: "系统提示词", systemPromptPH: "可选：设置系统提示词", refresh: "刷新", endpoint: "API 接口", openai: "OpenAI 格式", anthropic: "Anthropic 格式", presets: "常用语", selectModel: "选择模型", selectKey: "API Key", newSession: "新建会话", concurrency: "并发压测", concurrencyCount: "并发数", concurrencyGo: "开始压测", concurrencyRunning: "压测中...", concurrencyQps: "QPS", concurrencyTtft: "平均首字延迟", concurrencyTokenThroughput: "Token 吞吐" },
+  en: { title: "API Playground", send: "Send", sending: "Sending...", stop: "Stop", noResponse: "Send a message to see the response", error: "Error", usage: "Token Usage", inputNonCached: "Input(non-cached)", inputCached: "Input(cached)", outputTokens: "Output", totalTokensLabel: "Total", noKeys: "No API keys found.", noModels: "No models available", params: "Parameters", temperature: "Temperature", maxTokens: "Max Tokens", topP: "Top P", systemPrompt: "System Prompt", systemPromptPH: "Optional: Set a system prompt", refresh: "Refresh", endpoint: "API Endpoint", openai: "OpenAI Format", anthropic: "Anthropic Format", presets: "Presets", selectModel: "Select Model", selectKey: "API Key", newSession: "New Session", concurrency: "Concurrency Test", concurrencyCount: "Concurrency", concurrencyGo: "Start", concurrencyRunning: "Testing...", concurrencyQps: "QPS", concurrencyTtft: "Avg TTFT", concurrencyTokenThroughput: "Token/s" },
 };
 
 // ─── Component ─────────────────────────────────────────────
@@ -159,203 +64,132 @@ export default function PlaygroundPage() {
 
   const [models, setModels] = useState<Model[]>([]);
   const [keys, setKeys] = useState<ApiKey[]>([]);
-  const [selectedModel, setSelectedModel] = useState("");
-  const [selectedKeyId, setSelectedKeyId] = useState<number | null>(null);
+  const [sessions, setSessions] = useState<ChatSession[]>([]);
+  const [currentSessionId, setCurrentSessionId] = useState("");
   const [message, setMessage] = useState("");
   const [response, setResponse] = useState("");
   const [error, setError] = useState("");
   const [usage, setUsage] = useState<Usage | null>(null);
   const [isSending, setIsSending] = useState(false);
-  const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
-  const [showParams, setShowParams] = useState(false);
-  const [params, setParams] = useState<PlaygroundParams>({ temperature: 0.7, max_tokens: 4096, top_p: 1 });
-  const [systemPrompt, setSystemPrompt] = useState("");
   const [endpoint, setEndpoint] = useState<ApiEndpoint>("openai");
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [concurrencyCount, setConcurrencyCount] = useState(5);
-  const [concurrencyResults, setConcurrencyResults] = useState<ConcurrencyResult[]>([]);
   const [isConcurrencyTesting, setIsConcurrencyTesting] = useState(false);
 
   const abortRef = useRef<AbortController | null>(null);
-  const chatEndRef = useRef<HTMLDivElement>(null);
-  const STORAGE_KEY = "oortapi-playground";
+  const msgContainerRef = useRef<HTMLDivElement>(null);
+  const msgEndRef = useRef<HTMLDivElement>(null);
+  const sentMsgRef = useRef("");
 
-  // ── LocalStorage persistence ──
+  // ── Derive current session ──
+  const currentSession = sessions.find((s) => s.id === currentSessionId);
+  const chatHistory = currentSession?.messages ?? [];
+  const selectedModel = currentSession?.selectedModel ?? "";
+  const selectedKeyId = currentSession?.selectedKeyId ?? null;
+  const systemPrompt = currentSession?.systemPrompt ?? "";
+  const params = currentSession?.params ?? DEFAULT_PARAMS;
+  const selectedKey = keys.find((k) => k.id === selectedKeyId);
+  const presets = lang === "zh" ? PRESETS_ZH : PRESETS_EN;
+  const isAdmin = true; // placeholder, was never used in orig
 
+  // ── Session management ──
+  const createSession = useCallback(() => {
+    const id = genId();
+    setSessions((prev) => [...prev, { id, title: lang === "zh" ? "新会话" : "New Chat", messages: [], selectedModel: selectedModel || models[0]?.id || "", selectedKeyId: selectedKeyId ?? keys.find((k) => k.enabled === 1)?.id ?? null, systemPrompt: "", params: { ...DEFAULT_PARAMS } }]);
+    setCurrentSessionId(id);
+    setMessage(""); setResponse(""); setError(""); setUsage(null);
+  }, [lang, selectedModel, selectedKeyId, models, keys]);
+
+  const switchSession = useCallback((id: string) => { setCurrentSessionId(id); setMessage(""); setResponse(""); setError(""); setUsage(null); }, []);
+
+  const deleteSession = useCallback((e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    setSessions((prev) => {
+      const f = prev.filter((s) => s.id !== id);
+      if (f.length === 0) { const ns = { id: genId(), title: lang === "zh" ? "新会话" : "New Chat", messages: [], selectedModel: models[0]?.id || "", selectedKeyId: keys.find((k) => k.enabled === 1)?.id ?? null, systemPrompt: "", params: { ...DEFAULT_PARAMS } }; setCurrentSessionId(ns.id); return [ns]; }
+      if (currentSessionId === id) setCurrentSessionId(f[0].id);
+      return f;
+    });
+    setMessage(""); setResponse(""); setError(""); setUsage(null);
+  }, [currentSessionId, lang, models, keys]);
+
+  const updateSession = useCallback((updater: (s: ChatSession) => ChatSession) => {
+    setSessions((prev) => prev.map((s) => (s.id === currentSessionId ? updater(s) : s)));
+  }, [currentSessionId]);
+
+  // ── Init first session ──
+  useEffect(() => {
+    if (sessions.length === 0) {
+      const id = genId();
+      setSessions([{ id, title: lang === "zh" ? "新会话" : "New Chat", messages: [], selectedModel: models[0]?.id || "", selectedKeyId: keys.find((k) => k.enabled === 1)?.id ?? null, systemPrompt: "", params: { ...DEFAULT_PARAMS } }]);
+      setCurrentSessionId(id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang]);
+
+  // ── Fetch ──
+  useEffect(() => {
+    fetch("/api/v1/models").then((r) => (r.ok ? r.json() : null)).then((d) => { if (d?.data) { setModels(d.data); setSessions((prev) => prev.map((s) => ({ ...s, selectedModel: s.selectedModel || d.data[0]?.id || "" }))); } }).catch(() => {});
+  }, []);
+  useEffect(() => {
+    fetch("/api/dashboard/keys", { credentials: "include" }).then((r) => (r.ok ? r.json() : null)).then((d) => {
+      if (d?.keys) { const enabled = d.keys.filter((k: ApiKey) => k.enabled === 1); setKeys(enabled); if (enabled.length > 0) setSessions((prev) => prev.map((s) => ({ ...s, selectedKeyId: s.selectedKeyId ?? enabled[0].id }))); }
+    }).catch(() => {});
+  }, []);
+
+  // ── Persistence ──
   useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed.chatHistory) setChatHistory(parsed.chatHistory);
-        if (parsed.selectedModel) setSelectedModel(parsed.selectedModel);
-        if (parsed.selectedKeyId) setSelectedKeyId(parsed.selectedKeyId);
-        if (parsed.params) setParams(parsed.params);
-        if (parsed.systemPrompt !== undefined) setSystemPrompt(parsed.systemPrompt);
-      }
+      if (saved) { const p = JSON.parse(saved); if (p.sessions?.length > 0) setSessions(p.sessions); if (p.currentSessionId) setCurrentSessionId(p.currentSessionId); }
     } catch { /* ignore */ }
   }, []);
-
   useEffect(() => {
-    try {
-      const data = { chatHistory, selectedModel, selectedKeyId, params, systemPrompt };
-      const json = JSON.stringify(data);
-      if (json.length > 2_000_000) {
-        const trimmed = { ...data, chatHistory: chatHistory.slice(-20) };
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(trimmed));
-      } else {
-        localStorage.setItem(STORAGE_KEY, json);
-      }
-    } catch { /* ignore */ }
-  }, [chatHistory, selectedModel, selectedKeyId, params, systemPrompt]);
+    if (sessions.length > 0) {
+      try {
+        const json = JSON.stringify({ sessions: sessions.slice(-50), currentSessionId });
+        if (json.length > 2_000_000) { const trimmed = sessions.slice(-20).map((s) => ({ ...s, messages: s.messages.slice(-30) })); localStorage.setItem(STORAGE_KEY, JSON.stringify({ sessions: trimmed, currentSessionId })); }
+        else localStorage.setItem(STORAGE_KEY, json);
+      } catch { /* ignore */ }
+    }
+  }, [sessions, currentSessionId]);
 
-  // ── Auto-scroll ──
+  // ── Auto-scroll (container only) ──
+  const scrollToBottom = useCallback(() => { msgContainerRef.current?.scrollTo({ top: msgContainerRef.current.scrollHeight, behavior: "smooth" }); }, []);
 
-  const prevLen = useRef(0);
+  const prevMsgLen = useRef(0);
   useEffect(() => {
     const len = chatHistory.length;
-    if (len > 0 && len > prevLen.current) {
-      chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
-    if (response && len > 0) {
-      chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
-    prevLen.current = len;
-  }, [chatHistory, response]);
+    if (len > 0 && len > prevMsgLen.current) scrollToBottom();
+    if (response && len > 0) scrollToBottom();
+    prevMsgLen.current = len;
+  }, [chatHistory, response, scrollToBottom]);
 
-  // ── Fetch models & keys ──
-
-  useEffect(() => {
-    fetch("/api/v1/models")
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => {
-        if (d?.data) {
-          setModels(d.data);
-          if (d.data.length > 0 && !selectedModel) setSelectedModel(d.data[0].id);
-        }
-      })
-      .catch(() => {});
-  }, []);
-
-  useEffect(() => {
-    fetch("/api/dashboard/keys", { credentials: "include" })
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => {
-        if (d?.keys) {
-          const enabled = d.keys.filter((k: ApiKey) => k.enabled === 1);
-          setKeys(enabled);
-          if (enabled.length > 0 && selectedKeyId === null) setSelectedKeyId(enabled[0].id);
-        }
-      })
-      .catch(() => {});
-  }, []);
-
-  // ── Derived ──
-
-  const selectedKey = keys.find((k) => k.id === selectedKeyId);
-  const presets = lang === "zh" ? PRESETS_ZH : PRESETS_EN;
-
-  // ── Message builder ──
-
+  // ── Build messages ──
   const buildMessages = () => {
     const msgs: Array<{ role: string; content: string }> = [];
-    if (systemPrompt.trim() && endpoint === "openai") {
-      msgs.push({ role: "system", content: systemPrompt.trim() });
-    }
+    if (systemPrompt.trim() && endpoint === "openai") msgs.push({ role: "system", content: systemPrompt.trim() });
     for (const m of chatHistory) msgs.push(m);
     msgs.push({ role: "user", content: message });
     return msgs;
   };
 
-  // ── Send (streaming) ──
-
-  const handleSend = useCallback(async () => {
-    if (!message.trim() || !selectedModel || !selectedKey || isSending) return;
-
-    setIsSending(true);
-    setError("");
-    setUsage(null);
-    setResponse("");
-
-    const controller = new AbortController();
-    abortRef.current = controller;
-
-    try {
-      const endpointUrl = endpoint === "openai"
-        ? "/api/v1/chat/completions"
-        : "/api/v1/messages";
-
-      const body = endpoint === "openai"
-        ? {
-            model: selectedModel,
-            messages: buildMessages(),
-            stream: true,
-            temperature: params.temperature,
-            max_tokens: params.max_tokens,
-            top_p: params.top_p,
-          }
-        : {
-            model: selectedModel,
-            messages: [{ role: "user", content: message }],
-            system: systemPrompt.trim() || undefined,
-            stream: true,
-            max_tokens: params.max_tokens,
-            temperature: params.temperature,
-          };
-
-      const res = await fetch(endpointUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${selectedKey.key_value}`,
-          ...(endpoint === "anthropic" ? { "anthropic-version": "2023-06-01" } : {}),
-        },
-        body: JSON.stringify(body),
-        signal: controller.signal,
-      });
-
-      if (!res.ok) {
-        const errData = await res.json().catch(() => null);
-        setError(errData?.error?.message || `HTTP ${res.status}: ${res.statusText}`);
-        setIsSending(false);
-        return;
-      }
-
-      if (endpoint === "openai") {
-        await handleOpenAIStream(res);
-      } else {
-        await handleAnthropicStream(res);
-      }
-    } catch (err: unknown) {
-      if (err instanceof DOMException && err.name === "AbortError") {
-        // User cancelled
-      } else {
-        setError(err instanceof Error ? err.message : "Network error");
-      }
-    } finally {
-      setIsSending(false);
-      abortRef.current = null;
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [message, selectedModel, selectedKey, isSending, chatHistory, systemPrompt, params, endpoint]);
-
   // ── Streaming parsers ──
-
   const handleOpenAIStream = async (res: Response) => {
     const reader = res.body?.getReader();
     if (!reader) { setError("No response body"); setIsSending(false); return; }
-
     const decoder = new TextDecoder();
-    let buffer = "";
-    let fullText = "";
-    let streamDone = false;
+    let buf = "", fullText = "", textBuf = "";
+    let lastRender = Date.now(), lineCount = 0;
+    let streamUsage: Usage | null = null;
 
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split("\n");
-      buffer = lines.pop() || "";
-
+      buf += decoder.decode(value, { stream: true });
+      const lines = buf.split("\n");
+      buf = lines.pop() || "";
+      let streamDone = false;
       for (const line of lines) {
         const trimmed = line.trim();
         if (!trimmed || !trimmed.startsWith("data: ")) continue;
@@ -364,502 +198,278 @@ export default function PlaygroundPage() {
         try {
           const parsed = JSON.parse(data);
           const delta = parsed.choices?.[0]?.delta?.content;
-          if (delta) { fullText += delta; setResponse(fullText); }
-          if (parsed.usage) {
-            setUsage(parsed.usage);
+          if (delta) {
+            fullText += delta; textBuf += delta;
+            const now = Date.now();
+            if (now - lastRender > 65) { setResponse(fullText); lastRender = now; textBuf = ""; }
           }
+          if (parsed.usage) { streamUsage = parsed.usage; setUsage(parsed.usage); }
         } catch { /* skip */ }
+        lineCount++;
+        if (lineCount % 5 === 0) await new Promise((r) => setTimeout(r, 0));
       }
       if (streamDone) break;
     }
-
+    if (textBuf) setResponse(fullText);
+    const msgUsage = streamUsage || { prompt_tokens: estimateTokens(sentMsgRef.current || ""), completion_tokens: fullText ? estimateTokens(fullText) : 0, total_tokens: estimateTokens(sentMsgRef.current || "") + (fullText ? estimateTokens(fullText) : 0) };
+    setUsage(msgUsage);
     if (fullText) {
-      setChatHistory(prev => [...prev, { role: "user", content: message }, { role: "assistant", content: fullText }]);
-      setMessage("");
-      setResponse("");
+      updateSession((s) => ({ ...s, title: s.messages.length <= 1 ? fullText.slice(0, 30).replace(/\n/g, " ") : s.title, messages: [...s.messages, { role: "assistant", content: fullText, createdAt: nowHHMM(), usage: msgUsage }] }));
+      setMessage(""); setResponse("");
     }
   };
 
   const handleAnthropicStream = async (res: Response) => {
     const reader = res.body?.getReader();
     if (!reader) { setError("No response body"); setIsSending(false); return; }
-
     const decoder = new TextDecoder();
-    let buffer = "";
-    let fullText = "";
-    let streamDone = false;
-    let inputTokens = 0;
-    let outputTokens = 0;
+    let buf = "", fullText = "", textBuf = "";
+    let lastRender = Date.now(), inputTokens = 0, outputTokens = 0;
 
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split("\n");
-      buffer = lines.pop() || "";
-
+      buf += decoder.decode(value, { stream: true });
+      const lines = buf.split("\n"); buf = lines.pop() || "";
       for (const line of lines) {
         const trimmed = line.trim();
-        if (!trimmed) continue;
-        if (trimmed.startsWith("event: ")) continue;
+        if (!trimmed || trimmed.startsWith("event: ")) continue;
         if (trimmed.startsWith("data: ")) {
-          const data = trimmed.slice(6);
           try {
-            const parsed = JSON.parse(data);
+            const parsed = JSON.parse(trimmed.slice(6));
             if (parsed.type === "content_block_delta" && parsed.delta?.type === "text_delta") {
-              fullText += parsed.delta.text || "";
-              setResponse(fullText);
+              fullText += parsed.delta.text || ""; textBuf += parsed.delta.text || "";
+              const now = Date.now();
+              if (now - lastRender > 65) { setResponse(fullText); lastRender = now; textBuf = ""; }
             }
-            if (parsed.type === "message_start" && parsed.message?.usage) {
-              inputTokens = parsed.message.usage.input_tokens || 0;
-              outputTokens = parsed.message.usage.output_tokens || 0;
-              setUsage({ prompt_tokens: inputTokens, completion_tokens: outputTokens, total_tokens: inputTokens + outputTokens });
-            }
-            if (parsed.type === "message_delta" && parsed.usage) {
-              outputTokens = parsed.usage.output_tokens || 0;
-              inputTokens = parsed.usage.input_tokens || inputTokens;
-              setUsage({ prompt_tokens: inputTokens, completion_tokens: outputTokens, total_tokens: inputTokens + outputTokens });
-            }
+            if (parsed.type === "message_start" && parsed.message?.usage) { inputTokens = parsed.message.usage.input_tokens || 0; outputTokens = parsed.message.usage.output_tokens || 0; setUsage({ prompt_tokens: inputTokens, completion_tokens: outputTokens, total_tokens: inputTokens + outputTokens }); }
+            if (parsed.type === "message_delta" && parsed.usage) { outputTokens = parsed.usage.output_tokens || 0; inputTokens = parsed.usage.input_tokens || inputTokens; setUsage({ prompt_tokens: inputTokens, completion_tokens: outputTokens, total_tokens: inputTokens + outputTokens }); }
           } catch { /* skip */ }
         }
       }
     }
-
+    if (textBuf) setResponse(fullText);
+    const msgUsage = (inputTokens > 0 || outputTokens > 0) ? { prompt_tokens: inputTokens, completion_tokens: outputTokens, total_tokens: inputTokens + outputTokens } : { prompt_tokens: estimateTokens(sentMsgRef.current || ""), completion_tokens: fullText ? estimateTokens(fullText) : 0, total_tokens: estimateTokens(sentMsgRef.current || "") + (fullText ? estimateTokens(fullText) : 0) };
+    setUsage(msgUsage);
     if (fullText) {
-      setChatHistory(prev => [...prev, { role: "user", content: message }, { role: "assistant", content: fullText }]);
-      setMessage("");
-      setResponse("");
+      updateSession((s) => ({ ...s, title: s.messages.length <= 1 ? fullText.slice(0, 30).replace(/\n/g, " ") : s.title, messages: [...s.messages, { role: "assistant", content: fullText, createdAt: nowHHMM(), usage: msgUsage }] }));
+      setMessage(""); setResponse("");
     }
   };
 
-  // ── Concurrency test ──
+  // ── Send ──
+  const handleSend = useCallback(async () => {
+    if (!message.trim() || !selectedModel || !selectedKey || isSending) return;
+    setIsSending(true); setError(""); setUsage(null); setResponse("");
+    sentMsgRef.current = message;
+    setMessage("");
+    updateSession((s) => ({ ...s, messages: [...s.messages, { role: "user", content: sentMsgRef.current, createdAt: nowHHMM() }] }));
+
+    const controller = new AbortController();
+    abortRef.current = controller;
+    try {
+      const endpointUrl = endpoint === "openai" ? "/api/v1/chat/completions" : "/api/v1/messages";
+      const body = endpoint === "openai" ? { model: selectedModel, messages: buildMessages(), stream: true, temperature: params.temperature, max_tokens: params.max_tokens, top_p: params.top_p } : { model: selectedModel, messages: [{ role: "user", content: sentMsgRef.current }], system: systemPrompt.trim() || undefined, stream: true, max_tokens: params.max_tokens, temperature: params.temperature };
+      const res = await fetch(endpointUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${selectedKey.key_value}`, ...(endpoint === "anthropic" ? { "anthropic-version": "2023-06-01" } : {}) },
+        body: JSON.stringify(body), signal: controller.signal,
+      });
+      if (!res.ok) { const errData = await res.json().catch(() => null); setError(errData?.error?.message || `HTTP ${res.status}: ${res.statusText}`); setIsSending(false); return; }
+      if (endpoint === "openai") await handleOpenAIStream(res);
+      else await handleAnthropicStream(res);
+    } catch (err: unknown) {
+      if (err instanceof DOMException && err.name === "AbortError") { /* cancelled */ }
+      else setError(err instanceof Error ? err.message : "Network error");
+    } finally { setIsSending(false); abortRef.current = null; }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [message, selectedModel, selectedKey?.key_value, isSending, chatHistory, systemPrompt, params, endpoint]);
+
+  // ── Stop / Refresh / Concurrency ──
+  const handleStop = useCallback(() => { if (abortRef.current) { abortRef.current.abort(); abortRef.current = null; setIsSending(false); } }, []);
+  const handleRefresh = useCallback(() => {
+    fetch("/api/v1/models").then((r) => (r.ok ? r.json() : null)).then((d) => { if (d?.data) setModels(d.data); }).catch(() => {});
+    fetch("/api/dashboard/keys", { credentials: "include" }).then((r) => (r.ok ? r.json() : null)).then((d) => { if (d?.keys) setKeys(d.keys.filter((k: ApiKey) => k.enabled === 1)); }).catch(() => {});
+  }, []);
+  const handleKeyDown = (e: React.KeyboardEvent) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } };
 
   const handleConcurrencyTest = useCallback(async () => {
     if (!selectedModel || !selectedKey || isConcurrencyTesting) return;
-
     setIsConcurrencyTesting(true);
-    setConcurrencyResults([]);
-
-    const results: ConcurrencyResult[] = [];
-    const promises = Array.from({ length: concurrencyCount }, async (_, i) => {
+    const testMsg = message.trim() || (lang === "zh" ? "你好" : "Hello");
+    const startTime = performance.now();
+    let completed = 0, totalLatency = 0, totalTokens = 0;
+    const promises = Array.from({ length: concurrencyCount }, async () => {
       const reqStart = performance.now();
       try {
-        const endpointUrl = endpoint === "openai"
-          ? "/api/v1/chat/completions"
-          : "/api/v1/messages";
-
-        const testMessage = message.trim() || (lang === "zh" ? "你好" : "Hello");
-
-        const body = endpoint === "openai"
-          ? { model: selectedModel, messages: [{ role: "user", content: testMessage }], stream: false, max_tokens: 100 }
-          : { model: selectedModel, messages: [{ role: "user", content: testMessage }], max_tokens: 100, stream: false };
-
-        const res = await fetch(endpointUrl, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${selectedKey.key_value}`,
-            ...(endpoint === "anthropic" ? { "anthropic-version": "2023-06-01" } : {}),
-          },
-          body: JSON.stringify(body),
-        });
-
-        const latencyMs = Math.round(performance.now() - reqStart);
-
-        if (res.ok) {
-          const data = await res.json();
-          const content = data?.choices?.[0]?.message?.content || data?.content?.[0]?.text || "";
-          results.push({ index: i + 1, status: "success", latencyMs, responseSnippet: content.slice(0, 80) });
-        } else {
-          const errData = await res.json().catch(() => null);
-          results.push({ index: i + 1, status: "error", latencyMs, responseSnippet: "", errorMessage: errData?.error?.message || `HTTP ${res.status}` });
-        }
-      } catch (err) {
-        results.push({ index: i + 1, status: "error", latencyMs: Math.round(performance.now() - reqStart), responseSnippet: "", errorMessage: err instanceof Error ? err.message : "Network error" });
-      }
-      setConcurrencyResults([...results]);
+        const u = endpoint === "openai" ? "/api/v1/chat/completions" : "/api/v1/messages";
+        const b = endpoint === "openai" ? { model: selectedModel, messages: [{ role: "user", content: testMsg }], stream: false, max_tokens: 100 } : { model: selectedModel, messages: [{ role: "user", content: testMsg }], max_tokens: 100, stream: false };
+        const res = await fetch(u, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${selectedKey.key_value}`, ...(endpoint === "anthropic" ? { "anthropic-version": "2023-06-01" } : {}) }, body: JSON.stringify(b) });
+        totalLatency += performance.now() - reqStart;
+        if (res.ok) { const data = await res.json(); totalTokens += estimateTokens(data?.choices?.[0]?.message?.content || data?.content?.[0]?.text || ""); }
+      } catch { /* ignore */ }
+      completed++;
     });
-
     await Promise.allSettled(promises);
-    setConcurrencyResults([...results]);
     setIsConcurrencyTesting(false);
-  }, [selectedModel, selectedKey, concurrencyCount, message, endpoint, lang, isConcurrencyTesting]);
-
-  // ── Other callbacks ──
-
-  const handleStop = useCallback(() => {
-    if (abortRef.current) { abortRef.current.abort(); abortRef.current = null; setIsSending(false); }
-  }, []);
-
-  const handleRefresh = useCallback(() => {
-    fetch("/api/v1/models")
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => { if (d?.data) setModels(d.data); })
-      .catch(() => {});
-    fetch("/api/dashboard/keys", { credentials: "include" })
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => { if (d?.keys) setKeys(d.keys.filter((k: ApiKey) => k.enabled === 1)); })
-      .catch(() => {});
-  }, []);
-
-  const handleExport = useCallback(() => {
-    const lines: string[] = [];
-    lines.push(`# Playground Export — ${new Date().toLocaleString()}`);
-    lines.push("");
-    if (systemPrompt.trim()) { lines.push("## System Prompt"); lines.push(systemPrompt.trim()); lines.push(""); }
-    for (const msg of chatHistory) {
-      lines.push(`### ${msg.role === "user" ? "User" : "Assistant"}`);
-      lines.push(msg.content);
-      lines.push("");
-    }
-    const blob = new Blob([lines.join("\n")], { type: "text/markdown" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `playground-${new Date().toISOString().slice(0, 10)}.md`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }, [chatHistory, systemPrompt]);
-
-  const handleClear = () => {
-    setChatHistory([]); setResponse(""); setError(""); setUsage(null); setConcurrencyResults([]);
-    try { localStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
-  };
+  }, [selectedModel, selectedKey?.key_value, concurrencyCount, message, endpoint, lang, isConcurrencyTesting]);
 
   // ── Render ──
-
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold flex items-center gap-2">
-        <Play className="h-6 w-6 text-primary" />
-        {t.title}
-      </h1>
-
-      {/* Settings Card */}
-      <Card className="glass-card">
-        <CardContent className="p-6 space-y-4">
-          {/* Model, Key, Endpoint row */}
-          <div className="grid md:grid-cols-3 gap-4">
-            <div>
-              <label className="text-sm text-muted-foreground mb-1.5 block flex items-center gap-2">
-                {t.selectModel}
-                <button onClick={handleRefresh} className="p-0.5 rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" aria-label={t.refresh}>
-                  <RefreshCw className="h-3 w-3" />
-                </button>
-              </label>
-              <select
-                className="w-full h-9 px-3 rounded-md border border-input bg-background text-sm focus:border-primary focus:outline-none"
-                value={selectedModel}
-                onChange={(e) => setSelectedModel(e.target.value)}
-              >
-                {models.length === 0 && <option value="">{t.noModels}</option>}
-                {Object.entries(models.reduce<Record<string, Model[]>>((acc, m) => {
-                  const g = m.owned_by || "unknown"; if (!acc[g]) acc[g] = []; acc[g].push(m); return acc;
-                }, {})).map(([group, groupModels]) => (
-                  <optgroup key={group} label={group}>
-                    {groupModels.map((m) => (
-                      <option key={m.id} value={m.id}>{m.display_name || m.id}</option>
-                    ))}
-                  </optgroup>
-                ))}
-              </select>
+    <div className="rounded-xl dark:shadow-[0_0_100px_25px_rgba(0,212,255,0.1)]">
+      <div className="flex h-[calc(100vh-7rem)] w-full overflow-hidden bg-background border border-border/40 rounded-xl shadow-sm dark:border-white/[0.08]">
+      {/* Column 1: Session Sidebar */}
+      <aside className="w-56 h-full border-r border-border/90 bg-muted/20 backdrop-blur-sm p-3 flex flex-col shrink-0">
+        <button onClick={createSession} className="flex items-center gap-2 w-full px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors border border-border/50 mb-3"><Plus className="h-4 w-4" /><span>{t.newSession}</span></button>
+        <div className="flex-1 overflow-y-auto space-y-1 scrollbar-hide">
+          {sessions.map((s) => (
+            <div key={s.id} onClick={() => switchSession(s.id)} className={cn("group flex items-center gap-2 px-3 py-2 rounded-md text-sm cursor-pointer transition-colors", s.id === currentSessionId ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted")}>
+              <MessageSquare className="h-3.5 w-3.5 shrink-0" />
+              <span className="flex-1 truncate">{s.title}</span>
+              {sessions.length > 1 && <button onClick={(e) => deleteSession(e, s.id)} className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded hover:bg-muted-foreground/20"><X className="h-3 w-3" /></button>}
             </div>
-            <div>
-              <label className="text-sm text-muted-foreground mb-1.5 block flex items-center gap-2">
-                {t.selectKey}
-                <button onClick={handleRefresh} className="p-0.5 rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" aria-label={t.refresh}>
-                  <RefreshCw className="h-3 w-3" />
-                </button>
-              </label>
-              <select
-                className="w-full h-9 px-3 rounded-md border border-input bg-background text-sm focus:border-primary focus:outline-none"
-                value={selectedKeyId ?? ""}
-                onChange={(e) => setSelectedKeyId(e.target.value ? Number(e.target.value) : null)}
-              >
-                {keys.length === 0 && <option value="">{t.noKeys}</option>}
-                {keys.map((k) => (
-                  <option key={k.id} value={k.id}>{k.name} ({k.key_value.slice(0, 12)}...)</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="text-sm text-muted-foreground mb-1.5 block">{t.endpoint}</label>
-              <div className="flex rounded-md border border-input overflow-hidden">
-                <button
-                  onClick={() => setEndpoint("openai")}
-                  className={cn("flex-1 h-9 text-sm font-medium transition-colors",
-                    endpoint === "openai"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-background text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  {t.openai}
-                </button>
-                <button
-                  onClick={() => setEndpoint("anthropic")}
-                  className={cn("flex-1 h-9 text-sm font-medium transition-colors border-l border-input",
-                    endpoint === "anthropic"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-background text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  {t.anthropic}
-                </button>
-              </div>
-            </div>
-          </div>
+          ))}
+        </div>
+      </aside>
 
-          {/* Parameters toggle */}
-          <div>
-            <button onClick={() => setShowParams(!showParams)}
-              className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
-              <Settings2 className="h-3.5 w-3.5" />
-              {t.params}
-              <ChevronDown className={cn("h-3 w-3 transition-transform", showParams && "rotate-180")} />
-            </button>
-            {showParams && (
-              <div className="grid md:grid-cols-3 gap-4 mt-3 p-4 rounded-lg bg-muted/20 border border-border/30 animate-slideDown">
-                <div>
-                  <label className="text-xs text-muted-foreground block mb-1">{t.temperature}</label>
-                  <div className="flex items-center gap-2">
-                    <input type="range" min="0" max="2" step="0.1" value={params.temperature}
-                      onChange={e => setParams(p => ({ ...p, temperature: parseFloat(e.target.value) }))}
-                      className="flex-1" />
-                    <span className="text-xs font-mono w-8 text-right">{params.temperature.toFixed(1)}</span>
-                  </div>
-                </div>
-                <div>
-                  <label className="text-xs text-muted-foreground block mb-1">{t.maxTokens}</label>
-                  <input type="number" min="1" max="131072" step="1" value={params.max_tokens}
-                    onChange={e => setParams(p => ({ ...p, max_tokens: parseInt(e.target.value) || 4096 }))}
-                    className="w-full h-8 px-2 rounded-md border border-input bg-background text-sm" />
-                </div>
-                <div>
-                  <label className="text-xs text-muted-foreground block mb-1">{t.topP}</label>
-                  <div className="flex items-center gap-2">
-                    <input type="range" min="0" max="1" step="0.05" value={params.top_p}
-                      onChange={e => setParams(p => ({ ...p, top_p: parseFloat(e.target.value) }))}
-                      className="flex-1" />
-                    <span className="text-xs font-mono w-8 text-right">{params.top_p.toFixed(2)}</span>
-                  </div>
-                </div>
-              </div>
-            )}
+      {/* Column 2: Chat Area */}
+      <div className="flex-1 flex flex-col h-full relative overflow-hidden border-r border-border/90">
+        {/* Status bar */}
+        <div className="flex items-center justify-between px-5 py-2.5 border-b border-border/90 bg-muted/30 shrink-0">
+          <div className="flex items-center gap-2">
+            {selectedModel && <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-primary/10 backdrop-blur-sm border border-primary/20 text-[11px] font-mono text-primary"><Zap className="h-3 w-3" />{selectedModel}</span>}
+            {isSending && <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />}
           </div>
-
-          {/* System Prompt */}
-          <div>
-            <label className="text-xs text-muted-foreground block mb-1">{t.systemPrompt}</label>
-            <input value={systemPrompt} onChange={e => setSystemPrompt(e.target.value)}
-              placeholder={t.systemPromptPlaceholder}
-              className="w-full h-8 px-3 rounded-md border border-input bg-background text-sm focus:border-primary focus:outline-none" />
+          <div className="flex items-center gap-2 text-xs text-muted-foreground font-mono">
+            {usage && <span className="flex items-center gap-2"><Zap className="h-3 w-3" /><span>{t.usage}: {t.inputNonCached} {usage.prompt_tokens - (usage.tokens_in_cache || 0)} {t.inputCached} {usage.tokens_in_cache || 0} {t.outputTokens} {usage.completion_tokens} {t.totalTokensLabel} {usage.total_tokens}</span></span>}
           </div>
-        </CardContent>
-      </Card>
+        </div>
 
-      {/* Chat Area */}
-      <Card className="glass-card">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Bot className="h-5 w-5" />
-            {t.conversation}
-            {isSending && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
-          </CardTitle>
-          {chatHistory.length > 0 && (
-            <div className="flex gap-1.5">
-              <Button variant="outline" size="sm" onClick={handleExport} className="gap-1 text-xs h-7">
-                <Download className="h-3.5 w-3.5" />
-                {t.export}
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleClear} className="gap-1 text-xs h-7">
-                <Trash2 className="h-3.5 w-3.5" />
-                {t.clear}
-              </Button>
+        {/* Messages */}
+        <div ref={msgContainerRef} className="flex-1 overflow-y-auto p-6 space-y-4 scrollbar-hide">
+          {chatHistory.length === 0 && !response && !error && (
+            <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
+              <Bot className="h-12 w-12 mb-3 opacity-20" /><p className="text-sm">{t.noResponse}</p>
+              <div className="mt-6 max-w-md"><p className="text-[11px] text-muted-foreground mb-2">{t.presets}:</p><div className="flex flex-wrap gap-1.5 justify-center">{presets.map((p, i) => (<button key={i} onClick={() => setMessage(p)} className="px-2.5 py-1.5 rounded-md text-[11px] font-mono text-muted-foreground bg-muted/50 border border-border/50 hover:text-foreground hover:border-muted-foreground/30 transition-colors">{p}</button>))}</div></div>
             </div>
           )}
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Messages */}
-          <div className="max-h-[400px] overflow-y-auto space-y-3 pr-1">
-            {chatHistory.length === 0 && !response && !error && (
-              <div className="text-center py-8 text-muted-foreground">
-                <Bot className="h-10 w-10 mx-auto mb-2 opacity-30" />
-                <p className="text-sm">{t.noResponse}</p>
-              </div>
-            )}
 
-            {chatHistory.map((msg, i) => (
-              <div key={i} className={cn("flex gap-3 group", msg.role === "assistant" ? "" : "flex-row-reverse")}>
-                <div className={cn("p-1.5 rounded-lg shrink-0", msg.role === "assistant" ? "bg-primary/10" : "bg-muted")}>
-                  {msg.role === "assistant" ? <Bot className="h-4 w-4" /> : <User className="h-4 w-4" />}
-                </div>
-                <div className={cn("rounded-lg px-4 py-2.5 max-w-[80%] text-sm leading-relaxed relative",
-                  msg.role === "assistant" ? "bg-muted/30 border border-border/30" : "bg-primary/10"
-                )}>
+          {chatHistory.map((msg, i) => (
+            <div key={i} className={cn("flex gap-3 group", msg.role === "assistant" ? "" : "flex-row-reverse")}>
+              <div className={cn("p-1.5 rounded-lg shrink-0", msg.role === "assistant" ? "bg-primary/10" : "bg-muted")}>{msg.role === "assistant" ? <Bot className="h-4 w-4" /> : <User className="h-4 w-4" />}</div>
+              <div className="max-w-[80%]">
+                <div className={cn("glass-card rounded-lg px-4 py-2.5 text-sm leading-relaxed relative", msg.role === "assistant" ? "" : "bg-primary/10 border-0")}>
                   <div className="text-xs"><MarkdownRenderer content={msg.content} /></div>
                   <CopyButton text={msg.content} className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-md hover:bg-muted text-muted-foreground" />
                 </div>
-              </div>
-            ))}
-
-            {response && (
-              <div className="flex gap-3 group">
-                <div className="p-1.5 rounded-lg bg-primary/10 shrink-0">
-                  <Bot className="h-4 w-4" />
-                </div>
-                <div className="rounded-lg px-4 py-2.5 max-w-[80%] bg-muted/30 border border-border/30 relative">
-                  <div className="text-xs"><MarkdownRenderer content={response} /></div>
-                </div>
-              </div>
-            )}
-
-            <div ref={chatEndRef} />
-          </div>
-
-          {/* Error */}
-          {error && (
-            <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-3">
-              <p className="text-xs font-medium text-destructive mb-0.5">{t.error}</p>
-              <p className="text-xs text-destructive/80 font-mono">{error}</p>
-            </div>
-          )}
-
-          {/* Usage */}
-          {usage && (
-            <div className="flex items-center gap-3 text-xs text-muted-foreground">
-              <Zap className="h-3.5 w-3.5" />
-              <span className="font-medium">{t.usage}:</span>
-              <span>{t.promptTokens}: <span className="font-mono text-foreground">{usage.prompt_tokens}</span></span>
-              <span>{t.completionTokens}: <span className="font-mono text-foreground">{usage.completion_tokens}</span></span>
-              <span>{t.totalTokens}: <span className="font-mono text-foreground">{usage.total_tokens}</span></span>
-            </div>
-          )}
-
-          {/* Preset questions */}
-          {chatHistory.length === 0 && !isSending && (
-            <div>
-              <p className="text-xs text-muted-foreground mb-2">{t.presets}:</p>
-              <div className="flex flex-wrap gap-1.5">
-                {presets.map((p, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setMessage(p)}
-                    className="px-2.5 py-1.5 rounded-md text-[11px] font-mono text-muted-foreground bg-muted/50 border border-border/50 hover:text-foreground hover:border-muted-foreground/30 transition-colors"
-                  >
-                    {p}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Input */}
-          <div className="flex gap-2">
-            <Textarea
-              placeholder={lang === "zh" ? "输入消息... (Shift+Enter 换行, Enter 发送)" : "Type a message... (Shift+Enter newline, Enter send)"}
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              onKeyDown={handleKeyDown}
-              rows={2}
-              className="resize-none flex-1"
-              disabled={isSending}
-            />
-            <div className="flex flex-col gap-1.5">
-              {isSending ? (
-                <Button variant="destructive" onClick={handleStop} className="gap-1 h-full">
-                  <Square className="h-4 w-4" />
-                </Button>
-              ) : (
-                <Button onClick={handleSend}
-                  disabled={!message.trim() || !selectedModel || !selectedKey}
-                  className="gap-1 h-full">
-                  <Send className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Concurrency Test Card */}
-      {selectedModel && selectedKey && (
-        <Card className="glass-card">
-          <CardHeader className="flex flex-row items-center gap-2 py-3 px-5">
-            <Beaker className="h-4 w-4 text-muted-foreground" />
-            <CardTitle className="text-sm font-medium text-foreground">{t.concurrency}</CardTitle>
-          </CardHeader>
-          <CardContent className="px-5 pb-5 pt-0 space-y-3">
-            <div className="flex items-center gap-3">
-              <span className="text-xs text-muted-foreground">{t.concurrencyCount}:</span>
-              <input
-                type="number"
-                min={1}
-                max={50}
-                value={concurrencyCount}
-                onChange={e => setConcurrencyCount(Math.min(50, Math.max(1, parseInt(e.target.value) || 1)))}
-                className="w-16 h-7 px-2 rounded-md border border-input bg-background text-xs font-mono text-center"
-              />
-              <span className="text-[11px] text-muted-foreground">
-                {lang === "zh" ? "使用当前输入框中的消息" : "Uses current input message"}
-              </span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleConcurrencyTest}
-                disabled={isConcurrencyTesting}
-                className="gap-1.5 text-xs h-7 ml-auto"
-              >
-                {isConcurrencyTesting ? (
-                  <><Loader2 className="h-3 w-3 animate-spin" />{t.concurrencyRunning}</>
-                ) : (
-                  <><GanttChart className="h-3 w-3" />{t.concurrencyGo}</>
+                <div className="flex items-center gap-2 mt-1 px-1 text-[10px] text-muted-foreground/60 font-mono"><span>{wordCount(msg.content)} words</span><span>·</span><span>{msg.createdAt || nowHHMM()}</span></div>
+                {msg.role === "assistant" && msg.usage && (
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-0.5 px-1 text-[10px] text-muted-foreground/60 font-mono">
+                    <span className="text-primary/70">{t.usage}:</span>
+                    <span>{t.inputNonCached} <span className="text-foreground/80">{msg.usage.prompt_tokens - (msg.usage.tokens_in_cache || 0)}</span></span>
+                    <span>{t.inputCached} <span className="text-foreground/80">{msg.usage.tokens_in_cache || 0}</span></span>
+                    <span>{t.outputTokens} <span className="text-foreground/80">{msg.usage.completion_tokens}</span></span>
+                    <span>{t.totalTokensLabel} <span className="text-foreground/80">{msg.usage.total_tokens}</span></span>
+                  </div>
                 )}
-              </Button>
-            </div>
-
-            {concurrencyResults.length > 0 && (
-              <div className="rounded-lg border border-border/50 overflow-hidden">
-                <table className="w-full text-xs">
-                  <thead>
-                    <tr className="bg-muted/50">
-                      <th className="p-2 text-left text-muted-foreground font-medium">#</th>
-                      <th className="p-2 text-left text-muted-foreground font-medium">{t.concurrencyStatus}</th>
-                      <th className="p-2 text-left text-muted-foreground font-medium">{t.concurrencyLatency}</th>
-                      <th className="p-2 text-left text-muted-foreground font-medium">{t.concurrencyResponse}</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border/30">
-                    {concurrencyResults.map((r) => (
-                      <tr key={r.index} className={cn(r.status === "success" ? "" : "bg-destructive/5")}>
-                        <td className="p-2 font-mono text-muted-foreground">{r.index}</td>
-                        <td className="p-2">
-                          <span className={cn("font-medium", r.status === "success" ? "text-emerald-500" : "text-red-500")}>
-                            {r.status === "success" ? "✓" : "✗"}
-                          </span>
-                        </td>
-                        <td className="p-2 font-mono text-foreground">{r.latencyMs}ms</td>
-                        <td className="p-2 text-muted-foreground truncate max-w-[200px]">
-                          {r.status === "success" ? (
-                            <span className="text-foreground/70">{r.responseSnippet}{r.responseSnippet.length >= 80 ? "..." : ""}</span>
-                          ) : (
-                            <span className="text-red-500/70">{r.errorMessage}</span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
               </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
+            </div>
+          ))}
+
+          {response && (
+            <div className="flex gap-3">
+              <div className="p-1.5 rounded-lg bg-primary/10 shrink-0"><Bot className="h-4 w-4" /></div>
+              <div className="max-w-[80%]">
+                <div className="glass-card rounded-lg px-4 py-2.5 relative"><div className="text-xs"><MarkdownRenderer content={response} /></div></div>
+                <div className="flex items-center gap-2 mt-1 px-1 text-[10px] text-muted-foreground/60 font-mono"><span>{wordCount(response)} words</span><span>·</span><span>{nowHHMM()}</span></div>
+                {usage && (
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-0.5 px-1 text-[10px] text-muted-foreground/60 font-mono">
+                    <span className="text-primary/70">{t.usage}:</span>
+                    <span>{t.inputNonCached} <span className="text-foreground/80">{usage.prompt_tokens - (usage.tokens_in_cache || 0)}</span></span>
+                    <span>{t.inputCached} <span className="text-foreground/80">{usage.tokens_in_cache || 0}</span></span>
+                    <span>{t.outputTokens} <span className="text-foreground/80">{usage.completion_tokens}</span></span>
+                    <span>{t.totalTokensLabel} <span className="text-foreground/80">{usage.total_tokens}</span></span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+          <div ref={msgEndRef} />
+        </div>
+
+        {/* Error */}
+        {error && <div className="mx-5 mb-2 rounded-lg border border-destructive/30 bg-destructive/10 p-3"><p className="text-xs font-medium text-destructive mb-0.5">{t.error}</p><p className="text-xs text-destructive/80 font-mono">{error}</p></div>}
+
+        {/* Concurrency drawer */}
+        <div className="border-t border-border/90">
+          <button onClick={() => setDrawerOpen(!drawerOpen)} className="flex items-center gap-2 w-full px-5 py-2 text-xs text-muted-foreground hover:text-foreground transition-colors">
+            <Beaker className="h-3.5 w-3.5" /><span>{t.concurrency}</span>
+            {drawerOpen ? <ChevronDown className="h-3 w-3 ml-auto" /> : <ChevronUp className="h-3 w-3 ml-auto" />}
+          </button>
+          {drawerOpen && (
+            <div className="px-5 pb-3 space-y-3">
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-muted-foreground">{t.concurrencyCount}:</span>
+                <input type="number" min={1} max={50} value={concurrencyCount} onChange={(e) => setConcurrencyCount(Math.min(50, Math.max(1, parseInt(e.target.value) || 1)))} className="w-16 h-7 px-2 rounded-md border border-input bg-background text-xs font-mono text-center" />
+                <span className="text-[11px] text-muted-foreground">{lang === "zh" ? "使用当前输入框中的消息" : "Uses current input message"}</span>
+                <Button variant="outline" size="sm" onClick={handleConcurrencyTest} disabled={isConcurrencyTesting || !selectedModel || !selectedKey} className="gap-1.5 text-xs h-7 ml-auto">
+                  {isConcurrencyTesting ? <><Loader2 className="h-3 w-3 animate-spin" />{t.concurrencyRunning}</> : <><GanttChart className="h-3 w-3" />{t.concurrencyGo}</>}
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Input */}
+        <div className="p-4 bg-background border-t border-border/90">
+          <div className="flex gap-2">
+            <Textarea placeholder={lang === "zh" ? "输入消息... (Shift+Enter 换行, Enter 发送)" : "Type a message... (Shift+Enter newline, Enter send)"} value={message} onChange={(e) => setMessage(e.target.value)} onKeyDown={handleKeyDown} rows={2} className="resize-none flex-1" disabled={isSending} />
+            <div className="flex flex-col gap-1.5">
+              {isSending ? <Button variant="destructive" onClick={handleStop} className="gap-1 h-full"><Square className="h-4 w-4" /></Button> : <Button onClick={handleSend} disabled={!message.trim() || !selectedModel || !selectedKey} className="gap-1 h-full"><Send className="h-4 w-4" /></Button>}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Column 3: Parameters Panel */}
+      <aside className="w-72 h-full bg-muted/20 backdrop-blur-sm p-4 space-y-5 hidden xl:block overflow-y-auto shrink-0 border-l border-border/90">
+        {/* Model */}
+        <div>
+          <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-1.5 block flex items-center gap-2">{t.selectModel}<button onClick={handleRefresh} className="p-0.5 rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"><RefreshCw className="h-3 w-3" /></button></label>
+          <select className="w-full h-8 px-2.5 rounded-md border border-input bg-background text-xs font-mono focus:border-primary focus:outline-none" value={selectedModel} onChange={(e) => { updateSession((s) => ({ ...s, selectedModel: e.target.value })); }}>
+            {models.length === 0 && <option value="">{t.noModels}</option>}
+            {Object.entries(models.reduce<Record<string, Model[]>>((acc, m) => { const g = m.owned_by || "unknown"; if (!acc[g]) acc[g] = []; acc[g].push(m); return acc; }, {})).map(([group, gmodels]) => (<optgroup key={group} label={group}>{gmodels.map((m) => (<option key={m.id} value={m.id}>{sanitizeModelName(m)}</option>))}</optgroup>))}
+          </select>
+        </div>
+        {/* Key */}
+        <div>
+          <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-1.5 block">{t.selectKey}</label>
+          <select className="w-full h-8 px-2.5 rounded-md border border-input bg-background text-xs font-mono focus:border-primary focus:outline-none" value={selectedKeyId ?? ""} onChange={(e) => { updateSession((s) => ({ ...s, selectedKeyId: e.target.value ? Number(e.target.value) : null })); }}>
+            {keys.length === 0 && <option value="">{t.noKeys}</option>}
+            {keys.map((k) => (<option key={k.id} value={k.id}>{k.name} ({k.key_value.slice(0, 12)}...)</option>))}
+          </select>
+        </div>
+        {/* Endpoint */}
+        <div>
+          <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-1.5 block">{t.endpoint}</label>
+          <div className="flex rounded-md border border-input overflow-hidden">
+            <button onClick={() => setEndpoint("openai")} className={cn("flex-1 h-8 text-xs font-medium transition-colors", endpoint === "openai" ? "bg-primary text-primary-foreground" : "bg-background text-muted-foreground hover:text-foreground")}>{t.openai}</button>
+            <button onClick={() => setEndpoint("anthropic")} className={cn("flex-1 h-8 text-xs font-medium transition-colors border-l border-input", endpoint === "anthropic" ? "bg-primary text-primary-foreground" : "bg-background text-muted-foreground hover:text-foreground")}>{t.anthropic}</button>
+          </div>
+        </div>
+        {/* Params */}
+        <div>
+          <div className="flex items-center gap-1.5 mb-2"><Settings2 className="h-3.5 w-3.5 text-muted-foreground" /><span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">{t.params}</span></div>
+          <div className="space-y-4">
+            <div><label className="text-[11px] text-muted-foreground block mb-1">{t.temperature}</label><div className="flex items-center gap-2"><input type="range" min="0" max="2" step="0.1" value={params.temperature} onChange={(e) => { const v = parseFloat(e.target.value); updateSession((s) => ({ ...s, params: { ...s.params, temperature: v } })); }} className="flex-1" /><span className="text-xs font-mono w-8 text-right text-foreground">{params.temperature.toFixed(1)}</span></div></div>
+            <div><label className="text-[11px] text-muted-foreground block mb-1">{t.maxTokens}</label><input type="number" min="1" max="131072" step="1" value={params.max_tokens} onChange={(e) => { const v = parseInt(e.target.value) || 4096; updateSession((s) => ({ ...s, params: { ...s.params, max_tokens: v } })); }} className="w-full h-8 px-2 rounded-md border border-input bg-background text-xs font-mono" /></div>
+            <div><label className="text-[11px] text-muted-foreground block mb-1">{t.topP}</label><div className="flex items-center gap-2"><input type="range" min="0" max="1" step="0.05" value={params.top_p} onChange={(e) => { const v = parseFloat(e.target.value); updateSession((s) => ({ ...s, params: { ...s.params, top_p: v } })); }} className="flex-1" /><span className="text-xs font-mono w-8 text-right text-foreground">{params.top_p.toFixed(2)}</span></div></div>
+          </div>
+        </div>
+        {/* System Prompt */}
+        <div><label className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-1.5 block">{t.systemPrompt}</label><textarea value={systemPrompt} onChange={(e) => updateSession((s) => ({ ...s, systemPrompt: e.target.value }))} placeholder={t.systemPromptPH} rows={3} className="w-full px-2.5 py-1.5 rounded-md border border-input bg-background text-xs font-mono resize-none focus:border-primary focus:outline-none" /></div>
+      </aside>
+    </div>
     </div>
   );
 }

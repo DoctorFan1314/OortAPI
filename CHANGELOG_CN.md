@@ -6,6 +6,24 @@
 
 ---
 
+## [v3.3.4.17] — 2026-05-21
+
+### API 测试场四分栏工作台 & 流式截断修复
+- **四分栏布局** — 卡片堆叠改为 `h-[calc(100vh-7rem)]` flex 工作台：会话侧边栏 (w-56)、聊天区 (flex-1)、参数面板 (w-72)
+- **多会话管理** — `ChatSession` 接口，每个会话独立记忆模型/Key/参数/System Prompt；支持新建/切换/删除
+- **流式截断修复** — `[DONE]` 不再立即 break for 循环，改用 `streamDone` 标记处理完当前 chunk 所有行后再退出，修复内容丢失
+- **节流渲染优化** — 65ms 节流 `setResponse` + 每 5 行 `await new Promise(r => setTimeout(r, 0))` 释放主线程
+- **CJK 智能估算** — `estimateTokens` 和 `wordCount` 支持中文字符（CJK ~1.5 tok/字，ASCII ~0.25 tok/字）
+- **模型路径清洗** — 本地路径自动格式化为 `[Local] 名称`
+- **端点切换** — OpenAI / Anthropic 格式切换
+- **常用语预设** — 7 条测试短语，点击填充输入框
+- **并发测试抽屉** — 可折叠面板，可配并发数 (1-50)，并行发送非流式请求
+- **消息统计** — 每条气泡显示 `X words · HH:MM`；AI 气泡常驻 4 分类 Token 明细
+- **用户消息即时显示** — 发送后立即渲染用户消息，不等 AI 回复
+- **容器内自动滚动** — `scrollTop = scrollHeight` 仅滚动消息容器
+- **持久化** — `sessions` + `currentSessionId` 存入 localStorage，2MB 保护
+- **视觉增强** — 列分割线 `border-border/90`，暗色模式外层父级光晕 `shadow-[0_0_100px_25px_rgba(0,212,255,0.1)]`
+
 ## [v3.3.4.16] — 2026-05-21
 
 ### 视觉重构 — 暗黑工业风首页 & 终端打字机动画

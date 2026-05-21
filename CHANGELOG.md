@@ -6,6 +6,24 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [v3.3.4.17] — 2026-05-21
+
+### Playground 4-Column Workspace & Stream Truncation Fix
+- **4-column layout** — Replaced card stack with `h-[calc(100vh-7rem)]` flex workspace: session sidebar (w-56), chat area (flex-1), params panel (w-72)
+- **Multi-session management** — `ChatSession` interface with independent model/key/params/systemPrompt per session; create/switch/delete sessions
+- **Stream truncation fix** — `[DONE]` marker no longer breaks the for-loop immediately; uses `streamDone` flag to finish processing the current chunk, fixing content loss
+- **Streaming render optimization** — 65ms throttled `setResponse` + `await new Promise(r => setTimeout(r, 0))` yield every 5 lines to prevent UI freezes
+- **CJK-aware helpers** — `estimateTokens` and `wordCount` now handle Chinese characters (CJK at ~1.5 tok/char, ASCII at ~0.25 tok/char)
+- **Model path sanitization** — Local file paths cleaned to `[Local] name` format
+- **Endpoint toggle** — OpenAI / Anthropic format switch
+- **Preset questions** — 7 common test phrases with click-to-fill
+- **Concurrency test drawer** — Collapsible panel, configurable concurrency (1-50), fires parallel non-streaming requests
+- **Message stats** — Each bubble shows `X words · HH:MM`; AI bubbles show persistent 4-category token breakdown (input non-cached / input cached / output / total)
+- **Immediate user message** — User message appears instantly in chat before AI streams
+- **Container-scoped auto-scroll** — `scrollTop = scrollHeight` on message container instead of page-level `scrollIntoView`
+- **Persistence** — Full `sessions` + `currentSessionId` in localStorage with 2MB trim protection
+- **Visual polish** — Column dividers at `border-border/90`, dark mode outer glow via parent wrapper `shadow-[0_0_100px_25px_rgba(0,212,255,0.1)]`
+
 ## [v3.3.4.16] — 2026-05-21
 
 ### Visual Overhaul — Dark Industrial Homepage & Terminal Animation
