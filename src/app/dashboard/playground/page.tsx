@@ -140,12 +140,9 @@ export default function PlaygroundPage() {
   const [endpoint, setEndpoint] = useState<ApiEndpoint>("openai");
   const [showToolbar, setShowToolbar] = useState(false);
   const [thinkingMode, setThinkingMode] = useState(false);
-  const [toolConfig, setToolConfig] = useState<ToolConfig>(loadToolConfig());
   const [showToolConfig, setShowToolConfig] = useState(false);
+  const [toolConfig, setToolConfig] = useState<ToolConfig>(loadToolConfig());
   const [attachedImages, setAttachedImages] = useState<string[]>([]);
-  const [showLinkInput, setShowLinkInput] = useState(false);
-  const [linkUrl, setLinkUrl] = useState("");
-  const [linkLoading, setLinkLoading] = useState(false);
   const [reasoningContent, setReasoningContent] = useState("");
   const [quoteMessage, setQuoteMessage] = useState<ChatMessage | null>(null);
   const [copiedIdx, setCopiedIdx] = useState(-1);
@@ -487,24 +484,6 @@ export default function PlaygroundPage() {
   };
 
   // ── Link scraper ──
-  const handleLinkConfirm = async () => {
-    if (!linkUrl.trim()) return;
-    setLinkLoading(true);
-    try {
-      const res = await fetch("/api/playground/tools", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tool: "fetch_url", args: { url: linkUrl.trim() }, config: {} }),
-      });
-      const data = await res.json();
-      let content = data.result || "无法获取该链接的内容。";
-      if (content.length > 15000) { content = content.slice(0, 15000) + "\n\n[Content truncated at 15000 characters]"; }
-      setMessage((prev) => prev + (prev ? "\n\n" : "") + `以下是从网页获取的内容:\n---\n${content}\n---\n来源: ${linkUrl.trim()}`);
-      setShowLinkInput(false); setLinkUrl("");
-    } catch { setMessage((prev) => prev + `\n\n[无法抓取链接: ${linkUrl.trim()}]`); }
-    setLinkLoading(false);
-  };
-
   // ── Capabilities edit ──
   const openCapEdit = () => { setCapsDraft({ ...modelCaps }); setShowCapEdit(true); };
   const saveCapEdit = () => {
@@ -720,26 +699,15 @@ export default function PlaygroundPage() {
                 {showToolbar && (
                   <div className="absolute bottom-full left-0 mb-1 bg-card border border-border/50 rounded-lg shadow-xl p-1.5 space-y-0.5 z-10 min-w-[140px]">
                     {modelCaps.vision && <button onClick={() => { handleImageSelect(); setShowToolbar(false); }} className="flex items-center gap-2 w-full px-2.5 py-1.5 rounded-md text-xs text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"><Image className="h-3.5 w-3.5" />{t.image}</button>}
-                    <button onClick={() => { setShowLinkInput(true); setShowToolbar(false); }} className="flex items-center gap-2 w-full px-2.5 py-1.5 rounded-md text-xs text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"><Link2 className="h-3.5 w-3.5" />{t.link}</button>
-                    {modelCaps.tools && <button onClick={() => { setShowToolConfig(true); setShowToolbar(false); }} className="flex items-center gap-2 w-full px-2.5 py-1.5 rounded-md text-xs text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"><Wrench className="h-3.5 w-3.5" />{t.tools}</button>}
                   </div>
                 )}
               </div>
 
-              {/* Link input popup */}
-              {showLinkInput && (
-                <div className="flex-1 flex gap-2">
-                  <input autoFocus value={linkUrl} onChange={(e) => setLinkUrl(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") handleLinkConfirm(); if (e.key === "Escape") setShowLinkInput(false); }} placeholder={t.linkPlaceholder} disabled={linkLoading} className="flex-1 h-9 px-3 rounded-md border border-input bg-background text-xs font-mono focus:border-primary focus:outline-none" />
-                  <Button size="sm" onClick={handleLinkConfirm} disabled={linkLoading || !linkUrl.trim()} className="h-9 text-xs gap-1">{linkLoading ? <><Loader2 className="h-3 w-3 animate-spin" />{t.sending}</> : t.confirm}</Button>
-                  <Button size="sm" variant="outline" onClick={() => { setShowLinkInput(false); setLinkUrl(""); }} disabled={linkLoading} className="h-9 text-xs"><X className="h-3 w-3" /></Button>
-                </div>
-              )}
 
-              {!showLinkInput && (
+              
                 <Textarea placeholder={lang === "zh" ? "输入消息... (Shift+Enter 换行)" : "Type a message... (Shift+Enter newline)"} value={message} onChange={(e) => setMessage(e.target.value)} onKeyDown={handleKeyDown} rows={2} className="resize-none flex-1" disabled={isSending} />
-              )}
 
-              {!showLinkInput && (
+              
                 <div className="flex flex-col gap-1.5 self-center">
                   {/* Thinking toggle */}
                   {modelCaps.reasoning && (
@@ -751,7 +719,6 @@ export default function PlaygroundPage() {
                     {isSending ? <button onClick={handleStop} className="w-10 h-full min-h-[2.5rem] rounded-md border border-destructive/30 bg-destructive/10 text-destructive flex items-center justify-center shrink-0 hover:bg-destructive/20 transition-colors"><Loader2 className="h-5 w-5 animate-spin" /></button> : <button onClick={handleSend} disabled={!message.trim() || !selectedModel || !selectedKey} className="w-10 h-full min-h-[2.5rem] rounded-md border border-primary/30 bg-primary/10 text-primary flex items-center justify-center shrink-0 hover:bg-primary/20 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"><Send className="h-5 w-5" /></button>}
                   </div>
                 </div>
-              )}
             </div>
           </div>
         </div>
@@ -815,54 +782,6 @@ export default function PlaygroundPage() {
           <div><label className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-1.5 block">{t.systemPrompt}</label><textarea value={systemPrompt} onChange={(e) => updateSession((s) => ({ ...s, systemPrompt: e.target.value }))} placeholder={t.systemPromptPH} rows={3} className="w-full px-2.5 py-1.5 rounded-md border border-input bg-background text-xs font-mono resize-none focus:border-primary focus:outline-none" /></div>
         </aside>
       </div>
-
-      {/* Tool config modal */}
-      {showToolConfig && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setShowToolConfig(false)}>
-          <div className="bg-card border border-border/50 rounded-xl p-6 max-w-lg w-full mx-4 shadow-2xl max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-5"><h3 className="text-sm font-semibold">{t.toolSetup}</h3><button onClick={() => setShowToolConfig(false)} className="p-1 rounded hover:bg-muted"><X className="h-4 w-4" /></button></div>
-
-            {/* Built-in tools */}
-            <div className="space-y-3 mb-6">
-              <h4 className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">{t.webSearch}</h4>
-              {Object.entries(BUILTIN_TOOLS).map(([toolName, def]) => {
-                const enabled = toolConfig.enabledTools.includes(toolName);
-                return (
-                  <div key={toolName} className="rounded-lg border border-border/50 p-3 space-y-2">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <div className="text-sm font-semibold text-foreground font-mono">{def.function.name}</div>
-                        <div className="text-xs text-muted-foreground leading-relaxed mt-0.5">{def.function.description}</div>
-                      </div>
-                      <button onClick={() => {
-                        const next = enabled ? toolConfig.enabledTools.filter((n) => n !== toolName) : [...toolConfig.enabledTools, toolName];
-                        const c = { ...toolConfig, enabledTools: next }; setToolConfig(c); saveToolConfig(c);
-                      }} className={cn("w-8 h-5 rounded-full border transition-colors relative shrink-0", enabled ? "bg-primary border-primary" : "bg-muted border-border/60")}>
-                        <span className={cn("absolute top-0.5 w-3.5 h-3.5 rounded-full bg-white transition-all shadow-sm", enabled ? "left-[14px]" : "left-[2px]")} />
-                      </button>
-                    </div>
-                    {toolName === "web_search" && enabled && (
-                      <div className="pt-1">
-                        <label className="text-[11px] text-muted-foreground block mb-1"><Search className="h-3 w-3 inline mr-1" />Tavily API Key</label>
-                        <input type="password" value={toolConfig.tavilyApiKey} onChange={(e) => { const c = { ...toolConfig, tavilyApiKey: e.target.value }; setToolConfig(c); saveToolConfig(c); }} placeholder="sk-..." className="w-full h-8 px-2.5 rounded-md border border-input bg-background text-xs font-mono" />
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Custom MCP servers (placeholder) */}
-            <div>
-              <h4 className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-3">{t.mcpCustom}</h4>
-              <div className="rounded-lg border border-dashed border-border/50 p-4 text-center">
-                <p className="text-xs text-muted-foreground">{t.mcpComing}</p>
-                <button disabled className="mt-2 px-3 py-1.5 rounded-md text-xs bg-muted/50 text-muted-foreground/50 cursor-not-allowed">{t.mcpAdd}</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Capabilities edit modal */}
       {showCapEdit && (
