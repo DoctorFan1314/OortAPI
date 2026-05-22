@@ -271,7 +271,7 @@ export default function PlaygroundPage() {
     };
   }, []);
 
-  // ── Build messages ──// ── Build messages ──
+  // ── Build messages ──
   const buildMessages = () => {
     const msgs: Array<{ role: string; content: string | ContentPart[]; tool_call_id?: string; name?: string; tool_calls?: ToolCall[] }> = [];
     if (systemPrompt.trim() && endpoint === "openai") msgs.push({ role: "system", content: systemPrompt.trim() });
@@ -337,7 +337,7 @@ export default function PlaygroundPage() {
 
       try {
         const endpointUrl = endpoint === "openai" ? "/api/v1/chat/completions" : "/api/v1/messages";
-        const headers: Record<string, string> = { "Content-Type": "application/json", Authorization: `Bearer ${selectedKey!.key_value}` };
+        const headers: Record<string, string> = { "Content-Type": "application/json", Authorization: `Bearer ${selectedKey?.key_value || ""}` };
         if (endpoint === "anthropic") headers["anthropic-version"] = "2023-06-01";
         const res = await fetch(endpointUrl, { method: "POST", headers, body: JSON.stringify(body), signal: controller.signal });
 

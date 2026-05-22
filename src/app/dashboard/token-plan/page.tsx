@@ -109,7 +109,7 @@ function TokenPlanContent() {
           showToast(lang === "zh" ? "订阅已取消" : "Subscription cancelled", "success");
         }
       }
-    } catch {} finally { setActionLoading(null); setCancelTarget(null); }
+    } catch { showToast("Network error", "error"); } finally { setActionLoading(null); setCancelTarget(null); }
   }
 
   async function handleToggleAutoRenew(subscriptionId: number) {
@@ -124,7 +124,7 @@ function TokenPlanContent() {
         const data = await res.json();
         setSubscriptions(prev => prev.map(s => s.id === subscriptionId ? { ...s, auto_renew: data.auto_renew ? 1 : 0 } : s));
       }
-    } catch {} finally { setActionLoading(null); }
+    } catch { showToast("Network error", "error"); } finally { setActionLoading(null); }
   }
 
   function handleCopy(text: string, key: string) {
@@ -157,7 +157,7 @@ function TokenPlanContent() {
       } else {
         alert(data.error || "Plan change failed");
       }
-    } catch {} finally { setUpgradeLoading(false); }
+    } catch { showToast("Network error", "error"); } finally { setUpgradeLoading(false); }
   }
 
   function formatDate(dateStr: string): string {

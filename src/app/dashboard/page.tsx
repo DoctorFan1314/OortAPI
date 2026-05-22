@@ -99,7 +99,7 @@ export default function DashboardPage() {
         <div className="flex items-center gap-3">
           {lastUpdated && (
             <span className="text-xs text-muted-foreground">
-              {lang === "zh" ? "上次更新" : "Last updated"}: {lastUpdated.toLocaleDateString()} {lastUpdated.toLocaleTimeString()}
+              {lang === "zh" ? "上次更新" : "Last updated"}: {lastUpdated.toLocaleDateString(lang)} {lastUpdated.toLocaleTimeString(lang)}
             </span>
           )}
           <Button variant="outline" size="sm" onClick={handleRefresh} className="gap-1">
@@ -186,7 +186,7 @@ export default function DashboardPage() {
                   <span className="font-medium text-sm">{t.step2}</span>
                 </div>
                 <p className="text-xs text-muted-foreground">{t.step2Desc}</p>
-                <Link href="/token-plan" className="mt-auto">
+                <Link href="/dashboard/token-plan" className="mt-auto">
                   <Button size="sm" variant="outline" className="w-full gap-1">
                     {t.browsePlans} <ArrowRight className="h-3 w-3" />
                   </Button>

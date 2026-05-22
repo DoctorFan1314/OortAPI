@@ -145,7 +145,7 @@ export default function SettingsPage() {
         <CardContent>
           <div className="flex items-center gap-2">
             <code className="flex-1 bg-muted/50 rounded px-3 py-2 text-sm font-mono">{endpoint}</code>
-            <Button size="sm" variant="outline" onClick={() => { navigator.clipboard.writeText(endpoint); showToast(t.copyEndpoint, "success"); }}>
+            <Button size="sm" variant="outline" onClick={() => { navigator.clipboard.writeText(endpoint); showToast(lang === "zh" ? "已复制" : "Copied", "success"); }}>
               {t.copyEndpoint}
             </Button>
           </div>

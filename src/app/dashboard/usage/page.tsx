@@ -189,6 +189,7 @@ export default function UsagePage() {
   const [filterModel, setFilterModel] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
   const [filterFrom, setFilterFrom] = useState(defaultFrom);
+  const [filterApplied, setFilterApplied] = useState(false);
   const [filterTo, setFilterTo] = useState(todayStr);
   const [filterKeyId, setFilterKeyId] = useState("");
   // API keys & models for filter dropdowns
@@ -238,7 +239,7 @@ export default function UsagePage() {
     setPage(1);
   };
 
-  const hasActiveFilters = filterModel || filterStatus || filterFrom || filterTo || filterKeyId;
+  const hasActiveFilters = filterApplied;
 
   const chartOption = useMemo(() => {
     if (dailyTrend.length === 0) return null;
@@ -303,7 +304,7 @@ export default function UsagePage() {
           total_credits_used: d.total_credits_used || 0,
         });
         const trend = d.daily_trend || [];
-        trend.reverse(); // API returns DESC (LIMIT 60), frontend expects ASC
+        [...trend].reverse(); // API returns DESC (LIMIT 60), frontend expects ASC
         setDailyTrend(trend);
         setModelStats(d.model_stats || []);
         setLoading(false);
@@ -341,8 +342,8 @@ export default function UsagePage() {
   // Render detailed cost breakdown for a log entry
   const renderBreakdown = (log: UsageLog) => {
     const isCredits = log.deduction_source === 'credits';
-    const inputRate = log.input_rate ?? 0.001;
-    const outputRate = log.output_rate ?? 0.002;
+    const inputRate = log.input_rate ?? 0.0001;
+    const outputRate = log.output_rate ?? 0.0002;
     const cacheRate = log.cache_rate ?? 0;
     const creditRate = log.credit_rate ?? 1.0;
     const mult = log.multiplier ?? 1.0;

@@ -65,7 +65,7 @@ export default function TokenPlanPage() {
         setActiveSub({ plan_id: active.plan_id, plan_tier: active.plan_tier || 0 });
       }
       setLoading(false);
-    }).catch(() => setLoading(false));
+    }).catch(() => { setLoading(false); showToast("Failed to load plans", "error"); });
   }, []);
 
   async function handleSubscribe(planId: number) {

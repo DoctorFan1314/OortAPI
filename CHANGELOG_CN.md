@@ -8,6 +8,24 @@
 
 ## [v3.3.4.18] — 2026-05-22
 
+### 全站审计 — 30+ 项 Bug 修复
+- **安全修复** — `safeReturnUrl` 开放重定向漏洞修复（登录 + 注册）
+- **控制台首页** — 修复 `/token-plan` 错误链接 → `/dashboard/token-plan`；日期使用 `lang` locale
+- **调用日志** — `hasActiveFilters` 追踪用户主动筛选而非永远为真；`.reverse()` → `[...trend].reverse()`；默认费率降低
+- **用户管理** — 保存/删除失败时不再关闭对话框（添加 `return`）
+- **账单中心** — `data.amount?.toFixed(2) ?? "0.00"` 防止 `undefined` 崩溃；禁用充值按钮改用 `<span>`
+- **系统设置** — 复制 toast 显示 "已复制" 而非 "复制"
+- **模型市场** — 保存失败检查 `res.ok`；NaN 输入用 `|| 0` 保护；视图按钮加 `aria-pressed`
+- **套餐页（公开）** — 加载失败 toast 提示；渐变 CSS 添加 fallback
+- **套餐页（控制台）** — 3 个空 `catch {}` 加 toast 错误提示
+- **兑换码** — 加载失败 toast 替代静默忽略
+- **导航栏** — Escape 关闭搜索；移动端菜单加载骨架屏
+- **MarkdownRenderer** — 非拉丁 heading ID 修复（`h-{i}` fallback）
+- **聚光灯 Hook** — 离开时 `cancelAnimationFrame` 防止闪烁；卸载时 RAF 清理
+- **全局 CSS** — 暗色 `--input` 从 5% 提升到 12%；删除重复滚动条规则
+- **页脚** — 移除未使用的 `StatusIndicator` 导入
+- **API 测试** — 移除 `selectedKey!` 非空断言；修复重复注释
+
 ### Playground 交互优化 & LaTeX 公式渲染
 - **自动滚动修复** — 用 `wheel` 事件检测用户向上滚动，替代 `scrollHeight` 差值判断；用户消息始终滚底；流式内容仅在用户未主动滚上去时跟随
 - **移除链接与工具设置** — 移除了链接按钮、URL 输入弹窗和工具配置模态框；保留工具调用响应显示功能

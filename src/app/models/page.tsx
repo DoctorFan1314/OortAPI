@@ -174,7 +174,7 @@ export default function ModelsPage() {
           })
         )
       );
-    } catch { /* ignore */ }
+    } catch { console.error("Sync failed"); }
     setSyncing(false);
     fetchModels();
   };
@@ -372,10 +372,10 @@ export default function ModelsPage() {
             </div>
             {/* View toggle */}
             <div className="flex items-center border border-border rounded-lg overflow-hidden">
-              <button onClick={() => setViewMode("grid")} className={`p-2 transition-colors ${viewMode === "grid" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`} aria-label={lang === "zh" ? "网格视图" : "Grid view"}>
+              <button onClick={() => setViewMode("grid")} aria-pressed={viewMode === "grid"} className={`p-2 transition-colors ${viewMode === "grid" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`} aria-label={lang === "zh" ? "网格视图" : "Grid view"}>
                 <LayoutGrid className="h-3.5 w-3.5" />
               </button>
-              <button onClick={() => setViewMode("list")} className={`p-2 transition-colors ${viewMode === "list" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`} aria-label={lang === "zh" ? "列表视图" : "List view"}>
+              <button onClick={() => setViewMode("list")} aria-pressed={viewMode === "list"} className={`p-2 transition-colors ${viewMode === "list" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`} aria-label={lang === "zh" ? "列表视图" : "List view"}>
                 <List className="h-3.5 w-3.5" />
               </button>
             </div>
@@ -444,7 +444,7 @@ export default function ModelsPage() {
                                 step="0.0001"
                                 value={currency === "CNY" ? (editForm[key] * exchangeRate).toFixed(2) : editForm[key]}
                                 onChange={(e) => {
-                                  const raw = Number(e.target.value);
+                                  const raw = Math.max(0, Number(e.target.value) || 0);
                                   const usdValue = currency === "CNY" ? raw / exchangeRate : raw;
                                   setEditForm((f) => ({ ...f, [key]: usdValue }));
                                 }}

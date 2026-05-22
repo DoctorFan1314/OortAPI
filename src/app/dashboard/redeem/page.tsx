@@ -108,7 +108,7 @@ export default function RedeemPage() {
       const data = await res.json();
       setCodes(data.codes || []);
       setHasMore(data.has_more || false);
-    } catch { /* ignore */ }
+    } catch { showToast("Failed to load redeem codes", "error"); }
     setLoading(false);
   }, [page]);
 

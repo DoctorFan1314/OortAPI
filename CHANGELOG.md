@@ -8,6 +8,24 @@ All notable changes to this project will be documented in this file.
 
 ## [v3.3.4.18] — 2026-05-22
 
+### Full-Site Audit — 30+ Bug Fixes
+- **Security fix** — `safeReturnUrl` open redirect vulnerability patched (login + register)
+- **Dashboard page** — Fixed broken `/token-plan` link → `/dashboard/token-plan`; date locale uses `lang` instead of browser default
+- **Usage page** — `hasActiveFilters` now tracks user-applied filters instead of always truthy; `.reverse()` mutation → `[...trend].reverse()`; default rates lowered from GPT-4 levels
+- **Users page** — Save/delete operations no longer close dialog on API error (added early `return`)
+- **Billing page** — `data.amount?.toFixed(2) ?? "0.00"` prevents `undefined` crash; disabled recharge button uses `<span>` for tooltip events
+- **Settings page** — Copy toast shows "Copied" instead of "Copy"
+- **Models page** — Save failure now checks `res.ok` before closing edit form; NaN input clamped with `|| 0`; view toggle added `aria-pressed`
+- **Token plan (public)** — Load failure shows toast; gradient CSS fallback for unknown plan names
+- **Token plan (dashboard)** — 3 empty `catch {}` blocks now show toast errors
+- **Redeem page** — Failed fetch shows toast instead of silent ignore
+- **Navbar** — Escape key closes search; mobile sheet shows skeleton during auth loading
+- **MarkdownRenderer** — Non-Latin heading IDs fixed (`h-{i}` fallback), prevents duplicate IDs
+- **useSpotlight** — `cancelAnimationFrame` on mouse leave prevents flicker; RAF cleanup on unmount
+- **Globals.css** — Dark mode `--input` border increased from 5% to 12% opacity; removed duplicate playground scrollbar rules
+- **Footer** — Removed unused `StatusIndicator` import
+- **Playground** — Removed `selectedKey!` non-null assertion; fixed duplicate comment
+
 ### Playground UX Polish & LaTeX Math Rendering
 - **Auto-scroll fix** — Wheel event detection for user scroll-up instead of `scrollHeight` delta; user messages always scroll to bottom; streaming only scrolls if user hasn't explicitly scrolled up
 - **Removed link & tool settings** — Removed link button, URL input, and tool configuration modal from playground; kept tool call response display
