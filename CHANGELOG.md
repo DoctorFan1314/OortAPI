@@ -42,6 +42,8 @@ All notable changes to this project will be documented in this file.
 - **Send button spinner** — Removed status bar spinner, added `Loader2` animation inside stop button
 - **Reasoning font** — `text-[12px] text-muted-foreground/90` for visual distinction from response body
 - **Persistent token usage** — `usage` field stored in each `ChatMessage` for per-message display across sessions
+- **Image upload fix** — Resolved `Image` naming conflict (lucide-react import vs DOM `Image()` constructor); removed duplicate `img.onload` that overwrote compression logic, causing image selection to appear unresponsive
+- **Tools capability locked** — Permanently disabled with "Coming Soon" badge in capability editor; dark mode contrast improved
 
 ## [v3.3.4.17] — 2026-05-21
 
