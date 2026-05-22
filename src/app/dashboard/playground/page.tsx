@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { CopyButton } from "@/components/shared/copy-button";
 import { MarkdownRenderer } from "@/components/shared/markdown-renderer";
-import { Play, Send, Bot, User, Loader2, Square, Zap, Settings2, Trash2, Download, RefreshCw, Plus, MessageSquare, X, Image, Link2, Brain, Wrench, Search, Copy, Check, Quote } from "lucide-react";
+import { Play, Send, Bot, User, Loader2, Square, Zap, Settings2, Trash2, Download, RefreshCw, Plus, MessageSquare, X, Image, Link2, Brain, Wrench, Search, Copy, Check, Quote, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BUILTIN_TOOLS, getEnabledToolDefinitions, loadToolConfig, saveToolConfig, getModelCaps, saveModelCaps, loadModelCaps, type ToolConfig, type ToolDefinition, type ToolCall, type ModelCapabilities } from "@/lib/playground-tools";
 
@@ -812,14 +812,30 @@ export default function PlaygroundPage() {
           <div className="bg-card border border-border/50 rounded-xl p-5 max-w-xs w-full mx-4 shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4"><h3 className="text-sm font-semibold">{t.editCap}</h3><button onClick={() => setShowCapEdit(false)} className="p-1 rounded hover:bg-muted"><X className="h-4 w-4" /></button></div>
             <div className="space-y-3">
-              {capEntries.map((e) => (
-                <label key={e.key} className="flex items-center justify-between px-2 py-1.5 rounded hover:bg-muted/50 cursor-pointer">
-                  <span className="text-xs font-mono">{e.label}</span>
-                  <button onClick={() => setCapsDraft((p) => ({ ...p, [e.key]: !p[e.key as keyof typeof p] }))} className={cn("w-8 h-5 rounded-full border transition-colors relative shrink-0", capsDraft[e.key as keyof typeof capsDraft] ? "bg-primary border-primary" : "bg-muted border-border/60")}>
-                    <span className={cn("absolute top-0.5 w-3.5 h-3.5 rounded-full bg-white transition-all shadow-sm", capsDraft[e.key as keyof typeof capsDraft] ? "left-[14px]" : "left-[2px]")} />
-                  </button>
-                </label>
-              ))}
+              {capEntries.map((e) => {
+                const isTools = e.key === "tools";
+                const enabled = capsDraft[e.key as keyof typeof capsDraft];
+                if (isTools) return (
+                  <div key={e.key} className="flex items-center justify-between px-2 py-1.5 rounded opacity-50">
+                    <div className="flex items-center gap-2">
+                      <Lock className="h-3 w-3 text-muted-foreground" />
+                      <span className="text-xs font-mono text-muted-foreground">{e.label}</span>
+                      <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground/60 font-mono">{t.mcpComing}</span>
+                    </div>
+                    <div className="w-8 h-5 rounded-full bg-muted border border-border/30 relative shrink-0">
+                      <span className="absolute top-0.5 left-[2px] w-3.5 h-3.5 rounded-full bg-muted-foreground/20 shadow-sm" />
+                    </div>
+                  </div>
+                );
+                return (
+                  <label key={e.key} className="flex items-center justify-between px-2 py-1.5 rounded hover:bg-muted/50 cursor-pointer">
+                    <span className="text-xs font-mono">{e.label}</span>
+                    <button onClick={() => setCapsDraft((p) => ({ ...p, [e.key]: !p[e.key as keyof typeof p] }))} className={cn("w-8 h-5 rounded-full border transition-colors relative shrink-0", enabled ? "bg-primary border-primary" : "bg-muted border-border/60")}>
+                      <span className={cn("absolute top-0.5 w-3.5 h-3.5 rounded-full bg-white transition-all shadow-sm", enabled ? "left-[14px]" : "left-[2px]")} />
+                    </button>
+                  </label>
+                );
+              })}
             </div>
             <Button size="sm" onClick={saveCapEdit} className="w-full mt-4 h-8 text-xs">{t.confirm}</Button>
           </div>
