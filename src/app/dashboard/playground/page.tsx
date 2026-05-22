@@ -698,7 +698,7 @@ export default function PlaygroundPage() {
                 </button>
                 {showToolbar && (
                   <div className="absolute bottom-full left-0 mb-1 bg-card border border-border/50 rounded-lg shadow-xl p-1.5 space-y-0.5 z-10 min-w-[140px]">
-                    {modelCaps.vision && <button onClick={() => { handleImageSelect(); setShowToolbar(false); }} className="flex items-center gap-2 w-full px-2.5 py-1.5 rounded-md text-xs text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"><Image className="h-3.5 w-3.5" />{t.image}</button>}
+                    <button onClick={() => { if (!modelCaps.vision) return; handleImageSelect(); setShowToolbar(false); }} className={cn("flex items-center gap-2 w-full px-2.5 py-1.5 rounded-md text-xs transition-colors", modelCaps.vision ? "text-muted-foreground hover:text-foreground hover:bg-muted cursor-pointer" : "text-muted-foreground/30 cursor-not-allowed")}><Image className={cn("h-3.5 w-3.5", !modelCaps.vision && "opacity-30")} />{t.image}</button>
                   </div>
                 )}
               </div>
