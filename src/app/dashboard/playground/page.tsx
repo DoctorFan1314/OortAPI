@@ -480,7 +480,8 @@ export default function PlaygroundPage() {
     e.target.value = "";
     // Compress large images to avoid 10MB body limit
     if (file.size > 2_000_000) {
-      const img = new Image();
+      const img = new window.Image();
+      const blobUrl = URL.createObjectURL(file);
       img.onload = () => {
         const maxDim = 1920;
         let { width, height } = img;
@@ -495,10 +496,9 @@ export default function PlaygroundPage() {
         const ctx = canvas.getContext("2d")!;
         ctx.drawImage(img, 0, 0, width, height);
         setAttachedImages((prev) => [...prev, canvas.toDataURL("image/jpeg", 0.85)]);
+        URL.revokeObjectURL(blobUrl);
       };
-      const blobUrl = URL.createObjectURL(file);
       img.src = blobUrl;
-      img.onload = () => { URL.revokeObjectURL(blobUrl); };
       return;
     }
     const reader = new FileReader();
