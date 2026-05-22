@@ -477,10 +477,33 @@ export default function PlaygroundPage() {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    e.target.value = "";
+    // Compress large images to avoid 10MB body limit
+    if (file.size > 2_000_000) {
+      const img = new Image();
+      img.onload = () => {
+        const maxDim = 1920;
+        let { width, height } = img;
+        if (width > maxDim || height > maxDim) {
+          const ratio = Math.min(maxDim / width, maxDim / height);
+          width = Math.round(width * ratio);
+          height = Math.round(height * ratio);
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d")!;
+        ctx.drawImage(img, 0, 0, width, height);
+        setAttachedImages((prev) => [...prev, canvas.toDataURL("image/jpeg", 0.85)]);
+      };
+      const blobUrl = URL.createObjectURL(file);
+      img.src = blobUrl;
+      img.onload = () => { URL.revokeObjectURL(blobUrl); };
+      return;
+    }
     const reader = new FileReader();
     reader.onload = () => { setAttachedImages((prev) => [...prev, reader.result as string]); };
     reader.readAsDataURL(file);
-    e.target.value = "";
   };
 
   // ── Link scraper ──
