@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/contexts/toast-context";
-import { Loader2, Settings, Download, Upload, Wallet, Search } from "lucide-react";
+import { Loader2, Settings, Download, Upload, Wallet, Search, Bell } from "lucide-react";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 
 const LABELS = {
@@ -34,6 +34,7 @@ export default function SettingsPage() {
   const [savedBudget, setSavedBudget] = useState(0);
   const [confirmExchangeOpen, setConfirmExchangeOpen] = useState(false);
   const [settingsSearch, setSettingsSearch] = useState("");
+  const [notifPrefs, setNotifPrefs] = useState<Record<string, boolean>>({ budget: true, key_expiry: true, sub_expiry: true, usage_spike: false });
 
   const budgetLimit = monthlyBudget ? parseFloat(monthlyBudget) : savedBudget;
   const budgetPercent = budgetLimit > 0 ? (currentSpend / budgetLimit) * 100 : 0;
@@ -236,6 +237,37 @@ export default function SettingsPage() {
             {budgetSaving ? <Loader2 className="h-4 w-4 animate-spin mr-1.5" /> : null}
             {t.saveBudget}
           </Button>
+        </CardContent>
+      </Card>
+
+      {/* Notification Preferences */}
+      <Card className="glass-card">
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Bell className="h-5 w-5 text-primary" />
+            {lang === "zh" ? "通知偏好" : "Notification Preferences"}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3 max-w-md">
+            {[
+              { key: "budget", label: lang === "zh" ? "预算超限" : "Budget Exceeded", desc: lang === "zh" ? "当月度预算超限时通知" : "When monthly budget is exceeded" },
+              { key: "key_expiry", label: lang === "zh" ? "Key 即将过期" : "Key Expiring", desc: lang === "zh" ? "API Key 过期前 7 天通知" : "7 days before API key expires" },
+              { key: "sub_expiry", label: lang === "zh" ? "套餐到期" : "Plan Expiring", desc: lang === "zh" ? "套餐到期前 3 天通知" : "3 days before plan expires" },
+              { key: "usage_spike", label: lang === "zh" ? "用量异常" : "Usage Spike", desc: lang === "zh" ? "日用量突增 50% 以上时通知" : "When daily usage spikes >50%" },
+            ].map((item) => (
+              <label key={item.key} className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-muted/30 transition-colors cursor-pointer">
+                <div>
+                  <p className="text-sm text-foreground">{item.label}</p>
+                  <p className="text-xs text-muted-foreground">{item.desc}</p>
+                </div>
+                <div className={`w-9 h-5 rounded-full transition-colors relative ${notifPrefs[item.key] ? "bg-primary" : "bg-muted/50 border border-border"}`}>
+                  <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-all ${notifPrefs[item.key] ? "left-[18px]" : "left-[2px]"}`} />
+                </div>
+                <input type="checkbox" className="hidden" checked={notifPrefs[item.key]} onChange={() => setNotifPrefs(prev => ({ ...prev, [item.key]: !prev[item.key] }))} />
+              </label>
+            ))}
+          </div>
         </CardContent>
       </Card>
 
