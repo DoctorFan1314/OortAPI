@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { CopyButton } from "@/components/shared/copy-button";
 import { MarkdownRenderer } from "@/components/shared/markdown-renderer";
-import { Play, Send, Bot, User, Loader2, Square, Zap, Settings2, Trash2, Download, RefreshCw, Plus, MessageSquare, X, Image, Link2, Brain, Wrench, Search, Copy, Check, Quote, Lock } from "lucide-react";
+import { Play, Send, Bot, User, Loader2, Square, Zap, Settings2, Trash2, Download, RefreshCw, Plus, MessageSquare, X, Image, Link2, Brain, Wrench, Search, Copy, Check, Quote, Lock, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BUILTIN_TOOLS, getEnabledToolDefinitions, loadToolConfig, saveToolConfig, getModelCaps, saveModelCaps, loadModelCaps, type ToolConfig, type ToolDefinition, type ToolCall, type ModelCapabilities } from "@/lib/playground-tools";
 
@@ -146,6 +146,7 @@ export default function PlaygroundPage() {
   const [reasoningContent, setReasoningContent] = useState("");
   const [quoteMessage, setQuoteMessage] = useState<ChatMessage | null>(null);
   const [copiedIdx, setCopiedIdx] = useState(-1);
+  const [showAdvancedParams, setShowAdvancedParams] = useState(false);
     const [showCapEdit, setShowCapEdit] = useState(false);
   const [capsDraft, setCapsDraft] = useState<{ vision: boolean; reasoning: boolean; tools: boolean }>({ vision: false, reasoning: false, tools: false });
 
@@ -795,11 +796,22 @@ export default function PlaygroundPage() {
                 </div>
               </div>
               <div><label className="text-[11px] text-muted-foreground block mb-1">{t.topP}</label><div className="flex items-center gap-2"><input type="range" min="0" max="1" step="0.05" value={params.top_p} onChange={(e) => { const v = parseFloat(e.target.value); updateSession((s) => ({ ...s, params: { ...s.params, top_p: v } })); }} className="flex-1" /><span className="text-xs font-mono w-8 text-right text-foreground">{params.top_p.toFixed(2)}</span></div></div>
-              <div><label className="text-[11px] text-muted-foreground block mb-1">{t.responseFormat}</label><div className="flex rounded-md border border-input overflow-hidden"><button onClick={() => updateSession((s) => ({ ...s, params: { ...s.params, response_format: "text" } }))} className={cn("flex-1 h-7 text-[11px] font-medium transition-colors", params.response_format === "text" ? "bg-primary text-primary-foreground" : "bg-background text-muted-foreground hover:text-foreground")}>{t.textFormat}</button><button onClick={() => updateSession((s) => ({ ...s, params: { ...s.params, response_format: "json" } }))} className={cn("flex-1 h-7 text-[11px] font-medium transition-colors border-l border-input", params.response_format === "json" ? "bg-primary text-primary-foreground" : "bg-background text-muted-foreground hover:text-foreground")}>{t.jsonObject}</button></div></div>
-              <div><label className="text-[11px] text-muted-foreground block mb-1">{t.stopSequences}</label><input type="text" value={params.stop} onChange={(e) => updateSession((s) => ({ ...s, params: { ...s.params, stop: e.target.value } }))} placeholder="comma, separated" className="w-full h-7 px-2 rounded border border-input bg-background text-xs font-mono" /></div>
-              <div><label className="text-[11px] text-muted-foreground block mb-1">{t.seed}</label><input type="number" min={-1} max={999999} value={params.seed} onChange={(e) => { const v = parseInt(e.target.value) || -1; updateSession((s) => ({ ...s, params: { ...s.params, seed: v } })); }} className="w-full h-7 px-2 rounded border border-input bg-background text-xs font-mono" /></div>
-              <div><label className="text-[11px] text-muted-foreground block mb-1">{t.freqPenalty}</label><div className="flex items-center gap-2"><input type="range" min="0" max="2" step="0.1" value={params.frequency_penalty} onChange={(e) => { const v = parseFloat(e.target.value); updateSession((s) => ({ ...s, params: { ...s.params, frequency_penalty: v } })); }} className="flex-1" /><span className="text-xs font-mono w-8 text-right text-foreground">{params.frequency_penalty.toFixed(1)}</span></div></div>
-              <div><label className="text-[11px] text-muted-foreground block mb-1">{t.presPenalty}</label><div className="flex items-center gap-2"><input type="range" min="0" max="2" step="0.1" value={params.presence_penalty} onChange={(e) => { const v = parseFloat(e.target.value); updateSession((s) => ({ ...s, params: { ...s.params, presence_penalty: v } })); }} className="flex-1" /><span className="text-xs font-mono w-8 text-right text-foreground">{params.presence_penalty.toFixed(1)}</span></div></div>
+            </div>
+            {/* Advanced params (collapsible) */}
+            <div className="mt-3 pt-3 border-t border-border/40">
+              <button onClick={() => setShowAdvancedParams(!showAdvancedParams)} className="flex items-center gap-1.5 w-full text-left">
+                <ChevronDown className={cn("h-3 w-3 text-muted-foreground transition-transform", showAdvancedParams && "rotate-180")} />
+                <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">{lang === "zh" ? "高级参数" : "Advanced"}</span>
+              </button>
+              {showAdvancedParams && (
+                <div className="space-y-3 mt-3 animate-page-fade-in">
+                  <div><label className="text-[11px] text-muted-foreground block mb-1">{t.responseFormat}</label><div className="flex rounded-md border border-input overflow-hidden"><button onClick={() => updateSession((s) => ({ ...s, params: { ...s.params, response_format: "text" } }))} className={cn("flex-1 h-7 text-[11px] font-medium transition-colors", params.response_format === "text" ? "bg-primary text-primary-foreground" : "bg-background text-muted-foreground hover:text-foreground")}>{t.textFormat}</button><button onClick={() => updateSession((s) => ({ ...s, params: { ...s.params, response_format: "json" } }))} className={cn("flex-1 h-7 text-[11px] font-medium transition-colors border-l border-input", params.response_format === "json" ? "bg-primary text-primary-foreground" : "bg-background text-muted-foreground hover:text-foreground")}>{t.jsonObject}</button></div></div>
+                  <div><label className="text-[11px] text-muted-foreground block mb-1">{t.stopSequences}</label><input type="text" value={params.stop} onChange={(e) => updateSession((s) => ({ ...s, params: { ...s.params, stop: e.target.value } }))} placeholder="comma, separated" className="w-full h-7 px-2 rounded border border-input bg-background text-xs font-mono" /></div>
+                  <div><label className="text-[11px] text-muted-foreground block mb-1">{t.seed}</label><input type="number" min={-1} max={999999} value={params.seed} onChange={(e) => { const v = parseInt(e.target.value) || -1; updateSession((s) => ({ ...s, params: { ...s.params, seed: v } })); }} className="w-full h-7 px-2 rounded border border-input bg-background text-xs font-mono" /></div>
+                  <div><label className="text-[11px] text-muted-foreground block mb-1">{t.freqPenalty}</label><div className="flex items-center gap-2"><input type="range" min="0" max="2" step="0.1" value={params.frequency_penalty} onChange={(e) => { const v = parseFloat(e.target.value); updateSession((s) => ({ ...s, params: { ...s.params, frequency_penalty: v } })); }} className="flex-1" /><span className="text-xs font-mono w-8 text-right text-foreground">{params.frequency_penalty.toFixed(1)}</span></div></div>
+                  <div><label className="text-[11px] text-muted-foreground block mb-1">{t.presPenalty}</label><div className="flex items-center gap-2"><input type="range" min="0" max="2" step="0.1" value={params.presence_penalty} onChange={(e) => { const v = parseFloat(e.target.value); updateSession((s) => ({ ...s, params: { ...s.params, presence_penalty: v } })); }} className="flex-1" /><span className="text-xs font-mono w-8 text-right text-foreground">{params.presence_penalty.toFixed(1)}</span></div></div>
+                </div>
+              )}
             </div>
           </div>
           <div><label className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-1.5 block">{t.systemPrompt}</label><textarea value={systemPrompt} onChange={(e) => updateSession((s) => ({ ...s, systemPrompt: e.target.value }))} placeholder={t.systemPromptPH} rows={3} className="w-full px-2.5 py-1.5 rounded-md border border-input bg-background text-xs font-mono resize-none focus:border-primary focus:outline-none" /></div>
