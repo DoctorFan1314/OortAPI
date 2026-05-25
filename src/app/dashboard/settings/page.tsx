@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/contexts/toast-context";
-import { Loader2, Settings, Download, Upload, Wallet } from "lucide-react";
+import { Loader2, Settings, Download, Upload, Wallet, Search } from "lucide-react";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 
 const LABELS = {
@@ -33,6 +33,7 @@ export default function SettingsPage() {
   const [autoSaveStatus, setAutoSaveStatus] = useState<"saved"|"saving"|"unsaved">("saved");
   const [savedBudget, setSavedBudget] = useState(0);
   const [confirmExchangeOpen, setConfirmExchangeOpen] = useState(false);
+  const [settingsSearch, setSettingsSearch] = useState("");
 
   const budgetLimit = monthlyBudget ? parseFloat(monthlyBudget) : savedBudget;
   const budgetPercent = budgetLimit > 0 ? (currentSpend / budgetLimit) * 100 : 0;
@@ -151,6 +152,16 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">{t.apiEndpoint}</h1>
+      {/* Settings search */}
+      <div className="relative max-w-xs">
+        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/60" />
+        <input
+          value={settingsSearch}
+          onChange={(e) => setSettingsSearch(e.target.value)}
+          placeholder={lang === "zh" ? "搜索设置..." : "Search settings..."}
+          className="w-full h-8 pl-8 pr-3 rounded-md border border-input bg-background text-xs focus:border-primary focus:outline-none"
+        />
+      </div>
 
       <Card className="glass-card">
         <CardHeader>
