@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import useSWR from "swr";
 import dynamic from "next/dynamic";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -89,11 +89,17 @@ const LABELS = {
   },
 };
 
-const MODEL_COLORS = [
-  "#3b82f6", "#ef4444", "#22c55e", "#f59e0b", "#8b5cf6",
-  "#ec4899", "#06b6d4", "#f97316", "#14b8a6", "#a855f7",
-  "#e11d48", "#0ea5e9", "#84cc16", "#eab308", "#6366f1",
-];
+function getChartColors(): string[] {
+  if (typeof window === "undefined") return ["#3b82f6", "#ef4444", "#22c55e", "#f59e0b", "#8b5cf6"];
+  const style = getComputedStyle(document.documentElement);
+  const vars = ["--chart-1", "--chart-2", "--chart-3", "--chart-4", "--chart-5"];
+  const base = vars.map((v) => {
+    const val = style.getPropertyValue(v).trim();
+    return val || "#3b82f6";
+  });
+  // Extend with fixed palette fallbacks
+  return [...base, "#ec4899", "#06b6d4", "#f97316", "#14b8a6", "#a855f7", "#e11d48", "#0ea5e9", "#84cc16", "#eab308", "#6366f1"];
+}
 
 /** Generate last N date strings (YYYY-MM-DD) ending with today */
 function generateDateSlots(days: number): string[] {
@@ -147,12 +153,14 @@ export function ModelAnalytics() {
     return Array.from(set);
   }, [data]);
 
-  // Stable color map per model
+  // Stable color map per model (resolve CSS vars client-side)
+  const [chartColors, setChartColors] = useState(() => getChartColors());
+  useEffect(() => { setChartColors(getChartColors()); }, []);
   const colorMap = useMemo(() => {
     const map: Record<string, string> = {};
-    models.forEach((m, i) => { map[m] = MODEL_COLORS[i % MODEL_COLORS.length]; });
+    models.forEach((m, i) => { map[m] = chartColors[i % chartColors.length]; });
     return map;
-  }, [models]);
+  }, [models, chartColors]);
 
   // Build complete slots (always show full range, fill 0 for missing data)
   // Returns both tokens (for bar chart) and calls (for trend line)
