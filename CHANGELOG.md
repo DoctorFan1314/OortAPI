@@ -245,6 +245,14 @@ All notable changes to this project will be documented in this file.
 - **API 60-day cap** — Daily trend limited to 60 most recent days; warning banner when range exceeds 60 days
 - **Docs ToC** — New table of contents sidebar on doc pages (xl+ screens) with scroll tracking
 
+### Model Capabilities
+- **Capability tagging** — Models now have persistent capability tags (reasoning/vision/fc/long-context) stored in DB, seeded from known model types
+- **Marketplace filters** — New fixed capability filter buttons (Reasoning/Vision/FC/Long Context) with distinct colors; tags rendered as `<Badge>` component
+- **Admin editing** — Edit mode now includes capability checkboxes for assigning tags to models
+- **Public API** — `/api/v1/models` now returns `tags` array per model; backend POST/PATCH routes support tags
+- **Playground decoupling** — Playground reads capabilities from real model data instead of localStorage; thinking mode auto-enabled for reasoning models; manual edit modal removed
+- **Breadcrumb removal** — Removed redundant breadcrumb from dashboard layout; sidebar alone provides navigation context
+
 ---
 
 ## [v3.3.4.14] — 2026-05-19
