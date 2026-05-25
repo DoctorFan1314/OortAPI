@@ -170,18 +170,26 @@ export default function DashboardPage() {
           <CardContent>
             <div className="grid gap-4 md:grid-cols-3">
               {/* Step 1 */}
-              <div className="flex flex-col gap-2 p-4 rounded-lg glass-card glass-card-hover">
+              <div className={`flex flex-col gap-2 p-4 rounded-lg glass-card glass-card-hover ${hasKeys ? "opacity-60" : ""}`}>
                 <div className="flex items-center gap-2">
-                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold">1</span>
-                  <Key className="h-4 w-4 text-primary" />
-                  <span className="font-medium text-sm">{t.step1}</span>
+                  {hasKeys ? (
+                    <span className="flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-bold"><Check className="h-3.5 w-3.5" /></span>
+                  ) : (
+                    <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold">1</span>
+                  )}
+                  <Key className={`h-4 w-4 ${hasKeys ? "text-emerald-400" : "text-primary"}`} />
+                  <span className={`font-medium text-sm ${hasKeys ? "text-muted-foreground line-through" : "text-foreground"}`}>{t.step1}</span>
                 </div>
                 <p className="text-xs text-muted-foreground">{t.step1Desc}</p>
-                <Link href="/dashboard/keys" className="mt-auto">
-                  <Button size="sm" className="w-full gap-1">
-                    {t.createKey} <ArrowRight className="h-3 w-3" />
-                  </Button>
-                </Link>
+                {hasKeys ? (
+                  <span className="text-xs text-emerald-400 font-medium mt-auto">{lang === "zh" ? "已完成" : "Done"}</span>
+                ) : (
+                  <Link href="/dashboard/keys" className="mt-auto">
+                    <Button size="sm" className="w-full gap-1">
+                      {t.createKey} <ArrowRight className="h-3 w-3" />
+                    </Button>
+                  </Link>
+                )}
               </div>
 
               {/* Step 2 */}
