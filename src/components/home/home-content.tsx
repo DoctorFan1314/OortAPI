@@ -1,6 +1,7 @@
 "use client";
 
 import { Hero } from "@/components/home/hero";
+import { ApiDemo } from "@/components/home/api-demo";
 import { Features } from "@/components/home/features";
 import { ModelWall } from "@/components/home/model-wall";
 import { WhyOortapi } from "@/components/home/why-oortapi";
@@ -20,6 +21,7 @@ export function HomeContent() {
   return (
     <>
       <Hero />
+      <ScrollSection><ApiDemo lang={lang} /></ScrollSection>
       <ScrollSection><Features lang={lang} /></ScrollSection>
       <ScrollSection><ModelWall lang={lang} /></ScrollSection>
       <ScrollSection><WhyOortapi lang={lang} /></ScrollSection>
