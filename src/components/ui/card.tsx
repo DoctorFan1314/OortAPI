@@ -19,7 +19,7 @@ const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElemen
         ref={mergedRef}
         onMouseMove={(e) => { spotlight.onMouseMove(e); onMouseMove?.(e); }}
         onMouseLeave={(e) => { spotlight.onMouseLeave(); onMouseLeave?.(e); }}
-        className={cn("rounded-xl border bg-card text-card-foreground shadow-sm backdrop-blur-xl glass-card", className)}
+        className={cn("rounded-xl border bg-card text-card-foreground shadow-sm glass-card", className)}
         {...props}
       />
     );

@@ -62,8 +62,8 @@ export async function GET(request: NextRequest) {
 
       if (channelId) {
         const history = db.prepare(
-          `SELECT * FROM channel_health_log WHERE channel_id = ? AND created_at >= datetime('now', '-${days} days') ORDER BY created_at DESC LIMIT 100`
-        ).all(parseInt(channelId, 10));
+          `SELECT * FROM channel_health_log WHERE channel_id = ? AND created_at >= datetime('now', ?) ORDER BY created_at DESC LIMIT 100`
+        ).all(parseInt(channelId, 10), `-${Math.max(1, Math.min(days, 365))} days`);
         return NextResponse.json({ history });
       }
 

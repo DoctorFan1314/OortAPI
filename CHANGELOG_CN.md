@@ -6,6 +6,26 @@
 
 ---
 
+## [v3.3.4.19] — 2026-05-25
+
+### 安全与全站审计 #3 — 16 项修复
+- **安全** — 中间件现在验证 JWT 签名（不仅检查 cookie 存在性）
+- **安全** — `hashApiKey` 改用服务端 `ENCRYPTION_KEY` 而非 key 自身作为 HMAC 密钥
+- **安全** — 渠道健康历史 SQL 注入向量修复（参数化查询）
+- **安全** — CORS 不再回退到 `Access-Control-Allow-Origin: *`
+- **安全** — 修改密码最小长度从 6 提升到 8，与注册一致
+- **Bug 修复** — Dashboard 面包屑现在正确显示（阈值 `> 0` 替代 `> 2`）
+- **Bug 修复** — Usage 页"清除筛选"按钮现在在筛选生效时显示（`setFilterApplied` 从未被调用）
+- **Bug 修复** — Webhooks 保存/切换现在检查 `res.ok` 后才显示"成功"
+- **Bug 修复** — Users 编辑/删除在 API 失败时不再关闭弹窗（早期 return）
+- **Bug 修复** — Playground 聊天消息使用稳定 key（`createdAt-i`）替代数组索引
+- **CSS 修复** — `hsl(var(--primary))` 替换为 `color-mix()` / `var(--primary)`（3 处——hex 在 hsl 中静默失效）
+- **CSS 修复** — `glass-card` 圆角对齐主题 `--radius` 系统
+- **CSS 修复** — Card 组件不再重复应用 `backdrop-blur-xl`（与 glass-card 冲突）
+- **CSS 修复** — Skills 和 Prompts 页面统一使用 `max-w-7xl`
+- **无障碍** — Playground 会话列表添加 `role="button"`/`tabIndex`/`onKeyDown`；引用/重新生成/复制/删除按钮添加 `aria-label`
+- **无障碍** — Prompts 筛选标签英文模式下使用半角冒号 `:` 替代全角 `：`
+
 ## [v3.3.4.18] — 2026-05-22
 
 ### 全站审计 — 30+ 项 Bug 修复

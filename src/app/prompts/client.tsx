@@ -114,7 +114,7 @@ export default function PromptsClient() {
 
         <div className="space-y-3 md:space-y-0 md:flex md:flex-wrap md:gap-4 md:items-center">
           <div className="flex flex-wrap items-center gap-2" role="radiogroup" aria-label={t.common.categories}>
-            <span className="text-sm text-muted-foreground">{t.common.categories}：</span>
+            <span className="text-sm text-muted-foreground">{t.common.categories}:</span>
             <button role="radio" aria-checked={filterValues.cat === t.common.all} onClick={() => setFilter("cat", t.common.all)} className={`px-3 py-1 text-sm rounded-md transition-colors ${filterValues.cat === t.common.all ? "bg-primary/10 text-primary border border-primary/30" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}>
               {t.common.all}
             </button>
@@ -125,7 +125,7 @@ export default function PromptsClient() {
             ))}
           </div>
           <div className="flex flex-wrap items-center gap-2" role="radiogroup" aria-label={t.prompts.difficulty}>
-            <span className="text-sm text-muted-foreground">{t.prompts.difficulty}：</span>
+            <span className="text-sm text-muted-foreground">{t.prompts.difficulty}:</span>
             {difficultyOptions.map((d) => (
               <button key={d.key} role="radio" aria-checked={filterValues.diff === d.key} onClick={() => setFilter("diff", d.key)} className={`px-3 py-1 text-sm rounded-md transition-colors ${filterValues.diff === d.key ? "bg-primary/10 text-primary border border-primary/30" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}>
                 {d.label}

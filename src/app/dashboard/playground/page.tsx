@@ -576,9 +576,9 @@ export default function PlaygroundPage() {
           <button onClick={createSession} className="flex items-center gap-2 w-full px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors border border-border/50 mb-3"><Plus className="h-4 w-4" /><span>{t.newSession}</span></button>
           <div className="flex-1 overflow-y-auto space-y-1 scrollbar-hide">
             {sessions.map((s) => (
-              <div key={s.id} onClick={() => switchSession(s.id)} className={cn("group flex items-center gap-2 px-3 py-2 rounded-md text-sm cursor-pointer transition-colors", s.id === currentSessionId ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted")}>
+              <div key={`session-${s.id}`} onClick={() => switchSession(s.id)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); switchSession(s.id); } }} role="button" tabIndex={0} className={cn("group flex items-center gap-2 px-3 py-2 rounded-md text-sm cursor-pointer transition-colors", s.id === currentSessionId ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted")}>
                 <MessageSquare className="h-3.5 w-3.5 shrink-0" /><span className="flex-1 truncate">{s.title}</span>
-                {sessions.length > 1 && <button onClick={(e) => deleteSession(e, s.id)} className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded hover:bg-muted-foreground/20"><X className="h-3 w-3" /></button>}
+                {sessions.length > 1 && <button onClick={(e) => deleteSession(e, s.id)} aria-label={lang === "zh" ? "删除会话" : "Delete session"} className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded hover:bg-muted-foreground/20"><X className="h-3 w-3" /></button>}
               </div>
             ))}
           </div>
@@ -605,7 +605,7 @@ export default function PlaygroundPage() {
             )}
 
             {chatHistory.map((msg, i) => (
-              <div key={i} className={cn("flex gap-3 group", msg.role === "assistant" ? "" : "flex-row-reverse")}>
+              <div key={`${msg.createdAt}-${i}`} className={cn("flex gap-3 group", msg.role === "assistant" ? "" : "flex-row-reverse")}>
                 <div className={cn("p-1.5 rounded-lg shrink-0", msg.role === "assistant" ? "bg-primary/10" : msg.role === "tool" ? "bg-amber-500/10" : "bg-muted")}>
                   {msg.role === "assistant" ? <Bot className="h-4 w-4" /> : msg.role === "tool" ? <Wrench className="h-4 w-4 text-amber-500" /> : <User className="h-4 w-4" />}
                 </div>
@@ -630,11 +630,11 @@ export default function PlaygroundPage() {
                   <div className="flex items-center gap-1.5 mt-1 px-1">
                     <span className="text-[10px] text-muted-foreground/60 font-mono">{wordCount(flatContent(msg.content))} words · {msg.createdAt || nowHHMM()}</span>
                     <span className="flex-1" />
-                    <button onClick={() => setQuoteMessage(msg)} className="text-sm text-muted-foreground/70 hover:text-foreground transition-colors w-7 h-7 rounded hover:bg-muted/50 flex items-center justify-center" title="引用"><Quote className="h-3 w-3" /></button>
+                    <button onClick={() => setQuoteMessage(msg)} className="text-sm text-muted-foreground/70 hover:text-foreground transition-colors w-7 h-7 rounded hover:bg-muted/50 flex items-center justify-center" title={lang === "zh" ? "引用" : "Quote"} aria-label={lang === "zh" ? "引用" : "Quote"}><Quote className="h-3 w-3" /></button>
                     {msg.role === "assistant" && (
-                      <button onClick={() => handleRegenerate(msg)} className="text-sm text-muted-foreground/50 hover:text-foreground transition-colors w-7 h-7 rounded hover:bg-muted/50 flex items-center justify-center" title="重新生成">↻</button>
+                      <button onClick={() => handleRegenerate(msg)} className="text-sm text-muted-foreground/50 hover:text-foreground transition-colors w-7 h-7 rounded hover:bg-muted/50 flex items-center justify-center" title={lang === "zh" ? "重新生成" : "Regenerate"} aria-label={lang === "zh" ? "重新生成" : "Regenerate"}>↻</button>
                     )}
-                    <button onClick={() => { navigator.clipboard.writeText(flatContent(msg.content)); setCopiedIdx(i); setTimeout(() => setCopiedIdx(-1), 1500); }} className="text-xs text-muted-foreground/50 hover:text-foreground transition-colors w-6 h-6 rounded hover:bg-muted/50 flex items-center justify-center opacity-100" title="复制">{copiedIdx === i ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5" />}</button>
+                    <button onClick={() => { navigator.clipboard.writeText(flatContent(msg.content)); setCopiedIdx(i); setTimeout(() => setCopiedIdx(-1), 1500); }} className="text-xs text-muted-foreground/50 hover:text-foreground transition-colors w-6 h-6 rounded hover:bg-muted/50 flex items-center justify-center opacity-100" title={lang === "zh" ? "复制" : "Copy"} aria-label={lang === "zh" ? "复制" : "Copy"}>{copiedIdx === i ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5" />}</button>
                   </div>
                   {msg.role === "assistant" && msg.usage && (
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-0.5 px-1 text-[11px] text-muted-foreground/60 font-mono">
@@ -728,7 +728,7 @@ export default function PlaygroundPage() {
 
 
               
-                <Textarea placeholder={lang === "zh" ? "输入消息... (Shift+Enter 换行)" : "Type a message... (Shift+Enter newline)"} value={message} onChange={(e) => setMessage(e.target.value)} onKeyDown={handleKeyDown} rows={2} className="resize-none flex-1" disabled={isSending} />
+                <Textarea placeholder={lang === "zh" ? "输入消息... (Shift+Enter 换行)" : "Type a message... (Shift+Enter newline)"} value={message} onChange={(e) => setMessage(e.target.value)} onKeyDown={handleKeyDown} rows={1} className="resize-none flex-1 min-h-[2.5rem] max-h-32 overflow-y-auto" disabled={isSending} />
 
               
                 <div className="flex flex-col gap-1.5 self-center">

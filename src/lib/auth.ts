@@ -145,13 +145,14 @@ export function generateApiKey(): string {
   return `sk-oort-${random}`;
 }
 
-export function hashApiKey(key: string): string {
-  return createHmac('sha256', key).digest('hex');
-}
-
 // --- AES-256-GCM Encryption for channel API keys ---
 
 const DEFAULT_ENCRYPTION_KEY = 'oortapi-default-encryption-key-32b!';
+const API_KEY_HMAC_KEY = process.env.ENCRYPTION_KEY || DEFAULT_ENCRYPTION_KEY;
+
+export function hashApiKey(key: string): string {
+  return createHmac('sha256', API_KEY_HMAC_KEY).update(key).digest('hex');
+}
 
 function getEncryptionKey(): Buffer {
   const key = process.env.ENCRYPTION_KEY || DEFAULT_ENCRYPTION_KEY;

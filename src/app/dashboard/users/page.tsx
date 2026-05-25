@@ -172,8 +172,10 @@ export default function UsersPage() {
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         showToast(data.error || "Operation failed", "error");
+        setEditSaving(false);
+        return;
       }
-    } catch { showToast("Network error", "error"); }
+    } catch { showToast("Network error", "error"); setEditSaving(false); return; }
     setEditSaving(false);
     setEditUser(null);
     fetchUsers();
@@ -192,8 +194,10 @@ export default function UsersPage() {
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         showToast(data.error || "Delete failed", "error");
+        setDeleteLoading(false);
+        return;
       }
-    } catch { showToast("Network error", "error"); }
+    } catch { showToast("Network error", "error"); setDeleteLoading(false); return; }
     setDeleteLoading(false);
     setDeleteUser(null);
     fetchUsers();

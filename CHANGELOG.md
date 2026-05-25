@@ -6,6 +6,26 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [v3.3.4.19] — 2026-05-25
+
+### Security & Full-Site Audit #3 — 16 Fixes
+- **Security** — Middleware now verifies JWT signature (not just cookie existence) in proxy.ts
+- **Security** — `hashApiKey` now uses server-side `ENCRYPTION_KEY` instead of key-as-HMAC-key
+- **Security** — Channel health SQL injection vector fixed (parameterized query)
+- **Security** — CORS no longer falls back to `Access-Control-Allow-Origin: *`
+- **Security** — Change-password min length raised from 6 to 8, matching registration
+- **Bug fix** — Dashboard breadcrumbs now display correctly (threshold `> 0` instead of `> 2`)
+- **Bug fix** — Usage page "Clear filters" button now appears when filters are active (`setFilterApplied` was never set)
+- **Bug fix** — Webhooks save/toggle now checks `res.ok` before showing "success"
+- **Bug fix** — Users edit/delete no longer close dialog on API error (early return on failure)
+- **Bug fix** — Playground chat messages use stable key (`createdAt-i`) instead of array index
+- **CSS fix** — `hsl(var(--primary))` replaced with `color-mix()` / `var(--primary)` (3 locations — hex in hsl was silently broken)
+- **CSS fix** — `glass-card` radius aligned with theme `--radius` system
+- **CSS fix** — Card component no longer applies duplicate `backdrop-blur-xl` (conflicted with glass-card)
+- **CSS fix** — Skills and Prompts pages use consistent `max-w-7xl`
+- **Accessibility** — Playground session list: added `role="button"`, `tabIndex`, `onKeyDown`; added `aria-label` to quote/regenerate/copy/delete-session buttons
+- **Accessibility** — Prompts filter labels use halfwidth colon `:` instead of fullwidth `：` for English locale
+
 ## [v3.3.4.18] — 2026-05-22
 
 ### Full-Site Audit — 30+ Bug Fixes

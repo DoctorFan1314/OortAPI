@@ -135,35 +135,42 @@ export default function WebhooksPage() {
     if (!url) { showToast(t.urlRequired, "error"); return; }
     if (selectedEvents.length === 0) { showToast(t.eventsRequired, "error"); return; }
 
-    if (editingId) {
-      await fetch("/api/dashboard/webhooks", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ id: editingId, url, events: selectedEvents }),
-      });
-      showToast(t.updated, "success");
-    } else {
-      await fetch("/api/dashboard/webhooks", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ url, events: selectedEvents }),
-      });
-      showToast(t.created, "success");
-    }
-    setDialogOpen(false);
-    mutate();
+    try {
+      if (editingId) {
+        const res = await fetch("/api/dashboard/webhooks", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ id: editingId, url, events: selectedEvents }),
+        });
+        if (!res.ok) { const d = await res.json(); showToast(d.error || "Update failed", "error"); return; }
+        showToast(t.updated, "success");
+      } else {
+        const res = await fetch("/api/dashboard/webhooks", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ url, events: selectedEvents }),
+        });
+        if (!res.ok) { const d = await res.json(); showToast(d.error || "Create failed", "error"); return; }
+        showToast(t.created, "success");
+      }
+      setDialogOpen(false);
+      mutate();
+    } catch { showToast("Network error", "error"); }
   };
 
   const toggleEnabled = async (id: number, enabled: boolean) => {
-    await fetch("/api/dashboard/webhooks", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ id, enabled }),
-    });
-    mutate();
+    try {
+      const res = await fetch("/api/dashboard/webhooks", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ id, enabled }),
+      });
+      if (!res.ok) { const d = await res.json(); showToast(d.error || "Toggle failed", "error"); return; }
+      mutate();
+    } catch { showToast("Network error", "error"); }
   };
 
   const confirmDelete = async () => {

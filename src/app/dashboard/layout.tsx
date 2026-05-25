@@ -23,6 +23,8 @@ const ROUTE_LABELS: Record<string, { zh: string; en: string }> = {
   audit: { zh: "审计日志", en: "Audit Logs" },
   webhooks: { zh: "Webhook", en: "Webhooks" },
   "token-plan": { zh: "我的订阅", en: "My Subscription" },
+  playground: { zh: "API 测试", en: "Playground" },
+  monitor: { zh: "系统监控", en: "Monitor" },
 };
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -50,7 +52,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <AuthGuard>
       <div className="max-w-[1600px] mx-auto px-4 lg:px-8 py-6">
-        {breadcrumbItems.length > 2 && <Breadcrumb items={breadcrumbItems} />}
+        {breadcrumbItems.length > 0 && <Breadcrumb items={breadcrumbItems} />}
         <div className="flex flex-col lg:flex-row gap-6">
           <DashboardSidebar />
           <main className="flex-1 min-w-0">

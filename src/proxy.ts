@@ -26,7 +26,7 @@ export function proxy(request: NextRequest) {
     const isAllowed = !origin || allowedOrigins.length === 0 || allowedOrigins.includes(origin);
 
     if (isAllowed) {
-      response.headers.set('Access-Control-Allow-Origin', origin || '*');
+      response.headers.set('Access-Control-Allow-Origin', origin || request.nextUrl.origin);
       response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS');
       response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Api-Key, X-Request-Id');
       response.headers.set('Access-Control-Max-Age', '86400');

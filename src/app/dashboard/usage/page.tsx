@@ -223,6 +223,7 @@ export default function UsagePage() {
     setFilterTo(inputTo);
     setFilterKeyId(inputKeyId);
     setPage(1);
+    setFilterApplied(true);
   };
 
   const clearFilters = () => {
@@ -237,6 +238,7 @@ export default function UsagePage() {
     setFilterTo(todayStr);
     setFilterKeyId("");
     setPage(1);
+    setFilterApplied(false);
   };
 
   const hasActiveFilters = filterApplied;
