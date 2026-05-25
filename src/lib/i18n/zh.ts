@@ -943,6 +943,7 @@ export const zh: Dictionary = {
     navRateLimits: "速率限制",
     navDeployment: "部署",
     navPricing: "定价",
+    navChangelog: "API 更新日志",
     navInteractiveApi: "交互式 API 参考",
     navResources: "更多资源",
     navDocsSearch: "搜索文档...",

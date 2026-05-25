@@ -943,6 +943,7 @@ export const en: Dictionary = {
     navRateLimits: "Rate Limits",
     navDeployment: "Deployment",
     navPricing: "Pricing",
+    navChangelog: "API Changelog",
     navInteractiveApi: "Interactive API Reference",
     navResources: "Resources",
     navDocsSearch: "Search docs...",

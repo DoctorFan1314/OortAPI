@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/contexts/i18n-context";
-import { BookOpen, ChevronDown, Search, Zap, Key, Code, Activity, Book, Server, DollarSign, AlertTriangle, Gauge, Layout, Menu, X } from "lucide-react";
+import { BookOpen, ChevronDown, Search, Zap, Key, Code, Activity, Book, Server, DollarSign, AlertTriangle, Gauge, Layout, Menu, X, GitCommit } from "lucide-react";
 
 interface NavItem {
   href: string;
@@ -25,6 +25,7 @@ const NAV_SECTIONS: NavSection[] = [
     items: [
       { href: "/docs", labelKey: "navOverview", icon: BookOpen, exact: true },
       { href: "/docs/quickstart", labelKey: "navQuickStart", icon: Zap, exact: true },
+      { href: "/docs/changelog", labelKey: "navChangelog", icon: GitCommit, exact: true },
       { href: "/docs/authentication", labelKey: "navAuthentication", icon: Key, exact: true },
     ],
   },

@@ -478,6 +478,7 @@ export interface Dictionary {
     navRateLimits: string;
     navDeployment: string;
     navPricing: string;
+    navChangelog: string;
     navInteractiveApi: string;
     navResources: string;
     navDocsSearch: string;
