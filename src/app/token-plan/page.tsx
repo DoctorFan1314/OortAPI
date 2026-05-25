@@ -52,28 +52,29 @@ export default function TokenPlanPage() {
     (async () => {
       try {
         const [planRes, settingsRes, subRes] = await Promise.all([
-          fetch("/api/plans"),
-          fetch("/api/dashboard/settings").catch(() => null),
-          fetch("/api/dashboard/subscription", { credentials: "include" }).catch(() => null),
+          fetch("/api/plans", { credentials: "include" }),
+          fetch("/api/dashboard/settings", { credentials: "include" }),
+          fetch("/api/dashboard/subscription", { credentials: "include" }),
         ]);
         if (cancelled) return;
 
-        const planData = planRes.ok ? await planRes.json() : { plans: [] };
-        const settingsData = settingsRes?.ok ? await settingsRes.json() : {};
-        const subData = subRes?.ok ? await subRes.json() : {};
+        const planData = planRes.ok ? await planRes.json().catch(() => ({})) : { plans: [] };
+        const settingsData = settingsRes.ok ? await settingsRes.json().catch(() => ({})) : {};
+        const subData = subRes.ok ? await subRes.json().catch(() => ({})) : {};
 
         setPlans(planData.plans || []);
         if (settingsData.settings) {
-          const rate = settingsData.settings.find((s: { key: string }) => s.key === "exchange_rate");
-          if (rate) setExchangeRate(parseFloat(rate.value) || 7.3);
-          const cur = settingsData.settings.find((s: { key: string }) => s.key === "currency");
-          if (cur) setDisplayCurrency(cur.value || "CNY");
+          const rate = settingsData.settings.exchange_rate;
+          if (rate) setExchangeRate(parseFloat(rate) || 7.3);
+          const cur = settingsData.settings.currency;
+          if (cur) setDisplayCurrency(cur || "CNY");
         }
         const active = subData.subscriptions?.find((s: { status: string }) => s.status === "active");
         if (active) {
           setActiveSub({ plan_id: active.plan_id, plan_tier: active.plan_tier || 0 });
         }
-      } catch {
+      } catch (err) {
+        console.error("TokenPlan load error:", err);
         showToast("Failed to load plans", "error");
       }
       if (!cancelled) setLoading(false);
