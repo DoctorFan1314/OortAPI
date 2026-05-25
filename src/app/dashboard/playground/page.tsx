@@ -348,11 +348,18 @@ export default function PlaygroundPage() {
         const endpointUrl = endpoint === "openai" ? "/api/v1/chat/completions" : "/api/v1/messages";
         const headers: Record<string, string> = { "Content-Type": "application/json", Authorization: `Bearer ${selectedKey?.key_value || ""}` };
         if (endpoint === "anthropic") headers["anthropic-version"] = "2023-06-01";
-        const res = await fetch(endpointUrl, { method: "POST", headers, body: JSON.stringify(body), signal: controller.signal });
+        const fetchStart = performance.now();
+	        const res = await fetch(endpointUrl, { method: "POST", headers, body: JSON.stringify(body), signal: controller.signal });
+	        const ttfbMs = Math.round(performance.now() - fetchStart);
 
         if (!res.ok) { const errData = await res.json().catch(() => null); setError(errData?.error?.message || `HTTP ${res.status}`); setIsSending(false); return; }
 
-        const { fullText, toolCalls, reasoning } = await readStream(res);
+        const streamStart = performance.now();
+	        const { fullText, toolCalls, reasoning } = await readStream(res);
+	        const streamDur = (performance.now() - streamStart) / 1000;
+	        const tokCount = fullText ? fullText.split(/s+/).length : 0;
+	        const tps = streamDur > 0 ? Math.round(tokCount / streamDur) : null;
+	        setStreamMetrics({ ttfbMs, tokensPerSec: tps });
         setReasoningContent(reasoning);
 
         if (toolCalls.length > 0) {
