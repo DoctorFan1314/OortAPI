@@ -404,6 +404,11 @@ export default function ModelsPage() {
         </div>
       </div>
 
+      {/* Cost Simulator */}
+      <div className="max-w-[1600px] mx-auto px-4 lg:px-8 pt-4">
+        <CostSimulator models={filtered} exchangeRate={exchangeRate} currency={currency} />
+      </div>
+
       {/* Model Grid */}
       <div className="max-w-[1600px] mx-auto px-4 lg:px-8 py-6">
         {loading ? (
@@ -677,7 +682,6 @@ export default function ModelsPage() {
           </>
         )}
       </div>
-      <CostSimulator models={filtered} exchangeRate={exchangeRate} currency={currency} formatPrice={formatPrice} />
     </div>
   );
 }
