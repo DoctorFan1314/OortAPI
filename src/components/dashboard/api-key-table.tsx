@@ -247,16 +247,26 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
     if (selectedKeys.size === filteredKeys.length) setSelectedKeys(new Set());
     else setSelectedKeys(new Set(filteredKeys.map(k => k.id)));
   };
+  const [batchProgress, setBatchProgress] = useState<{ current: number; total: number } | null>(null);
+
   const batchDelete = async () => {
     if (selectedKeys.size === 0) return;
     setBatchDeleting(true);
-    for (const id of selectedKeys) {
-      await fetch("/api/dashboard/keys", { method: "DELETE", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({ id }) });
+    const ids = Array.from(selectedKeys);
+    setBatchProgress({ current: 0, total: ids.length });
+    let successCount = 0;
+    for (let i = 0; i < ids.length; i++) {
+      setBatchProgress({ current: i + 1, total: ids.length });
+      try {
+        const res = await fetch("/api/dashboard/keys", { method: "DELETE", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({ id: ids[i] }) });
+        if (res.ok) successCount++;
+      } catch {}
     }
+    setBatchProgress(null);
     setSelectedKeys(new Set());
     setBatchDeleting(false);
     mutate();
-    showToast(lang === "zh" ? `已删除 ${selectedKeys.size} 个 Key` : `Deleted ${selectedKeys.size} keys`, "success");
+    showToast(lang === "zh" ? `已删除 ${successCount}/${ids.length} 个 Key` : `Deleted ${successCount}/${ids.length} keys`, successCount === ids.length ? "success" : "warning");
   };
 
   const copyKey = (key: string) => {
@@ -325,9 +335,16 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
                   <input type="checkbox" checked={selectedKeys.size === filteredKeys.length && filteredKeys.length > 0}
                     onChange={toggleSelectAll} className="rounded border-border" />
                   {selectedKeys.size > 0 && (
-                    <Button size="sm" variant="outline" onClick={batchDelete} disabled={batchDeleting} className="text-red-500 text-xs h-7">
-                      {lang === "zh" ? `删除 ${selectedKeys.size} 个` : `Delete ${selectedKeys.size}`}
-                    </Button>
+                    <>
+                      <Button size="sm" variant="outline" onClick={batchDelete} disabled={batchDeleting} className="text-red-500 text-xs h-7">
+                        {batchDeleting ? (lang === "zh" ? `删除中 ${batchProgress?.current || 0}/${batchProgress?.total || selectedKeys.size}...` : `Deleting ${batchProgress?.current || 0}/${batchProgress?.total || selectedKeys.size}...`) : (lang === "zh" ? `删除 ${selectedKeys.size} 个` : `Delete ${selectedKeys.size}`)}
+                      </Button>
+                      {batchProgress && (
+                        <div className="w-20 h-1.5 bg-muted rounded-full overflow-hidden">
+                          <div className="h-full bg-red-500 rounded-full transition-all" style={{ width: `${(batchProgress.current / batchProgress.total) * 100}%` }} />
+                        </div>
+                      )}
+                    </>
                   )}
                 </>
               )}
