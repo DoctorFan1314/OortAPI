@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Copy, Plus, Trash2, ToggleLeft, ToggleRight } from "lucide-react";
+import { Copy, Plus, Trash2, ToggleLeft, ToggleRight, RefreshCw } from "lucide-react";
 import { useToast } from "@/contexts/toast-context";
 import { dashboardSWRConfig } from "@/lib/swr-fetcher";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
@@ -178,6 +178,24 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
     } catch {
       showToast("Network error", "error");
     }
+  };
+
+  const handleRotateKey = async (id: number) => {
+    try {
+      const res = await fetch("/api/dashboard/keys", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ id, action: "rotate" }),
+      });
+      const data = await res.json();
+      if (res.ok && data.key?.full_key) {
+        setNewKeyFull(data.key.full_key);
+      } else {
+        showToast(data.error || "Rotation failed", "error");
+      }
+      mutate();
+    } catch { showToast("Network error", "error"); }
   };
 
   const saveRateLimit = async (id: number) => {
@@ -377,6 +395,9 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
                 <div className="flex items-center gap-1">
                   <button onClick={() => toggleKey(k.id, !k.enabled)} className="text-muted-foreground hover:text-foreground" aria-label={k.enabled ? "Disable key" : "Enable key"}>
                     {k.enabled ? <ToggleRight className="h-5 w-5 text-green-500" /> : <ToggleLeft className="h-5 w-5" />}
+                  </button>
+                  <button onClick={() => handleRotateKey(k.id)} className="text-muted-foreground hover:text-amber-400" aria-label="Rotate key">
+                    <RefreshCw className="h-3.5 w-3.5" />
                   </button>
                   <button onClick={() => setDeleteTarget(k.id)} className="text-muted-foreground hover:text-red-500" aria-label="Delete key">
                     <Trash2 className="h-4 w-4" />

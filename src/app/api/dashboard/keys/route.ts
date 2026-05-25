@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { validateUserFromCookie } from '@/lib/api-gateway';
-import type { DBApiKey } from '@/lib/db';
 import { generateApiKey, hashApiKey } from '@/lib/auth';
+import type { DBApiKey } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
@@ -60,11 +60,19 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: auth.error || 'Unauthorized' }, { status: 401 });
     }
 
-    const { id, name, enabled, rate_limit, permissions, expires_at } = await request.json();
+    const { id, name, enabled, rate_limit, permissions, expires_at, action } = await request.json();
     if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 });
 
-    const key = db.prepare('SELECT * FROM api_keys WHERE id = ? AND user_id = ?').get(id, auth.user.id);
+    const key = db.prepare('SELECT * FROM api_keys WHERE id = ? AND user_id = ?').get(id, auth.user.id) as { id: number; key_value: string } | undefined;
     if (!key) return NextResponse.json({ error: 'Key not found' }, { status: 404 });
+
+    // Key rotation: generate new key, disable old one, return new value
+    if (action === 'rotate') {
+      const newKey = generateApiKey();
+      const hashed = hashApiKey(newKey);
+      db.prepare('UPDATE api_keys SET key_value = ?, enabled = 1 WHERE id = ?').run(hashed, id);
+      return NextResponse.json({ key: { id, full_key: newKey, key_value: `sk-oort-${newKey.slice(7, 17)}...` } });
+    }
 
     const updates: string[] = [];
     const values: unknown[] = [];
