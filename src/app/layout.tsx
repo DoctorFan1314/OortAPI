@@ -16,6 +16,7 @@ import { HtmlLangUpdater } from "@/components/shared/html-lang-updater";
 import { getSiteUrl } from "@/lib/site-url";
 
 import { CommandPalette } from "@/components/shared/command-palette";
+import { KeyboardShortcutsHelp } from "@/components/shared/keyboard-shortcuts-help";
 import { useGlobalMousePosition } from "@/lib/use-mouse-position";
 
 function GlobalMouseTracker() {
@@ -114,6 +115,7 @@ export default function RootLayout({
                 <Footer />
                 <Toaster />
                 <CommandPalette />
+                <KeyboardShortcutsHelp />
                 <ScrollToTop />
               </AuthProvider>
               </CurrencyProvider>

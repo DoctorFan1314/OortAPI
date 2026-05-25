@@ -51,7 +51,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <AuthGuard>
-      <div className="max-w-[1600px] mx-auto px-4 lg:px-8 py-6">
+      <div key={pathname} className="max-w-[1600px] mx-auto px-4 lg:px-8 py-6 animate-page-fade-in">
         {breadcrumbItems.length > 0 && <Breadcrumb items={breadcrumbItems} />}
         <div className="flex flex-col lg:flex-row gap-6">
           <DashboardSidebar />

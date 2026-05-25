@@ -2,16 +2,23 @@
 
 import { createContext, useContext, useState, useCallback, useEffect, useRef, useMemo } from "react";
 
+interface ToastAction {
+  label: string;
+  onClick: () => void;
+}
+
 interface Toast {
   id: string;
   message: string;
   type?: "info" | "success" | "error" | "warning";
   createdAt?: number;
+  action?: ToastAction;
 }
 
 interface ToastContextValue {
   toasts: Toast[];
   toast: (message: string, type?: Toast["type"], duration?: number) => void;
+  toastWithAction: (message: string, action: ToastAction, type?: Toast["type"], duration?: number) => void;
   dismiss: (id: string) => void;
 }
 
@@ -29,18 +36,16 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  const toast = useCallback(
-    (message: string, type: Toast["type"] = "info", duration?: number) => {
+  const addToast = useCallback(
+    (message: string, type: Toast["type"] = "info", action?: ToastAction, duration?: number) => {
       const id = Math.random().toString(36).slice(2) + Date.now().toString(36);
       const now = Date.now();
       const autoDismiss = duration ?? (type === "error" ? 5000 : 3000);
 
       setToasts((prev) => {
-        // Only suppress if an identical message was added less than 500ms ago
         const recentDuplicate = prev.some((t) => t.message === message && t.createdAt && now - t.createdAt < 500);
         if (recentDuplicate) return prev;
-        const next = [...prev, { id, message, type, createdAt: now }];
-        // Keep at most 5 toasts, remove earliest
+        const next = [...prev, { id, message, type, createdAt: now, action }];
         return next.length > 5 ? next.slice(next.length - 5) : next;
       });
 
@@ -51,6 +56,16 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       timeoutsRef.current.set(id, timeout);
     },
     [],
+  );
+
+  const toast = useCallback(
+    (message: string, type?: Toast["type"], duration?: number) => addToast(message, type, undefined, duration),
+    [addToast],
+  );
+
+  const toastWithAction = useCallback(
+    (message: string, action: ToastAction, type?: Toast["type"], duration?: number) => addToast(message, type, action, duration),
+    [addToast],
   );
 
   const dismiss = useCallback(
@@ -65,7 +80,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     [],
   );
 
-  const value = useMemo(() => ({ toasts, toast, dismiss }), [toasts, toast, dismiss]);
+  const value = useMemo(() => ({ toasts, toast, toastWithAction, dismiss }), [toasts, toast, toastWithAction, dismiss]);
 
   return (
     <ToastContext.Provider value={value}>

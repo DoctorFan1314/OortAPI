@@ -11,7 +11,7 @@ interface EmptyStateProps {
 
 export function EmptyState({ icon: Icon, title, description, action }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center py-16 px-4">
+    <div className="flex flex-col items-center justify-center py-16 px-4 animate-page-fade-in">
       {Icon && <Icon className="h-12 w-12 text-muted-foreground/30 mb-4" />}
       <h3 className="text-base font-medium text-foreground mb-1">{title}</h3>
       {description && <p className="text-sm text-muted-foreground text-center max-w-sm mb-4">{description}</p>}
