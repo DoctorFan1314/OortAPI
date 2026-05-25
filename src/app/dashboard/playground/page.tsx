@@ -147,7 +147,6 @@ export default function PlaygroundPage() {
   const [streamMetrics, setStreamMetrics] = useState<{ ttfbMs: number | null; tokensPerSec: number | null }>({ ttfbMs: null, tokensPerSec: null });
   const [endpoint, setEndpoint] = useState<ApiEndpoint>("openai");
   const [showToolbar, setShowToolbar] = useState(false);
-  const [thinkingMode, setThinkingMode] = useState(false);
   const [showToolConfig, setShowToolConfig] = useState(false);
   const [toolConfig, setToolConfig] = useState<ToolConfig>(loadToolConfig());
   const [attachedImages, setAttachedImages] = useState<string[]>([]);
@@ -186,11 +185,7 @@ export default function PlaygroundPage() {
     }
     return getModelCaps(selectedModel);
   })();
-
-  // ── Force reset thinking mode on every model switch ──
-  useEffect(() => {
-    setThinkingMode(false);
-  }, [selectedModel, modelCaps.reasoning]);
+  const thinkingMode = modelCaps.reasoning;
 
   // ── Session management ──
   const createSession = useCallback(() => {
@@ -772,12 +767,6 @@ export default function PlaygroundPage() {
 
               
                 <div className="flex flex-col gap-1.5 self-center">
-                  {/* Thinking toggle */}
-                  {modelCaps.reasoning && (
-                    <button onClick={() => setThinkingMode(!thinkingMode)} className={cn("flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs border transition-colors shrink-0", thinkingMode ? "bg-amber-500/10 border-amber-500/30 text-amber-500" : "bg-muted/20 border-border/50 text-muted-foreground hover:text-foreground")}>
-                      <Brain className={cn("h-4 w-4", thinkingMode && "animate-pulse")} />{t.thinking}
-                    </button>
-                  )}
                   <div className="flex gap-1.5">
                     {isSending ? <button onClick={handleStop} className="w-10 h-full min-h-[2.5rem] rounded-md border border-destructive/30 bg-destructive/10 text-destructive flex items-center justify-center shrink-0 hover:bg-destructive/20 transition-colors"><Loader2 className="h-5 w-5 animate-spin" /></button> : <button onClick={handleSend} disabled={!message.trim() || !selectedModel || !selectedKey} className="w-10 h-full min-h-[2.5rem] rounded-md border border-primary/30 bg-primary/10 text-primary flex items-center justify-center shrink-0 hover:bg-primary/20 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"><Send className="h-5 w-5" /></button>}
                   </div>
