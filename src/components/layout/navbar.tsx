@@ -101,35 +101,53 @@ export function Navbar() {
               key={link.href}
               href={link.href}
               aria-current={pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href)) ? "page" : undefined}
-              className={`px-3 py-2 text-sm transition-colors rounded-md hover:bg-secondary ${
+              className={`relative px-3 py-2 text-sm transition-colors hover:text-foreground ${
                 pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href))
-                  ? "text-foreground font-medium bg-secondary"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "text-foreground font-medium"
+                  : "text-muted-foreground"
               }`}
             >
               {link.label}
+              <span className={`absolute bottom-0 left-2 right-2 h-0.5 bg-primary rounded-full transition-all duration-300 ${
+                pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href))
+                  ? "opacity-100 scale-x-100"
+                  : "opacity-0 scale-x-0"
+              }`} />
             </Link>
           ))}
         </nav>
 
         <div className="flex items-center gap-2">
+          {/* Desktop: persistent search */}
+          <form role="search" onSubmit={handleSearch} className="hidden lg:flex items-center gap-1">
+            <div className="relative">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/60" />
+              <Input
+                placeholder={lang === "zh" ? "搜索模型、文档..." : "Search models, docs..."}
+                className="h-8 w-48 xl:w-56 bg-secondary border-border text-foreground placeholder:text-muted-foreground/60 text-sm pl-8 pr-8"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <kbd className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground/40 font-mono pointer-events-none hidden xl:inline">Ctrl+K</kbd>
+            </div>
+          </form>
+          {/* Mobile: toggle search */}
           {searchOpen ? (
-            <form role="search" onSubmit={handleSearch} className="flex items-center gap-1">
+            <form role="search" onSubmit={handleSearch} className="flex lg:hidden items-center gap-1">
               <Input
                 placeholder={lang === "zh" ? "搜索..." : "Search..."}
-                className="h-8 w-40 md:w-56 bg-secondary border-border text-foreground placeholder:text-muted-foreground text-sm"
+                className="h-8 w-40 bg-secondary border-border text-foreground placeholder:text-muted-foreground text-sm"
                 autoFocus
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-              <Button variant="ghost" size="icon-sm" onClick={() => { setSearchOpen(false); setSearchQuery(""); }} className="text-muted-foreground hover:text-foreground" aria-label="Close search">
+              <Button variant="ghost" size="icon-sm" onClick={() => { setSearchOpen(false); setSearchQuery(""); }} className="text-muted-foreground hover:text-foreground shrink-0" aria-label="Close search">
                 <X className="h-4 w-4" />
               </Button>
             </form>
           ) : (
-            <Button variant="ghost" size="icon-sm" onClick={() => setSearchOpen(true)} className="text-muted-foreground hover:text-foreground" aria-label="Search">
+            <Button variant="ghost" size="icon-sm" onClick={() => setSearchOpen(true)} className="lg:hidden text-muted-foreground hover:text-foreground" aria-label="Search">
               <Search className="h-4 w-4" />
-              <span className="hidden lg:inline text-[10px] text-muted-foreground/60 ml-1">Ctrl+K</span>
             </Button>
           )}
 

@@ -25,6 +25,7 @@ export default function RegisterClient() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
   const { register } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
@@ -88,7 +89,8 @@ export default function RegisterClient() {
     }
     toast(t.auth.registerSuccess, "success");
     const returnUrl = searchParams.get("returnUrl");
-    router.push(safeReturnUrl(returnUrl));
+    setShowCelebration(true);
+    setTimeout(() => router.push(safeReturnUrl(returnUrl)), 1200);
   }
 
   return (
@@ -156,6 +158,30 @@ export default function RegisterClient() {
           </p>
         </div>
       </div>
+      {/* Celebration overlay on successful registration */}
+      {showCelebration && (
+        <div className="fixed inset-0 z-[150] pointer-events-none flex items-center justify-center">
+          <div className="text-center animate-page-fade-in">
+            <div className="text-6xl mb-4 animate-bounce-in">🎉</div>
+            <p className="text-lg font-semibold text-foreground">Welcome aboard! 🚀</p>
+          </div>
+          <div className="fixed inset-0 pointer-events-none">
+            <style>{`
+              @keyframes cf-0 { 0%{transform:translateY(-10vh) rotate(0deg);opacity:1} 100%{transform:translateY(110vh) rotate(720deg);opacity:0} }
+              @keyframes cf-1 { 0%{transform:translateY(-10vh) rotate(0deg);opacity:1} 100%{transform:translateY(105vh) rotate(540deg);opacity:0} }
+              @keyframes cf-2 { 0%{transform:translateY(-10vh) rotate(0deg);opacity:1} 100%{transform:translateY(115vh) rotate(900deg);opacity:0} }
+            `}</style>
+            {['#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#a855f7','#f97316'].map((c,i) => (
+              <div key={i} style={{
+                position:'fixed', top:'-10px', left:`${8 + i * 15}%`,
+                width:i%2===0?'8px':'6px', height:i%2===0?'8px':'10px',
+                background:c, borderRadius:i%2===0?'50%':'2px',
+                animation:`cf-${i%3} ${1.5 + i*0.1}s ease-in ${i*0.12}s forwards`
+              }} />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

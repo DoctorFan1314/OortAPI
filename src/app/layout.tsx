@@ -17,6 +17,7 @@ import { getSiteUrl } from "@/lib/site-url";
 
 import { CommandPalette } from "@/components/shared/command-palette";
 import { KeyboardShortcutsHelp } from "@/components/shared/keyboard-shortcuts-help";
+import { NavigationProgress } from "@/components/shared/navigation-progress";
 import { useGlobalMousePosition } from "@/lib/use-mouse-position";
 
 function GlobalMouseTracker() {
@@ -107,6 +108,7 @@ export default function RootLayout({
               <CurrencyProvider>
               <AuthProvider>
                 <HtmlLangUpdater />
+                <NavigationProgress />
                 <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-lg focus:text-sm">
                   Skip to main content
                 </a>
