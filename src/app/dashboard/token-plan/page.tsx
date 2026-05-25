@@ -75,16 +75,24 @@ function TokenPlanContent() {
   const [upgradeLoading, setUpgradeLoading] = useState(false);
 
   useEffect(() => {
-    Promise.all([
-      fetch("/api/dashboard/subscription", { credentials: "include" }).then(r => r.json()),
-      fetch("/api/dashboard/keys", { credentials: "include" }).then(r => r.json()),
-      fetch("/api/plans").then(r => r.json()),
-    ]).then(([subData, keyData, planData]) => {
-      setSubscriptions(subData.subscriptions || []);
-      setApiKeys(keyData.keys || []);
-      setPlans(planData.plans || []);
-      setLoading(false);
-    }).catch(() => { setLoading(false); showToast(lang === "zh" ? "加载失败，请刷新重试" : "Failed to load. Please refresh.", "error"); });
+    let cancelled = false;
+    (async () => {
+      try {
+        const [subRes, keyRes, planRes] = await Promise.all([
+          fetch("/api/dashboard/subscription", { credentials: "include" }),
+          fetch("/api/dashboard/keys", { credentials: "include" }),
+          fetch("/api/plans"),
+        ]);
+        if (cancelled) return;
+        if (subRes.ok) { const d = await subRes.json(); setSubscriptions(d.subscriptions || []); }
+        if (keyRes.ok) { const d = await keyRes.json(); setApiKeys(d.keys || []); }
+        if (planRes.ok) { const d = await planRes.json(); setPlans(d.plans || []); }
+      } catch {
+        showToast(lang === "zh" ? "加载失败，请刷新重试" : "Failed to load. Please refresh.", "error");
+      }
+      if (!cancelled) setLoading(false);
+    })();
+    return () => { cancelled = true; };
   }, []);
 
   async function handleCancel(subscriptionId: number) {

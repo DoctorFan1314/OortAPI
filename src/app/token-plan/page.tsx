@@ -48,24 +48,37 @@ export default function TokenPlanPage() {
   const [activeSub, setActiveSub] = useState<ActiveSubscription | null>(null);
 
   useEffect(() => {
-    Promise.all([
-      fetch("/api/plans").then(r => r.json()),
-      fetch("/api/dashboard/settings").then(r => r.json()).catch(() => ({})),
-      fetch("/api/dashboard/subscription", { credentials: "include" }).then(r => r.json()).catch(() => ({})),
-    ]).then(([planData, settingsData, subData]) => {
-      setPlans(planData.plans || []);
-      if (settingsData.settings) {
-        const rate = settingsData.settings.find((s: { key: string }) => s.key === "exchange_rate");
-        if (rate) setExchangeRate(parseFloat(rate.value) || 7.3);
-        const cur = settingsData.settings.find((s: { key: string }) => s.key === "currency");
-        if (cur) setDisplayCurrency(cur.value || "CNY");
+    let cancelled = false;
+    (async () => {
+      try {
+        const [planRes, settingsRes, subRes] = await Promise.all([
+          fetch("/api/plans"),
+          fetch("/api/dashboard/settings").catch(() => null),
+          fetch("/api/dashboard/subscription", { credentials: "include" }).catch(() => null),
+        ]);
+        if (cancelled) return;
+
+        const planData = planRes.ok ? await planRes.json() : { plans: [] };
+        const settingsData = settingsRes?.ok ? await settingsRes.json() : {};
+        const subData = subRes?.ok ? await subRes.json() : {};
+
+        setPlans(planData.plans || []);
+        if (settingsData.settings) {
+          const rate = settingsData.settings.find((s: { key: string }) => s.key === "exchange_rate");
+          if (rate) setExchangeRate(parseFloat(rate.value) || 7.3);
+          const cur = settingsData.settings.find((s: { key: string }) => s.key === "currency");
+          if (cur) setDisplayCurrency(cur.value || "CNY");
+        }
+        const active = subData.subscriptions?.find((s: { status: string }) => s.status === "active");
+        if (active) {
+          setActiveSub({ plan_id: active.plan_id, plan_tier: active.plan_tier || 0 });
+        }
+      } catch {
+        showToast("Failed to load plans", "error");
       }
-      const active = subData.subscriptions?.find((s: { status: string }) => s.status === "active");
-      if (active) {
-        setActiveSub({ plan_id: active.plan_id, plan_tier: active.plan_tier || 0 });
-      }
-      setLoading(false);
-    }).catch(() => { setLoading(false); showToast("Failed to load plans", "error"); });
+      if (!cancelled) setLoading(false);
+    })();
+    return () => { cancelled = true; };
   }, []);
 
   async function handleSubscribe(planId: number) {
