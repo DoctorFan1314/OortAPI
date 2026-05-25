@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import useSWR from "swr";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
@@ -27,6 +28,7 @@ export function UsageChart({ lang = "zh" }: { lang?: "zh" | "en" }) {
   const { formatPrice } = useCurrency();
   const data = stats?.daily_usage || [];
   const t = LABELS[lang];
+  const [compareMode, setCompareMode] = useState(false);
 
   if (!stats) {
     return (
@@ -64,6 +66,9 @@ export function UsageChart({ lang = "zh" }: { lang?: "zh" | "en" }) {
   const avgDailyCost = data.length > 0 ? data.reduce((s, d) => s + d.cost, 0) / data.length : 0;
   const projectedCost = avgDailyCost * totalDays;
 
+  const half = Math.ceil(data.length / 2);
+  const firstHalf = data.slice(0, half);
+  const secondHalf = data.slice(half);
   const chartData = data.map(d => ({
     ...d,
     label: d.date.slice(5),
@@ -75,6 +80,9 @@ export function UsageChart({ lang = "zh" }: { lang?: "zh" | "en" }) {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg">{t.calls}</CardTitle>
+            <button onClick={() => setCompareMode(!compareMode)} className={`text-[10px] px-2 py-0.5 rounded-full font-medium transition-colors ${compareMode ? "bg-primary/10 text-primary border border-primary/20" : "text-muted-foreground hover:text-foreground border border-transparent"}`}>
+              {lang === "zh" ? "对比" : "Compare"}
+            </button>
           </div>
         </CardHeader>
         <CardContent>
@@ -91,7 +99,8 @@ export function UsageChart({ lang = "zh" }: { lang?: "zh" | "en" }) {
                   fontSize: 12,
                 }}
               />
-              <Bar dataKey="calls" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="calls" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} opacity={compareMode ? 0.6 : 1} />
+              {compareMode && <Bar dataKey="cost" fill="#f59e0b" radius={[4, 4, 0, 0]} opacity={0.4} />}
             </BarChart>
           </ResponsiveContainer>
         </CardContent>
