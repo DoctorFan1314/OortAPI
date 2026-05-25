@@ -74,6 +74,14 @@ export default function DashboardPage() {
   const hasKeys = (keysData?.keys?.length || 0) > 0;
   const hasSub = (subData?.subscriptions?.length || 0) > 0;
   const isNewUser = !hasKeys && !hasSub;
+  const isNewUserAny = !hasKeys || !hasSub;
+
+  const getOnboardProgress = () => {
+    let done = 0;
+    if (hasKeys) done++;
+    if (hasSub) done++;
+    return Math.round((done / 2) * 100);
+  };
 
   // Check for expiring subscription (within 3 days, not auto-renew)
   const expiringSub = subData?.subscriptions?.find(s => {
@@ -150,7 +158,7 @@ export default function DashboardPage() {
       )}
 
       {/* Onboarding for new users */}
-      {isNewUser && (
+      {isNewUserAny && (
         <Card className="glass-card border-primary/30">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
@@ -205,6 +213,14 @@ export default function DashboardPage() {
                   </Button>
                 </Link>
               </div>
+            </div>
+            {/* Progress bar */}
+            <div className="mt-5 flex items-center gap-3 text-xs text-muted-foreground">
+              <span className="shrink-0">{lang === "zh" ? "设置进度" : "Progress"}: {getOnboardProgress()}%</span>
+              <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-primary to-purple-500 rounded-full transition-all duration-500" style={{ width: `${getOnboardProgress()}%` }} />
+              </div>
+              {getOnboardProgress() === 100 && <span className="text-emerald-400 shrink-0">{lang === "zh" ? "✅ 已完成" : "✅ Complete"}</span>}
             </div>
           </CardContent>
         </Card>
