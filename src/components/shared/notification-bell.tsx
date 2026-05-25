@@ -53,15 +53,23 @@ function timeAgo(dateStr: string, agoText: string, justNowText: string): string 
   return justNowText;
 }
 
+const FILTER_TABS = [
+  { key: "all", labelKey: "all" },
+  { key: "system", labelKey: "system" },
+  { key: "like", labelKey: "likes" },
+  { key: "comment_reply", labelKey: "replies" },
+] as const;
+
 export function NotificationBell() {
   const [open, setOpen] = useState(false);
   const [activeIdx, setActiveIdx] = useState(-1);
+  const [filterTab, setFilterTab] = useState("all");
   const containerRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const pathname = usePathname();
   const { user } = useAuth();
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { notifications, unreadCount, markAsRead, markAllRead, clearAll } =
     useNotifications();
 
@@ -210,17 +218,41 @@ export function NotificationBell() {
             </div>
           </div>
 
+          {/* Filter tabs */}
+          <div className="flex gap-1 px-3 py-2 border-b border-border/30 bg-muted/20">
+            {FILTER_TABS.map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setFilterTab(tab.key)}
+                className={`px-2 py-0.5 text-[10px] rounded-full font-medium transition-colors ${
+                  filterTab === tab.key
+                    ? "bg-primary/10 text-primary border border-primary/20"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {tab.key === "all" ? (lang === "zh" ? "全部" : "All") : null}
+                {tab.key === "system" ? (lang === "zh" ? "系统" : "System") : null}
+                {tab.key === "like" ? (lang === "zh" ? "点赞" : "Likes") : null}
+                {tab.key === "comment_reply" ? (lang === "zh" ? "回复" : "Replies") : null}
+              </button>
+            ))}
+          </div>
+
           {/* Notification list */}
           <div className="max-h-80 overflow-y-auto">
-            {notifications.length === 0 ? (
-              <div className="px-4 py-8 text-center">
-                <Bell className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
-                <p className="text-sm text-muted-foreground">
-                  {t.common.noNotifications}
-                </p>
-              </div>
-            ) : (
-              notifications.map((notification, idx) => (
+            {(() => {
+              const filtered = filterTab === "all" ? notifications : notifications.filter((n) => n.type === filterTab);
+              if (filtered.length === 0) {
+                return (
+                  <div className="px-4 py-8 text-center">
+                    <Bell className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
+                    <p className="text-sm text-muted-foreground">
+                      {t.common.noNotifications}
+                    </p>
+                  </div>
+                );
+              }
+              return filtered.map((notification, idx) => (
                 <button
                   key={notification.id}
                   role="menuitem"
@@ -257,8 +289,13 @@ export function NotificationBell() {
                   </div>
                 </button>
               ))
-            )}
+            })()}
           </div>
+          {notifications.length > 0 && (
+            <a href="/profile" className="block text-center text-[11px] text-primary hover:text-primary/80 py-2.5 border-t border-border/30 transition-colors">
+              {lang === "zh" ? "查看全部通知" : "View All Notifications"} →
+            </a>
+          )}
         </div>
       )}
     </div>
