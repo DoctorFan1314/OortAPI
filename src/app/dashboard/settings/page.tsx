@@ -30,6 +30,7 @@ export default function SettingsPage() {
   const [monthlyBudget, setMonthlyBudget] = useState("");
   const [currentSpend, setCurrentSpend] = useState(0);
   const [budgetSaving, setBudgetSaving] = useState(false);
+  const [autoSaveStatus, setAutoSaveStatus] = useState<"saved"|"saving"|"unsaved">("saved");
   const [savedBudget, setSavedBudget] = useState(0);
   const [confirmExchangeOpen, setConfirmExchangeOpen] = useState(false);
 
@@ -75,6 +76,19 @@ export default function SettingsPage() {
     if (!isExceeded) hasNotifiedRef.current = false;
     prevExceeded.current = isExceeded;
   }, [budgetLimit, budgetPercent, lang]);
+
+  // Auto-save budget with 2s debounce
+  const budgetTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  useEffect(() => {
+    if (!monthlyBudget || monthlyBudget === String(savedBudget)) { setAutoSaveStatus("saved"); return; }
+    setAutoSaveStatus("unsaved");
+    clearTimeout(budgetTimerRef.current);
+    budgetTimerRef.current = setTimeout(() => {
+      setAutoSaveStatus("saving");
+      handleSaveBudget();
+    }, 2000);
+    return () => clearTimeout(budgetTimerRef.current);
+  }, [monthlyBudget]);
 
   const handleSaveSystem = async () => {
     if (exchangeRate !== initialExchangeRate) {
@@ -173,6 +187,11 @@ export default function SettingsPage() {
               placeholder="100"
               className="mt-1"
             />
+            <div className="flex items-center gap-1 mt-1">
+              <span className={`text-[10px] ${autoSaveStatus === "saved" ? "text-emerald-400" : autoSaveStatus === "saving" ? "text-amber-400" : "text-muted-foreground"}`}>
+                {autoSaveStatus === "saved" ? (lang === "zh" ? "已保存" : "Saved") : autoSaveStatus === "saving" ? (lang === "zh" ? "保存中..." : "Saving...") : (lang === "zh" ? "未保存" : "Unsaved")}
+              </span>
+            </div>
           </div>
           {budgetLimit > 0 && (
             <div className="space-y-2">
