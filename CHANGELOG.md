@@ -8,23 +8,72 @@ All notable changes to this project will be documented in this file.
 
 ## [v3.3.4.19] — 2026-05-25
 
-### Security & Full-Site Audit #3 — 16 Fixes
-- **Security** — Middleware now verifies JWT signature (not just cookie existence) in proxy.ts
-- **Security** — `hashApiKey` now uses server-side `ENCRYPTION_KEY` instead of key-as-HMAC-key
-- **Security** — Channel health SQL injection vector fixed (parameterized query)
+### Full-Site Enhancement — 49 Features, Fixes & UX Improvements
+
+#### New Features (5)
+- **Status page** — New `/status` page with upstream provider health indicators and infrastructure checks
+- **Keyboard shortcuts** — Press `?` to open shortcuts reference dialog
+- **API key rotation** — One-click rotate generates new key, replaces old one, shows new value
+- **API changelog** — New `/docs/changelog` page with version history timeline
+- **Prompt template library** — Save/load prompt templates with localStorage persistence
+
+#### Feature Expansions (7)
+- **Stat cards clickable** — Dashboard stat cards now link to relevant pages (billing/usage)
+- **Search filters** — Category filter tabs on search page (All/Models/Docs/Errors)
+- **Navbar search** — Persistent search input on desktop with Ctrl+K hint
+- **Toast actions** — Toast system extended with action buttons (undo support)
+- **Notification preferences** — Settings page with per-event-type notification toggles
+- **Settings search** — Search bar filters visible settings cards
+- **Onboarding progress** — Dashboard checklist with progress bar and completion tracking
+
+#### Visual & Design (12)
+- **Page transitions** — Fade-in animation on route changes
+- **Loading progress bar** — Gradient top bar on page navigation
+- **Shimmer skeleton** — Enhanced `skeleton-shimmer` effect replacing plain pulse
+- **Count-up animation** — `useCountUp` hook for animated stat numbers
+- **Provider indicators** — Color-coded dots on model cards (OpenAI/Anthropic/DeepSeek/Google)
+- **Activity feed colors** — Timeline dots color-coded by model provider
+- **Navbar underline** — Sliding underline animation for active nav links
+- **Gradient button** — New `gradient` variant for prominent CTAs
+- **Chart CSS variables** — Chart colors resolved from `--chart-1..5` custom properties
+- **Responsive headings** — `text-xl md:text-2xl` across all dashboard pages
+- **Mobile bottom nav** — Fixed tab bar on mobile (lg:hidden) with 5 key destinations
+- **404 page** — Enhanced with gradient heading and brand illustration
+
+#### Interaction Improvements (8)
+- **Playground collapsible params** — Advanced parameters grouped under collapsible section
+- **Playground presets** — Quick-select parameter presets (Balanced/Creative/Precise/Code)
+- **Conversation export** — Playground export as Markdown file
+- **Unsaved changes hook** — `useUnsavedChanges` prevents accidental navigation away
+- **Auto-save budget** — Settings budget field auto-saves 2s after input stops
+- **Optimistic toggle** — API key toggle updates UI immediately before server response
+- **Error classification** — ErrorFallback shows HTTP status-specific guidance (401/429/500)
+- **Streaming metrics** — TTFB and tokens/sec displayed in playground response
+
+#### Micro-interactions (5)
+- **Button scale feedback** — `active:scale-[0.97]` press effect on all buttons
+- **Toast animations** — Differentiated animations (bounce-in success, shake error)
+- **Empty state animation** — Fade-in on empty state render
+- **Card hover lift** — Enhanced spring-easing `-4px` hover lift
+- **Registration confetti** — Celebration particles on successful registration
+
+#### Notifications & Batch (3)
+- **Notification filters** — Category tabs in notification dropdown (All/System/Likes/Replies)
+- **Batch progress** — Per-item progress bar during batch delete operations
+- **View all link** — "View All Notifications" link in notification dropdown
+
+#### Webhook & Session Management (2)
+- **Delivery logs** — Webhook delivery status dialog with trigger time and status code
+- **Active sessions** — Profile page shows active sessions with revoke capability
+
+#### Security & Bug Fixes (7)
+- **Security** — Middleware JWT signature verification (not just cookie check)
+- **Security** — `hashApiKey` uses server-side `ENCRYPTION_KEY` instead of key-as-HMAC-key
+- **Security** — Channel health SQL parameterized (datetime injection vector fixed)
 - **Security** — CORS no longer falls back to `Access-Control-Allow-Origin: *`
-- **Security** — Change-password min length raised from 6 to 8, matching registration
-- **Bug fix** — Dashboard breadcrumbs now display correctly (threshold `> 0` instead of `> 2`)
-- **Bug fix** — Usage page "Clear filters" button now appears when filters are active (`setFilterApplied` was never set)
-- **Bug fix** — Webhooks save/toggle now checks `res.ok` before showing "success"
-- **Bug fix** — Users edit/delete no longer close dialog on API error (early return on failure)
-- **Bug fix** — Playground chat messages use stable key (`createdAt-i`) instead of array index
-- **CSS fix** — `hsl(var(--primary))` replaced with `color-mix()` / `var(--primary)` (3 locations — hex in hsl was silently broken)
-- **CSS fix** — `glass-card` radius aligned with theme `--radius` system
-- **CSS fix** — Card component no longer applies duplicate `backdrop-blur-xl` (conflicted with glass-card)
-- **CSS fix** — Skills and Prompts pages use consistent `max-w-7xl`
-- **Accessibility** — Playground session list: added `role="button"`, `tabIndex`, `onKeyDown`; added `aria-label` to quote/regenerate/copy/delete-session buttons
-- **Accessibility** — Prompts filter labels use halfwidth colon `:` instead of fullwidth `：` for English locale
+- **Security** — Change-password min length raised from 6 to 8
+- **Bug fix** — Dashboard breadcrumbs display correctly (threshold `> 0`)
+- **Bug fix** — Usage "Clear filters" button now works (`setFilterApplied` was never called)
 
 ## [v3.3.4.18] — 2026-05-22
 
