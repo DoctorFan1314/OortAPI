@@ -103,6 +103,7 @@ export default function SearchClient() {
   const [highlightIdx, setHighlightIdx] = useState(-1);
   const [models, setModels] = useState<Model[]>([]);
   const [modelsLoading, setModelsLoading] = useState(true);
+  const [filterTab, setFilterTab] = useState<string>("all");
 
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -431,8 +432,29 @@ export default function SearchClient() {
       {query.trim() ? (
         totalResults > 0 ? (
           <div className="space-y-12">
+            {/* Filter tabs */}
+            <div className="flex gap-2 -mt-4" role="tablist" aria-label="Filter by type">
+              {["all", "models", "docs", "errors"].map((tab) => (
+                <button
+                  key={tab}
+                  role="tab"
+                  aria-selected={filterTab === tab}
+                  onClick={() => setFilterTab(tab)}
+                  className={`px-3 py-1.5 text-xs rounded-full font-medium transition-all ${
+                    filterTab === tab
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "bg-secondary text-muted-foreground hover:text-foreground hover:bg-muted"
+                  }`}
+                >
+                  {tab === "all" ? (lang === "zh" ? "全部" : "All") : null}
+                  {tab === "models" ? (lang === "zh" ? "模型" : "Models") : null}
+                  {tab === "docs" ? (lang === "zh" ? "文档" : "Docs") : null}
+                  {tab === "errors" ? (lang === "zh" ? "错误码" : "Error Codes") : null}
+                </button>
+              ))}
+            </div>
             {/* Models Section */}
-            {searchResults.models.length > 0 && (
+            {(filterTab === "all" || filterTab === "models") && searchResults.models.length > 0 && (
               <section>
                 <div className="flex items-center justify-between mb-5">
                   <h2 className="text-xl font-semibold text-foreground flex items-center gap-2">
@@ -466,7 +488,7 @@ export default function SearchClient() {
             )}
 
             {/* Documentation Section */}
-            {searchResults.docs.length > 0 && (
+            {(filterTab === "all" || filterTab === "docs") && searchResults.docs.length > 0 && (
               <section>
                 <div className="flex items-center justify-between mb-5">
                   <h2 className="text-xl font-semibold text-foreground flex items-center gap-2">
