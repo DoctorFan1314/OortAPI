@@ -144,6 +144,7 @@ export default function PlaygroundPage() {
   const [error, setError] = useState("");
   const [usage, setUsage] = useState<Usage | null>(null);
   const [isSending, setIsSending] = useState(false);
+  const [streamMetrics, setStreamMetrics] = useState<{ ttfbMs: number | null; tokensPerSec: number | null }>({ ttfbMs: null, tokensPerSec: null });
   const [endpoint, setEndpoint] = useState<ApiEndpoint>("openai");
   const [showToolbar, setShowToolbar] = useState(false);
   const [thinkingMode, setThinkingMode] = useState(false);
@@ -710,6 +711,8 @@ export default function PlaygroundPage() {
                       <span>{t.inputCached} <span className="text-foreground/80">{usage.tokens_in_cache || 0}</span></span>
                       <span>{t.outputTokens} <span className="text-foreground/80">{usage.completion_tokens}</span></span>
                       <span>{t.totalTokensLabel} <span className="text-foreground/80">{usage.total_tokens}</span></span>
+                      {streamMetrics.ttfbMs !== null && <span className="text-muted-foreground/40">| TTFB: {streamMetrics.ttfbMs}ms</span>}
+                      {streamMetrics.tokensPerSec !== null && <span className="text-muted-foreground/40">{streamMetrics.tokensPerSec.toFixed(1)} tok/s</span>}
                     </div>
                   )}
                 </div>

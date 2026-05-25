@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useI18n } from "@/contexts/i18n-context";
 import { BaseUrlDisplay } from "@/components/docs/base-url-display";
+import { CodeBlock } from "@/components/docs/code-block";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Bot, Sparkles, Globe, MessageSquare, Cpu, Terminal } from "lucide-react";
 
@@ -132,6 +133,13 @@ export default function QuickStartPage() {
           {L.step3Title}
         </h2>
         <p className="text-sm text-muted-foreground">{L.step3Desc}</p>
+        <div className="mt-4">
+          <CodeBlock examples={[
+            { label: "cURL", code: `curl ${process.env.NEXT_PUBLIC_SITE_URL || "https://api.oortapi.com"}/api/v1/chat/completions \\\n  -H "Content-Type: application/json" \\\n  -H "Authorization: Bearer sk-oort-xxxxxxxxxxxx" \\\n  -d '{\n    "model": "gpt-4o",\n    "messages": [{"role": "user", "content": "Hello!"}]\n  }'` },
+            { label: "Python", code: `import openai\nclient = openai.OpenAI(\n  base_url="${process.env.NEXT_PUBLIC_SITE_URL || "https://api.oortapi.com"}/api/v1",\n  api_key="sk-oort-xxxxxxxxxxxx"\n)\nresponse = client.chat.completions.create(\n  model="gpt-4o",\n  messages=[{"role": "user", "content": "Hello!"}]\n)\nprint(response.choices[0].message.content)` },
+            { label: "Node.js", code: `import OpenAI from "openai";\nconst client = new OpenAI({\n  baseURL: "${process.env.NEXT_PUBLIC_SITE_URL || "https://api.oortapi.com"}/api/v1",\n  apiKey: "sk-oort-xxxxxxxxxxxx",\n});\nconst response = await client.chat.completions.create({\n  model: "gpt-4o",\n  messages: [{ role: "user", content: "Hello!" }],\n});\nconsole.log(response.choices[0].message.content);` },
+          ]} />
+        </div>
       </section>
 
       {/* AI App Integration */}

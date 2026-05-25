@@ -58,6 +58,12 @@ export function UsageChart({ lang = "zh" }: { lang?: "zh" | "en" }) {
     );
   }
 
+  // Compute projected end-of-month cost
+  const daysInMonth = new Date().getDate();
+  const totalDays = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+  const avgDailyCost = data.length > 0 ? data.reduce((s, d) => s + d.cost, 0) / data.length : 0;
+  const projectedCost = avgDailyCost * totalDays;
+
   const chartData = data.map(d => ({
     ...d,
     label: d.date.slice(5),
@@ -67,7 +73,9 @@ export function UsageChart({ lang = "zh" }: { lang?: "zh" | "en" }) {
     <div className="grid md:grid-cols-2 gap-4">
       <Card className="glass-card">
         <CardHeader>
-          <CardTitle className="text-lg">{t.calls}</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg">{t.calls}</CardTitle>
+          </div>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={200}>
@@ -90,7 +98,12 @@ export function UsageChart({ lang = "zh" }: { lang?: "zh" | "en" }) {
       </Card>
       <Card className="glass-card">
         <CardHeader>
-          <CardTitle className="text-lg">{t.cost}</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg">{t.cost}</CardTitle>
+            <span className="text-[10px] text-muted-foreground/60 font-mono">
+              {lang === "zh" ? "预估月" : "Proj. month"}: {formatPrice(projectedCost)}
+            </span>
+          </div>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={200}>
