@@ -141,6 +141,11 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
   };
 
   const toggleKey = async (id: number, enabled: boolean) => {
+    // Optimistic update
+    mutate((prev: { keys: { id: number; enabled: number }[] } | undefined) => {
+      if (!prev?.keys) return prev;
+      return { ...prev, keys: prev.keys.map((k) => k.id === id ? { ...k, enabled: enabled ? 1 : 0 } : k) };
+    }, false);
     try {
       const res = await fetch("/api/dashboard/keys", {
         method: "PATCH",
@@ -150,6 +155,7 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
       });
       if (!res.ok) {
         const data = await res.json();
+        mutate(); // Revert on error
         showToast(data.error || (lang === "zh" ? "操作失败" : "Operation failed"), "error");
         return;
       }
