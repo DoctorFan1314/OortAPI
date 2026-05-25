@@ -93,9 +93,7 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">
-          {lang === "zh" ? "控制台" : "Dashboard"}
-        </h1>
+        <h1 className="text-xl md:text-2xl font-bold">{lang === "zh" ? "控制台" : "Dashboard"}</h1>
         <div className="flex items-center gap-3">
           {lastUpdated && (
             <span className="text-xs text-muted-foreground">

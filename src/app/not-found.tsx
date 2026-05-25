@@ -38,7 +38,12 @@ export default function NotFound() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-20 text-center">
-      <div className="text-6xl font-bold text-primary mb-4">404</div>
+      <div className="text-7xl font-extrabold gradient-text mb-2">404</div>
+      <div className="flex justify-center mb-4">
+        <div className="h-16 w-16 rounded-full bg-primary/5 border border-primary/20 flex items-center justify-center">
+          <Search className="h-7 w-7 text-primary/60" />
+        </div>
+      </div>
       <h1 className="text-2xl font-bold text-foreground mb-3">{t.notFound.title}</h1>
       <p className="text-muted-foreground mb-8">{t.notFound.description}</p>
 

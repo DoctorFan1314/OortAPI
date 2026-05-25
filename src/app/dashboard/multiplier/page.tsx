@@ -204,7 +204,7 @@ export default function MultiplierPage() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold">{t.title}</h1>
+        <h1 className="text-xl md:text-2xl font-bold">{t.title}</h1>
         <div className="h-48 animate-pulse bg-muted rounded-lg" />
       </div>
     );

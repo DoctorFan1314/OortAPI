@@ -4,6 +4,7 @@ import useSWR from "swr";
 import { Card, CardContent } from "@/components/ui/card";
 import { useCurrency } from "@/contexts/currency-context";
 import { Wallet, TrendingDown, Activity, Coins, Gauge, Cpu } from "lucide-react";
+import Link from "next/link";
 import { dashboardSWRConfig } from "@/lib/swr-fetcher";
 import { DeltaBadge } from "@/components/shared/delta-badge";
 import { Sparkline } from "@/components/shared/sparkline";
@@ -134,17 +135,17 @@ export function StatsCards({ lang = "zh" }: { lang?: "zh" | "en" }) {
   const dailyTPM = sparkData.map(d => Math.round(d.tokens / 1440));
 
   const cards = [
-    { icon: Wallet, label: t.balance, value: formatPrice(stats.balance), color: "text-yellow-500", bgColor: "bg-yellow-500/10", hex: "#eab308" },
-    { icon: TrendingDown, label: t.monthlyCost, value: formatPrice(stats.month?.cost || 0), color: "text-red-500", bgColor: "bg-red-500/10", delta: costDelta, hex: "#ef4444", sparkData: dailyCosts },
-    { icon: Activity, label: t.monthlyCalls, value: (stats.month?.calls || 0).toLocaleString(), color: "text-blue-500", bgColor: "bg-blue-500/10", delta: callsDelta, hex: "#3b82f6", sparkData: dailyCalls },
-    { icon: Gauge, label: t.rpm, value: avgRPM, color: "text-purple-500", bgColor: "bg-purple-500/10", hex: "#a855f7", sparkData: dailyCalls },
-    { icon: Cpu, label: t.tpm, value: formatTokens(avgTPM), color: "text-cyan-500", bgColor: "bg-cyan-500/10", hex: "#06b6d4", sparkData: dailyTokens },
+    { icon: Wallet, label: t.balance, value: formatPrice(stats.balance), color: "text-yellow-500", bgColor: "bg-yellow-500/10", hex: "#eab308", href: "/dashboard/billing" },
+    { icon: TrendingDown, label: t.monthlyCost, value: formatPrice(stats.month?.cost || 0), color: "text-red-500", bgColor: "bg-red-500/10", delta: costDelta, hex: "#ef4444", sparkData: dailyCosts, href: "/dashboard/usage" },
+    { icon: Activity, label: t.monthlyCalls, value: (stats.month?.calls || 0).toLocaleString(), color: "text-blue-500", bgColor: "bg-blue-500/10", delta: callsDelta, hex: "#3b82f6", sparkData: dailyCalls, href: "/dashboard/usage" },
+    { icon: Gauge, label: t.rpm, value: avgRPM, color: "text-purple-500", bgColor: "bg-purple-500/10", hex: "#a855f7", sparkData: dailyCalls, href: "/dashboard/usage" },
+    { icon: Cpu, label: t.tpm, value: formatTokens(avgTPM), color: "text-cyan-500", bgColor: "bg-cyan-500/10", hex: "#06b6d4", sparkData: dailyTokens, href: "/dashboard/usage" },
   ];
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-      {cards.map((card, i) => (
-        <Card key={i} className="glass-card overflow-hidden">
+      {cards.map((card, i) => {
+        const content = (
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-2">
               <div className={`p-1.5 rounded-md ${card.bgColor}`}>
@@ -160,8 +161,15 @@ export function StatsCards({ lang = "zh" }: { lang?: "zh" | "en" }) {
               )}
             </div>
           </CardContent>
-        </Card>
-      ))}
+        );
+        return 'href' in card && card.href ? (
+          <Link key={i} href={card.href} className="block glass-card overflow-hidden hover:opacity-90 transition-opacity">
+            {content}
+          </Link>
+        ) : (
+          <Card key={i} className="glass-card overflow-hidden">{content}</Card>
+        );
+      })}
 
       {/* Token breakdown card */}
       <Card className="glass-card overflow-hidden">

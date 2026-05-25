@@ -467,7 +467,7 @@ export default function UsagePage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">{t.title}</h1>
+      <h1 className="text-xl md:text-2xl font-bold">{t.title}</h1>
 
       {/* Summary stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
