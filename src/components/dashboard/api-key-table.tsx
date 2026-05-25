@@ -141,11 +141,8 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
   };
 
   const toggleKey = async (id: number, enabled: boolean) => {
-    // Optimistic update
-    mutate((prev: { keys: { id: number; enabled: number }[] } | undefined) => {
-      if (!prev?.keys) return prev;
-      return { ...prev, keys: prev.keys.map((k) => k.id === id ? { ...k, enabled: enabled ? 1 : 0 } : k) };
-    }, false);
+    // Optimistic: toggle immediately, revalidate on response
+    mutate({ ...data, keys: (data?.keys || []).map((k: ApiKey) => k.id === id ? { ...k, enabled: enabled ? 1 : 0 } : k) } as typeof data, false);
     try {
       const res = await fetch("/api/dashboard/keys", {
         method: "PATCH",
