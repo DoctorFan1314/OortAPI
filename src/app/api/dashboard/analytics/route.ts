@@ -98,6 +98,18 @@ export async function GET(request: NextRequest) {
       ORDER BY date ASC
     `).all(userId, dateFilter) as Array<{ date: string; calls: number; cost: number; tokens: number; avg_latency: number | null; tokens_in_noncached: number; tokens_in_cache: number; tokens_out: number }>;
 
+    // TTFT & ITL latency trend (Feature 7)
+    const latencyTrend = db.prepare(`
+      SELECT
+        DATE(created_at) as date,
+        ROUND(AVG(ttft_ms), 1) as avg_ttft,
+        ROUND(AVG(itl_ms), 1) as avg_itl
+      FROM usage_logs
+      WHERE user_id = ? AND created_at >= DATE('now', ?) AND ttft_ms > 0
+      GROUP BY DATE(created_at)
+      ORDER BY date ASC
+    `).all(userId, dateFilter) as Array<{ date: string; avg_ttft: number; avg_itl: number }>;
+
     // RPM & TPM (requests per minute, tokens per minute) — last hour
     const lastHourStats = db.prepare(`
       SELECT
@@ -151,6 +163,7 @@ export async function GET(request: NextRequest) {
         total_cache_hits: cacheStats.total_cache_hits || 0,
         total_non_cached: cacheStats.total_non_cached || 0,
       },
+      latency_trend: latencyTrend,
       prev_period: prevPeriod || null,
       total: {
         calls: totalStats.total_calls || 0,

@@ -160,6 +160,8 @@ export async function POST(request: NextRequest) {
       let tokensInCache = 0;
       let completionText = '';
       let logged = false;
+      let firstChunkTime = 0;
+      let chunkCount = 0;
       const msgId = `msg_${Date.now().toString(36)}`;
 
       function doLogUsage() {
@@ -175,6 +177,8 @@ export async function POST(request: NextRequest) {
         }
 
         const latencyMs = Date.now() - streamData.startTime;
+        const ttftMs = firstChunkTime > 0 ? firstChunkTime - streamData.startTime : 0;
+        const itlMs = chunkCount > 1 ? (Date.now() - firstChunkTime) / (chunkCount - 1) : 0;
         const { multiplier } = getEffectiveMultiplier(streamData.model);
         const baseCost = calculateCost(streamData.model, tokensIn, tokensOut, tokensInCache);
         const cost = baseCost * multiplier;
@@ -193,7 +197,7 @@ export async function POST(request: NextRequest) {
           cost: deductResult?.source === 'credits' ? 0 : cost,
           creditsUsed: deductResult?.source === 'credits' ? (tokensIn + tokensOut) : 0,
           deductionSource: deductResult?.source || 'balance',
-          latencyMs, success: true, multiplier,
+          latencyMs, ttftMs, itlMs, success: true, multiplier,
         });
       }
 
@@ -249,6 +253,8 @@ export async function POST(request: NextRequest) {
               if (parsed.type === 'content_block_delta') {
                 const deltaType = parsed.delta?.type;
                 if (deltaType === 'text_delta') {
+                  if (firstChunkTime === 0) firstChunkTime = Date.now();
+                  chunkCount++;
                   currentText += parsed.delta?.text || '';
                   completionText += parsed.delta?.text || '';
                 }
@@ -313,6 +319,8 @@ export async function POST(request: NextRequest) {
 
                 // Handle text content
                 if (delta?.content) {
+                  if (firstChunkTime === 0) firstChunkTime = Date.now();
+                  chunkCount++;
                   completionText += delta.content;
                   // If this is the first text content, emit a text block_start
                   if (currentText === '') {

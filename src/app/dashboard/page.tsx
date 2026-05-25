@@ -5,9 +5,11 @@ import { useAuth } from "@/contexts/auth-context";
 import { StatsCards } from "@/components/dashboard/stats-cards";
 import { ModelAnalytics } from "@/components/dashboard/model-analytics";
 import { ActivityFeed } from "@/components/dashboard/activity-feed";
+import { LatencyMetrics } from "@/components/dashboard/latency-metrics";
+import { CacheSavingsChart } from "@/components/dashboard/cache-savings-chart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Code, Key, CreditCard, ArrowRight, Sparkles, Copy, Check, AlertTriangle, RefreshCw } from "lucide-react";
+import { Key, CreditCard, ArrowRight, Sparkles, AlertTriangle, RefreshCw, Check, Code } from "lucide-react";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 import Link from "next/link";
@@ -54,10 +56,18 @@ export default function DashboardPage() {
   const { lang } = useI18n();
   const { user } = useAuth();
   const t = LABELS[lang];
-  const [baseUrl, setBaseUrl] = useState("");
-  const [codeCopied, setCodeCopied] = useState(false);
   const { data: keysData, error: keysError, mutate: mutateKeys } = useSWR<{ keys: { id: number }[] }>("/api/dashboard/keys", dashboardSWRConfig);
   const { data: subData, error: subError, mutate: mutateSub } = useSWR<{ subscriptions: { id: number; status: string; current_period_end: string; plan_display_name: string; auto_renew: number }[] }>("/api/dashboard/subscription", dashboardSWRConfig);
+  const { data: statsData } = useSWR<{
+    cache_savings?: {
+      tokens_saved: number;
+      cache_hit_pct: number;
+      cost_saved: number;
+      cost_avoided_pct: string;
+      cache_hit_tokens: number;
+      non_cached_tokens: number;
+    };
+  }>("/api/dashboard/stats", dashboardSWRConfig);
 
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   useEffect(() => {
@@ -91,12 +101,6 @@ export default function DashboardPage() {
     const daysLeft = (endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
     return daysLeft > 0 && daysLeft <= 3;
   });
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setBaseUrl(window.location.origin);
-    }
-  }, []);
 
   return (
     <div className="space-y-6">
@@ -238,46 +242,23 @@ export default function DashboardPage() {
         <div className="flex-1 min-w-0 space-y-6">
           <StatsCards lang={lang} />
           <ModelAnalytics />
+          <LatencyMetrics lang={lang} />
         </div>
         <div className="w-full lg:w-80 shrink-0">
           <div className="lg:sticky lg:top-20 space-y-4">
+            {statsData?.cache_savings && (
+              <CacheSavingsChart
+                tokensSaved={statsData.cache_savings.tokens_saved}
+                costSaved={statsData.cache_savings.cost_saved}
+                costAvoidedPct={statsData.cache_savings.cost_avoided_pct}
+                cacheHitTokens={statsData.cache_savings.cache_hit_tokens}
+                nonCachedTokens={statsData.cache_savings.non_cached_tokens}
+                cacheHitPct={statsData.cache_savings.cache_hit_pct}
+                formatPrice={(n: number) => n.toFixed(2)}
+                lang={lang}
+              />
+            )}
             <ActivityFeed lang={lang} />
-
-      {baseUrl && (
-      <Card className="glass-card">
-        <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Code className="h-5 w-5" />
-            {t.title}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground mb-4">{t.description}</p>
-          <div className="relative group">
-            <pre className="bg-muted/50 rounded-lg p-4 overflow-x-auto text-sm font-mono">
-{`curl ${baseUrl}/api/v1/chat/completions \\
-  -H "Authorization: Bearer sk-oort-xxxxxxxxxxxx" \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "model": "gpt-4o",
-    "messages": [{"role": "user", "content": "Hello!"}]
-  }'`}
-            </pre>
-            <button
-              onClick={() => {
-                navigator.clipboard.writeText(`curl ${baseUrl}/api/v1/chat/completions \\\n  -H "Authorization: Bearer sk-oort-xxxxxxxxxxxx" \\\n  -H "Content-Type: application/json" \\\n  -d '{\n    "model": "gpt-4o",\n    "messages": [{"role": "user", "content": "Hello!"}]\n  }'`);
-                setCodeCopied(true);
-                setTimeout(() => setCodeCopied(false), 2000);
-              }}
-              className="absolute top-2 right-2 p-1.5 rounded-md bg-muted hover:bg-muted/80 transition-colors opacity-0 group-hover:opacity-100 group-focus-within:opacity-100"
-              aria-label="Copy code"
-            >
-              {codeCopied ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5 text-muted-foreground" />}
-            </button>
-          </div>
-        </CardContent>
-      </Card>
-      )}
           </div>
         </div>
       </div>

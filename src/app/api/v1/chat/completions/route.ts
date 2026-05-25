@@ -72,6 +72,8 @@ export async function POST(request: NextRequest) {
       let tokensInCache = 0;
       let completionText = '';
       let logged = false;
+      let firstChunkTime = 0;
+      let chunkCount = 0;
 
       function doLogUsage() {
         if (logged) return;
@@ -93,6 +95,8 @@ export async function POST(request: NextRequest) {
         }
 
         const latencyMs = Date.now() - streamData.startTime;
+        const ttftMs = firstChunkTime > 0 ? firstChunkTime - streamData.startTime : 0;
+        const itlMs = chunkCount > 1 ? (Date.now() - firstChunkTime) / (chunkCount - 1) : 0;
         const { multiplier } = getEffectiveMultiplier(streamData.model);
         const baseCost = calculateCost(streamData.model, tokensIn, tokensOut, tokensInCache);
         const cost = baseCost * multiplier;
@@ -114,6 +118,8 @@ export async function POST(request: NextRequest) {
           creditsUsed: deductResult?.source === 'credits' ? (tokensIn + tokensOut) : 0,
           deductionSource: deductResult?.source || 'balance',
           latencyMs,
+          ttftMs,
+          itlMs,
           success: true,
           multiplier,
         });
@@ -144,7 +150,11 @@ export async function POST(request: NextRequest) {
                   tokensInCache = parsed.usage.prompt_tokens_details?.cached_tokens || parsed.usage.cache_read_input_tokens || tokensInCache;
                 }
                 const delta = parsed.choices?.[0]?.delta?.content;
-                if (delta) completionText += delta;
+                if (delta) {
+                  if (firstChunkTime === 0) firstChunkTime = Date.now();
+                  chunkCount++;
+                  completionText += delta;
+                }
               } catch {
                 // Not valid JSON, skip
               }

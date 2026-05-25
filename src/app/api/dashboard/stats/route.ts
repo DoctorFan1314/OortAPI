@@ -94,6 +94,39 @@ export async function GET(request: NextRequest) {
       LIMIT 5
     `).all(userId) as Array<{ model: string; calls: number; cost: number }>;
 
+    // Cache savings (Feature 15)
+    const cacheData = db.prepare(`
+      SELECT
+        SUM(ul.tokens_in_cache) as tokens_saved,
+        SUM(ul.tokens_in) as total_input_tokens,
+        CASE WHEN SUM(ul.tokens_in) > 0
+          THEN ROUND(CAST(SUM(ul.tokens_in_cache) AS FLOAT) / SUM(ul.tokens_in) * 100, 1)
+          ELSE 0
+        END as cache_hit_pct
+      FROM usage_logs ul
+      WHERE ul.user_id = ? AND ul.created_at >= ?
+    `).get(userId, monthStart.toISOString()) as { tokens_saved: number | null; total_input_tokens: number | null; cache_hit_pct: number };
+
+    const costSavedData = db.prepare(`
+      SELECT
+        COALESCE(SUM(ul.tokens_in_cache * (COALESCE(mr.input_rate, 0) - COALESCE(mr.cache_rate, 0)) / 1000000), 0) as cost_saved,
+        COALESCE(SUM(ul.tokens_in * COALESCE(mr.input_rate, 0) / 1000000), 0) as cost_without_cache
+      FROM usage_logs ul
+      LEFT JOIN model_rates mr ON ul.model = mr.model_name
+      WHERE ul.user_id = ? AND ul.created_at >= ? AND ul.success = 1
+    `).get(userId, monthStart.toISOString()) as { cost_saved: number; cost_without_cache: number };
+
+    const cacheSavings = {
+      tokens_saved: cacheData.tokens_saved || 0,
+      cache_hit_pct: cacheData.cache_hit_pct || 0,
+      cost_saved: costSavedData.cost_saved || 0,
+      cost_avoided_pct: costSavedData.cost_without_cache > 0
+        ? ((costSavedData.cost_saved || 0) / costSavedData.cost_without_cache * 100).toFixed(1)
+        : '0',
+      cache_hit_tokens: cacheData.tokens_saved || 0,
+      non_cached_tokens: (cacheData.total_input_tokens || 0) - (cacheData.tokens_saved || 0),
+    };
+
     return NextResponse.json({
       today: {
         calls: todayStats?.total_calls || 0,
@@ -125,6 +158,7 @@ export async function GET(request: NextRequest) {
       daily_usage: dailyUsage,
       top_models: topModels,
       balance: auth.user.balance,
+      cache_savings: cacheSavings,
     });
   } catch (error) {
     console.error('Dashboard stats error:', error);

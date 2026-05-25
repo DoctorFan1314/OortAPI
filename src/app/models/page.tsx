@@ -11,6 +11,7 @@ import { useCurrency } from "@/contexts/currency-context";
 import { cn } from "@/lib/utils";
 import { Pencil, Save, X, RefreshCw, Search, Cpu, Check, Zap, ArrowUpDown, ExternalLink, LayoutGrid, List } from "lucide-react";
 import Link from "next/link";
+import { CostSimulator } from "@/components/models/cost-simulator";
 
 interface ChannelModel {
   model_name: string;
@@ -676,6 +677,7 @@ export default function ModelsPage() {
           </>
         )}
       </div>
+      <CostSimulator models={filtered} exchangeRate={exchangeRate} currency={currency} formatPrice={formatPrice} />
     </div>
   );
 }

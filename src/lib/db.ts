@@ -78,6 +78,9 @@ function getDb(): Database.Database {
     'ALTER TABLE webhooks ADD COLUMN last_triggered_at DATETIME',
     'ALTER TABLE webhooks ADD COLUMN last_status_code INTEGER',
     'ALTER TABLE api_keys ADD COLUMN expires_at TEXT',
+    // TTFT and ITL columns (Feature 7)
+    'ALTER TABLE usage_logs ADD COLUMN ttft_ms INTEGER DEFAULT 0',
+    'ALTER TABLE usage_logs ADD COLUMN itl_ms REAL DEFAULT 0',
   ];
   for (const sql of migrations) {
     try {
@@ -252,6 +255,8 @@ export interface DBUsageLog {
   credits_used: number;
   deduction_source: string;
   latency_ms: number | null;
+  ttft_ms: number | null;
+  itl_ms: number | null;
   success: number;
   error_message: string | null;
   cached: number;

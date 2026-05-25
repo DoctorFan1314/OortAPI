@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { Copy, Check } from "lucide-react";
+import { useAuth } from "@/contexts/auth-context";
+import useSWR from "swr";
 
 interface CodeExample {
   label: string;
@@ -13,19 +15,52 @@ interface CodeBlockProps {
   examples?: CodeExample[];
 }
 
+const PLACEHOLDER = "sk-oort-your-key";
+
+function useApiKey(): string {
+  const { user } = useAuth();
+  const { data } = useSWR<{ keys: Array<{ key_value: string }> }>(
+    user ? "/api/dashboard/keys" : null,
+    (url) => fetch(url, { credentials: "include" }).then((r) => r.json()),
+    { revalidateOnFocus: false, dedupingInterval: 30000 }
+  );
+  const [sessionKey, setSessionKey] = useState("");
+
+  useEffect(() => {
+    const stored = sessionStorage.getItem("oort_last_created_key");
+    if (stored) {
+      setSessionKey(stored);
+      const timer = setTimeout(() => {
+        sessionStorage.removeItem("oort_last_created_key");
+        setSessionKey("");
+      }, 5 * 60 * 1000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  const firstKey = data?.keys?.[0]?.key_value;
+  return sessionKey || firstKey || PLACEHOLDER;
+}
+
+function replaceKey(code: string, apiKey: string): string {
+  return apiKey !== PLACEHOLDER ? code.replaceAll(PLACEHOLDER, apiKey) : code;
+}
+
 export function CodeBlock({ code, examples }: CodeBlockProps) {
   const [activeIdx, setActiveIdx] = useState(0);
   const [copied, setCopied] = useState(false);
+  const apiKey = useApiKey();
 
   // Simple mode: single code string
   if (code) {
+    const displayCode = replaceKey(code, apiKey);
     return (
       <div className="relative group">
         <pre className="bg-zinc-950 rounded-lg p-4 overflow-x-auto text-sm leading-relaxed border border-zinc-800">
-          <code className="text-zinc-300 font-mono whitespace-pre">{code}</code>
+          <code className="text-zinc-300 font-mono whitespace-pre">{displayCode}</code>
         </pre>
         <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
-          <button onClick={() => { navigator.clipboard.writeText(code); setCopied(true); setTimeout(() => setCopied(false), 1500); }} className="p-1.5 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-200" aria-label="Copy code">
+          <button onClick={() => { navigator.clipboard.writeText(displayCode); setCopied(true); setTimeout(() => setCopied(false), 1500); }} className="p-1.5 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-200" aria-label="Copy code">
             {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
           </button>
         </div>
@@ -34,7 +69,10 @@ export function CodeBlock({ code, examples }: CodeBlockProps) {
   }
 
   // Multi-tab mode
-  const tabs = examples || [];
+  const tabs = useMemo(
+    () => (examples || []).map((ex) => ({ ...ex, code: replaceKey(ex.code, apiKey) })),
+    [examples, apiKey]
+  );
   const active = tabs[activeIdx];
 
   const handleCopy = useCallback(() => {

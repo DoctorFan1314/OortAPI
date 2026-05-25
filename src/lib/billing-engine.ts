@@ -123,6 +123,8 @@ export function logUsage(data: {
   creditsUsed?: number;
   deductionSource?: string;
   latencyMs?: number;
+  ttftMs?: number;
+  itlMs?: number;
   success: boolean;
   errorMessage?: string;
   cached?: boolean;
@@ -131,11 +133,12 @@ export function logUsage(data: {
   requestSizeBytes?: number;
 }) {
   db.prepare(
-    'INSERT INTO usage_logs (user_id, api_key_id, channel_id, model, tokens_in, tokens_out, tokens_in_cache, tokens_cache_creation, cost, credits_used, deduction_source, latency_ms, success, error_message, cached, multiplier, is_stream, request_size_bytes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+    'INSERT INTO usage_logs (user_id, api_key_id, channel_id, model, tokens_in, tokens_out, tokens_in_cache, tokens_cache_creation, cost, credits_used, deduction_source, latency_ms, ttft_ms, itl_ms, success, error_message, cached, multiplier, is_stream, request_size_bytes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
   ).run(
     data.userId, data.apiKeyId ?? null, data.channelId ?? null, data.model,
     data.tokensIn, data.tokensOut, data.tokensInCache ?? 0, data.tokensCacheCreation ?? 0,
     data.cost, data.creditsUsed ?? 0, data.deductionSource ?? 'balance', data.latencyMs ?? null,
+    data.ttftMs ?? null, data.itlMs ?? null,
     data.success ? 1 : 0, data.errorMessage ?? null, data.cached ? 1 : 0, data.multiplier ?? 1.0,
     data.isStream ? 1 : 0, data.requestSizeBytes ?? 0
   );
