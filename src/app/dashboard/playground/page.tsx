@@ -71,6 +71,13 @@ const STORAGE_KEY = "oortapi-playground-v3";
 const PRESETS_ZH = ["请你详细介绍你自己", "用 Python 写一个快速排序算法", "解释一下什么是量子计算"];
 const PRESETS_EN = ["Tell me about yourself", "Write a quicksort in Python", "Explain quantum computing"];
 
+const PARAM_PRESETS = [
+  { label: { zh: "均衡", en: "Balanced" }, params: { temperature: 0.7, top_p: 1, frequency_penalty: 0, presence_penalty: 0 } },
+  { label: { zh: "创意", en: "Creative" }, params: { temperature: 0.9, top_p: 0.95, frequency_penalty: 0.3, presence_penalty: 0.3 } },
+  { label: { zh: "精确", en: "Precise" }, params: { temperature: 0.2, top_p: 0.8, frequency_penalty: 0.1, presence_penalty: 0.1 } },
+  { label: { zh: "代码", en: "Code" }, params: { temperature: 0.1, top_p: 0.9, frequency_penalty: 0, presence_penalty: 0 } },
+];
+
 const LABELS = {
   zh: {
     title: "API 测试场", send: "发送", sending: "发送中...", stop: "停止",
@@ -808,6 +815,19 @@ export default function PlaygroundPage() {
           {/* Params */}
           <div>
             <div className="flex items-center gap-1.5 mb-2"><Settings2 className="h-3.5 w-3.5 text-muted-foreground" /><span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">{t.params}</span></div>
+            {/* Parameter presets */}
+            <div className="flex gap-1 mb-3">
+              {PARAM_PRESETS.map((p) => {
+                const label = p.label[lang as keyof typeof p.label] || p.label.en;
+                const active = params.temperature === p.params.temperature && params.top_p === p.params.top_p;
+                return (
+                  <button key={label} onClick={() => updateSession((s) => ({ ...s, params: { ...s.params, ...p.params } }))}
+                    className={`px-2 py-1 text-[10px] font-medium rounded-full border transition-colors ${active ? "bg-primary/10 border-primary/30 text-primary" : "border-border/50 text-muted-foreground hover:text-foreground hover:border-muted-foreground/30"}`}>
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
             <div className="space-y-3">
               <div><label className="text-[11px] text-muted-foreground block mb-1">{t.temperature}</label><div className="flex items-center gap-2"><input type="range" min="0" max="2" step="0.1" value={params.temperature} onChange={(e) => { const v = parseFloat(e.target.value); updateSession((s) => ({ ...s, params: { ...s.params, temperature: v } })); }} className="flex-1" /><span className="text-xs font-mono w-8 text-right text-foreground">{params.temperature.toFixed(1)}</span></div></div>
               <div><label className="text-[11px] text-muted-foreground block mb-1">{t.maxTokens}</label>
