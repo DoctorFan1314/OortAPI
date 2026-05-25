@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useState } from "react";
-import { Webhook, Plus, Trash2, ToggleLeft, ToggleRight, Pencil, Send, Copy, CheckCheck } from "lucide-react";
+import { Webhook, Plus, Trash2, ToggleLeft, ToggleRight, Pencil, Send, Copy, CheckCheck, Activity } from "lucide-react";
 import useSWR from "swr";
 import { dashboardSWRConfig } from "@/lib/swr-fetcher";
 import { useToast } from "@/contexts/toast-context";
@@ -63,6 +63,7 @@ const LABELS = {
     lastTriggered: "最后触发",
     lastStatus: "状态码",
     never: "从未",
+    deliveryLogs: "投递日志",
   },
   en: {
     title: "Webhook Management",
@@ -91,6 +92,7 @@ const LABELS = {
     lastTriggered: "Last Triggered",
     lastStatus: "Status",
     never: "Never",
+    deliveryLogs: "Delivery Logs",
   },
 };
 
@@ -108,6 +110,7 @@ export default function WebhooksPage() {
   const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
   const [testing, setTesting] = useState<number | null>(null);
   const [copiedSecret, setCopiedSecret] = useState<number | null>(null);
+  const [logTarget, setLogTarget] = useState<WebhookItem | null>(null);
 
   const openCreate = () => {
     setEditingId(null);
@@ -272,6 +275,9 @@ export default function WebhooksPage() {
                       <button onClick={() => openEdit(wh)} className="text-muted-foreground hover:text-foreground" aria-label="Edit">
                         <Pencil className="h-4 w-4" />
                       </button>
+                      <button onClick={() => setLogTarget(wh)} className="text-muted-foreground hover:text-foreground" aria-label="Delivery logs">
+                        <Activity className="h-3.5 w-3.5" />
+                      </button>
                       <button onClick={() => setDeleteTarget(wh.id)} className="text-muted-foreground hover:text-red-500" aria-label="Delete">
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -317,6 +323,35 @@ export default function WebhooksPage() {
               <Button onClick={save}>{t.save}</Button>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delivery Log Dialog */}
+      <Dialog open={logTarget !== null} onOpenChange={(open) => { if (!open) setLogTarget(null); }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t.deliveryLogs}</DialogTitle>
+            <DialogDescription>{logTarget?.url}</DialogDescription>
+          </DialogHeader>
+          {logTarget && (
+            <div className="space-y-3 py-2">
+              <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border">
+                <span className="text-xs text-muted-foreground">{t.lastTriggered}</span>
+                <span className="text-xs font-mono text-foreground">{logTarget.last_triggered_at ? new Date(logTarget.last_triggered_at + "Z").toLocaleString() : t.never}</span>
+              </div>
+              <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border">
+                <span className="text-xs text-muted-foreground">{t.lastStatus}</span>
+                <span className={`text-xs font-mono ${logTarget.last_status_code && logTarget.last_status_code >= 200 && logTarget.last_status_code < 300 ? "text-emerald-400" : "text-red-400"}`}>
+                  {logTarget.last_status_code ?? "-"}
+                  {logTarget.last_status_code && (logTarget.last_status_code >= 200 && logTarget.last_status_code < 300 ? " ✓" : " ✗")}
+                </span>
+              </div>
+              <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border">
+                <span className="text-xs text-muted-foreground">{t.events}</span>
+                <span className="text-xs text-foreground">{logTarget.events}</span>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
 
