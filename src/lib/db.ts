@@ -91,6 +91,32 @@ function getDb(): Database.Database {
     }
   }
 
+  // Seed/update model capability tags (only where still default '[]')
+  try {
+    const tagSeeds: [string, string[]][] = [
+      ['deepseek-reasoner',              ['reasoning']],
+      ['gpt-4o',                         ['vision', 'fc']],
+      ['gpt-4o-mini',                    ['vision', 'fc']],
+      ['gpt-4-turbo',                    ['vision', 'fc']],
+      ['gpt-3.5-turbo',                  ['fc']],
+      ['claude-3-5-sonnet-20241022',     ['vision', 'fc']],
+      ['claude-3-5-haiku-20241022',      ['fc']],
+      ['claude-3-opus-20240229',         ['vision', 'fc']],
+      ['deepseek-chat',                  ['fc']],
+      ['gemini-2.0-flash',               ['vision', 'fc']],
+      ['gemini-1.5-pro',                 ['vision', 'fc']],
+      ['qwen-max',                       ['fc']],
+    ];
+    const tagUpdate = _db.prepare(
+      "UPDATE model_rates SET tags = ? WHERE model_name = ? AND tags = '[]'"
+    );
+    for (const [name, tagList] of tagSeeds) {
+      tagUpdate.run(JSON.stringify(tagList), name);
+    }
+  } catch (e) {
+    console.error('Tag seed error:', e);
+  }
+
   // Seed/update default subscription plans on every startup
   try {
     // Use INSERT OR REPLACE with explicit IDs to handle both new and existing DBs

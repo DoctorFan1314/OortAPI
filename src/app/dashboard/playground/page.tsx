@@ -8,11 +8,11 @@ import { CopyButton } from "@/components/shared/copy-button";
 import { MarkdownRenderer } from "@/components/shared/markdown-renderer";
 import { Play, Send, Bot, User, Loader2, Square, Zap, Settings2, Trash2, Download, RefreshCw, Plus, MessageSquare, X, Image, Link2, Brain, Wrench, Search, Copy, Check, Quote, Lock, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { BUILTIN_TOOLS, getEnabledToolDefinitions, loadToolConfig, saveToolConfig, getModelCaps, saveModelCaps, loadModelCaps, type ToolConfig, type ToolDefinition, type ToolCall, type ModelCapabilities } from "@/lib/playground-tools";
+import { BUILTIN_TOOLS, getEnabledToolDefinitions, loadToolConfig, saveToolConfig, getModelCaps, type ToolConfig, type ToolDefinition, type ToolCall } from "@/lib/playground-tools";
 
 // ─── Types ─────────────────────────────────────────────────
 
-interface Model { id: string; owned_by: string; display_name?: string; }
+interface Model { id: string; owned_by: string; display_name?: string; tags?: string[]; }
 interface ApiKey { id: number; name: string; key_value: string; enabled: number; }
 interface Usage { prompt_tokens: number; completion_tokens: number; total_tokens: number; tokens_in_cache?: number; }
 
@@ -155,8 +155,6 @@ export default function PlaygroundPage() {
   const [quoteMessage, setQuoteMessage] = useState<ChatMessage | null>(null);
   const [copiedIdx, setCopiedIdx] = useState(-1);
   const [showAdvancedParams, setShowAdvancedParams] = useState(false);
-    const [showCapEdit, setShowCapEdit] = useState(false);
-  const [capsDraft, setCapsDraft] = useState<{ vision: boolean; reasoning: boolean; tools: boolean }>({ vision: false, reasoning: false, tools: false });
 
   const abortRef = useRef<AbortController | null>(null);
   const msgContainerRef = useRef<HTMLDivElement>(null);
@@ -176,7 +174,18 @@ export default function PlaygroundPage() {
   const params = currentSession?.params ?? DEFAULT_PARAMS;
   const selectedKey = keys.find((k) => k.id === selectedKeyId);
   const presets = lang === "zh" ? PRESETS_ZH : PRESETS_EN;
-  const modelCaps = getModelCaps(selectedModel);
+  const currentModelData = models.find((m) => m.id === selectedModel);
+  const modelCaps = (() => {
+    const tags = currentModelData?.tags;
+    if (tags && tags.length > 0) {
+      return {
+        vision: tags.includes("vision"),
+        reasoning: tags.includes("reasoning"),
+        tools: tags.includes("fc"),
+      };
+    }
+    return getModelCaps(selectedModel);
+  })();
 
   // ── Force reset thinking mode on every model switch ──
   useEffect(() => {
@@ -523,15 +532,6 @@ export default function PlaygroundPage() {
   };
 
   // ── Link scraper ──
-  // ── Capabilities edit ──
-  const openCapEdit = () => { setCapsDraft({ ...modelCaps }); setShowCapEdit(true); };
-  const saveCapEdit = () => {
-    const all: ModelCapabilities = loadModelCaps() || {};
-    all[selectedModel] = capsDraft;
-    saveModelCaps(all);
-    setShowCapEdit(false);
-  };
-
   // ── Other callbacks ──
   const handleStop = useCallback(() => { if (abortRef.current) { abortRef.current.abort(); abortRef.current = null; setIsSending(false); } }, []);
   const handleRefresh = useCallback(() => {
@@ -803,7 +803,6 @@ export default function PlaygroundPage() {
               {!capEntries.some((e) => modelCaps[e.key as keyof typeof modelCaps]) && (
                 <span className="text-[10px] text-muted-foreground/60 font-mono">{t.noCapability}</span>
               )}
-              <button onClick={openCapEdit} className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-primary/5 border border-primary/15 text-primary/70 hover:text-primary hover:bg-primary/10 hover:border-primary/30 transition-colors ml-auto">{t.editCap}</button>
             </div>
           </div>
           {/* Key */}
@@ -869,50 +868,6 @@ export default function PlaygroundPage() {
           <div><label className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-1.5 block">{t.systemPrompt}</label><textarea value={systemPrompt} onChange={(e) => updateSession((s) => ({ ...s, systemPrompt: e.target.value }))} placeholder={t.systemPromptPH} rows={3} className="w-full px-2.5 py-1.5 rounded-md border border-input bg-background text-xs font-mono resize-none focus:border-primary focus:outline-none" /></div>
         </aside>
       </div>
-
-      {/* Capabilities edit modal */}
-      {showCapEdit && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setShowCapEdit(false)}>
-          <div className="bg-card border border-border/70 rounded-xl p-6 max-w-xs w-full mx-4 shadow-2xl" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-5"><h3 className="text-sm font-semibold text-foreground">{t.editCap}</h3><button onClick={() => setShowCapEdit(false)} className="p-1.5 rounded-lg hover:bg-muted transition-colors"><X className="h-4 w-4 text-muted-foreground" /></button></div>
-            <div className="space-y-1">
-              {capEntries.map((e, i) => {
-                const isTools = e.key === "tools";
-                const enabled = capsDraft[e.key as keyof typeof capsDraft];
-                const row = (() => {
-                  if (isTools) return (
-                    <div className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-muted/20 dark:bg-white/[0.04] border border-dashed border-border/40 dark:border-white/[0.12]">
-                      <div className="flex items-center gap-2.5">
-                        <Lock className="h-3.5 w-3.5 text-muted-foreground/60" />
-                        <span className="text-xs font-mono text-muted-foreground/70">{e.label}</span>
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500/15 to-amber-500/5 text-amber-600/70 dark:text-amber-400/80 dark:from-amber-400/20 dark:to-amber-400/5 font-mono font-medium tracking-wide">{t.mcpComing}</span>
-                      </div>
-                      <div className="w-8 h-5 rounded-full bg-muted/50 dark:bg-white/[0.06] border border-border/20 dark:border-white/[0.08] relative shrink-0">
-                        <span className="absolute top-0.5 left-[2px] w-3.5 h-3.5 rounded-full bg-muted-foreground/15 dark:bg-white/20 shadow-sm" />
-                      </div>
-                    </div>
-                  );
-                  return (
-                    <label className="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-muted/40 cursor-pointer transition-colors">
-                      <span className="text-xs font-mono text-foreground">{e.label}</span>
-                      <button onClick={() => setCapsDraft((p) => ({ ...p, [e.key]: !p[e.key as keyof typeof p] }))} className={cn("w-8 h-5 rounded-full border-2 transition-all relative shrink-0", enabled ? "bg-primary border-primary" : "bg-muted/30 border-border/50 hover:border-muted-foreground/30")}>
-                        <span className={cn("absolute top-0.5 w-3.5 h-3.5 rounded-full bg-white transition-all shadow-sm", enabled ? "left-[14px]" : "left-[2px]")} />
-                      </button>
-                    </label>
-                  );
-                })();
-                return (
-                  <div key={e.key}>
-                    {row}
-                    {i < capEntries.length - 1 && <div className="mx-3 border-t border-border/30" />}
-                  </div>
-                );
-              })}
-            </div>
-            <Button size="sm" onClick={saveCapEdit} className="w-full mt-5 h-9 text-xs font-medium">{t.confirm}</Button>
-          </div>
-        </div>
-      )}
 
       {/* Hidden file inputs */}
       <input ref={imageInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageChange} />

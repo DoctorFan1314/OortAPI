@@ -142,7 +142,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 
-    const { model_name, display_name, provider, input_rate, output_rate, cache_rate, cache_creation_rate, credit_rate } = await request.json();
+    const { model_name, display_name, provider, input_rate, output_rate, cache_rate, cache_creation_rate, credit_rate, tags } = await request.json();
     if (!model_name) return NextResponse.json({ error: 'model_name is required' }, { status: 400 });
 
     const existing = db.prepare('SELECT id FROM model_rates WHERE model_name = ?').get(model_name);
@@ -151,8 +151,8 @@ export async function POST(request: NextRequest) {
     }
 
     const result = db.prepare(
-      'INSERT INTO model_rates (model_name, display_name, provider, input_rate, output_rate, cache_rate, cache_creation_rate, credit_rate) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
-    ).run(model_name, display_name || model_name, provider || 'unknown', input_rate || 0, output_rate || 0, cache_rate || 0, cache_creation_rate || 0, credit_rate ?? 1.0);
+      'INSERT INTO model_rates (model_name, display_name, provider, input_rate, output_rate, cache_rate, cache_creation_rate, credit_rate, tags) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+    ).run(model_name, display_name || model_name, provider || 'unknown', input_rate || 0, output_rate || 0, cache_rate || 0, cache_creation_rate || 0, credit_rate ?? 1.0, tags ? JSON.stringify(tags) : '[]');
 
     const model = db.prepare('SELECT * FROM model_rates WHERE id = ?').get(result.lastInsertRowid);
 

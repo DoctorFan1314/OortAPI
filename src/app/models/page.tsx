@@ -2,11 +2,13 @@
 
 import { useState, useEffect, useMemo, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useI18n } from "@/contexts/i18n-context";
 import { useAuth } from "@/contexts/auth-context";
 import { useCurrency } from "@/contexts/currency-context";
+import { cn } from "@/lib/utils";
 import { Pencil, Save, X, RefreshCw, Search, Cpu, Check, Zap, ArrowUpDown, ExternalLink, LayoutGrid, List } from "lucide-react";
 import Link from "next/link";
 
@@ -36,6 +38,25 @@ const PROVIDER_COLORS: Record<string, { bg: string; text: string; border: string
   alibaba:   { bg: "bg-violet-500/10",  text: "text-violet-400",  border: "border-violet-500/20" },
   meta:      { bg: "bg-blue-500/10",    text: "text-blue-400",    border: "border-blue-500/20" },
   unknown:   { bg: "bg-zinc-500/10",    text: "text-zinc-400",    border: "border-zinc-500/20" },
+};
+
+const CAP_CONFIG: Record<string, { label: Record<string, string>; color: string }> = {
+  reasoning: {
+    label: { zh: "推理", en: "Reasoning" },
+    color: "bg-amber-500/10 text-amber-500 border-amber-500/20",
+  },
+  vision: {
+    label: { zh: "视觉", en: "Vision" },
+    color: "bg-sky-500/10 text-sky-500 border-sky-500/20",
+  },
+  fc: {
+    label: { zh: "函数调用", en: "Function Calling" },
+    color: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
+  },
+  "long-context": {
+    label: { zh: "长上下文", en: "Long Context" },
+    color: "bg-violet-500/10 text-violet-500 border-violet-500/20",
+  },
 };
 
 const LABELS = {
@@ -140,7 +161,7 @@ export default function ModelsPage() {
   const [loading, setLoading] = useState(true);
   const { currency, setCurrency, exchangeRate, formatPrice } = useCurrency();
   const [editingModel, setEditingModel] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState({ input_rate: 0, output_rate: 0, cache_rate: 0, cache_creation_rate: 0, credit_rate: 1.0, display_name: "" });
+  const [editForm, setEditForm] = useState({ input_rate: 0, output_rate: 0, cache_rate: 0, cache_creation_rate: 0, credit_rate: 1.0, display_name: "", tags: [] as string[] });
   const [search, setSearch] = useState("");
   const [providerFilter, setProviderFilter] = useState("all");
   const [tagFilter, setTagFilter] = useState("all");
@@ -188,6 +209,7 @@ export default function ModelsPage() {
       cache_creation_rate: m.cache_creation_rate,
       credit_rate: m.credit_rate ?? 1.0,
       display_name: m.display_name || m.model_name,
+      tags: m.tags || [],
     });
   };
 
@@ -331,34 +353,32 @@ export default function ModelsPage() {
                 );
               })}
             </div>
-            {/* Tag filter */}
-            {allTags.length > 0 && (
-              <div className="flex gap-1.5 flex-wrap">
+            {/* Capability filter */}
+            <div className="flex gap-1.5 flex-wrap">
+              <button
+                onClick={() => setTagFilter("all")}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
+                  tagFilter === "all"
+                    ? "bg-primary/10 text-primary border-primary/30"
+                    : "bg-transparent text-muted-foreground border-border hover:text-foreground hover:border-foreground/20"
+                }`}
+              >
+                {t.all}
+              </button>
+              {Object.entries(CAP_CONFIG).map(([key, cfg]) => (
                 <button
-                  onClick={() => setTagFilter("all")}
+                  key={key}
+                  onClick={() => setTagFilter(key)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
-                    tagFilter === "all"
-                      ? "bg-primary/10 text-primary border-primary/30"
+                    tagFilter === key
+                      ? cfg.color
                       : "bg-transparent text-muted-foreground border-border hover:text-foreground hover:border-foreground/20"
                   }`}
                 >
-                  {t.all}
+                  {cfg.label[lang as keyof typeof cfg.label] || cfg.label.en}
                 </button>
-                {allTags.map((tag) => (
-                  <button
-                    key={tag}
-                    onClick={() => setTagFilter(tag)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
-                      tagFilter === tag
-                        ? "bg-blue-500/10 text-blue-400 border-blue-500/30"
-                        : "bg-transparent text-muted-foreground border-border hover:text-foreground hover:border-foreground/20"
-                    }`}
-                  >
-                    {tag}
-                  </button>
-                ))}
-              </div>
-            )}
+              ))}
+            </div>
             {/* Sort dropdown */}
             <div className="relative">
               <SortDropdown value={sortBy} onChange={setSortBy} options={[
@@ -469,6 +489,40 @@ export default function ModelsPage() {
                           </div>
                           <p className="text-[10px] text-muted-foreground mt-1">{t.creditRateHint}</p>
                         </div>
+                        {/* Capability checkboxes */}
+                        <div>
+                          <label className="text-xs text-muted-foreground mb-2 block">{lang === "zh" ? "能力" : "Capabilities"}</label>
+                          <div className="flex flex-wrap gap-2">
+                            {Object.entries(CAP_CONFIG).map(([key, cfg]) => {
+                              const enabled = editForm.tags.includes(key);
+                              return (
+                                <label
+                                  key={key}
+                                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs cursor-pointer border transition-colors ${
+                                    enabled
+                                      ? cfg.color + " border-current"
+                                      : "border-border/50 text-muted-foreground hover:text-foreground"
+                                  }`}
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={enabled}
+                                    onChange={() => {
+                                      setEditForm((f) => ({
+                                        ...f,
+                                        tags: enabled
+                                          ? f.tags.filter((t) => t !== key)
+                                          : [...f.tags, key],
+                                      }));
+                                    }}
+                                    className="sr-only"
+                                  />
+                                  {cfg.label[lang as keyof typeof cfg.label] || cfg.label.en}
+                                </label>
+                              );
+                            })}
+                          </div>
+                        </div>
                         <div className="flex gap-2 pt-1">
                           <Button size="sm" onClick={() => savePrice(m.model_name)} className="h-7 text-xs">
                             <Save className="h-3 w-3 mr-1" />{t.save}
@@ -488,11 +542,15 @@ export default function ModelsPage() {
                               <span className={`w-1.5 h-1.5 rounded-full ${c.text.replace('text-', 'bg-')}`} />
                               {m.provider}
                             </span>
-                            {m.tags && m.tags.length > 0 && m.tags.map((tag: string) => (
-                              <span key={tag} className="text-[9px] px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                                {tag}
-                              </span>
-                            ))}
+                            {m.tags && m.tags.length > 0 && m.tags.map((tag: string) => {
+                              const cfg = CAP_CONFIG[tag];
+                              const label = cfg?.label[lang as keyof typeof cfg.label] || cfg?.label.en || tag;
+                              return (
+                                <Badge key={tag} variant="outline" className={cn("text-[10px] px-2 py-0 h-auto font-normal", cfg?.color || "")}>
+                                  {label}
+                                </Badge>
+                              );
+                            })}
                           </div>
                           <span className={`flex items-center gap-1 text-[10px] font-medium ${m.enabled ? "text-emerald-400" : "text-red-400"}`}>
                             {m.enabled ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
@@ -578,11 +636,16 @@ export default function ModelsPage() {
                     <tr key={`${m.model_name}-${m.channel_id}`} className={`border-b border-border hover:bg-muted/30 transition-colors ${!m.enabled ? "opacity-50" : ""}`}>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
-                          {m.tags?.length > 0 && (
-                            <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${c.bg} ${c.text} border ${c.border}`}>
-                              {m.tags[0]}
-                            </span>
-                          )}
+                          {m.tags?.length > 0 && (() => {
+                            const t = m.tags[0];
+                            const cfg = CAP_CONFIG[t];
+                            const label = cfg?.label[lang as keyof typeof cfg.label] || cfg?.label.en || t;
+                            return (
+                              <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium border ${cfg?.color || "bg-zinc-500/10 text-zinc-400 border-zinc-500/20"}`}>
+                                {label}
+                              </span>
+                            );
+                          })()}
                           <span className="font-medium text-foreground text-sm">{m.display_name || m.model_name}</span>
                         </div>
                       </td>

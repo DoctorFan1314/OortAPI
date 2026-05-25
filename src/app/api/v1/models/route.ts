@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
     // If any channel supports all models, also include enabled model_rates
     if (hasWildcard) {
       const rates = db.prepare(
-        'SELECT model_name, display_name, provider, input_rate, output_rate, cache_rate, created_at FROM model_rates WHERE enabled = 1'
+        'SELECT model_name, display_name, provider, input_rate, output_rate, cache_rate, created_at, tags FROM model_rates WHERE enabled = 1'
       ).all() as DBModelRate[];
       for (const r of rates) {
         channelModels.add(r.model_name);
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
     // Build response with pricing info where available
     const rateMap = new Map<string, DBModelRate>();
     const allRates = db.prepare(
-      'SELECT model_name, display_name, provider, input_rate, output_rate, cache_rate, created_at FROM model_rates WHERE enabled = 1'
+      'SELECT model_name, display_name, provider, input_rate, output_rate, cache_rate, created_at, tags FROM model_rates WHERE enabled = 1'
     ).all() as DBModelRate[];
     for (const r of allRates) {
       rateMap.set(r.model_name, r);
@@ -61,6 +61,7 @@ export async function GET(request: NextRequest) {
           output: rate.output_rate,
           cache: rate.cache_rate,
         } : null,
+        tags: rate?.tags ? JSON.parse(rate.tags) : [],
       };
     });
 
