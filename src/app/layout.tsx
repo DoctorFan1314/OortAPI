@@ -17,6 +17,7 @@ import { getSiteUrl } from "@/lib/site-url";
 
 import { CommandPalette } from "@/components/shared/command-palette";
 import { KeyboardShortcutsHelp } from "@/components/shared/keyboard-shortcuts-help";
+import { MobileBottomNav } from "@/components/layout/mobile-bottom-nav";
 import { NavigationProgress } from "@/components/shared/navigation-progress";
 import { useGlobalMousePosition } from "@/lib/use-mouse-position";
 
@@ -113,8 +114,9 @@ export default function RootLayout({
                   Skip to main content
                 </a>
                 <Navbar />
-                <main id="main-content" className="flex-1 relative z-10">{children}</main>
+                <main id="main-content" className="flex-1 relative z-10 pb-16 lg:pb-0">{children}</main>
                 <Footer />
+                <MobileBottomNav />
                 <Toaster />
                 <CommandPalette />
                 <KeyboardShortcutsHelp />
