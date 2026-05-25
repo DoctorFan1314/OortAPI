@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useRef, useCallback } from "react";
+import { useState, useMemo, useRef, useCallback, useEffect } from "react";
 import { AuthGuard } from "@/components/auth/auth-guard";
 import { useI18n } from "@/contexts/i18n-context";
 import { useAuth } from "@/contexts/auth-context";
@@ -98,6 +98,11 @@ const LABELS = {
     time: "时间",
     status: "状态",
     latency: "延迟",
+    activeSessions: "活跃会话",
+    activeSessionsDesc: "当前登录的设备与浏览器",
+    noSessions: "暂无活跃会话",
+    revoke: "撤销",
+    unknownDevice: "未知设备",
   },
   en: {
     title: "Profile",
@@ -157,6 +162,11 @@ const LABELS = {
     time: "Time",
     status: "Status",
     latency: "Latency",
+    activeSessions: "Active Sessions",
+    activeSessionsDesc: "Devices and browsers where you are logged in",
+    noSessions: "No active sessions",
+    revoke: "Revoke",
+    unknownDevice: "Unknown device",
   },
 };
 
@@ -197,6 +207,24 @@ export default function ProfileClient() {
   const [showNewPw, setShowNewPw] = useState(false);
   const [showNewConfirmPw, setShowNewConfirmPw] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement>(null);
+
+  // Active sessions
+  const [sessions, setSessions] = useState<{ id: number; ip_address: string | null; user_agent: string | null; last_active_at: string }[]>([]);
+  const [sessionsLoading, setSessionsLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/auth/sessions", { credentials: "include" })
+      .then(r => r.json())
+      .then(d => { setSessions(d.sessions || []); setSessionsLoading(false); })
+      .catch(() => setSessionsLoading(false));
+  }, []);
+
+  const revokeSession = async (sessionId: number) => {
+    try {
+      const res = await fetch("/api/auth/sessions", { method: "DELETE", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({ sessionId }) });
+      if (res.ok) setSessions(prev => prev.filter(s => s.id !== sessionId));
+    } catch { /* ignore */ }
+  };
 
   const handleAvatarSelect = (file: File | undefined) => {
     if (!file) return;
@@ -620,6 +648,43 @@ export default function ProfileClient() {
                     );
                   })}
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Active Sessions */}
+            <Card className="glass-card">
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Activity className="h-5 w-5 text-primary" />
+                  {t.activeSessions}
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">{t.activeSessionsDesc}</p>
+              </CardHeader>
+              <CardContent>
+                {sessionsLoading ? (
+                  <div className="space-y-2">{[1,2,3].map(i => <div key={i} className="h-10 bg-muted rounded animate-pulse" />)}</div>
+                ) : sessions.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">{t.noSessions}</p>
+                ) : (
+                  <div className="space-y-2">
+                    {sessions.map((s) => (
+                      <div key={s.id} className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-muted/30 transition-colors">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <Monitor className="h-4 w-4 text-muted-foreground shrink-0" />
+                          <div className="min-w-0">
+                            <p className="text-sm text-foreground truncate">{s.user_agent ? s.user_agent.slice(0, 50) : t.unknownDevice}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {s.ip_address || "—"} · {new Date(s.last_active_at + "Z").toLocaleString()}
+                            </p>
+                          </div>
+                        </div>
+                        <button onClick={() => revokeSession(s.id)} className="text-xs text-red-400 hover:text-red-300 shrink-0 px-2 py-1 rounded hover:bg-red-500/10 transition-colors">
+                          {t.revoke}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
 
