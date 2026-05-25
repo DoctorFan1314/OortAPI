@@ -14,8 +14,8 @@ export function Toaster() {
       {toasts.map((t) => (
         <div
           key={t.id}
-          className={`glass-card px-4 py-3 flex items-center gap-3 min-w-[280px] shadow-lg border-l-2 animate-in fade-in slide-in-from-bottom-2 duration-200 ${
-            t.type === "error" ? "border-l-destructive" : t.type === "success" ? "border-l-primary" : t.type === "warning" ? "border-l-orange-500" : "border-l-blue-500"
+          className={`glass-card px-4 py-3 flex items-center gap-3 min-w-[280px] shadow-lg border-l-2 ${
+            t.type === "error" ? "border-l-destructive animate-shake" : t.type === "success" ? "border-l-primary animate-bounce-in" : "border-l-blue-500 animate-page-fade-in"
           }`}
         >
           <span className={`text-sm flex-1 ${t.type === "error" ? "text-destructive" : t.type === "success" ? "text-primary" : t.type === "warning" ? "text-orange-500" : "text-foreground"}`}>

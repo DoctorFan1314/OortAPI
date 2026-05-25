@@ -338,6 +338,8 @@
   .animate-fadeIn { animation: fadeIn 0.15s ease-out; }
   .animate-bounce-in { animation: bounceIn 0.5s ease-out; }
   @keyframes bounceIn { 0% { transform: scale(0); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+  .animate-shake { animation: shake 0.4s ease-out; }
+  @keyframes shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-4px); } 40% { transform: translateX(4px); } 60% { transform: translateX(-3px); } 80% { transform: translateX(1px); } }
   .animate-slideDown { animation: slideDown 0.15s ease-out; }
 
   /* Plan card gradients */

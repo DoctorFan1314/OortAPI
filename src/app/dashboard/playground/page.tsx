@@ -525,6 +525,21 @@ export default function PlaygroundPage() {
   }, []);
   const handleKeyDown = (e: React.KeyboardEvent) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } };
 
+  const exportConversation = useCallback(() => {
+    const title = currentSession?.title || "conversation";
+    const lines = chatHistory.map((msg) => {
+      const role = msg.role === "user" ? "**User**" : msg.role === "assistant" ? "**Assistant**" : "**Tool**";
+      const content = typeof msg.content === "string" ? msg.content : msg.content.map((p) => ("text" in p ? p.text : "[Image]")).join("\n");
+      return `## ${role}\n\n${content}\n`;
+    });
+    const md = `# ${title}\n\n${lines.join("---\n\n")}`;
+    const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url; a.download = `${title.replace(/[^a-zA-Z0-9一-鿿]/g, "_")}.md`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, [currentSession, chatHistory]);
+
   const handleRegenerate = useCallback(async (assistantMsg: ChatMessage) => {
     const idx = chatHistory.indexOf(assistantMsg);
     if (idx < 1) return;
@@ -593,7 +608,14 @@ export default function PlaygroundPage() {
               {selectedModel && <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-primary/10 backdrop-blur-sm border border-primary/20 text-[11px] font-mono text-primary"><Zap className="h-3 w-3" />{selectedModel}</span>}
               {thinkingMode && <span className="text-[11px] text-muted-foreground font-mono"><Brain className="h-3 w-3 inline mr-1" />{t.thinkingOn}</span>}
             </div>
-            <div className="flex-1" />
+            <div className="flex items-center gap-2">
+              {chatHistory.length > 0 && (
+                <button onClick={exportConversation} className="flex items-center gap-1 px-2 py-1 rounded-md text-[11px] text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" title={lang === "zh" ? "导出对话" : "Export conversation"}>
+                  <Download className="h-3 w-3" />
+                  <span className="hidden sm:inline">{lang === "zh" ? "导出" : "Export"}</span>
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Messages */}
