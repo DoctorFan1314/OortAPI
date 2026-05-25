@@ -23,6 +23,17 @@ function fmt(n: number): string {
   return n.toLocaleString();
 }
 
+function getProviderColor(model: string): { dot: string; icon: string } {
+  const m = model.toLowerCase();
+  if (m.startsWith("gpt") || m.startsWith("o1") || m.startsWith("o3") || m.includes("openai")) return { dot: "bg-emerald-500/15", icon: "text-emerald-400" };
+  if (m.startsWith("claude") || m.includes("anthropic")) return { dot: "bg-amber-500/15", icon: "text-amber-400" };
+  if (m.startsWith("gemini") || m.includes("google")) return { dot: "bg-blue-500/15", icon: "text-blue-400" };
+  if (m.startsWith("deepseek")) return { dot: "bg-sky-500/15", icon: "text-sky-400" };
+  if (m.startsWith("qwen") || m.includes("alibaba")) return { dot: "bg-violet-500/15", icon: "text-violet-400" };
+  if (m.startsWith("llama") || m.includes("meta")) return { dot: "bg-blue-500/15", icon: "text-blue-400" };
+  return { dot: "bg-muted", icon: "text-muted-foreground" };
+}
+
 export function ActivityFeed({ lang = "zh" }: { lang?: "zh" | "en" }) {
   const { data } = useSWR<UsageResponse>(
     "/api/v1/billing/usage?limit=10",
@@ -74,8 +85,8 @@ export function ActivityFeed({ lang = "zh" }: { lang?: "zh" | "en" }) {
 
               {/* Timeline dot */}
               <div className={`relative mt-0.5 shrink-0 ${isFirst ? "ring-2 ring-primary/20 rounded-full" : ""}`}>
-                <div className={`w-[22px] h-[22px] rounded-full flex items-center justify-center ${isFirst ? "bg-primary/15" : "bg-muted"}`}>
-                  <Cpu className="h-3 w-3 text-muted-foreground" />
+                <div className={`w-[22px] h-[22px] rounded-full flex items-center justify-center ${getProviderColor(entry.model).dot}`}>
+                  <Cpu className={`h-3 w-3 ${getProviderColor(entry.model).icon}`} />
                 </div>
               </div>
 

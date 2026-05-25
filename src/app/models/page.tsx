@@ -484,7 +484,8 @@ export default function ModelsPage() {
                         {/* Top bar: provider + status + tags */}
                         <div className="px-5 pt-4 pb-3 flex items-center justify-between">
                           <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded font-semibold border ${c.bg} ${c.text} ${c.border}`}>
+                            <span className={`inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wider px-2 py-0.5 rounded font-semibold border ${c.bg} ${c.text} ${c.border}`}>
+                              <span className={`w-1.5 h-1.5 rounded-full ${c.text.replace('text-', 'bg-')}`} />
                               {m.provider}
                             </span>
                             {m.tags && m.tags.length > 0 && m.tags.map((tag: string) => (
