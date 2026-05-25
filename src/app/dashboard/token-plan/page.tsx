@@ -84,7 +84,7 @@ function TokenPlanContent() {
       setApiKeys(keyData.keys || []);
       setPlans(planData.plans || []);
       setLoading(false);
-    }).catch(() => setLoading(false));
+    }).catch(() => { setLoading(false); showToast(lang === "zh" ? "加载失败，请刷新重试" : "Failed to load. Please refresh.", "error"); });
   }, []);
 
   async function handleCancel(subscriptionId: number) {
@@ -155,7 +155,7 @@ function TokenPlanContent() {
         setSubscriptions(subData.subscriptions || []);
         setUpgradeOpen(false);
       } else {
-        alert(data.error || "Plan change failed");
+        showToast(data.error || "Plan change failed", "error");
       }
     } catch { showToast("Network error", "error"); } finally { setUpgradeLoading(false); }
   }

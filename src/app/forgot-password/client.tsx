@@ -13,7 +13,6 @@ export default function ForgotPasswordClient() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [resetToken, setResetToken] = useState<string | null>(null);
   const { toast } = useToast();
   const { t, lang } = useI18n();
 
@@ -42,9 +41,6 @@ export default function ForgotPasswordClient() {
       }
 
       setSubmitted(true);
-      if (data.token) {
-        setResetToken(data.token);
-      }
       toast(
         lang === "zh"
           ? "如果该邮箱已注册，重置链接已生成"
@@ -99,19 +95,6 @@ export default function ForgotPasswordClient() {
                   ? "如果该邮箱已注册，重置链接已生成"
                   : "If this email is registered, a reset link has been generated"}
               </p>
-              {resetToken && (
-                <div className="bg-secondary border border-border rounded-lg p-4 text-left">
-                  <p className="text-xs text-muted-foreground mb-2 font-mono">
-                    {lang === "zh" ? "重置令牌（请复制后使用）" : "Reset token (copy and use it)"}
-                  </p>
-                  <p className="text-xs text-foreground font-mono break-all bg-background p-3 rounded border border-border select-all">
-                    {resetToken}
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-2 font-mono">
-                    {lang === "zh" ? "此令牌 30 分钟后失效" : "This token expires in 30 minutes"}
-                  </p>
-                </div>
-              )}
               <p className="text-sm text-muted-foreground">
                 {lang === "zh"
                   ? "请前往重置密码页面，输入你的邮箱和令牌来设置新密码"

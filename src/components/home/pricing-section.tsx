@@ -23,7 +23,7 @@ export function PricingSection({ lang = "zh" }: { lang?: "zh" | "en" }) {
             : "From individual to enterprise, find the plan that fits you"}
         </p>
       </div>
-      <div className="grid md:grid-cols-3 gap-5 max-w-4xl mx-auto">
+      <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
         {TIERS.map((tier) => (
           <div key={tier.nameEn} className={`glass-card p-6 rounded-xl flex flex-col ${tier.popular ? "border-primary/50 ring-1 ring-primary/20" : ""}`}>
             {tier.popular && (

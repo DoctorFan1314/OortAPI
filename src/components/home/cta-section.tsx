@@ -6,7 +6,7 @@ import { Zap, FileText, ArrowRight } from "lucide-react";
 
 export function CTASection({ lang = "zh" }: { lang?: "zh" | "en" }) {
   return (
-    <section className="py-20 px-4 border-beam">
+    <section className="py-16 lg:py-20 px-4 border-beam">
       <div className="max-w-3xl mx-auto text-center">
         <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
           {lang === "zh" ? "开始使用 OortAPI" : "Get Started with OortAPI"}

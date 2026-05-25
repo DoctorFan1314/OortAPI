@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
     db.prepare('UPDATE users SET preferences = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
       .run(JSON.stringify(preferences), user.id);
 
-    return NextResponse.json({ success: true, token: resetToken });
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Forgot password error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

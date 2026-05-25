@@ -837,8 +837,12 @@ export default function PlaygroundPage() {
                     </label>
                   );
                 })();
-                if (i < capEntries.length - 1) return <>{row}{i < capEntries.length - 1 && <div className="mx-3 border-t border-border/30" />}</>;
-                return row;
+                return (
+                  <div key={e.key}>
+                    {row}
+                    {i < capEntries.length - 1 && <div className="mx-3 border-t border-border/30" />}
+                  </div>
+                );
               })}
             </div>
             <Button size="sm" onClick={saveCapEdit} className="w-full mt-5 h-9 text-xs font-medium">{t.confirm}</Button>

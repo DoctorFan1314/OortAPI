@@ -111,7 +111,7 @@ export default function DashboardPage() {
 
       {/* Error banner */}
       {hasError && (
-        <div className="flex items-center gap-3 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+        <div role="alert" className="flex items-center gap-3 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
           <AlertTriangle className="h-5 w-5 text-red-400 shrink-0" />
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-red-400">

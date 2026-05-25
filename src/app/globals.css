@@ -75,8 +75,8 @@
   --accent: #e2e8f0;
   --accent-foreground: #1a1a2e;
   --destructive: #ef4444;
-  --border: rgba(0, 0, 0, 0.05);
-  --input: rgba(0, 0, 0, 0.05);
+  --border: rgba(0, 0, 0, 0.08);
+  --input: rgba(0, 0, 0, 0.08);
   --ring: #0891b2;
   --chart-1: #0891b2;
   --chart-2: #7c3aed;
@@ -369,8 +369,8 @@
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
-.marquee-animate { animation: marquee 90s linear infinite; }
-.marquee-animate-reverse { animation: marquee 110s linear infinite reverse; }
+.marquee-animate { animation: marquee 60s linear infinite; }
+.marquee-animate-reverse { animation: marquee 75s linear infinite reverse; }
 
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(20px); }

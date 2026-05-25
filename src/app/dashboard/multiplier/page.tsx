@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useEffect, useState } from "react";
-import { Clock, Layers, Plus, Trash2, Save } from "lucide-react";
+import { Clock, Layers, Plus, Trash2, Save, AlertTriangle } from "lucide-react";
 import { useToast } from "@/contexts/toast-context";
 
 interface MultiplierRule {
@@ -108,16 +108,18 @@ export default function MultiplierPage() {
   const [selectedRules, setSelectedRules] = useState<Set<string>>(new Set());
   const [batchMultValue, setBatchMultValue] = useState('1.0');
   const [showBatchDialog, setShowBatchDialog] = useState(false);
+  const [fetchError, setFetchError] = useState(false);
 
   const fetchData = () => {
+    setFetchError(false);
     fetch('/api/dashboard/multiplier', { credentials: 'include' })
-      .then(res => res.json())
+      .then(res => { if (!res.ok) throw new Error(); return res.json(); })
       .then(d => {
         setRules(d.rules || []);
         if (d.time_settings) setTimeSettings(d.time_settings);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => { setLoading(false); setFetchError(true); });
   };
 
   useEffect(() => { fetchData(); }, []);
@@ -204,6 +206,18 @@ export default function MultiplierPage() {
       <div className="space-y-6">
         <h1 className="text-2xl font-bold">{t.title}</h1>
         <div className="h-48 animate-pulse bg-muted rounded-lg" />
+      </div>
+    );
+  }
+
+  if (fetchError) {
+    return (
+      <div className="space-y-6">
+        <h1 className="text-2xl font-bold">{t.title}</h1>
+        <div className="flex items-center gap-3 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+          <AlertTriangle className="h-5 w-5 text-red-400 shrink-0" />
+          <p className="text-sm text-red-400">{lang === "zh" ? "加载失败，请刷新重试" : "Failed to load. Please refresh."}</p>
+        </div>
       </div>
     );
   }

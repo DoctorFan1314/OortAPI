@@ -471,7 +471,7 @@ export function ModelAnalytics() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ReactECharts option={stackedAreaOption} style={{ height: 400 }} opts={{ renderer: "canvas" }} notMerge />
+            <ReactECharts option={stackedAreaOption} style={{ height: 'auto' }} opts={{ renderer: "canvas" }} notMerge className="min-h-[250px] md:min-h-[350px] w-full" />
           </CardContent>
         </Card>
         <Card className="glass-card">

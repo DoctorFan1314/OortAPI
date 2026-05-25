@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useCallback } from "react";
 import { AuthGuard } from "@/components/auth/auth-guard";
 import { useI18n } from "@/contexts/i18n-context";
 import { useAuth } from "@/contexts/auth-context";
@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useSearchParams, useRouter } from "next/navigation";
 import { AvatarCropDialog } from "@/components/profile/avatar-crop-dialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
@@ -169,7 +170,12 @@ export default function ProfileClient() {
   const locale = useLocale();
   const t = LABELS[lang];
 
-  const [activeTab, setActiveTab] = useState<"overview" | "settings">("overview");
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const activeTab = (searchParams.get("tab") as "overview" | "settings") || "overview";
+  const setActiveTab = useCallback((tab: "overview" | "settings") => {
+    router.replace(`/profile?tab=${tab}`, { scroll: false });
+  }, [router]);
 
   // Settings state
   const [username, setUsername] = useState(user?.username || "");
@@ -187,7 +193,18 @@ export default function ProfileClient() {
   const [newPw, setNewPw] = useState("");
   const [confirmPw, setConfirmPw] = useState("");
   const [pwLoading, setPwLoading] = useState(false);
-  const [showPw, setShowPw] = useState(false);
+  const [showCurrentPw, setShowCurrentPw] = useState(false);
+  const [showNewPw, setShowNewPw] = useState(false);
+  const [showNewConfirmPw, setShowNewConfirmPw] = useState(false);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+
+  const handleAvatarSelect = (file: File | undefined) => {
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { toast("File too large (max 5MB)", "error"); return; }
+    const reader = new FileReader();
+    reader.onload = (ev) => setCropImage(ev.target?.result as string);
+    reader.readAsDataURL(file);
+  };
 
   const { data: usageData, isLoading } = useSWR<{ data: UsageLog[]; total: number; total_tokens: number; total_cost: number }>(
     "/api/v1/billing/usage?limit=10",
@@ -278,21 +295,9 @@ export default function ProfileClient() {
               type="button"
               onDragOver={e => { e.preventDefault(); e.currentTarget.classList.add('border-primary'); }}
               onDragLeave={e => { e.currentTarget.classList.remove('border-primary'); }}
-              onDrop={e => { e.preventDefault(); e.currentTarget.classList.remove('border-primary'); const file = e.dataTransfer.files?.[0]; if (file) { if (file.size > 5 * 1024 * 1024) { toast("File too large (max 5MB)", "error"); return; } const reader = new FileReader(); reader.onload = ev => setCropImage(ev.target?.result as string); reader.readAsDataURL(file); } }}
-              onClick={() => {
-                const input = document.createElement("input");
-                input.type = "file";
-                input.accept = "image/jpeg,image/png";
-                input.onchange = (e) => {
-                  const file = (e.target as HTMLInputElement).files?.[0];
-                  if (!file) return;
-                  if (file.size > 5 * 1024 * 1024) { toast("File too large (max 5MB)", "error"); return; }
-                  const reader = new FileReader();
-                  reader.onload = (ev) => setCropImage(ev.target?.result as string);
-                  reader.readAsDataURL(file);
-                };
-                input.click();
-              }}
+              onDrop={e => { e.preventDefault(); e.currentTarget.classList.remove('border-primary'); handleAvatarSelect(e.dataTransfer.files?.[0]); }}
+              onClick={() => avatarInputRef.current?.click()}
+              onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); avatarInputRef.current?.click(); } }}
               className="relative h-16 w-16 rounded-full bg-primary/10 border-2 border-primary/30 flex items-center justify-center text-2xl font-bold text-primary shrink-0 overflow-hidden cursor-pointer hover:border-primary/60 transition-colors"
             >
               {user.avatar ? (
@@ -511,20 +516,8 @@ export default function ProfileClient() {
                     <div className="flex items-center gap-4">
                       <button
                         type="button"
-                        onClick={() => {
-                          const input = document.createElement("input");
-                          input.type = "file";
-                          input.accept = "image/jpeg,image/png";
-                          input.onchange = (e) => {
-                            const file = (e.target as HTMLInputElement).files?.[0];
-                            if (!file) return;
-                            if (file.size > 5 * 1024 * 1024) { toast("File too large (max 5MB)", "error"); return; }
-                            const reader = new FileReader();
-                            reader.onload = (ev) => setCropImage(ev.target?.result as string);
-                            reader.readAsDataURL(file);
-                          };
-                          input.click();
-                        }}
+                        onClick={() => avatarInputRef.current?.click()}
+                        onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); avatarInputRef.current?.click(); } }}
                         className="relative h-14 w-14 rounded-full bg-primary/10 border-2 border-primary/30 flex items-center justify-center text-xl font-bold text-primary shrink-0 overflow-hidden cursor-pointer hover:border-primary/60 transition-colors"
                       >
                         {user.avatar ? (
@@ -534,20 +527,7 @@ export default function ProfileClient() {
                         )}
                       </button>
                       <div>
-                        <Button type="button" variant="outline" size="sm" onClick={() => {
-                          const input = document.createElement("input");
-                          input.type = "file";
-                          input.accept = "image/jpeg,image/png";
-                          input.onchange = (e) => {
-                            const file = (e.target as HTMLInputElement).files?.[0];
-                            if (!file) return;
-                            if (file.size > 5 * 1024 * 1024) { toast("File too large (max 5MB)", "error"); return; }
-                            const reader = new FileReader();
-                            reader.onload = (ev) => setCropImage(ev.target?.result as string);
-                            reader.readAsDataURL(file);
-                          };
-                          input.click();
-                        }}>
+                        <Button type="button" variant="outline" size="sm" onClick={() => avatarInputRef.current?.click()}>
                           <Camera className="h-3.5 w-3.5 mr-1.5" />{t.changeAvatar}
                         </Button>
                       </div>
@@ -579,27 +559,27 @@ export default function ProfileClient() {
                   <div>
                     <label className="text-sm mb-1.5 block">{t.currentPassword}</label>
                     <div className="relative">
-                      <Input type={showPw ? "text" : "password"} value={currentPw} onChange={e => setCurrentPw(e.target.value)} placeholder="********" className="pr-9" />
-                      <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground" aria-label={showPw ? "Hide password" : "Show password"}>
-                        {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      <Input type={showCurrentPw ? "text" : "password"} value={currentPw} onChange={e => setCurrentPw(e.target.value)} placeholder="********" className="pr-9" />
+                      <button type="button" onClick={() => setShowCurrentPw(!showCurrentPw)} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground" aria-label={showCurrentPw ? "Hide password" : "Show password"}>
+                        {showCurrentPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
                     </div>
                   </div>
                   <div>
                     <label className="text-sm mb-1.5 block">{t.newPassword}</label>
                     <div className="relative">
-                      <Input type={showPw ? "text" : "password"} value={newPw} onChange={e => setNewPw(e.target.value)} className="pr-9" />
-                      <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground" aria-label={showPw ? "Hide password" : "Show password"}>
-                        {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      <Input type={showNewPw ? "text" : "password"} value={newPw} onChange={e => setNewPw(e.target.value)} className="pr-9" />
+                      <button type="button" onClick={() => setShowNewPw(!showNewPw)} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground" aria-label={showNewPw ? "Hide password" : "Show password"}>
+                        {showNewPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
                     </div>
                   </div>
                   <div>
                     <label className="text-sm mb-1.5 block">{t.confirmPassword}</label>
                     <div className="relative">
-                      <Input type={showPw ? "text" : "password"} value={confirmPw} onChange={e => setConfirmPw(e.target.value)} className="pr-9" />
-                      <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground" aria-label={showPw ? "Hide password" : "Show password"}>
-                        {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      <Input type={showNewConfirmPw ? "text" : "password"} value={confirmPw} onChange={e => setConfirmPw(e.target.value)} className="pr-9" />
+                      <button type="button" onClick={() => setShowNewConfirmPw(!showNewConfirmPw)} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground" aria-label={showNewConfirmPw ? "Hide password" : "Show password"}>
+                        {showNewConfirmPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
                     </div>
                   </div>
@@ -726,6 +706,7 @@ export default function ProfileClient() {
             onCropComplete={handleCropComplete}
           />
         )}
+        <input ref={avatarInputRef} type="file" accept="image/jpeg,image/png" className="hidden" onChange={e => handleAvatarSelect(e.target.files?.[0])} />
       </div>
     </AuthGuard>
   );

@@ -141,37 +141,64 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
   };
 
   const toggleKey = async (id: number, enabled: boolean) => {
-    await fetch("/api/dashboard/keys", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ id, enabled }),
-    });
-    mutate();
+    try {
+      const res = await fetch("/api/dashboard/keys", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ id, enabled }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        showToast(data.error || (lang === "zh" ? "操作失败" : "Operation failed"), "error");
+        return;
+      }
+      mutate();
+    } catch {
+      showToast("Network error", "error");
+    }
   };
 
   const confirmDelete = async () => {
     if (deleteTarget === null) return;
-    await fetch("/api/dashboard/keys", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ id: deleteTarget }),
-    });
-    setDeleteTarget(null);
-    mutate();
+    try {
+      const res = await fetch("/api/dashboard/keys", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ id: deleteTarget }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        showToast(data.error || (lang === "zh" ? "删除失败" : "Delete failed"), "error");
+        return;
+      }
+      setDeleteTarget(null);
+      mutate();
+    } catch {
+      showToast("Network error", "error");
+    }
   };
 
   const saveRateLimit = async (id: number) => {
     const val = Math.min(Math.max(Math.floor(Number(editRateValue) || 60), 1), 10000);
-    await fetch("/api/dashboard/keys", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ id, rate_limit: val }),
-    });
-    setEditingRateId(null);
-    mutate();
+    try {
+      const res = await fetch("/api/dashboard/keys", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ id, rate_limit: val }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        showToast(data.error || (lang === "zh" ? "保存失败" : "Save failed"), "error");
+        return;
+      }
+      setEditingRateId(null);
+      mutate();
+    } catch {
+      showToast("Network error", "error");
+    }
   };
 
   const toggleKeyAnalytics = async (id: number) => {

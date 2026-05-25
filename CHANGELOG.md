@@ -45,6 +45,34 @@ All notable changes to this project will be documented in this file.
 - **Image upload fix** — Resolved `Image` naming conflict (lucide-react import vs DOM `Image()` constructor); removed duplicate `img.onload` that overwrote compression logic, causing image selection to appear unresponsive
 - **Tools capability locked** — Permanently disabled with "Coming Soon" badge in capability editor; dark mode contrast improved
 
+### Full-Site Audit #2 — 28 UI/UX & Aesthetics Improvements
+- **Bug fix** — Playground capability editor map missing key prop (React console error)
+- **Security fix** — Forgot password page no longer exposes reset token in API response and UI
+- **Password toggle** — Change password form now has independent show/hide toggles for each of the 3 fields
+- **Accessibility** — Avatar upload replaced dynamically-created file input with accessible ref-based hidden input + keyboard Enter/Space support
+- **Shortcut fix** — Removed navbar Ctrl+K handler that conflicted with CommandPalette
+- **Error feedback** — Token plan page: replaced `alert()` with Toast; Promise.all catch now shows Toast
+- **Error feedback** — Dashboard StatsCards: added SWR error state with retry message
+- **Error feedback** — API Key table: all CRUD operations now show error Toast on failure
+- **Error feedback** — Multiplier page: added fetch error state with error banner
+- **Error feedback** — Dashboard page: added `role="alert"` to error banner for screen reader announcements
+- **Error feedback** — Login page: server error now clears when user starts typing
+- **Docs sidebar** — Sections now default-collapsed (only active page section is open); search auto-expands matching sections
+- **Docs sidebar** — Mobile overlay now closes on Escape key press
+- **Profile tabs** — Tab state now persisted in URL (`?tab=settings`), survives page refresh
+- **Search** — Recent search delete buttons now semi-visible by default, touch-friendly
+- **Visual** — Light theme border/input opacity increased from 5% to 8% for better contrast
+- **Visual** — Dialog/Sheet backdrop scrim increased from `bg-black/10` to `bg-black/20`
+- **Visual** — Homepage section vertical spacing unified to `py-16 lg:py-20`
+- **Visual** — Marquee animation speed increased (90s→60s, 110s→75s)
+- **Visual** — Hero badge replaced hardcoded colors with theme-aware CSS variables
+- **Visual** — ECharts chart containers changed from fixed 400px to responsive `min-h-[250px] md:min-h-[350px]`
+- **Visual** — Default button horizontal padding increased from `px-2.5` to `px-3`
+- **Visual** — Pricing card grid gap increased from `gap-5` to `gap-6`
+- **Visual** — Tabs minimum height increased from 32px to 36px for better touch targets
+- **Component** — LoadingSkeleton enhanced with `width`/`shape`/`lines` options
+- **Consistency** — Register API password minimum length raised from 6 to 8, matching client-side validation
+
 ## [v3.3.4.17] — 2026-05-21
 
 ### Playground 4-Column Workspace & Stream Truncation Fix

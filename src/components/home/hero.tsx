@@ -201,13 +201,13 @@ export function Hero() {
         aria-hidden="true"
       />
 
-      <div className="relative mx-auto max-w-7xl px-4 py-16 lg:py-24 lg:px-8">
+      <div className="relative mx-auto max-w-7xl px-4 py-16 lg:py-20 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           {/* ═══ Left Column ═══ */}
           <div className="lg:col-span-6 text-left min-w-0">
             {/* Micro label */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-zinc-900 dark:bg-zinc-900 border border-zinc-800 dark:border-zinc-800 text-[11px] font-mono tracking-widest text-cyan-400 dark:text-cyan-400 uppercase mb-6">
-              <Zap className="h-3 w-3 text-cyan-400 dark:text-cyan-400" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-primary/10 border border-primary/20 text-[11px] font-mono tracking-widest text-primary uppercase mb-6">
+              <Zap className="h-3 w-3 text-primary" />
               <span>{lang === "zh" ? "统一 AI API 网关" : "Unified AI API Gateway"}</span>
             </div>
 

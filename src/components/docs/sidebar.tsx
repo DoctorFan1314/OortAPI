@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -64,9 +64,13 @@ export function DocsSidebar() {
   const { t } = useI18n();
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [expandedSections, setExpandedSections] = useState<Set<string>>(
-    new Set(NAV_SECTIONS.map(s => s.sectionKey))
-  );
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(() => {
+    // Only expand the section containing the current page
+    const activeSection = NAV_SECTIONS.find(
+      section => section.items.some(item => pathname.startsWith(item.href))
+    );
+    return new Set(activeSection ? [activeSection.sectionKey] : []);
+  });
 
   const toggleSection = (key: string) => {
     setExpandedSections(prev => {
@@ -91,6 +95,17 @@ export function DocsSidebar() {
       }))
       .filter(s => s.items.length > 0);
   }, [searchQuery, t]);
+
+  // Auto-expand sections with matches when searching
+  useEffect(() => {
+    if (searchQuery) {
+      setExpandedSections(prev => {
+        const next = new Set(prev);
+        filteredSections.forEach(s => next.add(s.sectionKey));
+        return next;
+      });
+    }
+  }, [searchQuery, filteredSections]);
 
   const isActive = (href: string, exact?: boolean) => {
     if (exact) return pathname === href;
@@ -169,7 +184,7 @@ export function DocsSidebar() {
 
       {/* Mobile overlay */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm lg:hidden" onClick={() => setMobileOpen(false)} />
+        <div className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm lg:hidden" onClick={() => setMobileOpen(false)} onKeyDown={(e) => { if (e.key === 'Escape') { e.stopPropagation(); setMobileOpen(false); } }} />
       )}
 
       {/* Sidebar panel */}

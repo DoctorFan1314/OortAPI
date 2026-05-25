@@ -74,13 +74,30 @@ const LABELS = {
 };
 
 export function StatsCards({ lang = "zh" }: { lang?: "zh" | "en" }) {
-  const { data: stats } = useSWR<StatsData>("/api/dashboard/stats", dashboardSWRConfig);
+  const { data: stats, error } = useSWR<StatsData>("/api/dashboard/stats", dashboardSWRConfig);
   const { currency, exchangeRate, symbol, formatPrice } = useCurrency();
   const t = LABELS[lang];
 
   const formatTokens = (n: number) => {
     return n.toLocaleString();
   };
+
+  if (error) {
+    return (
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <Card key={i} className="glass-card border-red-500/20">
+            <CardContent className="p-4 flex items-center gap-2">
+              <div className="p-1.5 rounded-md bg-red-500/10">
+                <Activity className="h-3.5 w-3.5 text-red-500" />
+              </div>
+              <span className="text-xs text-muted-foreground">{lang === "zh" ? "加载失败，请刷新重试" : "Failed to load. Please refresh."}</span>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
+  }
 
   if (!stats) {
     return (
