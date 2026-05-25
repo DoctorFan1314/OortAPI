@@ -253,6 +253,18 @@ All notable changes to this project will be documented in this file.
 - **Playground decoupling** — Playground reads capabilities from real model data instead of localStorage; thinking mode auto-enabled for reasoning models; manual edit modal removed
 - **Breadcrumb removal** — Removed redundant breadcrumb from dashboard layout; sidebar alone provides navigation context
 
+### Streaming Metrics & Analytics
+- **TTFT/ITL tracking** — Streaming routes now capture Time-To-First-Token and Inter-Token Latency; persisted to `usage_logs`
+- **Latency monitoring** — New `LatencyMetrics` ECharts dual-axis chart (TTFT blue + ITL green) on dashboard
+- **Cache ROI dashboard** — New `CacheSavingsChart` donut chart showing cache hit ratio, tokens saved, and cost avoided percentage
+- **Stats API** — `/api/dashboard/stats` now returns `cache_savings` with cost/tokens saved calculations
+- **Analytics API** — `/api/dashboard/analytics` now returns `latency_trend` with per-day avg TTFT/ITL
+
+### Developer Experience
+- **Dynamic key injection** — Documentation `CodeBlock` auto-injects first valid API key for logged-in users, replacing `sk-oort-your-key` placeholder
+- **Token calculator** — New inline calculator in model marketplace: select model, input tokens, see per-call/daily/monthly/yearly cost & plan Credits deduction
+- **Marketplace layout** — Model grid changed to 4 columns; glass card visuals enhanced with richer shadows and spotlight
+
 ---
 
 ## [v3.3.4.14] — 2026-05-19
