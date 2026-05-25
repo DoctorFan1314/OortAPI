@@ -92,12 +92,12 @@
   --sidebar-accent-foreground: #1a1a2e;
   --sidebar-border: rgba(0, 0, 0, 0.05);
   --sidebar-ring: #0891b2;
-  --glass-bg: rgba(255, 255, 255, 0.8);
-  --glass-border: rgba(0, 0, 0, 0.05);
-  --glass-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.02);
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(0, 0, 0, 0.06);
+  --glass-shadow: 0 1px 2px rgba(0, 0, 0, 0.03), 0 4px 12px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.02);
   --glow-blue: rgba(59, 130, 246, 0.15);
   --glow-purple: rgba(139, 92, 246, 0.1);
-  --spotlight-color: rgba(8, 145, 178, 0.06);
+  --spotlight-color: rgba(8, 145, 178, 0.08);
   --noise-opacity: 0.02;
   /* Plan card gradients */
   --plan-spark-from: #667eea;
@@ -144,12 +144,12 @@
   --sidebar-accent-foreground: #e6edf3;
   --sidebar-border: rgba(255, 255, 255, 0.05);
   --sidebar-ring: #00d4ff;
-  --glass-bg: rgba(15, 23, 42, 0.6);
-  --glass-border: rgba(255, 255, 255, 0.05);
-  --glass-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), 0 4px 16px rgba(0, 0, 0, 0.1);
-  --glow-blue: rgba(59, 130, 246, 0.06);
-  --glow-purple: rgba(139, 92, 246, 0.04);
-  --spotlight-color: rgba(0, 212, 255, 0.08);
+  --glass-bg: rgba(15, 23, 42, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.06);
+  --glass-shadow: 0 1px 2px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(0, 0, 0, 0.15), 0 8px 24px rgba(0, 0, 0, 0.08);
+  --glow-blue: rgba(59, 130, 246, 0.08);
+  --glow-purple: rgba(139, 92, 246, 0.06);
+  --spotlight-color: rgba(0, 212, 255, 0.1);
   --noise-opacity: 0.025;
   /* Plan card gradients */
   --plan-spark-from: #7b8ff7;

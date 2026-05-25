@@ -412,7 +412,7 @@ export default function ModelsPage() {
       {/* Model Grid */}
       <div className="max-w-[1600px] mx-auto px-4 lg:px-8 py-6">
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {Array.from({ length: 6 }).map((_, i) => (
               <Card key={i} className="glass-card animate-pulse">
                 <CardContent className="p-5">
@@ -436,7 +436,7 @@ export default function ModelsPage() {
         ) : (
           <>
           {viewMode === "grid" ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {filtered.slice(0, visibleCount).map((m) => {
               const c = pc(m.provider);
               const isEditing = editingModel === m.model_name && isAdmin;
