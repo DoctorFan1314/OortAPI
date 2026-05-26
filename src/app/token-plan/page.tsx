@@ -115,7 +115,7 @@ export default function TokenPlanPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen" style={{ background: "linear-gradient(180deg, var(--background) 0%, color-mix(in srgb, var(--background) 97%, var(--primary)) 100%)" }}>
       {/* Global styles for animations */}
       <style jsx global>{`
         @keyframes shimmer-slide {
@@ -180,6 +180,8 @@ export default function TokenPlanPage() {
           <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-purple-500/6 rounded-full blur-3xl animate-[hero-float_10s_ease-in-out_infinite_1s]" />
           <div className="absolute top-1/3 left-1/2 w-48 h-48 bg-emerald-500/8 rounded-full blur-3xl animate-[hero-float_7s_ease-in-out_infinite_0.5s]" />
         </div>
+        {/* Wide horizontal glow behind title */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 w-full max-w-[1000px] h-[500px] bg-gradient-to-r from-primary/[0.06] via-primary/[0.08] to-transparent rounded-full blur-[120px] pointer-events-none" />
         <div className="relative mx-auto max-w-6xl px-4 py-14 lg:py-20 text-center">
           <h1 className="text-4xl lg:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-foreground via-foreground to-muted-foreground mb-3">
             {lang === "zh" ? "选择你的 Token Plan" : "Choose Your Token Plan"}
@@ -221,7 +223,11 @@ export default function TokenPlanPage() {
       </section>
 
       {/* Plan Cards */}
-      <section className="mx-auto max-w-6xl px-4 py-10">
+      <section className="relative mx-auto max-w-6xl px-4 py-10">
+        {/* Background radial glow behind card grid */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[800px] h-[600px] rounded-full blur-[150px] opacity-[0.04] dark:opacity-[0.03]" style={{ background: "radial-gradient(ellipse at center, var(--plan-pulse-from) 0%, transparent 70%)" }} />
+        </div>
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[1, 2, 3, 4].map((i) => (
@@ -294,7 +300,9 @@ export default function TokenPlanPage() {
 
       {/* Comparison Table */}
       {plans.length > 0 && (
-        <section className="border-t border-border">
+        <section className="relative border-t border-border">
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border/60 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-b from-primary/[0.015] via-transparent to-transparent pointer-events-none" />
           <div className="mx-auto max-w-6xl px-4 py-10">
             <h2 className="text-lg font-semibold text-foreground text-center mb-6">
               {lang === "zh" ? "套餐对比" : "Compare Plans"}
@@ -367,7 +375,8 @@ export default function TokenPlanPage() {
       )}
 
       {/* Tools — Card-style blocks */}
-      <section className="border-t border-border bg-muted/20">
+      <section className="relative border-t border-border bg-muted/20">
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border/60 to-transparent" />
         <div className="mx-auto max-w-6xl px-4 py-10 text-center">
           <h2 className="text-sm font-semibold text-foreground mb-4">
             {lang === "zh" ? "兼容主流编程工具" : "Compatible with Popular Coding Tools"}
@@ -395,7 +404,10 @@ export default function TokenPlanPage() {
       </section>
 
       {/* FAQ — Accordion */}
-      <section className="border-t border-border">
+      <section className="relative border-t border-border">
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border/60 to-transparent" />
+        {/* Center focal glow */}
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-primary/[0.04] rounded-full blur-[100px] pointer-events-none" />
         <div className="mx-auto max-w-3xl px-4 py-10">
           <h2 className="text-lg font-semibold text-foreground text-center mb-6">
             {lang === "zh" ? "常见问题" : "FAQ"}
