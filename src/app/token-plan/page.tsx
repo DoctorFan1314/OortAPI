@@ -299,10 +299,10 @@ export default function TokenPlanPage() {
             <h2 className="text-lg font-semibold text-foreground text-center mb-6">
               {lang === "zh" ? "套餐对比" : "Compare Plans"}
             </h2>
-            <div className="overflow-hidden rounded-xl border border-border/40 bg-card/60 backdrop-blur-sm">
+            <div className="overflow-hidden rounded-xl border border-border/70 bg-card/60 backdrop-blur-sm shadow-sm">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-muted/30">
+                  <tr className="bg-muted/50">
                     <th className="text-left p-3.5 text-muted-foreground font-medium whitespace-nowrap w-44">
                       {lang === "zh" ? "功能特性" : "Feature"}
                     </th>
@@ -320,28 +320,28 @@ export default function TokenPlanPage() {
                     })}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border/10">
-                  <tr className="transition-colors hover:bg-muted/5">
+                <tbody className="divide-y divide-border/30">
+                  <tr className="transition-colors hover:bg-muted/15">
                     <td className="p-3 text-muted-foreground whitespace-nowrap font-medium">{lang === "zh" ? "每月 Credits" : "Monthly Credits"}</td>
                     {plans.map((p) => <td key={p.id} className="p-3 text-center whitespace-nowrap font-mono font-semibold">{p.monthly_credits.toLocaleString()}</td>)}
                   </tr>
-                  <tr className="transition-colors hover:bg-muted/5">
+                  <tr className="transition-colors hover:bg-muted/15">
                     <td className="p-3 text-muted-foreground whitespace-nowrap font-medium">{lang === "zh" ? "最大并发" : "Max Concurrency"}</td>
                     {plans.map((p) => <td key={p.id} className="p-3 text-center whitespace-nowrap">{p.max_concurrency}</td>)}
                   </tr>
-                  <tr className="transition-colors hover:bg-muted/5">
+                  <tr className="transition-colors hover:bg-muted/15">
                     <td className="p-3 text-muted-foreground whitespace-nowrap font-medium">{lang === "zh" ? "路由优先级" : "Route Priority"}</td>
                     {plans.map((p) => <td key={p.id} className="p-3 text-center whitespace-nowrap capitalize">{p.route_priority}</td>)}
                   </tr>
-                  <tr className="transition-colors hover:bg-muted/5">
+                  <tr className="transition-colors hover:bg-muted/15">
                     <td className="p-3 text-muted-foreground whitespace-nowrap font-medium">{lang === "zh" ? "支持等级" : "Support Level"}</td>
                     {plans.map((p) => <td key={p.id} className="p-3 text-center whitespace-nowrap">{p.support_level === "dedicated" ? (lang === "zh" ? "专属客服" : "Dedicated") : p.support_level === "priority" ? (lang === "zh" ? "优先" : "Priority") : p.support_level === "email" ? (lang === "zh" ? "邮件" : "Email") : (lang === "zh" ? "社区" : "Community")}</td>)}
                   </tr>
-                  <tr className="transition-colors hover:bg-muted/5">
+                  <tr className="transition-colors hover:bg-muted/15">
                     <td className="p-3 text-muted-foreground whitespace-nowrap font-medium">{lang === "zh" ? "非高峰折扣" : "Off-Peak Discount"}</td>
                     {plans.map((p) => <td key={p.id} className="p-3 text-center whitespace-nowrap">{(p.off_peak_discount * 100).toFixed(0)}%</td>)}
                   </tr>
-                  <tr className="transition-colors hover:bg-muted/5 border-t-2 border-border/20">
+                  <tr className="transition-colors hover:bg-muted/15 border-t-2 border-border/40">
                     <td className="p-3 text-muted-foreground whitespace-nowrap font-medium">{lang === "zh" ? "月付价格" : "Monthly Price"}</td>
                     {plans.map((p) => {
                       const needsConversion = displayCurrency !== p.currency;
@@ -350,7 +350,7 @@ export default function TokenPlanPage() {
                       return <td key={p.id} className="p-3 text-center whitespace-nowrap font-mono font-bold" style={{ color: `var(--plan-${p.name}-from)` }}>{sym}{price.toFixed(2)}</td>;
                     })}
                   </tr>
-                  <tr className="transition-colors hover:bg-muted/5">
+                  <tr className="transition-colors hover:bg-muted/15">
                     <td className="p-3 text-muted-foreground whitespace-nowrap font-medium">{lang === "zh" ? "年付价格" : "Yearly Price"}</td>
                     {plans.map((p) => {
                       const needsConversion = displayCurrency !== p.currency;
