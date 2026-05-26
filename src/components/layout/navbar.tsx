@@ -89,10 +89,10 @@ export function Navbar() {
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/60 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 lg:px-8">
         <Link href="/" className="flex items-center gap-2.5 shrink-0">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 border border-primary/30">
-            <span className="text-sm font-bold text-primary">O</span>
-          </div>
-          <span className="text-lg font-semibold text-foreground hidden sm:inline">OortAPI</span>
+          {/* Mobile icon */}
+          <img src={`/logo-icon${resolvedTheme === "dark" ? "-dark" : ""}.svg`} alt="" className="h-12 w-12 sm:hidden" />
+          {/* Desktop full logo */}
+          <img src={`/logo${resolvedTheme === "dark" ? "-dark" : ""}.svg`} alt="OortAPI" className="hidden sm:block h-14 w-auto" />
         </Link>
 
         <nav className="hidden lg:flex items-center gap-1">

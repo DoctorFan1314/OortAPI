@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 import { useI18n } from "@/contexts/i18n-context";
+import { useTheme } from "@/contexts/theme-context";
 import { StatusIndicator } from "@/components/layout/status-indicator";
 
 export function Footer() {
   const { t, lang } = useI18n();
+  const { resolvedTheme } = useTheme();
 
   const footerSections = [
     { id: "product", title: t.footer.product, links: [
@@ -40,11 +42,8 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-4 py-12 lg:px-8">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
           <div className="col-span-2 md:col-span-1">
-            <div className="flex items-center gap-2.5 mb-4">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 border border-primary/30">
-                <span className="text-sm font-bold text-primary">O</span>
-              </div>
-              <span className="text-lg font-semibold text-foreground">OortAPI</span>
+            <div className="mb-4">
+              <img src={`/logo${resolvedTheme === "dark" ? "-dark" : ""}.svg`} alt="OortAPI" className="h-14 w-auto" />
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed mb-6">
               {t.footer.description}

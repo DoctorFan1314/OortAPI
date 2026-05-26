@@ -38,6 +38,7 @@ export default function NotFound() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-20 text-center">
+      <img src="/logo-icon.svg" alt="" className="h-24 w-24 mx-auto mb-6 opacity-60" />
       <div className="text-7xl font-extrabold gradient-text mb-2">404</div>
       <div className="flex justify-center mb-4">
         <div className="h-16 w-16 rounded-full bg-primary/5 border border-primary/20 flex items-center justify-center">

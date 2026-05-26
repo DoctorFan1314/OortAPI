@@ -205,12 +205,6 @@ export function Hero() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           {/* ═══ Left Column ═══ */}
           <div className="lg:col-span-6 text-left min-w-0">
-            {/* Micro label */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-primary/10 border border-primary/20 text-[11px] font-mono tracking-widest text-primary uppercase mb-6">
-              <Zap className="h-3 w-3 text-primary" />
-              <span>{lang === "zh" ? "统一 AI API 网关" : "Unified AI API Gateway"}</span>
-            </div>
-
             {/* Main heading */}
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tighter text-foreground leading-none mb-6 font-sans">
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-zinc-900 to-zinc-500 dark:from-white dark:to-zinc-400">
