@@ -3,6 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Diamond, Sparkles, Zap, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useCountUp } from "@/hooks/use-count-up";
 
 interface PlanData {
   id: number;
@@ -101,6 +102,9 @@ export function SubscriptionCard({
     : (lang === "zh" ? "/月" : "/mo");
 
   const yearlySavings = Math.round((1 - plan.yearly_price / (plan.monthly_price * 12)) * 100);
+  const priceInt = Math.round(displayPrice);
+  const priceDec = (displayPrice % 1).toFixed(2).slice(-3);
+  const animatedPrice = useCountUp(priceInt, 500, true);
 
   if (variant === "current") {
     // Compact card for current subscription
@@ -203,12 +207,21 @@ export function SubscriptionCard({
           </div>
         </div>
 
-        {/* Price */}
+        {/* Price with count-up animation */}
         <div className="relative mt-4">
           <div className="flex items-baseline gap-1">
-            <span className="text-3xl font-extrabold text-white">{sym}{displayPrice.toFixed(2)}</span>
+            <span className="text-3xl font-extrabold text-white">{sym}{animatedPrice.toLocaleString()}{priceDec}</span>
             <span className="text-sm text-white/70">{priceLabel}</span>
           </div>
+          {/* Per-million-token price */}
+          {plan.monthly_credits > 0 && (() => {
+            const perMillion = (convert(plan.monthly_price) / plan.monthly_credits) * 1000000;
+            return (
+              <p className="text-[10px] text-white/40 mt-0.5">
+                ≈ {sym}{perMillion < 0.01 ? perMillion.toFixed(4) : perMillion.toFixed(2)} / 百万 Tokens
+              </p>
+            );
+          })()}
           {billingCycle === "yearly" ? (
             <div className="flex items-center gap-2 mt-1">
               <span className="text-[11px] text-white/40 line-through">{sym}{convert(plan.monthly_price * 12).toFixed(2)}</span>
@@ -223,6 +236,14 @@ export function SubscriptionCard({
           )}
         </div>
       </div>
+
+      {/* Popular card separator glow bar */}
+      {isPopular && (
+        <div className="relative h-[4px] overflow-hidden shadow-[0_2px_12px_rgba(168,85,247,0.3)]">
+          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500" />
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-[shimmer-slide_2s_linear_infinite]" />
+        </div>
+      )}
 
       {/* Card body */}
       <div className="px-5 pt-3 pb-5 bg-card rounded-b-xl">
