@@ -89,6 +89,15 @@ All notable changes to this project will be documented in this file.
 - **UI** — Popular plan card: faster 3s breathing cycle, stronger glow, elevated position
 - **UI** — Monthly credits number uses plan theme accent color with "credits" label
 - **UI** — Subscribe button uses plan theme gradient (from/to colors); current-plan button has prominent border
+- **UI** — Hero trust bar with real-time site stats (total calls, models, active users) from `/api/stats` + `/api/health`
+- **UI** — Per-million-token price display on each plan card, currency-aware
+- **UI** — Count-up animation on price numbers when switching billing cycle
+- **UI** — Popular card gradient separator glow bar at header/body seam
+- **UI** — Scroll reveal animations (IntersectionObserver) on all sections
+- **UI** — Bottom CTA glass card section (Contact Sales / View Docs)
+- **Feature** — New `/docs/ai-tools/` section with overview page and 8 individual tool configuration guides
+- **Feature** — Token plan tool cards (2×4 grid) link to respective docs pages; logo placeholders with SVG support
+- **Integration** — `@lobehub/icons` installed for AI/LLM brand logo assets
 
 ## [v3.3.4.18] — 2026-05-22
 
