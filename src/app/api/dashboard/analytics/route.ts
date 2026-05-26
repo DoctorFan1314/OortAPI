@@ -147,8 +147,8 @@ export async function GET(request: NextRequest) {
         SUM(tokens_in_cache) as tokens_in_cache,
         SUM(tokens_out) as tokens_out
       FROM usage_logs
-      WHERE user_id = ?
-    `).get(userId) as { total_calls: number; total_cost: number; total_tokens: number; tokens_in_noncached: number; tokens_in_cache: number; tokens_out: number };
+      WHERE user_id = ? AND created_at >= DATE('now', ?)
+    `).get(userId, dateFilter) as { total_calls: number; total_cost: number; total_tokens: number; tokens_in_noncached: number; tokens_in_cache: number; tokens_out: number };
 
     return NextResponse.json({
       model_by_day: modelByDay,
