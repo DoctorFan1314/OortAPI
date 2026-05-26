@@ -65,7 +65,7 @@ export default function LoginClient() {
     <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <img src="/logo-icon.svg" alt="" className="h-20 w-20 mx-auto mb-4" />
+          <img src="/logo-icon.svg" alt="" className="h-28 w-28 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-foreground mb-2">{t.auth.loginTitle}</h1>
           <p className="text-muted-foreground">{t.auth.welcomeBack}</p>
         </div>
