@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { useToast } from "@/contexts/toast-context";
 import { SubscriptionCard } from "@/components/shared/subscription-card";
 import { Loader2, CheckCircle, ArrowUpCircle, ChevronDown, Star } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface Plan {
   id: number;
@@ -115,19 +116,50 @@ export default function TokenPlanPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Global styles for animations */}
+      <style jsx global>{`
+        @keyframes shimmer-slide {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+        .shimmer-skeleton {
+          position: relative;
+          overflow: hidden;
+        }
+        .shimmer-skeleton::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+          animation: shimmer-slide 2s infinite;
+          pointer-events: none;
+        }
+        @keyframes animate-fadeIn {
+          from { opacity: 0; transform: translateY(16px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+          animation: animate-fadeIn 0.5s ease-out both;
+        }
+        @keyframes hero-float {
+          0%, 100% { transform: translateY(0) scale(1); }
+          50% { transform: translateY(-20px) scale(1.05); }
+        }
+      `}</style>
+
       {/* Header — Enhanced Hero */}
       <section className="relative overflow-hidden border-b border-border">
         {/* Decorative orbs */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
-          <div className="absolute -bottom-32 -left-32 w-80 h-80 bg-purple-500/5 rounded-full blur-3xl" />
-          <div className="absolute top-1/2 left-1/3 w-48 h-48 bg-emerald-500/5 rounded-full blur-3xl" />
+          <div className="absolute -top-24 -right-24 w-72 h-72 bg-primary/8 rounded-full blur-3xl animate-[hero-float_8s_ease-in-out_infinite]" />
+          <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-purple-500/6 rounded-full blur-3xl animate-[hero-float_10s_ease-in-out_infinite_1s]" />
+          <div className="absolute top-1/3 left-1/2 w-48 h-48 bg-emerald-500/8 rounded-full blur-3xl animate-[hero-float_7s_ease-in-out_infinite_0.5s]" />
         </div>
-        <div className="relative mx-auto max-w-6xl px-4 py-12 lg:py-16 text-center">
-          <h1 className="text-3xl lg:text-4xl font-bold gradient-text mb-3 animate-fadeIn">
-            {lang === "zh" ? "选择你的 Token Plan" : "Choose your Token Plan"}
+        <div className="relative mx-auto max-w-6xl px-4 py-14 lg:py-20 text-center">
+          <h1 className="text-4xl lg:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-foreground via-foreground to-muted-foreground mb-3">
+            {lang === "zh" ? "选择你的 Token Plan" : "Choose Your Token Plan"}
           </h1>
-          <p className="text-sm text-muted-foreground mb-8 max-w-md mx-auto animate-fadeIn">
+          <p className="text-sm text-muted-foreground mb-8 max-w-md mx-auto">
             {lang === "zh" ? "根据你的使用需求，选择最适合的套餐方案" : "Select the best plan for your usage needs"}
           </p>
 
@@ -156,15 +188,33 @@ export default function TokenPlanPage() {
       <section className="mx-auto max-w-6xl px-4 py-10">
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[1, 2, 3, 4].map((i) => <div key={i} className="h-[420px] bg-muted rounded-xl animate-pulse" />)}
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="shimmer-skeleton rounded-xl bg-card/40 border border-border/30">
+                <div className="p-5 space-y-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-9 h-9 rounded-lg bg-muted" />
+                    <div className="space-y-1.5 flex-1">
+                      <div className="h-3.5 bg-muted rounded w-20" />
+                      <div className="h-2.5 bg-muted rounded w-14" />
+                    </div>
+                  </div>
+                  <div className="h-10 bg-muted rounded w-32" />
+                  <div className="h-3 bg-muted rounded w-24" />
+                  <div className="space-y-2">
+                    {[1,2,3,4].map(j => <div key={j} className="h-3 bg-muted rounded" />)}
+                  </div>
+                  <div className="h-10 bg-muted rounded-lg mt-4" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {plans.map((plan) => {
+            {plans.map((plan, i) => {
               const action = getPlanAction(plan);
               return (
+                <div key={plan.id} className="animate-fadeIn" style={{ animationDelay: `${i * 100}ms` }}>
                 <SubscriptionCard
-                  key={plan.id}
                   plan={plan}
                   lang={lang}
                   variant="select"
@@ -173,8 +223,15 @@ export default function TokenPlanPage() {
                   exchangeRate={exchangeRate}
                 >
                   <Button
-                    className="w-full"
-                    variant={action.type === "current" ? "outline" : action.type === "upgrade" ? "default" : "default"}
+                    className={cn(
+                      "w-full",
+                      action.type === "current" && "border-2 border-foreground/30 font-semibold",
+                    )}
+                    variant={action.type === "current" ? "outline" : "default"}
+                    style={action.type !== "current" ? {
+                      background: `linear-gradient(135deg, var(--plan-${plan.name}-from), var(--plan-${plan.name}-to))`,
+                      color: "#fff",
+                    } : {}}
                     onClick={(e) => { e.stopPropagation(); handleSubscribe(plan.id); }}
                     disabled={subscribing === plan.id || action.disabled}
                   >
@@ -189,6 +246,7 @@ export default function TokenPlanPage() {
                     )}
                   </Button>
                 </SubscriptionCard>
+                </div>
               );
             })}
           </div>
@@ -304,7 +362,7 @@ export default function TokenPlanPage() {
               { q: "How does first purchase discount work?", a: "Your first subscription automatically gets 23% off. No promo code needed. First billing cycle only." },
               { q: "What is Overage Rate Multiplier?", a: "When plan credits are exhausted, the system deducts from your balance at the plan's overage rate multiplier. Higher tier plans have lower multipliers." },
             ]).map((item, i) => (
-              <details key={i} className="group rounded-lg border border-border bg-card transition-colors hover:border-muted-foreground/30 [&[open]]:border-primary/30">
+              <details key={i} className="group rounded-xl border border-border/40 bg-card/60 backdrop-blur-sm transition-all hover:border-muted-foreground/30 hover:shadow-sm [&[open]]:border-primary/30 [&[open]]:shadow-md">
                 <summary className="flex items-center justify-between p-4 cursor-pointer text-sm font-medium text-foreground list-none">
                   {item.q}
                   <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0 transition-transform group-open:rotate-180" />

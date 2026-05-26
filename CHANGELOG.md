@@ -81,6 +81,14 @@ All notable changes to this project will be documented in this file.
 - **UI** — Removed redundant cache hit rate line from monthly tokens breakdown card
 - **UI** — Model grid changed from 3-column to 4-column layout for more compact cards
 - **UI** — Glass card visual enhancement with improved backdrop-blur and spotlight effects
+- **UI** — Redesigned Token Plan page: hero section with gradient title and animated floating orbs
+- **UI** — Shimmer skeleton loading with 45° sweep glow effect (replaces plain pulse)
+- **UI** — Staggered card entry animation with cascading fade-in per card
+- **UI** — FAQ accordion upgraded to glass card style with backdrop-blur and hover effects
+- **UI** — Every plan card now has a theme-colored breathing glow border using box-shadow spread technique, perfectly matching rounded corners
+- **UI** — Popular plan card: faster 3s breathing cycle, stronger glow, elevated position
+- **UI** — Monthly credits number uses plan theme accent color with "credits" label
+- **UI** — Subscribe button uses plan theme gradient (from/to colors); current-plan button has prominent border
 
 ## [v3.3.4.18] — 2026-05-22
 

@@ -2,6 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Diamond, Sparkles, Zap, Star } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface PlanData {
   id: number;
@@ -137,18 +138,42 @@ export function SubscriptionCard({
     );
   }
 
-  // Select variant - full card with features
+  // breathing参数 — 值越高越明显
+  const breathDur = isPopular ? "3s" : "5s";
+  const glowMid = isPopular ? "50%" : "30%";
+  const glowPeak = isPopular ? "75%" : "50%";
+
+  // "边框"用 box-shadow spread 实现(0 0 0 1px)，不占盒模型，圆角无偏移，不透明
+  // "呼吸光晕"用 blur shadow (0 0 Npx color)
   return (
+    <>
     <div
-      className={`relative rounded-xl transition-all duration-300 cursor-pointer ${
-        selected ? "ring-2 ring-primary shadow-lg" : "ring-1 ring-border hover:ring-muted-foreground/30"
-      } ${isPopular ? "shadow-lg" : ""} hover:scale-[1.02] hover:shadow-xl`}
+      className={cn(
+        "relative rounded-xl cursor-pointer transition-all duration-300 hover:scale-[1.02]",
+        selected ? "ring-2 ring-primary" : "",
+        isPopular && "scale-[1.02] -translate-y-2 z-10 shadow-xl hover:scale-[1.04]",
+      )}
+      style={{
+        animation: `breath-${plan.name} ${breathDur} ease-in-out infinite`,
+      }}
       onClick={onSelect}
     >
+      <style>{`
+        @keyframes breath-${plan.name} {
+          0%, 100% {
+            box-shadow: 0 0 0 1px var(--plan-${plan.name}-from),
+                        0 0 10px color-mix(in srgb, var(--plan-${plan.name}-from) ${glowMid}, transparent);
+          }
+          50% {
+            box-shadow: 0 0 0 1px var(--plan-${plan.name}-from),
+                        0 0 24px color-mix(in srgb, var(--plan-${plan.name}-from) ${glowPeak}, transparent);
+          }
+        }
+      `}</style>
       {/* Popular badge */}
       {isPopular && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
-          <Badge className={`${theme.gradientClass} text-white border-0 px-4 py-1 text-[11px] font-bold shadow-lg`}>
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20">
+          <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0 px-4 py-1 text-[11px] font-bold shadow-lg shadow-orange-500/25">
             <Star className="h-3 w-3 mr-1 fill-current" />
             {lang === "zh" ? "最受欢迎" : "Most Popular"}
           </Badge>
@@ -195,11 +220,14 @@ export function SubscriptionCard({
       </div>
 
       {/* Card body */}
-      <div className="p-5 bg-card rounded-b-xl">
+      <div className="px-5 pt-3 pb-5 bg-card rounded-b-xl">
         {/* Credits */}
-        <div className="flex items-center justify-between mb-4 pb-3 border-b border-border/50">
+        <div className="flex items-baseline justify-between mb-2 pb-1.5 border-b border-border/50">
           <span className="text-sm text-muted-foreground">{lang === "zh" ? "每月额度" : "Monthly Credits"}</span>
-          <span className="text-base font-bold text-foreground">{plan.monthly_credits.toLocaleString()}</span>
+          <div className="text-right">
+            <span className={`text-base font-bold ${theme.accent}`}>{plan.monthly_credits.toLocaleString()}</span>
+            <div className="text-[10px] text-muted-foreground leading-tight text-right">credits</div>
+          </div>
         </div>
 
         {/* Features */}
@@ -232,5 +260,6 @@ export function SubscriptionCard({
         {children && <div className="mt-5">{children}</div>}
       </div>
     </div>
+    </>
   );
 }
