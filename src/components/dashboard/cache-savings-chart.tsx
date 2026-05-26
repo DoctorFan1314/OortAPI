@@ -73,7 +73,7 @@ export function CacheSavingsChart(props: CacheSavingsProps) {
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-semibold flex items-center gap-2">
           <Coins className="h-4 w-4 text-emerald-400" />
-          {lang === "zh" ? "缓存 ROI" : "Cache ROI"}
+          {lang === "zh" ? "本月缓存 ROI" : "MTD Cache ROI"}
         </CardTitle>
       </CardHeader>
       <CardContent>

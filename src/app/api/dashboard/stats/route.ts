@@ -29,10 +29,6 @@ export async function GET(request: NextRequest) {
     // Active API keys count
     const activeKeys = db.prepare('SELECT COUNT(*) as count FROM api_keys WHERE user_id = ? AND enabled = 1').get(userId) as { count: number };
 
-    // This month's stats
-    const monthStart = new Date();
-    monthStart.setDate(1);
-    monthStart.setHours(0, 0, 0, 0);
     const monthStats = db.prepare(`
       SELECT
         COUNT(*) as total_calls,
@@ -43,8 +39,8 @@ export async function GET(request: NextRequest) {
         SUM(tokens_cache_creation) as tokens_cache_creation,
         SUM(tokens_out) as tokens_out
       FROM usage_logs
-      WHERE user_id = ? AND created_at >= ?
-    `).get(userId, monthStart.toISOString()) as Record<string, number | null>;
+      WHERE user_id = ? AND created_at >= DATE('now', 'start of month')
+    `).get(userId) as Record<string, number | null>;
 
     // Yesterday's stats (for comparison)
     const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
@@ -104,8 +100,8 @@ export async function GET(request: NextRequest) {
           ELSE 0
         END as cache_hit_pct
       FROM usage_logs ul
-      WHERE ul.user_id = ? AND ul.created_at >= ?
-    `).get(userId, monthStart.toISOString()) as { tokens_saved: number | null; total_input_tokens: number | null; cache_hit_pct: number };
+      WHERE ul.user_id = ? AND ul.created_at >= DATE('now', 'start of month')
+    `).get(userId) as { tokens_saved: number | null; total_input_tokens: number | null; cache_hit_pct: number };
 
     const costSavedData = db.prepare(`
       SELECT
@@ -113,8 +109,8 @@ export async function GET(request: NextRequest) {
         COALESCE(SUM(ul.tokens_in * COALESCE(mr.input_rate, 0) / 1000000), 0) as cost_without_cache
       FROM usage_logs ul
       LEFT JOIN model_rates mr ON ul.model = mr.model_name
-      WHERE ul.user_id = ? AND ul.created_at >= ? AND ul.success = 1
-    `).get(userId, monthStart.toISOString()) as { cost_saved: number; cost_without_cache: number };
+      WHERE ul.user_id = ? AND ul.created_at >= DATE('now', 'start of month') AND ul.success = 1
+    `).get(userId) as { cost_saved: number; cost_without_cache: number };
 
     const cacheSavings = {
       tokens_saved: cacheData.tokens_saved || 0,

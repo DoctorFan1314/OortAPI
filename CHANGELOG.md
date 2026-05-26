@@ -74,6 +74,13 @@ All notable changes to this project will be documented in this file.
 - **Security** — Change-password min length raised from 6 to 8
 - **Bug fix** — Dashboard breadcrumbs display correctly (threshold `> 0`)
 - **Bug fix** — Usage "Clear filters" button now works (`setFilterApplied` was never called)
+- **Bug fix** — Analytics summary stats (total calls/tokens/cost) now respect 7/14/30 day selector instead of always showing all-time totals
+- **Bug fix** — Analytics pie chart, cost trend, model latency, error rate, cache rate, and latency trend all consistently respect the time range selector (7/14/30/按天/按小时)
+- **Bug fix** — Cache savings queries use `DATE('now', 'start of month')` to avoid timezone/format mismatch with SQLite timestamps
+- **UI** — Cache ROI card renamed to "MTD Cache ROI" with month-scoped data clarity
+- **UI** — Removed redundant cache hit rate line from monthly tokens breakdown card
+- **UI** — Model grid changed from 3-column to 4-column layout for more compact cards
+- **UI** — Glass card visual enhancement with improved backdrop-blur and spotlight effects
 
 ## [v3.3.4.18] — 2026-05-22
 
