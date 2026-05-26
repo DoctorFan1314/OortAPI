@@ -450,10 +450,7 @@ export default function TokenPlanPage() {
               <Link key={name} href={`/docs/ai-tools/${slug}`}
                 className="flex flex-col items-center justify-center gap-2 rounded-xl border border-border/60 bg-card/70 backdrop-blur-sm px-4 py-5 shadow-md text-sm font-medium text-foreground/80 transition-all hover:border-primary/40 hover:bg-card hover:shadow-lg hover:scale-[1.03]"
               >
-                {/* Logo placeholder — replace img tag below when logo is available */}
-                <div className="h-10 w-10 rounded-xl bg-muted/60 flex items-center justify-center text-xs font-bold text-muted-foreground/40 border border-border/20">
-                  {name.charAt(0)}
-                </div>
+                <img src={`/logos/${slug}.svg`} alt={name} className="h-10 w-10 rounded-xl" />
                 <span>{name}</span>
               </Link>
             ))}
