@@ -17,6 +17,7 @@ export async function GET(request: NextRequest) {
 
     const daysBack = range === '30d' ? 30 : range === '14d' ? 14 : 7;
     const dateFilter = `-${daysBack} days`;
+    const timeFilterValue = groupBy === 'hour' ? '-24 hours' : dateFilter;
 
     // Model consumption by day (for stacked bar chart)
     const modelByDay = db.prepare(`
@@ -61,9 +62,9 @@ export async function GET(request: NextRequest) {
         AVG(CASE WHEN latency_ms > 0 THEN latency_ms END) as avg_latency,
         ROUND(CAST(SUM(CASE WHEN success = 0 THEN 1 ELSE 0 END) AS FLOAT) / MAX(COUNT(*), 1) * 100, 1) as error_rate
       FROM usage_logs
-      WHERE user_id = ? AND created_at >= DATE('now', ?)
+      WHERE user_id = ? AND created_at >= datetime('now', ?)
       GROUP BY model ORDER BY avg_latency DESC
-    `).all(userId, dateFilter) as Array<{ model: string; avg_latency: number | null; error_rate: number }>;
+    `).all(userId, timeFilterValue) as Array<{ model: string; avg_latency: number | null; error_rate: number }>;
 
     // Call distribution by model (for pie chart)
     const modelDistribution = db.prepare(`
@@ -76,10 +77,10 @@ export async function GET(request: NextRequest) {
         SUM(tokens_in_cache) as tokens_in_cache,
         SUM(tokens_out) as tokens_out
       FROM usage_logs
-      WHERE user_id = ? AND created_at >= DATE('now', ?)
+      WHERE user_id = ? AND created_at >= datetime('now', ?)
       GROUP BY model
       ORDER BY calls DESC
-    `).all(userId, dateFilter) as Array<{ model: string; calls: number; cost: number; tokens: number; tokens_in_noncached: number; tokens_in_cache: number; tokens_out: number }>;
+    `).all(userId, timeFilterValue) as Array<{ model: string; calls: number; cost: number; tokens: number; tokens_in_noncached: number; tokens_in_cache: number; tokens_out: number }>;
 
     // Daily trend (for line chart)
     const dailyTrend = db.prepare(`
@@ -105,10 +106,10 @@ export async function GET(request: NextRequest) {
         ROUND(AVG(ttft_ms), 1) as avg_ttft,
         ROUND(AVG(itl_ms), 1) as avg_itl
       FROM usage_logs
-      WHERE user_id = ? AND created_at >= DATE('now', ?) AND ttft_ms > 0
+      WHERE user_id = ? AND created_at >= datetime('now', ?) AND ttft_ms > 0
       GROUP BY DATE(created_at)
       ORDER BY date ASC
-    `).all(userId, dateFilter) as Array<{ date: string; avg_ttft: number; avg_itl: number }>;
+    `).all(userId, timeFilterValue) as Array<{ date: string; avg_ttft: number; avg_itl: number }>;
 
     // RPM & TPM (requests per minute, tokens per minute) — last hour
     const lastHourStats = db.prepare(`
@@ -126,8 +127,8 @@ export async function GET(request: NextRequest) {
         SUM(tokens_in - tokens_in_cache) as total_non_cached,
         CASE WHEN SUM(tokens_in) > 0 THEN ROUND(CAST(SUM(tokens_in_cache) AS FLOAT) / SUM(tokens_in) * 100, 1) ELSE 0 END as cache_hit_rate
       FROM usage_logs
-      WHERE user_id = ? AND created_at >= DATE('now', ?)
-    `).get(userId, dateFilter) as { total_cache_hits: number; total_non_cached: number; cache_hit_rate: number };
+      WHERE user_id = ? AND created_at >= datetime('now', ?)
+    `).get(userId, timeFilterValue) as { total_cache_hits: number; total_non_cached: number; cache_hit_rate: number };
 
     // Previous period comparison
     const prevDateFilter = `-${daysBack * 2} days`;
@@ -147,8 +148,8 @@ export async function GET(request: NextRequest) {
         SUM(tokens_in_cache) as tokens_in_cache,
         SUM(tokens_out) as tokens_out
       FROM usage_logs
-      WHERE user_id = ? AND created_at >= DATE('now', ?)
-    `).get(userId, dateFilter) as { total_calls: number; total_cost: number; total_tokens: number; tokens_in_noncached: number; tokens_in_cache: number; tokens_out: number };
+      WHERE user_id = ? AND created_at >= datetime('now', ?)
+    `).get(userId, timeFilterValue) as { total_calls: number; total_cost: number; total_tokens: number; tokens_in_noncached: number; tokens_in_cache: number; tokens_out: number };
 
     return NextResponse.json({
       model_by_day: modelByDay,
