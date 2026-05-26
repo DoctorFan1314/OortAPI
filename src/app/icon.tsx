@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import fs from "fs";
 import path from "path";
 
-export const size = { width: 128, height: 128 };
+export const size = { width: 64, height: 64 };
 export const contentType = "image/png";
 
 export default function Icon() {
@@ -12,9 +12,9 @@ export default function Icon() {
   return new ImageResponse(
     (
       <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", background: "transparent" }}>
-        <img src={`data:image/svg+xml;base64,${b64}`} width={128} height={128} />
+        <img src={`data:image/svg+xml;base64,${b64}`} width={64} height={64} />
       </div>
     ),
-    { width: 128, height: 128 }
+    { width: 64, height: 64 }
   );
 }
