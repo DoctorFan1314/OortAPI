@@ -7,7 +7,7 @@ import { useI18n } from "@/contexts/i18n-context";
 import { useAuth } from "@/contexts/auth-context";
 import { useToast } from "@/contexts/toast-context";
 import { SubscriptionCard } from "@/components/shared/subscription-card";
-import { Loader2, CheckCircle, ArrowUpCircle, ChevronDown, Star } from "lucide-react";
+import { Loader2, CheckCircle, ArrowUpCircle, ChevronDown, Star, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Plan {
@@ -145,6 +145,31 @@ export default function TokenPlanPage() {
           0%, 100% { transform: translateY(0) scale(1); }
           50% { transform: translateY(-20px) scale(1.05); }
         }
+        @keyframes banner-pulse {
+          0%, 100% { opacity: 0.7; }
+          50% { opacity: 1; }
+        }
+        @keyframes faq-expand {
+          from { opacity: 0; max-height: 0; }
+          to { opacity: 1; max-height: 300px; }
+        }
+        .faq-content {
+          overflow: hidden;
+          transition: max-height 0.3s ease, opacity 0.3s ease;
+          max-height: 0;
+          opacity: 0;
+        }
+        details[open] .faq-content {
+          max-height: 300px;
+          opacity: 1;
+        }
+        .hover-col:hover {
+          background: rgba(128,128,128,0.04);
+        }
+        @keyframes slide-indicator {
+          from { left: var(--from-x); }
+          to { left: var(--to-x); }
+        }
       `}</style>
 
       {/* Header — Enhanced Hero */}
@@ -159,26 +184,37 @@ export default function TokenPlanPage() {
           <h1 className="text-4xl lg:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-foreground via-foreground to-muted-foreground mb-3">
             {lang === "zh" ? "选择你的 Token Plan" : "Choose Your Token Plan"}
           </h1>
-          <p className="text-sm text-muted-foreground mb-8 max-w-md mx-auto">
-            {lang === "zh" ? "根据你的使用需求，选择最适合的套餐方案" : "Select the best plan for your usage needs"}
+          <p className="text-sm text-muted-foreground mb-8 max-w-md mx-auto transition-all">
+            {billingCycle === "monthly"
+              ? (lang === "zh" ? "按月订阅，灵活自由" : "Monthly, cancel anytime")
+              : (lang === "zh" ? "年度优选，立省 12%" : "Yearly plan, save 12%")}
           </p>
 
           <div className="flex flex-col items-center gap-3">
-            {/* Billing cycle toggle */}
-            <div className="inline-flex items-center gap-1 p-1 bg-muted rounded-full hero-animate-1">
-              <button onClick={() => setBillingCycle("monthly")} className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${billingCycle === "monthly" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>
+            {/* Billing cycle toggle with sliding indicator */}
+            <div className="relative inline-flex items-center gap-1 p-1 bg-muted rounded-full">
+              <div
+                className="absolute top-1 bottom-1 w-[calc(50%-2px)] rounded-full bg-background shadow-sm transition-transform duration-300 ease-out"
+                style={{ transform: `translateX(${billingCycle === "yearly" ? "100%" : "0%"})` }}
+              />
+              <button onClick={() => setBillingCycle("monthly")} className={`relative px-5 py-2 rounded-full text-sm font-medium transition-colors z-10 ${billingCycle === "monthly" ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
                 {lang === "zh" ? "连续包月" : "Monthly"}
               </button>
-              <button onClick={() => setBillingCycle("yearly")} className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${billingCycle === "yearly" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>
+              <button onClick={() => setBillingCycle("yearly")} className={`relative px-5 py-2 rounded-full text-sm font-medium transition-colors z-10 ${billingCycle === "yearly" ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
                 {lang === "zh" ? "连续包年" : "Yearly"}
-                <span className="ml-1.5 text-xs text-amber-400 font-semibold">{lang === "zh" ? "省12%" : "Save 12%"}</span>
               </button>
             </div>
 
             {/* Currency toggle */}
-            <div className="inline-flex items-center gap-1 p-1 bg-muted rounded-full hero-animate-2">
+            <div className="inline-flex items-center gap-1 p-1 bg-muted rounded-full">
               <button onClick={() => setDisplayCurrency("USD")} className={`px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer ${displayCurrency === "USD" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}>$ USD</button>
               <button onClick={() => setDisplayCurrency("CNY")} className={`px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer ${displayCurrency === "CNY" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}>¥ CNY</button>
+            </div>
+
+            {/* First purchase banner with subtle pulse */}
+            <div className="inline-flex items-center gap-1.5 text-xs text-muted-foreground bg-muted/30 rounded-full px-4 py-1.5 animate-[banner-pulse_3s_ease-in-out_infinite]">
+              <Sparkles className="h-3 w-3 text-amber-400" />
+              {lang === "zh" ? "首购特惠：首个订阅周期享 7 折" : "First purchase: 30% off first billing cycle"}
             </div>
           </div>
         </div>
@@ -194,14 +230,17 @@ export default function TokenPlanPage() {
                   <div className="flex items-center gap-2">
                     <div className="w-9 h-9 rounded-lg bg-muted" />
                     <div className="space-y-1.5 flex-1">
-                      <div className="h-3.5 bg-muted rounded w-20" />
-                      <div className="h-2.5 bg-muted rounded w-14" />
+                      <div className="h-3.5 bg-muted rounded w-3/5" />
+                      <div className="h-2.5 bg-muted rounded w-2/5" />
                     </div>
                   </div>
-                  <div className="h-10 bg-muted rounded w-32" />
-                  <div className="h-3 bg-muted rounded w-24" />
+                  <div className="h-10 bg-muted rounded w-2/5" />
+                  <div className="h-3 bg-muted rounded w-3/5" />
                   <div className="space-y-2">
-                    {[1,2,3,4].map(j => <div key={j} className="h-3 bg-muted rounded" />)}
+                    <div className="h-3 bg-muted rounded w-full" />
+                    <div className="h-3 bg-muted rounded w-4/5" />
+                    <div className="h-3 bg-muted rounded w-3/5" />
+                    <div className="h-3 bg-muted rounded w-1/2" />
                   </div>
                   <div className="h-10 bg-muted rounded-lg mt-4" />
                 </div>
@@ -260,12 +299,16 @@ export default function TokenPlanPage() {
             <h2 className="text-lg font-semibold text-foreground text-center mb-6">
               {lang === "zh" ? "套餐对比" : "Compare Plans"}
             </h2>
-            <div className="overflow-x-auto rounded-xl border border-border">
+            <div className="overflow-x-auto rounded-xl border border-border/40 bg-card/50 backdrop-blur-sm">
               <table className="w-full text-sm">
+                <colgroup>
+                  <col className="w-44" />
+                  {plans.map((p) => <col key={p.id} className="hover-col" />)}
+                </colgroup>
                 <thead>
-                  <tr>
-                    <th className="text-left p-3.5 bg-muted/50 text-muted-foreground font-medium whitespace-nowrap">
-                      {lang === "zh" ? "功能" : "Feature"}
+                  <tr className="sticky top-16 bg-background/95 backdrop-blur-md z-10">
+                    <th className="text-left p-3.5 text-muted-foreground font-medium whitespace-nowrap">
+                      {lang === "zh" ? "功能特性" : "Feature"}
                     </th>
                     {plans.map((plan) => {
                       const thClass = `gradient-${plan.name}`;
@@ -280,47 +323,43 @@ export default function TokenPlanPage() {
                     })}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border/50 bg-card">
-                  <tr className="transition-colors hover:bg-muted/30">
+                <tbody className="divide-y divide-border/10">
+                  <tr className="transition-colors hover:bg-muted/10">
                     <td className="p-3.5 text-muted-foreground whitespace-nowrap font-medium">{lang === "zh" ? "每月 Credits" : "Monthly Credits"}</td>
                     {plans.map((p) => <td key={p.id} className="p-3.5 text-center whitespace-nowrap font-mono font-semibold">{p.monthly_credits.toLocaleString()}</td>)}
                   </tr>
-                  <tr className="transition-colors hover:bg-muted/30">
+                  <tr className="transition-colors hover:bg-muted/10">
                     <td className="p-3.5 text-muted-foreground whitespace-nowrap font-medium">{lang === "zh" ? "最大并发" : "Max Concurrency"}</td>
                     {plans.map((p) => <td key={p.id} className="p-3.5 text-center whitespace-nowrap">{p.max_concurrency}</td>)}
                   </tr>
-                  <tr className="transition-colors hover:bg-muted/30">
+                  <tr className="transition-colors hover:bg-muted/10">
                     <td className="p-3.5 text-muted-foreground whitespace-nowrap font-medium">{lang === "zh" ? "路由优先级" : "Route Priority"}</td>
                     {plans.map((p) => <td key={p.id} className="p-3.5 text-center whitespace-nowrap capitalize">{p.route_priority}</td>)}
                   </tr>
-                  <tr className="transition-colors hover:bg-muted/30">
+                  <tr className="transition-colors hover:bg-muted/10">
                     <td className="p-3.5 text-muted-foreground whitespace-nowrap font-medium">{lang === "zh" ? "支持等级" : "Support Level"}</td>
                     {plans.map((p) => <td key={p.id} className="p-3.5 text-center whitespace-nowrap">{p.support_level === "dedicated" ? (lang === "zh" ? "专属客服" : "Dedicated") : p.support_level === "priority" ? (lang === "zh" ? "优先" : "Priority") : p.support_level === "email" ? (lang === "zh" ? "邮件" : "Email") : (lang === "zh" ? "社区" : "Community")}</td>)}
                   </tr>
-                  <tr className="transition-colors hover:bg-muted/30">
+                  <tr className="transition-colors hover:bg-muted/10">
                     <td className="p-3.5 text-muted-foreground whitespace-nowrap font-medium">{lang === "zh" ? "非高峰折扣" : "Off-Peak Discount"}</td>
                     {plans.map((p) => <td key={p.id} className="p-3.5 text-center whitespace-nowrap">{(p.off_peak_discount * 100).toFixed(0)}%</td>)}
                   </tr>
-                  <tr className="transition-colors hover:bg-muted/30 border-t-2 border-border/30">
+                  <tr className="transition-colors hover:bg-muted/10 border-t-2 border-border/20">
                     <td className="p-3.5 text-muted-foreground whitespace-nowrap font-medium">{lang === "zh" ? "月付价格" : "Monthly Price"}</td>
                     {plans.map((p) => {
                       const needsConversion = displayCurrency !== p.currency;
-                      const price = needsConversion && displayCurrency === "CNY" ? p.monthly_price * exchangeRate
-                                  : needsConversion && displayCurrency === "USD" ? p.monthly_price / exchangeRate
-                                  : p.monthly_price;
+                      const price = needsConversion && displayCurrency === "CNY" ? p.monthly_price * exchangeRate : needsConversion && displayCurrency === "USD" ? p.monthly_price / exchangeRate : p.monthly_price;
                       const sym = displayCurrency === "CNY" ? "¥" : "$";
-                      return <td key={p.id} className="p-3.5 text-center whitespace-nowrap font-mono font-bold">{sym}{price.toFixed(2)}</td>;
+                      return <td key={p.id} className="p-3.5 text-center whitespace-nowrap font-mono" style={{ color: `var(--plan-${p.name}-from)` }}><span className="font-bold">{sym}{price.toFixed(2)}</span></td>;
                     })}
                   </tr>
-                  <tr className="transition-colors hover:bg-muted/30">
+                  <tr className="transition-colors hover:bg-muted/10">
                     <td className="p-3.5 text-muted-foreground whitespace-nowrap font-medium">{lang === "zh" ? "年付价格" : "Yearly Price"}</td>
                     {plans.map((p) => {
                       const needsConversion = displayCurrency !== p.currency;
-                      const price = needsConversion && displayCurrency === "CNY" ? p.yearly_price * exchangeRate
-                                  : needsConversion && displayCurrency === "USD" ? p.yearly_price / exchangeRate
-                                  : p.yearly_price;
+                      const price = needsConversion && displayCurrency === "CNY" ? p.yearly_price * exchangeRate : needsConversion && displayCurrency === "USD" ? p.yearly_price / exchangeRate : p.yearly_price;
                       const sym = displayCurrency === "CNY" ? "¥" : "$";
-                      return <td key={p.id} className="p-3.5 text-center whitespace-nowrap font-mono font-bold text-primary">{sym}{price.toFixed(2)}</td>;
+                      return <td key={p.id} className="p-3.5 text-center whitespace-nowrap font-mono" style={{ color: `var(--plan-${p.name}-from)` }}><span className="font-bold">{sym}{price.toFixed(2)}</span></td>;
                     })}
                   </tr>
                 </tbody>
@@ -330,17 +369,31 @@ export default function TokenPlanPage() {
         </section>
       )}
 
-      {/* Tools */}
-      <section className="border-t border-border bg-muted/30">
-        <div className="mx-auto max-w-6xl px-4 py-8 text-center">
-          <h2 className="text-sm font-semibold text-foreground mb-3">
+      {/* Tools — Card-style blocks */}
+      <section className="border-t border-border bg-muted/20">
+        <div className="mx-auto max-w-6xl px-4 py-10 text-center">
+          <h2 className="text-sm font-semibold text-foreground mb-4">
             {lang === "zh" ? "兼容主流编程工具" : "Compatible with Popular Coding Tools"}
           </h2>
-          <div className="flex flex-wrap justify-center gap-2">
-            {["VS Code", "Cursor", "JetBrains", "Continue", "Cline", "OpenAI SDK", "LangChain"].map((t) => (
-              <span key={t} className="px-3 py-1 rounded-md border border-border bg-card text-xs text-muted-foreground">{t}</span>
+          <div className="flex flex-wrap justify-center gap-3">
+            {[
+              { name: "VS Code", icon: "🔧" },
+              { name: "Cursor", icon: "✏️" },
+              { name: "JetBrains", icon: "🧩" },
+              { name: "Continue", icon: "🔌" },
+              { name: "Cline", icon: "💻" },
+              { name: "OpenAI SDK", icon: "🤖" },
+              { name: "LangChain", icon: "⛓️" },
+            ].map((t) => (
+              <span key={t.name} className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-border/40 bg-card/60 backdrop-blur-sm text-xs text-muted-foreground transition-all hover:border-border hover:bg-card hover:scale-105 hover:shadow-sm cursor-default">
+                <span className="text-[11px]">{t.icon}</span>
+                {t.name}
+              </span>
             ))}
           </div>
+          <p className="text-[11px] text-muted-foreground/60 mt-4">
+            {lang === "zh" ? "统一 API 端点，一行配置即可接入" : "Unified API endpoint, one-line config"}
+          </p>
         </div>
       </section>
 
@@ -365,10 +418,12 @@ export default function TokenPlanPage() {
               <details key={i} className="group rounded-xl border border-border/40 bg-card/60 backdrop-blur-sm transition-all hover:border-muted-foreground/30 hover:shadow-sm [&[open]]:border-primary/30 [&[open]]:shadow-md">
                 <summary className="flex items-center justify-between p-4 cursor-pointer text-sm font-medium text-foreground list-none">
                   {item.q}
-                  <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0 transition-transform group-open:rotate-180" />
+                  <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0 transition-transform duration-300 group-open:rotate-180" />
                 </summary>
-                <div className="px-4 pb-4">
-                  <p className="text-xs text-muted-foreground leading-relaxed">{item.a}</p>
+                <div className="faq-content">
+                  <div className="px-4 pb-4">
+                    <p className="text-xs text-muted-foreground leading-relaxed">{item.a}</p>
+                  </div>
                 </div>
               </details>
             ))}

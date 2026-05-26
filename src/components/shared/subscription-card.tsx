@@ -209,11 +209,16 @@ export function SubscriptionCard({
             <span className="text-3xl font-extrabold text-white">{sym}{displayPrice.toFixed(2)}</span>
             <span className="text-sm text-white/70">{priceLabel}</span>
           </div>
-          {billingCycle === "monthly" && (
+          {billingCycle === "yearly" ? (
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-[11px] text-white/40 line-through">{sym}{convert(plan.monthly_price * 12).toFixed(2)}</span>
+              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold text-white bg-white/15">{lang === "zh" ? `省 ${sym}${(convert(plan.monthly_price * 12) - convert(plan.yearly_price)).toFixed(2)}` : `Save ${sym}${(convert(plan.monthly_price * 12) - convert(plan.yearly_price)).toFixed(2)}`}</span>
+            </div>
+          ) : (
             <p className="text-[11px] text-white/50 mt-1">
               {lang === "zh"
-                ? `年付 ${sym}${convert(plan.yearly_price).toFixed(2)}/年 · 省 ${yearlySavings}%`
-                : `Yearly ${sym}${convert(plan.yearly_price).toFixed(2)}/yr · Save ${yearlySavings}%`}
+                ? `年付 ${sym}${convert(plan.yearly_price).toFixed(2)}/年 · 省 ${sym}${(convert(plan.monthly_price * 12) - convert(plan.yearly_price)).toFixed(2)}`
+                : `Yearly ${sym}${convert(plan.yearly_price).toFixed(2)}/yr · Save ${sym}${(convert(plan.monthly_price * 12) - convert(plan.yearly_price)).toFixed(2)}`}
             </p>
           )}
         </div>
@@ -222,7 +227,7 @@ export function SubscriptionCard({
       {/* Card body */}
       <div className="px-5 pt-3 pb-5 bg-card rounded-b-xl">
         {/* Credits */}
-        <div className="flex items-baseline justify-between mb-2 pb-1.5 border-b border-border/50">
+        <div className="flex items-baseline justify-between mb-2 pb-1.5 border-b border-border/20">
           <span className="text-sm text-muted-foreground">{lang === "zh" ? "每月额度" : "Monthly Credits"}</span>
           <div className="text-right">
             <span className={`text-base font-bold ${theme.accent}`}>{plan.monthly_credits.toLocaleString()}</span>
