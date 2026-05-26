@@ -94,10 +94,10 @@ export async function GET(request: NextRequest) {
         SUM(tokens_in_cache) as tokens_in_cache,
         SUM(tokens_out) as tokens_out
       FROM usage_logs
-      WHERE user_id = ? AND created_at >= DATE('now', ?)
+      WHERE user_id = ? AND created_at >= datetime('now', ?)
       GROUP BY DATE(created_at)
       ORDER BY date ASC
-    `).all(userId, dateFilter) as Array<{ date: string; calls: number; cost: number; tokens: number; avg_latency: number | null; tokens_in_noncached: number; tokens_in_cache: number; tokens_out: number }>;
+    `).all(userId, timeFilterValue) as Array<{ date: string; calls: number; cost: number; tokens: number; avg_latency: number | null; tokens_in_noncached: number; tokens_in_cache: number; tokens_out: number }>;
 
     // TTFT & ITL latency trend (Feature 7)
     const latencyTrend = db.prepare(`
