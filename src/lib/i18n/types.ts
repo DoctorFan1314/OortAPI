@@ -480,6 +480,16 @@ export interface Dictionary {
     navPricing: string;
     navChangelog: string;
     navInteractiveApi: string;
+    navAiTools: string;
+    navAiToolsOverview: string;
+    navOpenAICodex: string;
+    navOpenCode: string;
+    navClaudeCode: string;
+    navCursor: string;
+    navOpenClaw: string;
+    navQwenCode: string;
+    navHermes: string;
+    navWindsurf: string;
     navResources: string;
     navDocsSearch: string;
     navDocsSearchPlaceholder: string;

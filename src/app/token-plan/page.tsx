@@ -429,30 +429,36 @@ export default function TokenPlanPage() {
         </section>
       )}
 
-      {/* Tools — Card-style blocks */}
+      {/* Tools — 2×4 card grid */}
       <section ref={setSectionRef} className="relative border-t border-border bg-muted/20 section-hidden">
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border/60 to-transparent" />
         <div className="mx-auto max-w-6xl px-4 py-10 text-center">
-          <h2 className="text-sm font-semibold text-foreground mb-4">
+          <h2 className="text-lg font-semibold text-foreground mb-6">
             {lang === "zh" ? "兼容主流编程工具" : "Compatible with Popular Coding Tools"}
           </h2>
-          <div className="flex flex-wrap justify-center gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-6xl mx-auto">
             {[
-              { name: "VS Code", icon: "🔧" },
-              { name: "Cursor", icon: "✏️" },
-              { name: "JetBrains", icon: "🧩" },
-              { name: "Continue", icon: "🔌" },
-              { name: "Cline", icon: "💻" },
-              { name: "OpenAI SDK", icon: "🤖" },
-              { name: "LangChain", icon: "⛓️" },
-            ].map((t) => (
-              <span key={t.name} className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-border/40 bg-card/60 backdrop-blur-sm text-xs text-muted-foreground transition-all hover:border-border hover:bg-card hover:scale-105 hover:shadow-sm cursor-default">
-                <span className="text-[11px]">{t.icon}</span>
-                {t.name}
-              </span>
+              { name: "OpenAI Codex", slug: "openai-codex" },
+              { name: "Claude Code", slug: "claude-code" },
+              { name: "Cursor", slug: "cursor" },
+              { name: "OpenCode", slug: "opencode" },
+              { name: "OpenClaw", slug: "openclaw" },
+              { name: "Qwen Code", slug: "qwen-code" },
+              { name: "Hermes", slug: "hermes" },
+              { name: "Windsurf", slug: "windsurf" },
+            ].map(({ name, slug }) => (
+              <Link key={name} href={`/docs/ai-tools/${slug}`}
+                className="flex flex-col items-center justify-center gap-2 rounded-xl border border-border/60 bg-card/70 backdrop-blur-sm px-4 py-5 shadow-md text-sm font-medium text-foreground/80 transition-all hover:border-primary/40 hover:bg-card hover:shadow-lg hover:scale-[1.03]"
+              >
+                {/* Logo placeholder — replace img tag below when logo is available */}
+                <div className="h-10 w-10 rounded-xl bg-muted/60 flex items-center justify-center text-xs font-bold text-muted-foreground/40 border border-border/20">
+                  {name.charAt(0)}
+                </div>
+                <span>{name}</span>
+              </Link>
             ))}
           </div>
-          <p className="text-[11px] text-muted-foreground/60 mt-4">
+          <p className="text-xs text-muted-foreground/60 mt-6">
             {lang === "zh" ? "统一 API 端点，兼容 OpenAI / Anthropic 格式，一行代码切换" : "Unified API endpoint. OpenAI / Anthropic compatible, one-line config"}
           </p>
         </div>

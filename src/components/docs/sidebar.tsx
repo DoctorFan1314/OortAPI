@@ -47,6 +47,20 @@ const NAV_SECTIONS: NavSection[] = [
     ],
   },
   {
+    sectionKey: "navAiTools",
+    items: [
+      { href: "/docs/ai-tools", labelKey: "navAiToolsOverview", icon: Book, exact: true },
+      { href: "/docs/ai-tools/openai-codex", labelKey: "navOpenAICodex", icon: Book, exact: true },
+      { href: "/docs/ai-tools/opencode", labelKey: "navOpenCode", icon: Book, exact: true },
+      { href: "/docs/ai-tools/claude-code", labelKey: "navClaudeCode", icon: Book, exact: true },
+      { href: "/docs/ai-tools/cursor", labelKey: "navCursor", icon: Book, exact: true },
+      { href: "/docs/ai-tools/openclaw", labelKey: "navOpenClaw", icon: Book, exact: true },
+      { href: "/docs/ai-tools/qwen-code", labelKey: "navQwenCode", icon: Book, exact: true },
+      { href: "/docs/ai-tools/hermes", labelKey: "navHermes", icon: Book, exact: true },
+      { href: "/docs/ai-tools/windsurf", labelKey: "navWindsurf", icon: Book, exact: true },
+    ],
+  },
+  {
     sectionKey: "navDeployment",
     items: [
       { href: "/docs/deployment", labelKey: "navDeploymentGuide", icon: Server, exact: true },
