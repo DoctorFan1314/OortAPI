@@ -668,5 +668,35 @@ export interface Dictionary {
     sectionTrendingDesc: string;
     sectionTags: string;
     sectionTagsDesc: string;
+    // MCP ecosystem page
+    mcpPageTitle: string;
+    mcpPageSubtitle: string;
+    mcpFilterAll: string;
+    mcpFilterHosted: string;
+    mcpFilterLocal: string;
+    mcpCatAll: string;
+    mcpCatBrowser: string;
+    mcpCatSearch: string;
+    mcpCatCommunication: string;
+    mcpCatDeveloper: string;
+    mcpCatFinance: string;
+    mcpCatKnowledge: string;
+    mcpCatLocation: string;
+    mcpCatMedia: string;
+    mcpCatProductivity: string;
+    mcpActivate: string;
+    mcpCopyConfig: string;
+    mcpHosted: string;
+    mcpLocal: string;
+    mcpNodeCount: string;
+    // Playground tool manager
+    toolManager: string;
+    toolManagerDesc: string;
+    toolActive: string;
+    toolRemove: string;
+    toolEmpty: string;
+    toolSource: string;
+    toolSourceBuiltin: string;
+    toolSourceMcp: string;
   };
 }

@@ -6,6 +6,8 @@ import { useI18n } from "@/contexts/i18n-context";
 import { useToast } from "@/contexts/toast-context";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { Badge } from "@/components/ui/badge";
 import { CopyButton } from "@/components/shared/copy-button";
 import { MarkdownRenderer } from "@/components/shared/markdown-renderer";
 import { Play, Send, Bot, User, Loader2, Square, Zap, Settings2, Trash2, Download, RefreshCw, Plus, MessageSquare, X, Image, Link2, Brain, Wrench, Search, Copy, Check, Quote, Lock, ChevronDown } from "lucide-react";
@@ -136,7 +138,7 @@ const CAP_COLORS: Record<string, string> = {
 // ─── Component ─────────────────────────────────────────────
 
 function PlaygroundContent() {
-  const { lang } = useI18n();
+  const { lang, t: dict } = useI18n();
   const t = LABELS[lang];
 
   const [models, setModels] = useState<Model[]>([]);
@@ -158,6 +160,7 @@ function PlaygroundContent() {
   const [quoteMessage, setQuoteMessage] = useState<ChatMessage | null>(null);
   const [copiedIdx, setCopiedIdx] = useState(-1);
   const [showAdvancedParams, setShowAdvancedParams] = useState(false);
+  const [showToolManager, setShowToolManager] = useState(false);
   const { toast } = useToast();
 
   const abortRef = useRef<AbortController | null>(null);
@@ -221,6 +224,14 @@ function PlaygroundContent() {
   const updateSession = useCallback((updater: (s: ChatSession) => ChatSession) => {
     setSessions((prev) => prev.map((s) => (s.id === currentSessionId ? updater(s) : s)));
   }, [currentSessionId]);
+
+  const removeMcpTool = useCallback((toolName: string) => {
+    updateSession((s) => ({
+      ...s,
+      activeMcpTools: (s.activeMcpTools ?? []).filter(t => t.function.name !== toolName),
+    }));
+    toast(lang === "zh" ? `已移除工具「${toolName}」` : `Removed tool "${toolName}"`, "info");
+  }, [updateSession, lang, toast]);
 
   // ── Init ──
   useEffect(() => {
@@ -821,9 +832,17 @@ function PlaygroundContent() {
                 )}
               </div>
 
+              {/* Tool manager button */}
+              <button onClick={() => setShowToolManager(true)} className="relative w-9 h-9 rounded-md border border-border/60 bg-muted/20 hover:bg-muted flex items-center justify-center transition-colors shrink-0 mt-1.5" title={dict.resourceHub.toolManager}>
+                <Wrench className="h-4 w-4 text-muted-foreground" />
+                {(currentSession?.activeMcpTools?.length ?? 0) > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold px-1">
+                    {currentSession!.activeMcpTools!.length}
+                  </span>
+                )}
+              </button>
 
-              
-                <Textarea placeholder={lang === "zh" ? "输入消息... (Shift+Enter 换行)" : "Type a message... (Shift+Enter newline)"} value={message} onChange={(e) => setMessage(e.target.value)} onKeyDown={handleKeyDown} rows={1} className="resize-none flex-1 min-h-[2.5rem] max-h-32 overflow-y-auto" disabled={isSending} />
+              <Textarea placeholder={lang === "zh" ? "输入消息... (Shift+Enter 换行)" : "Type a message... (Shift+Enter newline)"} value={message} onChange={(e) => setMessage(e.target.value)} onKeyDown={handleKeyDown} rows={1} className="resize-none flex-1 min-h-[2.5rem] max-h-32 overflow-y-auto" disabled={isSending} />
 
               
                 <div className="flex flex-col gap-1.5 self-center">
@@ -917,6 +936,59 @@ function PlaygroundContent() {
           <div><label className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-1.5 block">{t.systemPrompt}</label><textarea value={systemPrompt} onChange={(e) => updateSession((s) => ({ ...s, systemPrompt: e.target.value }))} placeholder={t.systemPromptPH} rows={3} className="w-full px-2.5 py-1.5 rounded-md border border-input bg-background text-xs font-mono resize-none focus:border-primary focus:outline-none" /></div>
         </aside>
       </div>
+
+      {/* Tool Manager Sheet */}
+      <Sheet open={showToolManager} onOpenChange={setShowToolManager}>
+        <SheetContent side="right" className="w-80 sm:max-w-80">
+          <SheetHeader>
+            <SheetTitle className="flex items-center gap-2">
+              <Wrench className="h-4 w-4" />
+              {dict.resourceHub.toolManager}
+            </SheetTitle>
+            <SheetDescription>{dict.resourceHub.toolManagerDesc}</SheetDescription>
+          </SheetHeader>
+          <div className="px-4 py-3 space-y-2 overflow-y-auto flex-1">
+            {/* MCP Tools */}
+            {(currentSession?.activeMcpTools?.length ?? 0) > 0 ? (
+              <>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-2">{dict.resourceHub.toolSourceMcp}</p>
+                {currentSession!.activeMcpTools!.map(tool => (
+                  <div key={tool.function.name} className="flex items-center justify-between gap-2 p-2.5 rounded-lg bg-muted/30 border border-border/50">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-medium font-mono truncate">{tool.function.name}</p>
+                      <p className="text-[10px] text-muted-foreground truncate mt-0.5">{tool.function.description}</p>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <Badge className="bg-purple-500/10 text-purple-400 border-purple-500/20 border text-[9px]">{dict.resourceHub.toolSourceMcp}</Badge>
+                      <button onClick={() => removeMcpTool(tool.function.name)} className="p-1 rounded hover:bg-destructive/20 transition-colors" title={dict.resourceHub.toolRemove}>
+                        <X className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <Wrench className="h-8 w-8 mx-auto mb-2 opacity-30" />
+                <p className="text-xs">{dict.resourceHub.toolEmpty}</p>
+              </div>
+            )}
+
+            {/* Built-in tools */}
+            {toolConfig.enabledTools.length > 0 && (
+              <>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-2 mt-4">{dict.resourceHub.toolSourceBuiltin}</p>
+                {toolConfig.enabledTools.map(toolName => (
+                  <div key={toolName} className="flex items-center justify-between gap-2 p-2.5 rounded-lg bg-muted/30 border border-border/50">
+                    <p className="text-xs font-medium font-mono">{toolName}</p>
+                    <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 border text-[9px]">{dict.resourceHub.toolSourceBuiltin}</Badge>
+                  </div>
+                ))}
+              </>
+            )}
+          </div>
+        </SheetContent>
+      </Sheet>
 
       {/* Hidden file inputs */}
       <input ref={imageInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageChange} />

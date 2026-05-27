@@ -23,7 +23,7 @@ interface CountsData {
 const SECTIONS = [
   { href: "/skills", icon: Puzzle, i18nKey: "sectionSkills" as const, countKey: "skills" as const },
   { href: "/prompts", icon: BookOpen, i18nKey: "sectionPrompts" as const, countKey: "prompts" as const },
-  { href: "/docs/ai-tools", icon: Server, i18nKey: "mcpEcosystem" as const },
+  { href: "/resources/mcp", icon: Server, i18nKey: "mcpEcosystem" as const },
   { href: "/categories", icon: LayoutGrid, i18nKey: "sectionCategories" as const },
   { href: "/trending", icon: TrendingUp, i18nKey: "sectionTrending" as const },
   { href: "/tags", icon: Tags, i18nKey: "sectionTags" as const },
