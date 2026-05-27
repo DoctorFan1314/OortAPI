@@ -658,5 +658,15 @@ export interface Dictionary {
     quickLinks: string;
     mcpEcosystem: string;
     mcpEcosystemDesc: string;
+    sectionSkills: string;
+    sectionSkillsDesc: string;
+    sectionPrompts: string;
+    sectionPromptsDesc: string;
+    sectionCategories: string;
+    sectionCategoriesDesc: string;
+    sectionTrending: string;
+    sectionTrendingDesc: string;
+    sectionTags: string;
+    sectionTagsDesc: string;
   };
 }

@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { BookOpen, Puzzle, LayoutGrid, TrendingUp, Tags, ArrowRight, Search, X, Cloud, Rocket, Copy, Sparkles, Wrench, Check, Server } from "lucide-react";
+import { Puzzle, BookOpen, Server, LayoutGrid, TrendingUp, Tags, ArrowRight, Search, X, Cloud, Rocket, Copy, Sparkles, Wrench, Check } from "lucide-react";
 import { useI18n } from "@/contexts/i18n-context";
+import { useToast } from "@/contexts/toast-context";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -18,14 +19,14 @@ interface CountsData {
   prompts?: number;
 }
 
-// ── Quick-link sections (kept from original) ──
+// ── Quick-link sections — all use i18n keys ──
 const SECTIONS = [
-  { href: "/skills", icon: Puzzle, zh: "Agent 技能市场", en: "Agent Skills", zhDesc: "可执行的 AI 技能，一键安装赋予 AI 行动力", enDesc: "Executable AI skills — install and give AI real action power", countKey: "skills" as const },
-  { href: "/prompts", icon: BookOpen, zh: "Prompt 模板", en: "Prompt Templates", zhDesc: "28+ 高质量模板，覆盖编程、写作、分析等场景", enDesc: "28+ quality templates for coding, writing, analysis", countKey: "prompts" as const },
+  { href: "/skills", icon: Puzzle, i18nKey: "sectionSkills" as const, countKey: "skills" as const },
+  { href: "/prompts", icon: BookOpen, i18nKey: "sectionPrompts" as const, countKey: "prompts" as const },
   { href: "/docs/ai-tools", icon: Server, i18nKey: "mcpEcosystem" as const },
-  { href: "/categories", icon: LayoutGrid, zh: "分类浏览", en: "Categories", zhDesc: "按方向浏览 Prompt 模板", enDesc: "Browse prompts by category" },
-  { href: "/trending", icon: TrendingUp, zh: "排行榜", en: "Trending", zhDesc: "热门 Prompt 模板排行", enDesc: "Trending prompt templates" },
-  { href: "/tags", icon: Tags, zh: "标签云", en: "Tags", zhDesc: "通过标签发现内容", enDesc: "Discover content through tags" },
+  { href: "/categories", icon: LayoutGrid, i18nKey: "sectionCategories" as const },
+  { href: "/trending", icon: TrendingUp, i18nKey: "sectionTrending" as const },
+  { href: "/tags", icon: Tags, i18nKey: "sectionTags" as const },
 ];
 
 // ── Badge color maps ──
@@ -35,14 +36,15 @@ const BADGE_STYLES: Record<ResourceType, string> = {
   "prompt-template": "bg-green-500/10 text-green-400 border-green-500/20",
 };
 
-const BADGE_LABELS: Record<ResourceType, { zh: string; en: string }> = {
-  mcp: { zh: "MCP", en: "MCP" },
-  "client-skill": { zh: "客户端技能", en: "Client Skill" },
-  "prompt-template": { zh: "Prompt", en: "Prompt" },
+const BADGE_I18N: Record<ResourceType, "badgeMcp" | "badgeClientSkill" | "badgePrompt"> = {
+  mcp: "badgeMcp",
+  "client-skill": "badgeClientSkill",
+  "prompt-template": "badgePrompt",
 };
 
 export default function ResourcesPage() {
   const { lang, t, tFormat } = useI18n();
+  const { toast } = useToast();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all");
@@ -64,7 +66,7 @@ export default function ResourcesPage() {
     return items.filter(i => {
       const name = lang === "zh" ? i.nameZh : i.name;
       const desc = lang === "zh" ? i.descriptionZh : i.description;
-      return name.toLowerCase().includes(q) || desc.toLowerCase().includes(q) || i.tags.some(t => t.toLowerCase().includes(q));
+      return name.toLowerCase().includes(q) || desc.toLowerCase().includes(q) || i.tags.some(tag => tag.toLowerCase().includes(q));
     });
   }, [searchQuery, lang, activeTab]);
 
@@ -73,14 +75,12 @@ export default function ResourcesPage() {
     if (!searchQuery.trim()) return SECTIONS;
     const q = searchQuery.toLowerCase();
     return SECTIONS.filter(s => {
-      if ("i18nKey" in s) {
-        const label = t.resourceHub[s.i18nKey as keyof typeof t.resourceHub];
-        const desc = t.resourceHub[`${s.i18nKey}Desc` as keyof typeof t.resourceHub];
-        return label.toLowerCase().includes(q) || desc.toLowerCase().includes(q);
-      }
-      return s[lang].toLowerCase().includes(q) || s[`${lang}Desc` as 'zhDesc' | 'enDesc'].toLowerCase().includes(q);
+      const label = t.resourceHub[s.i18nKey];
+      const descKey = `${s.i18nKey}Desc` as keyof typeof t.resourceHub;
+      const desc = t.resourceHub[descKey];
+      return label.toLowerCase().includes(q) || desc.toLowerCase().includes(q);
     });
-  }, [searchQuery, lang]);
+  }, [searchQuery, lang, t]);
 
   const handleLaunch = (item: ResourceItem) => {
     router.push(`/dashboard/playground?source=hub&type=${item.type}&id=${item.id}`);
@@ -91,9 +91,12 @@ export default function ResourcesPage() {
     try {
       await navigator.clipboard.writeText(item.clientConfigJson);
       setCopiedId(item.id);
+      toast(t.resourceHub.copiedSuccess, "success");
       setTimeout(() => setCopiedId(null), 2000);
-    } catch { /* ignore */ }
-  }, []);
+    } catch {
+      toast("Copy failed", "error");
+    }
+  }, [toast, t]);
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
@@ -140,13 +143,13 @@ export default function ResourcesPage() {
         )}
       </div>
 
-      {/* ── Tab Navigation ── */}
-      <Tabs defaultValue="all" className="mb-8">
+      {/* ── Tab Navigation (controlled) ── */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
         <TabsList variant="line">
-          <TabsTrigger value="all" onClick={() => setActiveTab("all")}>{t.resourceHub.tabAll}</TabsTrigger>
-          <TabsTrigger value="mcp" onClick={() => setActiveTab("mcp")}>{t.resourceHub.tabMcp}</TabsTrigger>
-          <TabsTrigger value="client-skill" onClick={() => setActiveTab("client-skill")}>{t.resourceHub.tabClientSkill}</TabsTrigger>
-          <TabsTrigger value="prompt-template" onClick={() => setActiveTab("prompt-template")}>{t.resourceHub.tabPrompt}</TabsTrigger>
+          <TabsTrigger value="all">{t.resourceHub.tabAll}</TabsTrigger>
+          <TabsTrigger value="mcp">{t.resourceHub.tabMcp}</TabsTrigger>
+          <TabsTrigger value="client-skill">{t.resourceHub.tabClientSkill}</TabsTrigger>
+          <TabsTrigger value="prompt-template">{t.resourceHub.tabPrompt}</TabsTrigger>
         </TabsList>
       </Tabs>
 
@@ -162,7 +165,7 @@ export default function ResourcesPage() {
               {/* Type badge */}
               <div className="flex items-center gap-2 mb-3">
                 <Badge className={`${BADGE_STYLES[item.type]} border text-[10px] font-medium`}>
-                  {lang === "zh" ? BADGE_LABELS[item.type].zh : BADGE_LABELS[item.type].en}
+                  {t.resourceHub[BADGE_I18N[item.type]]}
                 </Badge>
                 {item.featured && (
                   <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
@@ -201,7 +204,7 @@ export default function ResourcesPage() {
 
               {/* Pricing */}
               <p className="text-[10px] text-muted-foreground mb-3">
-                {lang === "zh" ? item.pricing.zh : item.pricing.en}
+                {t.resourceHub[item.pricing]}
               </p>
 
               {/* Action button */}
@@ -235,7 +238,7 @@ export default function ResourcesPage() {
         </div>
       )}
 
-      {/* ── Quick Links (original navigation sections) ── */}
+      {/* ── Quick Links ── */}
       <div className="border-t border-border pt-8">
         <h2 className="text-lg font-semibold mb-4">{t.resourceHub.quickLinks}</h2>
         {filteredSections.length === 0 ? (
@@ -243,9 +246,9 @@ export default function ResourcesPage() {
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredSections.map((s) => {
-              const isI18n = "i18nKey" in s;
-              const label = isI18n ? t.resourceHub[s.i18nKey as keyof typeof t.resourceHub] : s[lang];
-              const desc = isI18n ? t.resourceHub[`${s.i18nKey}Desc` as keyof typeof t.resourceHub] : s[`${lang}Desc` as 'zhDesc' | 'enDesc'];
+              const label = t.resourceHub[s.i18nKey];
+              const descKey = `${s.i18nKey}Desc` as keyof typeof t.resourceHub;
+              const desc = t.resourceHub[descKey];
               return (
                 <Link key={s.href} href={s.href} className="glass-card glass-card-hover p-6 rounded-xl group">
                   <div className="flex items-center gap-3 mb-3">

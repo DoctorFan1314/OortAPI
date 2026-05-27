@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useI18n } from "@/contexts/i18n-context";
+import { useToast } from "@/contexts/toast-context";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { CopyButton } from "@/components/shared/copy-button";
@@ -157,7 +158,7 @@ function PlaygroundContent() {
   const [quoteMessage, setQuoteMessage] = useState<ChatMessage | null>(null);
   const [copiedIdx, setCopiedIdx] = useState(-1);
   const [showAdvancedParams, setShowAdvancedParams] = useState(false);
-  const [hubToast, setHubToast] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const abortRef = useRef<AbortController | null>(null);
   const msgContainerRef = useRef<HTMLDivElement>(null);
@@ -282,14 +283,14 @@ function PlaygroundContent() {
 
     if (item.type === "prompt-template" && item.promptContent) {
       newSession.systemPrompt = item.promptContent;
-      setHubToast(lang === "zh"
+      toast(lang === "zh"
         ? `已加载提示词模板「${item.nameZh}」`
-        : `Loaded prompt template "${item.name}"`);
+        : `Loaded prompt template "${item.name}"`, "success");
     } else if (item.type === "mcp" && item.requiredTools) {
       newSession.activeMcpTools = item.requiredTools;
-      setHubToast(lang === "zh"
+      toast(lang === "zh"
         ? `已成功在云端挂载「${item.nameZh}」MCP 工具集`
-        : `Mounted "${item.name}" MCP toolset in cloud`);
+        : `Mounted "${item.name}" MCP toolset in cloud`, "success");
     }
 
     setSessions((prev) => [...prev, newSession]);
@@ -298,13 +299,6 @@ function PlaygroundContent() {
     setAttachedImages([]); setReasoningContent("");
     router.replace("/dashboard/playground");
   }, [searchParams, models, keys]); // eslint-disable-line
-
-  // Auto-dismiss hub toast
-  useEffect(() => {
-    if (!hubToast) return;
-    const timer = setTimeout(() => setHubToast(null), 4000);
-    return () => clearTimeout(timer);
-  }, [hubToast]);
 
   // ── Auto-scroll (always follow new content) ──
   const prevMsgLen = useRef(0);
@@ -392,12 +386,10 @@ function PlaygroundContent() {
   const executeTool = async (tc: ToolCall): Promise<string> => {
     try {
       const args = JSON.parse(tc.function.arguments);
-      const mcpTools = currentSession?.activeMcpTools ?? [];
-      const isMcp = mcpTools.some(t => t.function.name === tc.function.name);
       const res = await fetch("/api/playground/tools", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tool: tc.function.name, args, config: { tavilyApiKey: toolConfigRef.current.tavilyApiKey }, isMcp }),
+        body: JSON.stringify({ tool: tc.function.name, args, config: { tavilyApiKey: toolConfigRef.current.tavilyApiKey } }),
       });
       const data = await res.json();
       return data.result || data.error || "Tool execution returned no result.";
@@ -663,16 +655,7 @@ function PlaygroundContent() {
 
   // ── Render ──
   return (
-    <div className="rounded-xl dark:shadow-[0_0_100px_25px_rgba(0,212,255,0.1)] relative">
-      {/* Hub injection toast */}
-      {hubToast && (
-        <div className="absolute top-3 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-top-2">
-          <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm shadow-lg backdrop-blur-sm">
-            <Check className="h-4 w-4 shrink-0" />
-            <span>{hubToast}</span>
-          </div>
-        </div>
-      )}
+    <div className="rounded-xl dark:shadow-[0_0_100px_25px_rgba(0,212,255,0.1)]">
       <div className="flex h-[calc(100vh-7rem)] w-full overflow-hidden bg-background border border-border/40 rounded-xl shadow-sm dark:border-white/[0.08]">
         {/* Column 1: Sessions */}
         <aside className="w-56 h-full border-r border-border/90 bg-muted/20 backdrop-blur-sm p-3 flex flex-col shrink-0">

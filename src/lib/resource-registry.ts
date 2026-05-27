@@ -17,7 +17,7 @@ export interface ResourceItem {
   descriptionZh: string;
   category: "production" | "development" | "marketing" | "analytics";
   tags: string[];
-  pricing: { zh: string; en: string };
+  pricing: "pricingFree" | "pricingPlatformDeduct" | "pricingClientOnly";
   featured: boolean;
   // Type-specific (mutually exclusive):
   promptContent?: string;           // prompt-template only
@@ -142,7 +142,7 @@ export const RESOURCE_ITEMS: ResourceItem[] = [
     descriptionZh: "基于谷歌的实时网页搜索与新闻检索。赋予大模型实时联网能力，获取最新资讯。",
     category: "production",
     tags: ["search", "web", "news", "real-time"],
-    pricing: { zh: "平台代扣工具额度", en: "Platform deducts tool credits" },
+    pricing: "pricingPlatformDeduct",
     featured: true,
     requiredTools: googleSearchTools,
   },
@@ -155,7 +155,7 @@ export const RESOURCE_ITEMS: ResourceItem[] = [
     descriptionZh: "跨仓库搜索代码、创建 Issue、管理 GitHub 工作流，直接在 AI 对话中完成。",
     category: "development",
     tags: ["github", "code-search", "issues", "automation"],
-    pricing: { zh: "平台代扣工具额度", en: "Platform deducts tool credits" },
+    pricing: "pricingPlatformDeduct",
     featured: true,
     requiredTools: githubAssistantTools,
   },
@@ -168,7 +168,7 @@ export const RESOURCE_ITEMS: ResourceItem[] = [
     descriptionZh: "验证 SQL 查询语句、抓取数据库表结构元数据。帮助大模型生成正确的、感知 Schema 的 SQL。",
     category: "development",
     tags: ["database", "postgresql", "sql", "schema"],
-    pricing: { zh: "平台代扣工具额度", en: "Platform deducts tool credits" },
+    pricing: "pricingPlatformDeduct",
     featured: true,
     requiredTools: postgresContextTools,
   },
@@ -183,7 +183,7 @@ export const RESOURCE_ITEMS: ResourceItem[] = [
     descriptionZh: "资深代码审查专家提示词，捕获 Bug、安全漏洞和风格违规。输出带严重等级的结构化反馈。",
     category: "development",
     tags: ["code-review", "security", "best-practices"],
-    pricing: { zh: "免费", en: "Free" },
+    pricing: "pricingFree",
     featured: true,
     promptContent: `You are a senior code reviewer with 15+ years of experience across multiple languages and frameworks. When reviewing code:
 
@@ -209,7 +209,7 @@ Be thorough but constructive. Prioritize critical issues first.`,
     descriptionZh: "专业数据分析专家提示词，用于探索数据集、发现规律并生成可视化洞察。",
     category: "analytics",
     tags: ["data-analysis", "visualization", "statistics"],
-    pricing: { zh: "免费", en: "Free" },
+    pricing: "pricingFree",
     featured: false,
     promptContent: `You are an expert data analyst. When analyzing data:
 
@@ -234,7 +234,7 @@ When given a dataset:
     descriptionZh: "创意写作教练提示词，协助故事叙述、角色塑造和跨体裁文案打磨。",
     category: "production",
     tags: ["writing", "creative", "storytelling"],
-    pricing: { zh: "免费", en: "Free" },
+    pricing: "pricingFree",
     featured: false,
     promptContent: `You are a creative writing coach with an MFA in Fiction and experience editing for major literary magazines. Your approach:
 
@@ -261,7 +261,7 @@ When reviewing writing:
     descriptionZh: "客户端技能，用于读取、写入和管理本地文件。兼容 Claude Code、Cursor 等客户端。",
     category: "development",
     tags: ["filesystem", "local", "file-operations"],
-    pricing: { zh: "仅客户端使用", en: "Client-side only" },
+    pricing: "pricingClientOnly",
     featured: false,
     clientConfigJson: JSON.stringify({
       name: "file-manager",
@@ -283,7 +283,7 @@ When reviewing writing:
     descriptionZh: "自动化 Git 操作：提交、分支、合并、变基和冲突解决。适用于本地终端客户端。",
     category: "development",
     tags: ["git", "version-control", "workflow"],
-    pricing: { zh: "仅客户端使用", en: "Client-side only" },
+    pricing: "pricingClientOnly",
     featured: false,
     clientConfigJson: JSON.stringify({
       name: "git-workflow",
@@ -306,7 +306,7 @@ When reviewing writing:
     descriptionZh: "监控本机 CPU、内存、磁盘和网络使用情况。适用于性能调试场景。",
     category: "analytics",
     tags: ["monitoring", "system", "performance"],
-    pricing: { zh: "仅客户端使用", en: "Client-side only" },
+    pricing: "pricingClientOnly",
     featured: false,
     clientConfigJson: JSON.stringify({
       name: "system-monitor",
