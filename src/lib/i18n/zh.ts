@@ -1121,5 +1121,7 @@ export const zh: Dictionary = {
     badgePrompt: "Prompt",
     toolLabel: "工具",
     quickLinks: "快捷入口",
+    mcpEcosystem: "云端 MCP 生态",
+    mcpEcosystemDesc: "聚合业界主流开源 MCP 节点，免部署一键为大模型注入真实世界行动力。",
   },
 };

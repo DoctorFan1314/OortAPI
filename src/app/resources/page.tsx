@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { BookOpen, Puzzle, LayoutGrid, TrendingUp, Tags, Send, ArrowRight, Search, X, Cloud, Rocket, Copy, Sparkles, Wrench, Check } from "lucide-react";
+import { BookOpen, Puzzle, LayoutGrid, TrendingUp, Tags, ArrowRight, Search, X, Cloud, Rocket, Copy, Sparkles, Wrench, Check, Server } from "lucide-react";
 import { useI18n } from "@/contexts/i18n-context";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -22,10 +22,10 @@ interface CountsData {
 const SECTIONS = [
   { href: "/skills", icon: Puzzle, zh: "Agent 技能市场", en: "Agent Skills", zhDesc: "可执行的 AI 技能，一键安装赋予 AI 行动力", enDesc: "Executable AI skills — install and give AI real action power", countKey: "skills" as const },
   { href: "/prompts", icon: BookOpen, zh: "Prompt 模板", en: "Prompt Templates", zhDesc: "28+ 高质量模板，覆盖编程、写作、分析等场景", enDesc: "28+ quality templates for coding, writing, analysis", countKey: "prompts" as const },
+  { href: "/docs/ai-tools", icon: Server, i18nKey: "mcpEcosystem" as const },
   { href: "/categories", icon: LayoutGrid, zh: "分类浏览", en: "Categories", zhDesc: "按方向浏览 Prompt 模板", enDesc: "Browse prompts by category" },
   { href: "/trending", icon: TrendingUp, zh: "排行榜", en: "Trending", zhDesc: "热门 Prompt 模板排行", enDesc: "Trending prompt templates" },
   { href: "/tags", icon: Tags, zh: "标签云", en: "Tags", zhDesc: "通过标签发现内容", enDesc: "Discover content through tags" },
-  { href: "/submit", icon: Send, zh: "提交模板", en: "Submit", zhDesc: "分享你的 Prompt 模板", enDesc: "Share your prompt templates" },
 ];
 
 // ── Badge color maps ──
@@ -73,9 +73,12 @@ export default function ResourcesPage() {
     if (!searchQuery.trim()) return SECTIONS;
     const q = searchQuery.toLowerCase();
     return SECTIONS.filter(s => {
-      const label = s[lang];
-      const desc = s[`${lang}Desc` as 'zhDesc' | 'enDesc'];
-      return label.toLowerCase().includes(q) || desc.toLowerCase().includes(q);
+      if ("i18nKey" in s) {
+        const label = t.resourceHub[s.i18nKey as keyof typeof t.resourceHub];
+        const desc = t.resourceHub[`${s.i18nKey}Desc` as keyof typeof t.resourceHub];
+        return label.toLowerCase().includes(q) || desc.toLowerCase().includes(q);
+      }
+      return s[lang].toLowerCase().includes(q) || s[`${lang}Desc` as 'zhDesc' | 'enDesc'].toLowerCase().includes(q);
     });
   }, [searchQuery, lang]);
 
@@ -239,25 +242,30 @@ export default function ResourcesPage() {
           <p className="text-sm text-muted-foreground py-8 text-center">{t.resourceHub.noResults}</p>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredSections.map((s) => (
-              <Link key={s.href} href={s.href} className="glass-card glass-card-hover p-6 rounded-xl group">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <s.icon className="h-5 w-5 text-primary" />
+            {filteredSections.map((s) => {
+              const isI18n = "i18nKey" in s;
+              const label = isI18n ? t.resourceHub[s.i18nKey as keyof typeof t.resourceHub] : s[lang];
+              const desc = isI18n ? t.resourceHub[`${s.i18nKey}Desc` as keyof typeof t.resourceHub] : s[`${lang}Desc` as 'zhDesc' | 'enDesc'];
+              return (
+                <Link key={s.href} href={s.href} className="glass-card glass-card-hover p-6 rounded-xl group">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <s.icon className="h-5 w-5 text-primary" />
+                    </div>
+                    <h3 className="font-semibold">{label}</h3>
+                    {"countKey" in s && counts && (counts as Record<string, number | undefined>)[s.countKey!] != null && (counts as Record<string, number>)[s.countKey!] > 0 && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-mono">
+                        {(counts as Record<string, number>)[s.countKey!]}
+                      </span>
+                    )}
                   </div>
-                  <h3 className="font-semibold">{s[lang]}</h3>
-                  {"countKey" in s && counts && (counts as Record<string, number | undefined>)[s.countKey!] != null && (counts as Record<string, number>)[s.countKey!] > 0 && (
-                    <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-mono">
-                      {(counts as Record<string, number>)[s.countKey!]}
-                    </span>
-                  )}
-                </div>
-                <p className="text-sm text-muted-foreground mb-3">{s[`${lang}Desc` as 'zhDesc' | 'enDesc']}</p>
-                <span className="text-primary text-sm flex items-center gap-1 group-hover:underline">
-                  {lang === "zh" ? "前往" : "Go"} <ArrowRight className="h-3 w-3" />
-                </span>
-              </Link>
-            ))}
+                  <p className="text-sm text-muted-foreground mb-3">{desc}</p>
+                  <span className="text-primary text-sm flex items-center gap-1 group-hover:underline">
+                    {lang === "zh" ? "前往" : "Go"} <ArrowRight className="h-3 w-3" />
+                  </span>
+                </Link>
+              );
+            })}
           </div>
         )}
       </div>

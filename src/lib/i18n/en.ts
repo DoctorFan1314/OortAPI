@@ -1121,5 +1121,7 @@ export const en: Dictionary = {
     badgePrompt: "Prompt",
     toolLabel: "Tool",
     quickLinks: "Quick Links",
+    mcpEcosystem: "Cloud MCP Servers",
+    mcpEcosystemDesc: "Aggregate mainstream open-source MCP nodes to instantly empower models with real-world capabilities.",
   },
 };

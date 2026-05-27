@@ -656,5 +656,7 @@ export interface Dictionary {
     badgePrompt: string;
     toolLabel: string;
     quickLinks: string;
+    mcpEcosystem: string;
+    mcpEcosystemDesc: string;
   };
 }
