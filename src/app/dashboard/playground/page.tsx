@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useI18n } from "@/contexts/i18n-context";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,6 +10,7 @@ import { MarkdownRenderer } from "@/components/shared/markdown-renderer";
 import { Play, Send, Bot, User, Loader2, Square, Zap, Settings2, Trash2, Download, RefreshCw, Plus, MessageSquare, X, Image, Link2, Brain, Wrench, Search, Copy, Check, Quote, Lock, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BUILTIN_TOOLS, getEnabledToolDefinitions, loadToolConfig, saveToolConfig, getModelCaps, type ToolConfig, type ToolDefinition, type ToolCall } from "@/lib/playground-tools";
+import { getResourceById } from "@/lib/resource-registry";
 
 // ─── Types ─────────────────────────────────────────────────
 
@@ -41,6 +43,7 @@ interface ChatSession {
   id: string; title: string; messages: ChatMessage[];
   selectedModel: string; selectedKeyId: number | null;
   systemPrompt: string; params: PlaygroundParams;
+  activeMcpTools?: ToolDefinition[];  // MCP tools injected from resource hub
 }
 
 type ApiEndpoint = "openai" | "anthropic";
@@ -131,7 +134,7 @@ const CAP_COLORS: Record<string, string> = {
 
 // ─── Component ─────────────────────────────────────────────
 
-export default function PlaygroundPage() {
+function PlaygroundContent() {
   const { lang } = useI18n();
   const t = LABELS[lang];
 
@@ -163,6 +166,11 @@ export default function PlaygroundPage() {
   const imageInputRef = useRef<HTMLInputElement>(null);
   const toolConfigRef = useRef(toolConfig);
   toolConfigRef.current = toolConfig;
+
+  // ── Resource hub injection (cross-page params) ──
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const hasProcessedParams = useRef(false);
 
   // ── Derive current session ──
   const currentSession = sessions.find((s) => s.id === currentSessionId);
@@ -247,6 +255,41 @@ export default function PlaygroundPage() {
     }
   }, [sessions, currentSessionId]);
 
+  // ── Resource Hub injection ──
+  useEffect(() => {
+    const source = searchParams.get("source");
+    const type = searchParams.get("type");
+    const id = searchParams.get("id");
+    if (source !== "hub" || !type || !id || hasProcessedParams.current) return;
+    hasProcessedParams.current = true;
+
+    const item = getResourceById(id);
+    if (!item) { router.replace("/dashboard/playground"); return; }
+
+    const sessionId = genId();
+    const newSession: ChatSession = {
+      id: sessionId,
+      title: lang === "zh" ? item.nameZh : item.name,
+      messages: [],
+      selectedModel: selectedModel || models[0]?.id || "",
+      selectedKeyId: selectedKeyId ?? keys.find((k) => k.enabled === 1)?.id ?? null,
+      systemPrompt: "",
+      params: { ...DEFAULT_PARAMS },
+    };
+
+    if (item.type === "prompt-template" && item.promptContent) {
+      newSession.systemPrompt = item.promptContent;
+    } else if (item.type === "mcp" && item.requiredTools) {
+      newSession.activeMcpTools = item.requiredTools;
+    }
+
+    setSessions((prev) => [...prev, newSession]);
+    setCurrentSessionId(sessionId);
+    setMessage(""); setResponse(""); setError(""); setUsage(null);
+    setAttachedImages([]); setReasoningContent("");
+    router.replace("/dashboard/playground");
+  }, [searchParams]); // eslint-disable-line
+
   // ── Auto-scroll (always follow new content) ──
   const prevMsgLen = useRef(0);
   useEffect(() => {
@@ -306,7 +349,14 @@ export default function PlaygroundPage() {
 
   // ── Build request body ──
   const buildRequestBody = (msgs: ReturnType<typeof buildMessages>, extra: Record<string, unknown> = {}) => {
-    const enabledTools = modelCaps.tools ? getEnabledToolDefinitions(toolConfigRef.current) : [];
+    const builtinTools = modelCaps.tools ? getEnabledToolDefinitions(toolConfigRef.current) : [];
+    const mcpTools = currentSession?.activeMcpTools ?? [];
+    const seen = new Set<string>();
+    const enabledTools = [...builtinTools, ...mcpTools].filter(t => {
+      if (seen.has(t.function.name)) return false;
+      seen.add(t.function.name);
+      return true;
+    });
     const body: Record<string, unknown> = {
       model: selectedModel, messages: msgs, stream: true,
       temperature: params.temperature, max_tokens: params.max_tokens, top_p: params.top_p,
@@ -326,10 +376,12 @@ export default function PlaygroundPage() {
   const executeTool = async (tc: ToolCall): Promise<string> => {
     try {
       const args = JSON.parse(tc.function.arguments);
+      const mcpTools = currentSession?.activeMcpTools ?? [];
+      const isMcp = mcpTools.some(t => t.function.name === tc.function.name);
       const res = await fetch("/api/playground/tools", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tool: tc.function.name, args, config: { tavilyApiKey: toolConfigRef.current.tavilyApiKey } }),
+        body: JSON.stringify({ tool: tc.function.name, args, config: { tavilyApiKey: toolConfigRef.current.tavilyApiKey }, isMcp }),
       });
       const data = await res.json();
       return data.result || data.error || "Tool execution returned no result.";
@@ -861,5 +913,13 @@ export default function PlaygroundPage() {
       {/* Hidden file inputs */}
       <input ref={imageInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
     </div>
+  );
+}
+
+export default function PlaygroundPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center h-screen text-muted-foreground">Loading...</div>}>
+      <PlaygroundContent />
+    </Suspense>
   );
 }

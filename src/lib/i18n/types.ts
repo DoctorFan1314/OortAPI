@@ -634,4 +634,27 @@ export interface Dictionary {
     guide: string;
     guideDesc: string;
   };
+  resourceHub: {
+    title: string;
+    subtitle: string;
+    heroStatMcp: string;
+    heroStatTools: string;
+    tabAll: string;
+    tabMcp: string;
+    tabClientSkill: string;
+    tabPrompt: string;
+    launchPlayground: string;
+    copyConfig: string;
+    copiedSuccess: string;
+    pricingFree: string;
+    pricingPlatformDeduct: string;
+    pricingClientOnly: string;
+    searchPlaceholder: string;
+    noResults: string;
+    badgeMcp: string;
+    badgeClientSkill: string;
+    badgePrompt: string;
+    toolLabel: string;
+    quickLinks: string;
+  };
 }
