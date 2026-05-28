@@ -407,7 +407,12 @@ function PlaygroundContent() {
   // ── Execute tool via server proxy ──
   const executeTool = async (tc: ToolCall): Promise<string> => {
     try {
-      const args = JSON.parse(tc.function.arguments);
+      // Defensive parsing: models sometimes return empty/invalid arguments
+      let args: Record<string, unknown> = {};
+      const raw = tc.function.arguments?.trim();
+      if (raw && raw !== "" && raw !== "{}") {
+        try { args = JSON.parse(raw); } catch { args = {}; }
+      }
       const res = await fetch("/api/playground/tools", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

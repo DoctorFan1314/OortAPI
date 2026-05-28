@@ -69,8 +69,12 @@ async function handleWebSearch(
   args: Record<string, unknown>,
   config: { tavilyApiKey?: string },
 ) {
-  const query = String(args.query || '');
+  const query = String(args.query || '').trim();
   const count = Math.min(10, Math.max(1, Number(args.count) || 5));
+
+  if (!query) {
+    return NextResponse.json({ result: 'Error: No search query provided. Please provide a query parameter.' });
+  }
 
   if (!config.tavilyApiKey) {
     return NextResponse.json({ result: 'Please configure a Tavily API Key in tool settings first.' });
