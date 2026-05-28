@@ -17,6 +17,8 @@ export async function POST(request: NextRequest) {
         return await handleWebSearch(args, config);
       case 'fetch_url':
         return await handleFetchUrl(args);
+      case 'sequential_thinking':
+        return handleSequentialThinking(args);
 
       // MCP tools — real execution where possible, demo fallback
       case 'google_search':
@@ -133,6 +135,20 @@ async function handleFetchUrl(args: Record<string, unknown>) {
     .slice(0, 8000);
 
   return NextResponse.json({ result: text || 'No readable content found.' });
+}
+
+function handleSequentialThinking(args: Record<string, unknown>) {
+  const thought = String(args.thought || '');
+  const nextThought = String(args.nextThought || '');
+  const thoughtNumber = Number(args.thoughtNumber) || 1;
+  const totalThoughts = Number(args.totalThoughts) || 1;
+
+  // This is a reasoning aid — it structures the model's thinking process.
+  // The model uses this to break down complex problems step by step.
+  // We return a confirmation so the tool loop continues.
+  return NextResponse.json({
+    result: `Thinking step ${thoughtNumber}/${totalThoughts} recorded.\n\nCurrent: ${thought}\n\nNext: ${nextThought}`,
+  });
 }
 
 // ── MCP Tools with Real Execution ──────────────────────
