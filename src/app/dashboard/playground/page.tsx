@@ -154,7 +154,6 @@ function PlaygroundContent() {
   const [streamMetrics, setStreamMetrics] = useState<{ ttfbMs: number | null; tokensPerSec: number | null }>({ ttfbMs: null, tokensPerSec: null });
   const [endpoint, setEndpoint] = useState<ApiEndpoint>("openai");
   const [showToolbar, setShowToolbar] = useState(false);
-  const [showToolConfig, setShowToolConfig] = useState(false);
   const [toolConfig, setToolConfig] = useState<ToolConfig>(loadToolConfig());
   const [attachedImages, setAttachedImages] = useState<string[]>([]);
   const [reasoningContent, setReasoningContent] = useState("");
@@ -843,10 +842,6 @@ function PlaygroundContent() {
                 )}
               </button>
 
-              {/* Tool settings button */}
-              <button onClick={() => setShowToolConfig(true)} className="w-9 h-9 rounded-md border border-border/60 bg-muted/20 hover:bg-muted flex items-center justify-center transition-colors shrink-0 mt-1.5" title={t.tools}>
-                <Settings2 className="h-4 w-4 text-muted-foreground" />
-              </button>
 
               <Textarea placeholder={lang === "zh" ? "输入消息... (Shift+Enter 换行)" : "Type a message... (Shift+Enter newline)"} value={message} onChange={(e) => setMessage(e.target.value)} onKeyDown={handleKeyDown} rows={1} className="resize-none flex-1 min-h-[2.5rem] max-h-32 overflow-y-auto" disabled={isSending} />
 
@@ -943,71 +938,18 @@ function PlaygroundContent() {
         </aside>
       </div>
 
-      {/* Tool Manager Sheet */}
-      <Sheet open={showToolManager} onOpenChange={setShowToolManager}>
+      {/* Combined Tool Manager + Settings Sheet */}
+      <Sheet open={showToolManager} onOpenChange={(open) => { setShowToolManager(open); if (!open) { setTimeout(() => msgContainerRef.current?.querySelector("textarea")?.focus(), 100); } }}>
         <SheetContent side="right" className="w-80 sm:max-w-80">
           <SheetHeader>
             <SheetTitle className="flex items-center gap-2">
               <Wrench className="h-4 w-4" />
-              {dict.resourceHub.toolManager}
+              {t.tools}
             </SheetTitle>
             <SheetDescription>{dict.resourceHub.toolManagerDesc}</SheetDescription>
           </SheetHeader>
-          <div className="px-4 py-3 space-y-2 overflow-y-auto flex-1">
-            {/* MCP Tools */}
-            {(currentSession?.activeMcpTools?.length ?? 0) > 0 ? (
-              <>
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-2">{dict.resourceHub.toolSourceMcp}</p>
-                {currentSession!.activeMcpTools!.map(tool => (
-                  <div key={tool.function.name} className="flex items-center justify-between gap-2 p-2.5 rounded-lg bg-muted/30 border border-border/50">
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs font-medium font-mono truncate">{tool.function.name}</p>
-                      <p className="text-[10px] text-muted-foreground truncate mt-0.5">{tool.function.description}</p>
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <Badge className="bg-purple-500/10 text-purple-400 border-purple-500/20 border text-[9px]">{dict.resourceHub.toolSourceMcp}</Badge>
-                      <button onClick={() => removeMcpTool(tool.function.name)} className="p-1 rounded hover:bg-destructive/20 transition-colors" title={dict.resourceHub.toolRemove}>
-                        <X className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </>
-            ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                <Wrench className="h-8 w-8 mx-auto mb-2 opacity-30" />
-                <p className="text-xs">{dict.resourceHub.toolEmpty}</p>
-              </div>
-            )}
-
-            {/* Built-in tools */}
-            {toolConfig.enabledTools.length > 0 && (
-              <>
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-2 mt-4">{dict.resourceHub.toolSourceBuiltin}</p>
-                {toolConfig.enabledTools.map(toolName => (
-                  <div key={toolName} className="flex items-center justify-between gap-2 p-2.5 rounded-lg bg-muted/30 border border-border/50">
-                    <p className="text-xs font-medium font-mono">{toolName}</p>
-                    <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 border text-[9px]">{dict.resourceHub.toolSourceBuiltin}</Badge>
-                  </div>
-                ))}
-              </>
-            )}
-          </div>
-        </SheetContent>
-      </Sheet>
-
-      {/* Tool Settings Sheet */}
-      <Sheet open={showToolConfig} onOpenChange={setShowToolConfig}>
-        <SheetContent side="right" className="w-80 sm:max-w-80">
-          <SheetHeader>
-            <SheetTitle className="flex items-center gap-2">
-              <Settings2 className="h-4 w-4" />
-              {t.tools}
-            </SheetTitle>
-            <SheetDescription>{lang === "zh" ? "配置工具 API Key 和启用内置工具" : "Configure tool API keys and enable built-in tools"}</SheetDescription>
-          </SheetHeader>
           <div className="px-4 py-3 space-y-5 overflow-y-auto flex-1">
-            {/* Tavily API Key */}
+            {/* ── Section 1: Tavily API Key ── */}
             <div>
               <label className="text-xs font-medium text-foreground mb-1.5 block">{t.tavilyKey}</label>
               <Input type="password" value={toolConfig.tavilyApiKey} placeholder="tvly-..."
@@ -1018,18 +960,18 @@ function PlaygroundContent() {
                 }}
                 className="text-xs font-mono" />
               <p className="text-[10px] text-muted-foreground mt-1">
-                {lang === "zh" ? "用于联网搜索工具。获取免费 Key：tavily.com" : "For web search tool. Get a free key at tavily.com"}
+                {lang === "zh" ? "联网搜索工具需要。获取免费 Key：tavily.com" : "Required for web search. Get a free key at tavily.com"}
               </p>
             </div>
 
-            {/* Built-in tool toggles */}
+            {/* ── Section 2: Built-in tool toggles ── */}
             <div>
-              <label className="text-xs font-medium text-foreground mb-2 block">{lang === "zh" ? "内置工具" : "Built-in Tools"}</label>
-              <div className="space-y-2">
+              <label className="text-xs font-medium text-foreground mb-2 block">{dict.resourceHub.toolSourceBuiltin}</label>
+              <div className="space-y-1.5">
                 {Object.entries(BUILTIN_TOOLS).map(([name, def]) => {
                   const enabled = toolConfig.enabledTools.includes(name);
                   return (
-                    <label key={name} className="flex items-center gap-3 p-2.5 rounded-lg bg-muted/30 border border-border/50 cursor-pointer hover:bg-muted/50 transition-colors">
+                    <label key={name} className="flex items-center gap-3 p-2 rounded-lg bg-muted/20 border border-border/40 cursor-pointer hover:bg-muted/40 transition-colors">
                       <input type="checkbox" checked={enabled}
                         onChange={() => {
                           const newEnabled = enabled
@@ -1048,6 +990,28 @@ function PlaygroundContent() {
                   );
                 })}
               </div>
+            </div>
+
+            {/* ── Section 3: MCP Tools (from resource hub) ── */}
+            <div>
+              <label className="text-xs font-medium text-foreground mb-2 block">{dict.resourceHub.toolSourceMcp}</label>
+              {(currentSession?.activeMcpTools?.length ?? 0) > 0 ? (
+                <div className="space-y-1.5">
+                  {currentSession!.activeMcpTools!.map(tool => (
+                    <div key={tool.function.name} className="flex items-center justify-between gap-2 p-2 rounded-lg bg-muted/20 border border-border/40">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-medium font-mono truncate">{tool.function.name}</p>
+                        <p className="text-[10px] text-muted-foreground truncate mt-0.5">{tool.function.description}</p>
+                      </div>
+                      <button onClick={() => removeMcpTool(tool.function.name)} className="p-1 rounded hover:bg-destructive/20 transition-colors shrink-0" title={dict.resourceHub.toolRemove}>
+                        <X className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-[10px] text-muted-foreground py-4 text-center">{dict.resourceHub.toolEmpty}</p>
+              )}
             </div>
           </div>
         </SheetContent>
