@@ -247,7 +247,18 @@ function PlaygroundContent() {
   }, []);
   useEffect(() => {
     fetch("/api/dashboard/keys", { credentials: "include" }).then((r) => (r.ok ? r.json() : null)).then((d) => {
-      if (d?.keys) { const enabled = d.keys.filter((k: ApiKey) => k.enabled === 1); setKeys(enabled); if (enabled.length > 0) setSessions((prev) => prev.map((s) => ({ ...s, selectedKeyId: s.selectedKeyId ?? enabled[0].id }))); }
+      if (d?.keys) {
+        const enabled = d.keys.filter((k: ApiKey) => k.enabled === 1);
+        setKeys(enabled);
+        if (enabled.length > 0) {
+          const validIds = new Set(enabled.map((k: ApiKey) => k.id));
+          setSessions((prev) => prev.map((s) => ({
+            ...s,
+            // Fix stale selectedKeyId: if it doesn't match any loaded key, reset to first available
+            selectedKeyId: s.selectedKeyId != null && validIds.has(s.selectedKeyId) ? s.selectedKeyId : enabled[0].id,
+          })));
+        }
+      }
     }).catch(() => {});
   }, []);
 
