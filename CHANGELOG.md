@@ -6,6 +6,31 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## 2026-05-28 — Resource Center Refactor & MCP Ecosystem Integration
+
+### New Features
+- **Cloud MCP Ecosystem Square** — New standalone page `/resources/mcp` with dual-column layout, sidebar category filters (9 verticals), deployment type filters (Hosted/Local), and search
+- **17 MCP Nodes** — Google Search, GitHub Assistant, PostgreSQL, Amap, Bing Search, Supabase, RollingGo Hotels, Douyin Assistant, ChatPPT, McDonald's, 12306, Chrome DevTools, AntVis Charts, MemOS Memory, WeRead, Fetch Content
+- **Playground Tool Manager** — New wrench button in chat input toolbar with red count badge, opens Sheet panel listing all mounted MCP and built-in tools with one-click remove
+- **28+ Real Prompt Templates** — Full integration with prompt marketplace dataset (Xiaohongshu notes, translator, weekly reports, meeting minutes, code review, etc.), replacing 3 hardcoded examples
+
+### Cross-Page Integration
+- **Resource Center → Playground** — "Launch in Playground" button auto-creates a new session, injects systemPrompt (prompt templates) or activeMcpTools (MCP toolsets), with toast confirmation
+- **MCP Square → Playground** — Same one-click activation, tool definitions mounted directly to session's body.tools
+- **Real-time Tool Management** — View and remove mounted MCP tools from within the Playground, changes reflect immediately in next request
+
+### Visual Upgrades
+- **Hero Dashboard Banner** — Gradient glow ring with dark grid background, dynamic stat badges (MCP nodes / tools count)
+- **Tab Navigation** — All / Cloud MCP / Client Skills / Prompt Templates four-category tabs
+- **Glassmorphic Cards** — Type-specific glowing badges (MCP purple / Client Skill blue / Prompt emerald green), MCP cards show tool name micro-tags
+
+### Engineering
+- **Suspense Boundary** — Playground page wrapped in `<Suspense>` for `useSearchParams` production build safety
+- **Full i18n Coverage** — All new UI text goes through dictionary system (zh/en), zero hardcoded strings
+- **LocalStorage Compatibility** — `activeMcpTools` optional field with `?? []` short-circuit guard for safe deserialization of legacy sessions
+
+---
+
 ## [v3.3.4.19] — 2026-05-25
 
 ### Full-Site Enhancement — 49 Features, Fixes & UX Improvements

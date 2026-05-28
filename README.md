@@ -188,7 +188,8 @@ Supports full `tool_use` / `tool_result` conversion between Anthropic and OpenAI
 - **Delete account** — Users can delete their account with password verification
 - **Usage trend charts** — ECharts bar chart with cost/tokens/calls toggle, filter-linked
 - **System monitor** — Admin dashboard: QPS, error rate, P50/P95 latency, per-provider health
-- **API Playground** — Interactive testing: select model + key, multi-turn conversation, configurable parameters, streaming response
+- **API Playground** — Interactive testing: select model + key, multi-turn conversation, configurable parameters, streaming response, MCP Tool Loop, tool manager
+- **Resource Center** — AI App Store: 17 cloud MCP nodes, 28+ prompt templates, client skills, one-click activation to Playground
 - **Multi-page documentation** — Sidebar-navigated docs with Quick Start, Authentication, API Endpoints, SDK, Streaming, Pricing, Error Codes, Rate Limits, Deployment, Integration Guides, and Swagger UI
 - **Shared component library** — StatCard, StatusBadge, ConfirmDialog, LoadingSkeleton, and more reusable components
 - **Channel routing matrix** — Visual model-to-channel mapping with priority/weight
@@ -277,7 +278,7 @@ After registering, users get access to a full dashboard:
 - **Plans** — Admin: manage subscription plans at `/dashboard/admin/plans` with currency toggle and plan-model bindings
 - **Multiplier** — Admin: per-model and time-based pricing multiplier rules with effective price display and batch edit
 - **System Monitor** — Admin: real-time platform health at `/dashboard/admin/monitor` (QPS, error rate, P50/P95 latency, per-provider stats)
-- **API Playground** — Interactive testing at `/dashboard/playground` with model selector, streaming response, Markdown rendering, and conversation export
+- **API Playground** — Interactive testing at `/dashboard/playground` with model selector, streaming response, Markdown rendering, conversation export, MCP Tool Loop, and tool manager panel
 - **Budget** — Monthly spending limit with progress bar, threshold alerts, and projected spend forecast
 - **Audit Logs** — Admin: full-text search, CSV export, date range filtering
 
@@ -391,12 +392,14 @@ See [docs/deploy.md](docs/deploy.md) for full deployment guide (Nginx reverse pr
 
 ## Resource Center
 
-The resource center hub at `/resources/` provides quick access to:
+The resource center hub at `/resources/` provides unified access to three resource dimensions:
 
-- Agent Skills marketplace
-- Prompt Templates
-- Categories, Trending, Tags
-- Submit Templates
+- **Cloud MCP Servers** — 17 MCP nodes (Google Search, GitHub, Amap, 12306, etc.) with one-click activation to Playground, auto-mounting tool definitions for Tool Loop
+- **Prompt Templates** — 28+ high-quality prompt templates (Xiaohongshu notes, code review, weekly reports, etc.) with one-click systemPrompt injection
+- **Agent Client Skills** — Local client configs (file manager, Git workflow) with one-click JSON copy
+
+Standalone pages:
+- `/resources/mcp` — Cloud MCP Ecosystem Square with dual-column layout, 9 vertical category filters, Hosted/Local deployment type filtering
 
 ---
 
