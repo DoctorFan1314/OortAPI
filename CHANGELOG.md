@@ -9,7 +9,8 @@ All notable changes to this project will be documented in this file.
 ## 2026-05-28 — Resource Center UX Polish
 
 ### Improvements
-- **MCP detail page** — New `/resources/mcp/[id]` page with service details, available tools with parameter docs, deployment type, pricing, 2-row button layout (detail + activate)
+- **MCP detail page** — New `/resources/mcp/[id]` page following Agent Skill detail layout (breadcrumb, title+stats row, 3-tab switcher: Service Details / Available Tools / Configuration), tools shown in parameter table, config section with transport type and tool definition JSON
+- **MCP square detail links** — Each card in the MCP ecosystem square now has a "Details" button linking to the detail page
 - **Detail links on all cards** — Prompt → `/prompts/{id}`, Skill → `/skills/{id}`, MCP → `/resources/mcp/{id}`
 - **Real Agent Skills** — Client skill cards now source from Agent Skills marketplace (8 real skills), detail links no longer 404
 - **2-row button layout** — Card actions split into 2 rows: "Details" on top, "Launch in Playground" / "Copy Config" below

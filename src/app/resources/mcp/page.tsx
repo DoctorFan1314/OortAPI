@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useState, useMemo } from "react";
 import { Cloud, Server, Rocket, Copy, Check, Search, X, ExternalLink } from "lucide-react";
 import { useI18n } from "@/contexts/i18n-context";
@@ -181,15 +182,20 @@ export default function McpEcosystemPage() {
                     ))}
                   </div>
 
-                  {/* Actions */}
-                  <div className="flex gap-2 mt-auto">
-                    <Button size="sm" className="flex-1 bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20" onClick={() => handleActivate(item)}>
-                      <Rocket className="h-3.5 w-3.5 mr-1" />
-                      {t.resourceHub.mcpActivate}
-                    </Button>
-                    <Button size="sm" variant="secondary" className="border border-border" onClick={() => handleCopy(item)}>
-                      {copiedId === item.id ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
-                    </Button>
+                  {/* Actions — 2 rows: detail on top, activate + copy below */}
+                  <div className="flex flex-col gap-2 mt-auto">
+                    <Link href={`/resources/mcp/${item.id}`} className="flex items-center justify-center gap-1 px-3 py-1.5 text-xs rounded-md border border-border bg-secondary text-secondary-foreground hover:bg-muted transition-colors">
+                      {t.resourceHub.viewDetail}
+                    </Link>
+                    <div className="flex gap-2">
+                      <Button size="sm" className="flex-1 bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20" onClick={() => handleActivate(item)}>
+                        <Rocket className="h-3.5 w-3.5 mr-1" />
+                        {t.resourceHub.mcpActivate}
+                      </Button>
+                      <Button size="sm" variant="secondary" className="border border-border" onClick={() => handleCopy(item)}>
+                        {copiedId === item.id ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
+                      </Button>
+                    </div>
                   </div>
                 </div>
               ))}
