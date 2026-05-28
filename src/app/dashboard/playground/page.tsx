@@ -429,8 +429,9 @@ function PlaygroundContent() {
   const sendWithTools = async (firstBatchMsgs: ReturnType<typeof buildMessages>) => {
     let currentMsgs = firstBatchMsgs;
     let loopCount = 0;
-    const MAX_TOOL_LOOPS = 5;
+    const MAX_TOOL_LOOPS = 3; // Reduced from 5 to fail faster
   let consecutiveEmptyToolCalls = 0;
+  let lastToolResult: string | null = null;
 
     while (loopCount < MAX_TOOL_LOOPS) {
       loopCount++;
@@ -446,7 +447,17 @@ function PlaygroundContent() {
 	        const res = await fetch(endpointUrl, { method: "POST", headers, body: JSON.stringify(body), signal: controller.signal });
 	        const ttfbMs = Math.round(performance.now() - fetchStart);
 
-        if (!res.ok) { const errData = await res.json().catch(() => null); setError(errData?.error?.message || `HTTP ${res.status}`); setIsSending(false); return; }
+        if (!res.ok) {
+          // If we have a successful tool result, show it as the response instead of error
+          if (lastToolResult) {
+            const resultMsg: ChatMessage = { role: "assistant", content: `Based on the search results I found:\n\n${lastToolResult}`, createdAt: nowHHMM() };
+            updateSession((s) => ({ ...s, messages: [...s.messages, resultMsg] }));
+            setResponse(`Based on the search results I found:\n\n${lastToolResult}`);
+            setError(""); setIsSending(false);
+            return;
+          }
+          const errData = await res.json().catch(() => null); setError(errData?.error?.message || `HTTP ${res.status}`); setIsSending(false); return;
+        }
 
         const streamStart = performance.now();
 	        const { fullText, toolCalls, reasoning } = await readStream(res);
@@ -490,6 +501,9 @@ function PlaygroundContent() {
               // sequential_thinking and other tools: leave arguments as-is (server handles empty)
             }
             const toolResult = await executeTool(tc);
+            if (!toolResult.startsWith("Error:") && !toolResult.startsWith("Unknown tool") && toolResult !== "Error executing tool.") {
+              lastToolResult = toolResult; // Save for fallback if LLM fails
+            }
             recentToolNames.push(tc.function.name);
             // Detect consecutive failed/empty tool calls to break loops
             const isFailedCall = toolResult.startsWith("Error:") || toolResult === "Error executing tool." || toolResult.startsWith("Unknown tool");
