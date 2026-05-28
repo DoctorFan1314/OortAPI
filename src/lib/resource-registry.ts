@@ -164,7 +164,7 @@ const clientSkillItems: ResourceItem[] = agentSkills.map((skill) => ({
   name: skill.name,
   nameZh: skill.title,
   description: skill.description.split("\n").find(l => l && !l.startsWith("#") && !l.startsWith("-"))?.slice(0, 200) || skill.description.slice(0, 200),
-  descriptionZh: skill.description.split("\n").find(l => l && !l.startsWith("#") && !l.startsWith("-"))?.slice(0, 200) || skill.description.slice(0, 200),
+  descriptionZh: skill.title,
   category: "development",
   tags: skill.tags || [],
   pricing: "pricingClientOnly" as const,
@@ -194,15 +194,13 @@ export const RESOURCE_ITEMS: ResourceItem[] = [
 
 // ─── MCP Category Definitions ─────────────────────────────
 
-export type McpCategory = "search" | "browser" | "communication" | "developer" | "finance" | "knowledge" | "location" | "media" | "productivity";
+export type McpCategory = "search" | "browser" | "developer" | "knowledge" | "location" | "media" | "productivity";
 
 export const MCP_CATEGORIES: { key: McpCategory | "all"; i18nKey: string }[] = [
   { key: "all", i18nKey: "mcpCatAll" },
   { key: "browser", i18nKey: "mcpCatBrowser" },
   { key: "search", i18nKey: "mcpCatSearch" },
-  { key: "communication", i18nKey: "mcpCatCommunication" },
   { key: "developer", i18nKey: "mcpCatDeveloper" },
-  { key: "finance", i18nKey: "mcpCatFinance" },
   { key: "knowledge", i18nKey: "mcpCatKnowledge" },
   { key: "location", i18nKey: "mcpCatLocation" },
   { key: "media", i18nKey: "mcpCatMedia" },

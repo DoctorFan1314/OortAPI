@@ -30,7 +30,7 @@ export default function McpEcosystemPage() {
       items = items.filter(i => {
         const name = lang === "zh" ? i.nameZh : i.name;
         const desc = lang === "zh" ? i.descriptionZh : i.description;
-        return name.toLowerCase().includes(q) || desc.toLowerCase().includes(q) || i.tags.some(tag => tag.includes(q));
+        return name.toLowerCase().includes(q) || desc.toLowerCase().includes(q) || i.tags.some(tag => tag.toLowerCase().includes(q));
       });
     }
     return items;
@@ -48,7 +48,7 @@ export default function McpEcosystemPage() {
       toast(t.resourceHub.copiedSuccess, "success");
       setTimeout(() => setCopiedId(null), 2000);
     } catch {
-      toast("Copy failed", "error");
+      toast(t.resourceHub.mcpCopyFailed, "error");
     }
   };
 
@@ -86,10 +86,10 @@ export default function McpEcosystemPage() {
 
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Sidebar filters */}
-        <aside className="lg:w-56 shrink-0 space-y-4">
+        <aside className="lg:w-56 shrink-0 space-y-4 lg:sticky lg:top-20 lg:self-start">
           {/* Deployment filter */}
           <div className="glass-card p-4 rounded-xl">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Service Type</h3>
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">{t.resourceHub.mcpServiceType}</h3>
             <div className="space-y-1">
               {(["all", "hosted", "local"] as const).map(v => (
                 <button key={v} onClick={() => setDeploymentFilter(v)} className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${deploymentFilter === v ? "bg-primary/10 text-primary font-medium" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}>
@@ -101,7 +101,7 @@ export default function McpEcosystemPage() {
 
           {/* Category filter */}
           <div className="glass-card p-4 rounded-xl">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Category</h3>
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">{t.resourceHub.mcpCategoryLabel}</h3>
             <div className="space-y-1">
               {MCP_CATEGORIES.map(cat => (
                 <button key={cat.key} onClick={() => setActiveCategory(cat.key)} className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${activeCategory === cat.key ? "bg-primary/10 text-primary font-medium" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}>
@@ -152,9 +152,12 @@ export default function McpEcosystemPage() {
                       </div>
                       <h3 className="text-sm font-semibold truncate">{lang === "zh" ? item.nameZh : item.name}</h3>
                     </div>
-                    <Badge className={`shrink-0 border text-[10px] ${item.mcpDeployment === "local" ? "bg-blue-500/10 text-blue-400 border-blue-500/20" : "bg-purple-500/10 text-purple-400 border-purple-500/20"}`}>
-                      {item.mcpDeployment === "local" ? t.resourceHub.mcpLocal : t.resourceHub.mcpHosted}
-                    </Badge>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {item.featured && <Badge className="bg-amber-500/10 text-amber-400 border-amber-500/20 border text-[10px]">★</Badge>}
+                      <Badge className={`border text-[10px] ${item.mcpDeployment === "local" ? "bg-blue-500/10 text-blue-400 border-blue-500/20" : "bg-purple-500/10 text-purple-400 border-purple-500/20"}`}>
+                        {item.mcpDeployment === "local" ? t.resourceHub.mcpLocal : t.resourceHub.mcpHosted}
+                      </Badge>
+                    </div>
                   </div>
 
                   {/* Description */}

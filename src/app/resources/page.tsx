@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Puzzle, BookOpen, Server, LayoutGrid, TrendingUp, Tags, ArrowRight, Search, X, Cloud, Rocket, Copy, Sparkles, Wrench, Check } from "lucide-react";
+import { Puzzle, BookOpen, Server, LayoutGrid, TrendingUp, Tags, ArrowRight, Search, X, Cloud, Rocket, Copy, Sparkles, Wrench, Check, BarChart3, Users } from "lucide-react";
 import { useI18n } from "@/contexts/i18n-context";
 import { useToast } from "@/contexts/toast-context";
 import { Input } from "@/components/ui/input";
@@ -65,11 +65,18 @@ function ResourceCard({ item, copiedId, onLaunch, onCopy, t, lang }: { item: Res
           {t.resourceHub[BADGE_I18N[item.type]]}
         </Badge>
         {item.featured && (
-          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">★</span>
+          <Badge className="bg-amber-500/10 text-amber-400 border-amber-500/20 border text-[10px]">★ Featured</Badge>
         )}
       </div>
       <h3 className="text-sm font-semibold mb-1.5 line-clamp-1">{lang === "zh" ? item.nameZh : item.name}</h3>
-      <p className="text-xs text-muted-foreground mb-3 line-clamp-2 flex-1">{lang === "zh" ? item.descriptionZh : item.description}</p>
+      <p className="text-xs text-muted-foreground mb-2 line-clamp-2 flex-1">{lang === "zh" ? item.descriptionZh : item.description}</p>
+      {/* Stats row (M2) */}
+      {(item.mcpUsageCount || item.mcpUserCount) && (
+        <div className="flex items-center gap-3 text-[10px] text-muted-foreground mb-2">
+          {item.mcpUsageCount && <span className="flex items-center gap-1"><BarChart3 className="h-3 w-3" />{item.mcpUsageCount}</span>}
+          {item.mcpUserCount && <span className="flex items-center gap-1"><Users className="h-3 w-3" />{item.mcpUserCount}</span>}
+        </div>
+      )}
       {item.type === "mcp" && item.requiredTools && (
         <div className="flex flex-wrap gap-1 mb-3">
           {item.requiredTools.map(tool => (
@@ -131,11 +138,10 @@ export default function ResourcesPage() {
 
   // "全部" tab: show OVERVIEW_PER_TYPE per type
   const overviewSections = useMemo(() => {
-    return OVERVIEW_SECTIONS.map(sec => ({
-      ...sec,
-      items: searchFilter(getResourcesByType(sec.type)).slice(0, OVERVIEW_PER_TYPE),
-      total: searchFilter(getResourcesByType(sec.type)).length,
-    }));
+    return OVERVIEW_SECTIONS.map(sec => {
+      const filtered = searchFilter(getResourcesByType(sec.type));
+      return { ...sec, items: filtered.slice(0, OVERVIEW_PER_TYPE), total: filtered.length };
+    });
   }, [searchFilter]);
 
   // Specific tab: filtered + paginated
@@ -157,7 +163,7 @@ export default function ResourcesPage() {
       const desc = t.resourceHub[descKey];
       return label.toLowerCase().includes(q) || desc.toLowerCase().includes(q);
     });
-  }, [searchQuery, lang, t]);
+  }, [searchQuery, t]);
 
   const handleLaunch = (item: ResourceItem) => router.push(`/dashboard/playground?source=hub&type=${item.type}&id=${item.id}`);
 
@@ -168,7 +174,7 @@ export default function ResourcesPage() {
       setCopiedId(item.id);
       toast(t.resourceHub.copiedSuccess, "success");
       setTimeout(() => setCopiedId(null), 2000);
-    } catch { toast("Copy failed", "error"); }
+    } catch { toast(t.resourceHub.mcpCopyFailed, "error"); }
   }, [toast, t]);
 
   return (
@@ -280,7 +286,7 @@ export default function ResourcesPage() {
                     )}
                   </div>
                   <p className="text-sm text-muted-foreground mb-3">{desc}</p>
-                  <span className="text-primary text-sm flex items-center gap-1 group-hover:underline">{lang === "zh" ? "前往" : "Go"} <ArrowRight className="h-3 w-3" /></span>
+                  <span className="text-primary text-sm flex items-center gap-1 group-hover:underline">{t.resourceHub.mcpGo} <ArrowRight className="h-3 w-3" /></span>
                 </Link>
               );
             })}

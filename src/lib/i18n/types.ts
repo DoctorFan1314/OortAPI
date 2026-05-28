@@ -716,5 +716,38 @@ export interface Dictionary {
     toolSourceMcp: string;
     viewDetail: string;
     viewMore: string;
+    // MCP detail page
+    mcpNotFound: string;
+    mcpBackToSquare: string;
+    mcpCollection: string;
+    mcpLicenseLabel: string;
+    mcpDeveloperLabel: string;
+    mcpTabDetails: string;
+    mcpTabTools: string;
+    mcpTabFeedback: string;
+    mcpTabTest: string;
+    mcpAvailableTools: string;
+    mcpTips: string;
+    mcpTipsHosted: string;
+    mcpTipsLocal: string;
+    mcpParameters: string;
+    mcpRequired: string;
+    mcpOptional: string;
+    mcpNoToolInfo: string;
+    mcpGetServer: string;
+    mcpShare: string;
+    mcpQuickInfo: string;
+    mcpDeploymentLabel: string;
+    mcpToolsCountLabel: string;
+    mcpPricingLabel: string;
+    mcpServiceType: string;
+    mcpCategoryLabel: string;
+    mcpGo: string;
+    mcpCopyFailed: string;
+    // Sort
+    sortBy: string;
+    sortFeatured: string;
+    sortName: string;
+    sortUsage: string;
   };
 }
