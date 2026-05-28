@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Copy, Plus, Trash2, ToggleLeft, ToggleRight, RefreshCw, Key } from "lucide-react";
+import { Copy, Plus, Trash2, ToggleLeft, ToggleRight, RefreshCw, Key, Check } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/contexts/toast-context";
 import { dashboardSWRConfig } from "@/lib/swr-fetcher";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
@@ -308,10 +309,25 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
     <Card className="glass-card">
       <CardHeader>
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <CardTitle className="text-lg flex items-center gap-2">
-            {t.title}
+          <div className="flex items-center gap-2">
+            {filteredKeys.length > 0 && (
+              <input type="checkbox" checked={selectedKeys.size === filteredKeys.length && filteredKeys.length > 0}
+                onChange={toggleSelectAll} className="rounded border-border" title={lang === "zh" ? "全选" : "Select all"} />
+            )}
             <Badge variant="secondary" className="text-xs font-mono">{keys.length}</Badge>
-          </CardTitle>
+            {selectedKeys.size > 0 && (
+              <Button size="sm" variant="outline" onClick={batchDelete} disabled={batchDeleting} className="text-red-500 text-xs h-7 ml-1">
+                {batchDeleting
+                  ? (lang === "zh" ? `删除中 ${batchProgress?.current || 0}/${batchProgress?.total || selectedKeys.size}...` : `Deleting ${batchProgress?.current || 0}/${batchProgress?.total || selectedKeys.size}...`)
+                  : (lang === "zh" ? `删除 ${selectedKeys.size} 个` : `Delete ${selectedKeys.size}`)}
+              </Button>
+            )}
+            {batchProgress && (
+              <div className="w-20 h-1.5 bg-muted rounded-full overflow-hidden">
+                <div className="h-full bg-red-500 rounded-full transition-all" style={{ width: `${(batchProgress.current / batchProgress.total) * 100}%` }} />
+              </div>
+            )}
+          </div>
           <div className="flex items-center gap-2 w-full sm:w-auto">
             <div className="relative flex-1 sm:w-36">
               <input value={keySearch} onChange={e => setKeySearch(e.target.value)}
@@ -341,26 +357,6 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
           </div>
         ) : (
           <div className="space-y-3">
-            <div className="flex items-center gap-2 mb-2">
-              {filteredKeys.length > 0 && (
-                <>
-                  <input type="checkbox" checked={selectedKeys.size === filteredKeys.length && filteredKeys.length > 0}
-                    onChange={toggleSelectAll} className="rounded border-border" />
-                  {selectedKeys.size > 0 && (
-                    <>
-                      <Button size="sm" variant="outline" onClick={batchDelete} disabled={batchDeleting} className="text-red-500 text-xs h-7">
-                        {batchDeleting ? (lang === "zh" ? `删除中 ${batchProgress?.current || 0}/${batchProgress?.total || selectedKeys.size}...` : `Deleting ${batchProgress?.current || 0}/${batchProgress?.total || selectedKeys.size}...`) : (lang === "zh" ? `删除 ${selectedKeys.size} 个` : `Delete ${selectedKeys.size}`)}
-                      </Button>
-                      {batchProgress && (
-                        <div className="w-20 h-1.5 bg-muted rounded-full overflow-hidden">
-                          <div className="h-full bg-red-500 rounded-full transition-all" style={{ width: `${(batchProgress.current / batchProgress.total) * 100}%` }} />
-                        </div>
-                      )}
-                    </>
-                  )}
-                </>
-              )}
-            </div>
             {filteredKeys.map((k) => {
               const isExpired = k.expires_at ? new Date(k.expires_at + 'T23:59:59') < new Date() : false;
               const calcDaysLeft = k.expires_at ? Math.ceil((new Date(k.expires_at + 'T23:59:59').getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) : null;
@@ -418,22 +414,16 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
                     </button>
                   )}
                 </div>
-                <div className="flex items-center gap-0.5">
-                  <Button size="icon-sm" variant="ghost" onClick={() => toggleKey(k.id, !k.enabled)}
-                    className="h-8 w-8 text-muted-foreground hover:text-foreground data-[state=active]:text-green-500"
-                    title={k.enabled ? (lang === "zh" ? "禁用" : "Disable") : (lang === "zh" ? "启用" : "Enable")}>
-                    {k.enabled ? <ToggleRight className="h-5 w-5 text-green-500" /> : <ToggleLeft className="h-5 w-5" />}
-                  </Button>
-                  <Button size="icon-sm" variant="ghost" onClick={() => handleRotateKey(k.id)}
-                    className="h-8 w-8 text-muted-foreground hover:text-amber-400"
-                    title={lang === "zh" ? "轮换 Key" : "Rotate key"}>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs text-muted-foreground">{k.enabled ? t.enabled : t.disabled}</span>
+                  <Switch checked={!!k.enabled} onCheckedChange={(checked) => toggleKey(k.id, checked)}
+                    className="data-[checked]:bg-green-500" />
+                  <button onClick={() => handleRotateKey(k.id)} className="p-1.5 rounded-md text-muted-foreground hover:text-amber-400 hover:bg-muted transition-colors" title={lang === "zh" ? "轮换 Key" : "Rotate"}>
                     <RefreshCw className="h-4 w-4" />
-                  </Button>
-                  <Button size="icon-sm" variant="ghost" onClick={() => setDeleteTarget(k.id)}
-                    className="h-8 w-8 text-muted-foreground hover:text-red-500"
-                    title={lang === "zh" ? "删除" : "Delete"}>
+                  </button>
+                  <button onClick={() => setDeleteTarget(k.id)} className="p-1.5 rounded-md text-muted-foreground hover:text-red-500 hover:bg-muted transition-colors" title={lang === "zh" ? "删除" : "Delete"}>
                     <Trash2 className="h-4 w-4" />
-                  </Button>
+                  </button>
                 </div>
               </div>
               {expandedKeyId === k.id && (
