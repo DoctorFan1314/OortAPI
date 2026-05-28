@@ -503,9 +503,9 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
                 : "Copy and save this key now — it will only be shown once!"}
             </DialogDescription>
           </DialogHeader>
-          <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
-            <code className="flex-1 text-sm font-mono break-all">{newKeyFull}</code>
-            <Button size="sm" variant="outline" onClick={() => { if (newKeyFull) { navigator.clipboard.writeText(newKeyFull); showToast(t.copied, "success"); } }}>
+          <div className="flex items-center gap-2 p-3 bg-muted rounded-lg overflow-hidden">
+            <code className="flex-1 text-xs font-mono break-all select-all min-w-0 leading-relaxed">{newKeyFull}</code>
+            <Button size="sm" variant="outline" className="shrink-0" onClick={() => { if (newKeyFull) { navigator.clipboard.writeText(newKeyFull); showToast(t.copied, "success"); } }}>
               <Copy className="h-4 w-4" />
             </Button>
           </div>
