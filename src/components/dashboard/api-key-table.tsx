@@ -455,7 +455,7 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
             </DialogDescription>
           </DialogHeader>
           <div className="flex items-center gap-2 p-3 bg-muted rounded-lg overflow-hidden">
-            <code className="flex-1 text-xs font-mono break-all select-all min-w-0 leading-relaxed">{newKeyFull}</code>
+            <code className="flex-1 text-xs font-mono whitespace-nowrap select-all overflow-x-auto leading-relaxed">{newKeyFull}</code>
             <Button size="sm" variant="outline" className="shrink-0" onClick={() => { if (newKeyFull) { navigator.clipboard.writeText(newKeyFull); showToast(t.copied, "success"); } }}>
               <Copy className="h-4 w-4" />
             </Button>
