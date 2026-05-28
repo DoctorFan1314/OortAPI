@@ -11,14 +11,17 @@
 ### 资源中心重构 & MCP 生态链深度打通
 
 #### 新增功能
-- **云端 MCP 生态广场** — 全新独立页 `/resources/mcp`，双栏布局，侧边分类过滤器（9 大垂直领域），部署类型筛选（Hosted/Local），搜索功能
-- **MCP 详情页** — `/resources/mcp/[id]` 对标魔搭社区布局：标题+部署badge、统计行、合集+GitHub 链接、描述、分类/协议/开发者信息、三 Tab（服务详情/可用工具/交流反馈），右侧操作边栏（获取MCP服务器/复制配置/分享、快速信息卡片）
+- **云端 MCP 生态广场** — 全新独立页 `/resources/mcp`，双栏布局，侧边分类过滤器（8 大垂直领域），部署类型筛选（Hosted/Local），搜索功能
+- **MCP 详情页** — `/resources/mcp/[id]` 对标魔搭社区布局：标题+部署badge、统计行、合集+GitHub 链接、描述、分类/协议/开发者信息、四 Tab（服务详情/可用工具/工具测试/交流反馈），右侧操作边栏（获取MCP服务器/复制配置/分享、快速信息卡片）
+- **工具测试沙盒** — MCP 详情页新增交互式工具测试 Tab，自动根据参数 Schema 生成输入表单，点击运行测试真实调用 `/api/playground/tools`，展示返回结果
 - **交流反馈系统** — MCP 详情页复用 Agent 技能 CommentSection 组件，支持评分、评论、点赞、回复
 - **MCP 元数据** — 17 个 MCP 节点全部填充 developer/license/github/lastUpdated/usageCount/userCount 字段
 - **17 个 MCP 节点** — 谷歌搜索、GitHub 助手、PostgreSQL、高德地图、必应搜索、Supabase、RollingGo 酒店预订、抖音运营、ChatPPT、麦当劳、12306、Chrome DevTools、AntVis 图表、MemOS 记忆、微信读书、Fetch 内容抓取
 - **测试场工具管理器** — 输入栏新增工具按钮（带红色数字气泡），Sheet 面板列出已挂载 MCP 工具与内置工具，支持一键移除
 - **28+ 真实 Prompt 模板** — 全量对接提示词市场数据集，替代原有 3 个硬编码示例
 - **真实 Agent 技能** — 客户端技能数据源切换为 Agent 技能市场真实数据（8 个技能），详情链接不再 404
+- **资源卡片使用量统计** — 卡片新增使用量/用户数统计行，数据来自 MCP 元数据
+- **Featured 徽章升级** — 从微小 ★ 字符升级为正式 Badge 组件，琥珀色高亮
 
 #### 资源中心体验优化
 - **详情页入口** — 所有卡片支持「详情」按钮：Prompt → `/prompts/{id}`，Skill → `/skills/{id}`，MCP → `/resources/mcp/{id}`
@@ -53,6 +56,26 @@
 - **i18n 全量覆盖** — 所有新增 UI 文本通过字典系统（zh/en），零硬编码
 - **LocalStorage 兼容** — `activeMcpTools` 可选字段，老会话反序列化安全（`?? []` 短路保护）
 - **删除 8 个冗余子路由** — `claude-code/`、`cursor/`、`hermes/` 等 8 个物理目录移除
+
+### 资源中心体验审计修复
+
+#### i18n 修复
+- **MCP 详情页** — 替换 20+ 处硬编码 `lang === "zh"` 三元表达式为 `t.resourceHub.*` 字典键
+- **MCP 广场** — 修复 "Service Type"、"Category"、"Copy failed" 等硬编码英文字符串
+- **资源中心主页** — 修复 "前往/Go"、"Copy failed" 等硬编码字符串
+- **新增 30+ i18n 键** — MCP 详情页标签、工具测试、快速信息等（zh/en 同步）
+
+#### 数据修复
+- **空分类过滤器** — 移除无数据的 `communication` 和 `finance` 分类，避免用户点击后看到空白
+- **标签搜索大小写** — MCP 广场标签搜索改为大小写不敏感（`tag.toLowerCase()`）
+- **客户端技能中文描述** — `descriptionZh` 从英文提取改为使用 `skill.title` 中文标题
+- **Tips 文案修正** — 根据 `mcpDeployment` 区分显示云端托管/本地集成的不同提示文案
+
+#### 功能改进
+- **MCP 广场侧边栏** — 桌面端添加 `lg:sticky lg:top-20` 定位，滚动时侧边栏固定可见
+- **overviewSections 去重计算** — 消除 `searchFilter(getResourcesByType())` 的重复调用
+- **filteredSections 依赖修正** — 移除冗余的 `lang` 依赖项
+- **复制失败 Toast** — MCP 详情页 `handleCopy` 添加错误 Toast 提示
 
 ---
 

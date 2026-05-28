@@ -11,14 +11,17 @@ All notable changes to this project will be documented in this file.
 ### Resource Center Refactor & MCP Ecosystem Integration
 
 #### New Features
-- **Cloud MCP Ecosystem Square** — New standalone page `/resources/mcp` with dual-column layout, sidebar category filters (9 verticals), deployment type filters (Hosted/Local), and search
-- **MCP Detail Page** — `/resources/mcp/[id]` inspired by ModelScope: title+badge, stats row, collection+GitHub link, description, category/license/developer, 3 tabs (Service Details/Available Tools/Feedback), right sidebar (Get MCP Server/Copy Config/Share, quick info card)
+- **Cloud MCP Ecosystem Square** — New standalone page `/resources/mcp` with dual-column layout, sidebar category filters (8 verticals), deployment type filters (Hosted/Local), and search
+- **MCP Detail Page** — `/resources/mcp/[id]` inspired by ModelScope: title+badge, stats row, collection+GitHub link, description, category/license/developer, 4 tabs (Service Details/Available Tools/Tool Testing/Feedback), right sidebar (Get MCP Server/Copy Config/Share, quick info card)
+- **Tool Testing Sandbox** — New interactive tab on MCP detail page: auto-generates input form from parameter schema, runs real test against `/api/playground/tools`, displays response
 - **Feedback System** — MCP detail page reuses Agent Skill's CommentSection with ratings, comments, likes, replies
 - **MCP Metadata** — All 17 MCP nodes populated with developer/license/github/lastUpdated/usageCount/userCount
 - **17 MCP Nodes** — Google Search, GitHub Assistant, PostgreSQL, Amap, Bing Search, Supabase, RollingGo Hotels, Douyin Assistant, ChatPPT, McDonald's, 12306, Chrome DevTools, AntVis Charts, MemOS Memory, WeRead, Fetch Content
 - **Playground Tool Manager** — Wrench button with red count badge, Sheet panel listing mounted MCP and built-in tools with one-click remove
 - **28+ Real Prompt Templates** — Full integration with prompt marketplace dataset, replacing 3 hardcoded examples
 - **Real Agent Skills** — Client skill cards sourced from Agent Skills marketplace (8 real skills), detail links no longer 404
+- **Card Usage Stats** — Resource cards now show usage count and user count from MCP metadata
+- **Featured Badge Upgrade** — Upgraded from subtle ★ character to proper Badge component with amber styling
 
 #### Resource Center UX
 - **Detail links on all cards** — Prompt → `/prompts/{id}`, Skill → `/skills/{id}`, MCP → `/resources/mcp/{id}`
@@ -53,6 +56,26 @@ All notable changes to this project will be documented in this file.
 - **Full i18n coverage** — All new UI text through dictionary system (zh/en), zero hardcoded strings
 - **LocalStorage compatibility** — `activeMcpTools` optional field with `?? []` guard for legacy sessions
 - **Deleted 8 redundant sub-routes** — `claude-code/`, `cursor/`, `hermes/` etc. removed
+
+### Resource Center Audit Fixes
+
+#### i18n Fixes
+- **MCP detail page** — Replaced 20+ hardcoded `lang === "zh"` ternaries with `t.resourceHub.*` dictionary keys
+- **MCP square** — Fixed hardcoded "Service Type", "Category", "Copy failed" strings
+- **Resource center main** — Fixed hardcoded "Go", "Copy failed" strings
+- **30+ new i18n keys** — MCP detail page labels, tool testing, quick info (zh/en synced)
+
+#### Data Fixes
+- **Empty category filters** — Removed `communication` and `finance` categories with zero items
+- **Tag search case sensitivity** — MCP square tag search now uses `tag.toLowerCase()`
+- **Client skill Chinese description** — `descriptionZh` now uses `skill.title` instead of English text
+- **Tips text accuracy** — Shows correct text for local vs hosted MCP based on `mcpDeployment`
+
+#### Improvements
+- **MCP square sidebar** — Added `lg:sticky lg:top-20` for desktop scroll persistence
+- **overviewSections dedup** — Eliminated duplicate `searchFilter(getResourcesByType())` calls
+- **filteredSections deps** — Removed redundant `lang` dependency from useMemo
+- **Copy failure toast** — MCP detail page `handleCopy` now shows error toast on failure
 
 ---
 

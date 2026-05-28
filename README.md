@@ -12,11 +12,11 @@
 
 | Dependency | Minimum Version |
 |------------|-----------------|
-| Node.js | >= 18.0, **推荐 v20 LTS** |
+| Node.js | >= 18.0, **v20 LTS recommended** |
 | npm | >= 9.0 |
-| C++ Build Tools | Windows: [VS Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) (勾选 "Desktop development with C++")<br>macOS: `xcode-select --install`<br>Linux: `build-essential` / `python3` / `make` / `g++` |
+| C++ Build Tools | Windows: [VS Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) (check "Desktop development with C++")<br>macOS: `xcode-select --install`<br>Linux: `build-essential` / `python3` / `make` / `g++` |
 
-> **💡 推荐使用 Docker（无需编译环境）：** 见下方 Docker 部署。
+> **💡 Docker is recommended (no build tools needed):** See Docker deployment below.
 
 ### 2. Install & Run
 
@@ -34,7 +34,7 @@ npm run dev
 
 Open http://localhost:3000 in your browser.
 
-> **Windows 编译问题：** 如果 `better-sqlite3` 安装失败（`node-gyp` 报错），请先安装 [Visual Studio Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/)，勾选 "Desktop development with C++"。或者使用 Node.js 20 LTS（会自动使用预编译二进制，无需编译工具）。
+> **Windows build issues:** If `better-sqlite3` fails to install (`node-gyp` error), install [Visual Studio Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) with "Desktop development with C++" checked. Alternatively, use Node.js 20 LTS (uses pre-built binaries automatically).
 
 ### 3. Production Build
 
@@ -396,10 +396,15 @@ The resource center hub at `/resources/` provides unified access to three resour
 
 - **Cloud MCP Servers** — 17 MCP nodes (Google Search, GitHub, Amap, 12306, etc.) with one-click activation to Playground, auto-mounting tool definitions for Tool Loop
 - **Prompt Templates** — 28+ high-quality prompt templates (Xiaohongshu notes, code review, weekly reports, etc.) with one-click systemPrompt injection
-- **Agent Client Skills** — Local client configs (file manager, Git workflow) with one-click JSON copy
+- **Agent Client Skills** — 8 real skills from the Agent Skills marketplace with detail page links
+
+Each resource card shows a "Details" button linking to its full detail page, plus an action button ("Launch in Playground" for MCP/Prompt, "Copy Config" for Client Skills).
 
 Standalone pages:
-- `/resources/mcp` — Cloud MCP Ecosystem Square with dual-column layout, 9 vertical category filters, Hosted/Local deployment type filtering
+- `/resources/mcp` — Cloud MCP Ecosystem Square with dual-column layout, 8 vertical category filters, Hosted/Local deployment type filtering, featured badges, usage stats
+- `/resources/mcp/[id]` — MCP detail page with 4 tabs: Service Details, Available Tools, Tool Testing (interactive sandbox), Feedback (ratings/comments)
+- `/prompts/[id]` — Prompt template detail page with before/after examples, variable substitution, usage steps
+- `/skills/[id]` — Agent skill detail page with file browser, install command, version history, comments
 
 ---
 

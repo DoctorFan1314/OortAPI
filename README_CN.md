@@ -394,10 +394,15 @@ pm2 startup
 
 - **云端 MCP 服务器** — 17 个 MCP 节点（谷歌搜索、GitHub、高德地图、12306 等），一键激活至测试场，自动挂载工具定义启动 Tool Loop
 - **Prompt 高效模板** — 28+ 高质量提示词模板（小红书笔记、代码审查、周报生成器等），一键注入 systemPrompt
-- **Agent 客户端技能** — 本地客户端配置（文件管理、Git 工作流），一键复制 JSON 配置
+- **Agent 客户端技能** — 8 个来自 Agent 技能市场的真实技能，支持详情页跳转
+
+每张资源卡片提供「详情」按钮跳转至对应详情页，以及操作按钮（MCP/Prompt 为「一键激活至测试场」，Client Skill 为「复制配置」）。
 
 独立页面：
-- `/resources/mcp` — 云端 MCP 生态广场，双栏布局，9 大垂直领域分类过滤，Hosted/Local 部署类型筛选
+- `/resources/mcp` — 云端 MCP 生态广场，双栏布局，8 大垂直领域分类过滤，Hosted/Local 部署类型筛选，Featured 徽章，使用量统计
+- `/resources/mcp/[id]` — MCP 详情页，4 个 Tab：服务详情、可用工具、工具测试（交互式沙盒）、交流反馈（评分/评论）
+- `/prompts/[id]` — Prompt 模板详情页，包含前后对比示例、变量替换、使用步骤
+- `/skills/[id]` — Agent 技能详情页，文件浏览器、安装命令、版本历史、评论区
 
 ---
 
