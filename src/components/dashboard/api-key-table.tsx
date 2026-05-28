@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Fragment } from "react";
+import { useState, useEffect, useRef, Fragment } from "react";
 import useSWR from "swr";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -103,6 +103,12 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
   const [newKeyFull, setNewKeyFull] = useState<string | null>(null);
+  // Auto-copy to clipboard when key is created
+  useEffect(() => {
+    if (newKeyFull) {
+      navigator.clipboard.writeText(newKeyFull).catch(() => {});
+    }
+  }, [newKeyFull]);
   const [selectedKeys, setSelectedKeys] = useState<Set<number>>(new Set());
   const [batchDeleting, setBatchDeleting] = useState(false);
   const [editingRateId, setEditingRateId] = useState<number | null>(null);
