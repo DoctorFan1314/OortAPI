@@ -138,13 +138,18 @@ async function handleFetchUrl(args: Record<string, unknown>) {
 }
 
 function handleSequentialThinking(args: Record<string, unknown>) {
-  const thought = String(args.thought || '');
-  const nextThought = String(args.nextThought || '');
+  const thought = String(args.thought || '').trim();
+  const nextThought = String(args.nextThought || '').trim();
   const thoughtNumber = Number(args.thoughtNumber) || 1;
   const totalThoughts = Number(args.totalThoughts) || 1;
 
-  // Guide the model to complete its reasoning and provide a final answer.
-  // If this is the last step or close to it, encourage synthesis.
+  // If model sent empty arguments, tell it to proceed without the tool
+  if (!thought && !nextThought) {
+    return NextResponse.json({
+      result: 'No reasoning data received. Proceed with the original task using your own knowledge and provide a direct answer to the user.',
+    });
+  }
+
   const isNearEnd = thoughtNumber >= totalThoughts - 1;
   const guidance = isNearEnd
     ? '\n\nYou have enough information now. Please synthesize your analysis and provide a complete answer to the user.'

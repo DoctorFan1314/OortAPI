@@ -430,6 +430,7 @@ function PlaygroundContent() {
     let currentMsgs = firstBatchMsgs;
     let loopCount = 0;
     const MAX_TOOL_LOOPS = 5;
+  let consecutiveEmptyToolCalls = 0;
 
     while (loopCount < MAX_TOOL_LOOPS) {
       loopCount++;
@@ -490,6 +491,17 @@ function PlaygroundContent() {
             }
             const toolResult = await executeTool(tc);
             recentToolNames.push(tc.function.name);
+            // Detect consecutive failed/empty tool calls to break loops
+            const isFailedCall = toolResult.startsWith("Error:") || toolResult === "Error executing tool." || toolResult.startsWith("Unknown tool");
+            if (isFailedCall) {
+              consecutiveEmptyToolCalls++;
+              if (consecutiveEmptyToolCalls >= 2) {
+                const warnMsg = { role: "tool" as const, content: lang === "zh" ? "工具调用连续失败，当前模型可能不支持工具操作。请尝试其他模型。已基于已有信息为您回答。" : "Tool calls keep failing. This model may not support tool calling. Answering based on available information.", createdAt: nowHHMM(), tool_call_id: tc.id, name: tc.function.name };
+                currentMsgs = [...currentMsgs, { role: "assistant" as const, content: fullText || "", tool_calls: [tc] }, warnMsg];
+                updateSession((s) => ({ ...s, messages: [...s.messages, warnMsg] }));
+                break;
+              }
+            } else { consecutiveEmptyToolCalls = 0; }
             const toolMsg: ChatMessage = { role: "tool", content: toolResult, createdAt: nowHHMM(), tool_call_id: tc.id, name: tc.function.name };
             currentMsgs = [...currentMsgs, { role: "assistant" as const, content: fullText || "", tool_calls: [tc] }, { role: "tool" as const, content: toolResult, tool_call_id: tc.id, name: tc.function.name }];
             updateSession((s) => ({ ...s, messages: [...s.messages, toolMsg] }));
