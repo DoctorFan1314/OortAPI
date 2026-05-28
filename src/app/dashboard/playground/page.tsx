@@ -6,6 +6,7 @@ import { useI18n } from "@/contexts/i18n-context";
 import { useToast } from "@/contexts/toast-context";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import { CopyButton } from "@/components/shared/copy-button";
@@ -842,6 +843,11 @@ function PlaygroundContent() {
                 )}
               </button>
 
+              {/* Tool settings button */}
+              <button onClick={() => setShowToolConfig(true)} className="w-9 h-9 rounded-md border border-border/60 bg-muted/20 hover:bg-muted flex items-center justify-center transition-colors shrink-0 mt-1.5" title={t.tools}>
+                <Settings2 className="h-4 w-4 text-muted-foreground" />
+              </button>
+
               <Textarea placeholder={lang === "zh" ? "输入消息... (Shift+Enter 换行)" : "Type a message... (Shift+Enter newline)"} value={message} onChange={(e) => setMessage(e.target.value)} onKeyDown={handleKeyDown} rows={1} className="resize-none flex-1 min-h-[2.5rem] max-h-32 overflow-y-auto" disabled={isSending} />
 
               
@@ -986,6 +992,63 @@ function PlaygroundContent() {
                 ))}
               </>
             )}
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Tool Settings Sheet */}
+      <Sheet open={showToolConfig} onOpenChange={setShowToolConfig}>
+        <SheetContent side="right" className="w-80 sm:max-w-80">
+          <SheetHeader>
+            <SheetTitle className="flex items-center gap-2">
+              <Settings2 className="h-4 w-4" />
+              {t.tools}
+            </SheetTitle>
+            <SheetDescription>{lang === "zh" ? "配置工具 API Key 和启用内置工具" : "Configure tool API keys and enable built-in tools"}</SheetDescription>
+          </SheetHeader>
+          <div className="px-4 py-3 space-y-5 overflow-y-auto flex-1">
+            {/* Tavily API Key */}
+            <div>
+              <label className="text-xs font-medium text-foreground mb-1.5 block">{t.tavilyKey}</label>
+              <Input type="password" value={toolConfig.tavilyApiKey} placeholder="tvly-..."
+                onChange={e => {
+                  const newConfig = { ...toolConfig, tavilyApiKey: e.target.value };
+                  setToolConfig(newConfig);
+                  saveToolConfig(newConfig);
+                }}
+                className="text-xs font-mono" />
+              <p className="text-[10px] text-muted-foreground mt-1">
+                {lang === "zh" ? "用于联网搜索工具。获取免费 Key：tavily.com" : "For web search tool. Get a free key at tavily.com"}
+              </p>
+            </div>
+
+            {/* Built-in tool toggles */}
+            <div>
+              <label className="text-xs font-medium text-foreground mb-2 block">{lang === "zh" ? "内置工具" : "Built-in Tools"}</label>
+              <div className="space-y-2">
+                {Object.entries(BUILTIN_TOOLS).map(([name, def]) => {
+                  const enabled = toolConfig.enabledTools.includes(name);
+                  return (
+                    <label key={name} className="flex items-center gap-3 p-2.5 rounded-lg bg-muted/30 border border-border/50 cursor-pointer hover:bg-muted/50 transition-colors">
+                      <input type="checkbox" checked={enabled}
+                        onChange={() => {
+                          const newEnabled = enabled
+                            ? toolConfig.enabledTools.filter(n => n !== name)
+                            : [...toolConfig.enabledTools, name];
+                          const newConfig = { ...toolConfig, enabledTools: newEnabled };
+                          setToolConfig(newConfig);
+                          saveToolConfig(newConfig);
+                        }}
+                        className="rounded border-border" />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-medium font-mono">{name}</p>
+                        <p className="text-[10px] text-muted-foreground truncate">{def.function.description}</p>
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </SheetContent>
       </Sheet>
