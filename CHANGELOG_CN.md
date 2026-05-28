@@ -9,7 +9,8 @@
 ## 2026-05-28 — 资源中心体验优化
 
 ### 功能改进
-- **MCP 详情页** — 全新 `/resources/mcp/[id]` 详情页，对标魔搭社区布局：左侧主内容区（面包屑、标题+部署badge、统计行、GitHub 链接、描述、分类badge、协议/开发者信息、三 Tab 切换：服务详情/可用工具/交流反馈）+ 右侧操作边栏（获取MCP服务器按钮、服务配置 Remote/Stdio 切换、快速信息卡片）
+- **MCP 详情页** — 全新 `/resources/mcp/[id]` 详情页，对标魔搭社区布局：左侧主内容区（面包屑、标题+部署badge、统计行、合集+GitHub 链接、描述、分类badge、协议/开发者信息、三 Tab：服务详情/可用工具/交流反馈）+ 右侧操作边栏（获取MCP服务器/复制配置/分享按钮、快速信息卡片、标签）
+- **交流反馈系统** — MCP 详情页「交流反馈」Tab 复用 Agent 技能的 CommentSection 组件，支持评分、评论、点赞、回复
 - **MCP 元数据扩展** — ResourceItem 新增 mcpDeveloper/mcpLicense/mcpGithub/mcpLastUpdated/mcpUsageCount/mcpUserCount/mcpToolDescription 字段，17 个 MCP 节点全部填充
 - **MCP 广场详情入口** — 生态广场每张卡片新增「详情」按钮，跳转至对应的 MCP 详情页
 - **详情页入口** — 所有卡片均支持「详情」按钮：Prompt → `/prompts/{id}`，Skill → `/skills/{id}`，MCP → `/resources/mcp/{id}`

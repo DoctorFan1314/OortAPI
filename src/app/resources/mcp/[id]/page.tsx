@@ -2,12 +2,13 @@
 
 import { useRouter, useParams } from "next/navigation";
 import { useState } from "react";
-import { Cloud, Rocket, Copy, Check, ArrowLeft, Wrench, Server, Tag, Clock, Boxes, Share2, ExternalLink, GitBranch, Shield, User, Calendar, BarChart3, Users, ChevronRight } from "lucide-react";
+import { Rocket, Copy, Check, Wrench, Share2, GitBranch, Calendar, BarChart3, Users, ChevronRight, Tag, Shield, User } from "lucide-react";
 import { useI18n } from "@/contexts/i18n-context";
 import { useToast } from "@/contexts/toast-context";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getResourceById, type ResourceItem } from "@/lib/resource-registry";
+import { CommentSection } from "@/components/skill/comment-section";
 import Link from "next/link";
 
 export default function McpDetailPage() {
@@ -17,7 +18,6 @@ export default function McpDetailPage() {
   const params = useParams();
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState<"details" | "tools" | "feedback">("details");
-  const [configTab, setConfigTab] = useState<"remote" | "stdio">("remote");
 
   const item = getResourceById(params.id as string);
 
@@ -68,7 +68,7 @@ export default function McpDetailPage() {
         <div className="flex-1 min-w-0">
           {/* Header */}
           <div className="mb-6">
-            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2 flex items-center gap-3">
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2 flex items-center gap-3 flex-wrap">
               {name}
               <Badge className={`border text-xs ${item.mcpDeployment === "local" ? "bg-blue-500/10 text-blue-400 border-blue-500/20" : "bg-purple-500/10 text-purple-400 border-purple-500/20"}`}>
                 {item.mcpDeployment === "local" ? t.resourceHub.mcpLocal : t.resourceHub.mcpHosted}
@@ -83,16 +83,16 @@ export default function McpDetailPage() {
               <span className="flex items-center gap-1"><Wrench className="h-3.5 w-3.5" />{item.requiredTools?.length ?? 0}</span>
             </div>
 
-            {/* GitHub + collection */}
-            {item.mcpGithub && (
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-xs text-muted-foreground">{lang === "zh" ? "合集" : "Collection"}</span>
+            {/* Collection + GitHub */}
+            <div className="flex items-center gap-3 mb-3">
+              <span className="text-xs text-muted-foreground">{lang === "zh" ? "合集" : "Collection"}</span>
+              {item.mcpGithub && (
                 <a href={`https://github.com/${item.mcpGithub}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-primary hover:underline">
                   <GitBranch className="h-3 w-3" />
                   GitHub @{item.mcpGithub.split("/")[0]} / {item.mcpGithub.split("/")[1]}
                 </a>
-              </div>
-            )}
+              )}
+            </div>
 
             {/* Short description */}
             <p className="text-sm text-muted-foreground leading-relaxed mb-3">{toolDesc}</p>
@@ -106,8 +106,8 @@ export default function McpDetailPage() {
 
             {/* License + Developer */}
             <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground mt-3">
-              {item.mcpLicense && <span className="flex items-center gap-1">{lang === "zh" ? "开源协议：" : "License: "}{item.mcpLicense}</span>}
-              {item.mcpDeveloper && <span className="flex items-center gap-1">{lang === "zh" ? "开发者：" : "Developer: "}{item.mcpDeveloper}</span>}
+              {item.mcpLicense && <span className="flex items-center gap-1"><Shield className="h-3 w-3" />{lang === "zh" ? "开源协议：" : "License: "}{item.mcpLicense}</span>}
+              {item.mcpDeveloper && <span className="flex items-center gap-1"><User className="h-3 w-3" />{lang === "zh" ? "开发者：" : "Developer: "}{item.mcpDeveloper}</span>}
             </div>
           </div>
 
@@ -132,12 +132,10 @@ export default function McpDetailPage() {
             ))}
           </div>
 
-          {/* Tab content: Service Details */}
+          {/* Tab: Service Details */}
           {activeTab === "details" && (
             <div className="space-y-6">
-              <div className="text-sm text-muted-foreground leading-relaxed">{desc}</div>
-
-              {/* Tool preview */}
+              <div className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{desc}</div>
               {item.requiredTools && item.requiredTools.length > 0 && (
                 <div>
                   <h3 className="text-sm font-semibold mb-3">{lang === "zh" ? "可用工具" : "Available Tools"}</h3>
@@ -151,8 +149,6 @@ export default function McpDetailPage() {
                   </div>
                 </div>
               )}
-
-              {/* Tips */}
               <div className="p-4 rounded-lg bg-amber-500/5 border border-amber-500/20">
                 <p className="text-xs font-semibold text-amber-500/80 mb-1">{lang === "zh" ? "提示" : "Tips"}</p>
                 <p className="text-xs text-muted-foreground">
@@ -164,9 +160,9 @@ export default function McpDetailPage() {
             </div>
           )}
 
-          {/* Tab content: Available Tools */}
+          {/* Tab: Available Tools */}
           {activeTab === "tools" && (
-            <div className="space-y-4">
+            <div className="space-y-6">
               {item.requiredTools && item.requiredTools.length > 0 ? item.requiredTools.map(tool => {
                 const toolParams = tool.function.parameters as Record<string, unknown> | undefined;
                 const props = toolParams?.properties as Record<string, Record<string, unknown>> | undefined;
@@ -196,18 +192,16 @@ export default function McpDetailPage() {
             </div>
           )}
 
-          {/* Tab content: Feedback */}
+          {/* Tab: Feedback — reuses CommentSection from Agent Skills */}
           {activeTab === "feedback" && (
-            <div className="text-center py-12 text-muted-foreground">
-              <p className="text-sm">{lang === "zh" ? "暂无反馈" : "No feedback yet"}</p>
-            </div>
+            <CommentSection skillId={item.id} skillTitle={name} />
           )}
         </div>
 
         {/* ── Right: Action sidebar ── */}
         <aside className="lg:w-72 shrink-0 space-y-4">
-          {/* Get MCP Server */}
-          <div className="glass-card p-5 rounded-xl border border-border/50 space-y-4">
+          {/* Action buttons */}
+          <div className="glass-card p-5 rounded-xl border border-border/50 space-y-3">
             <Button className="w-full bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20" onClick={handleActivate}>
               <Rocket className="h-4 w-4 mr-2" />
               {lang === "zh" ? "获取 MCP 服务器" : "Get MCP Server"}
@@ -215,70 +209,26 @@ export default function McpDetailPage() {
             <Button variant="secondary" className="w-full border border-border" onClick={handleCopyTools}>
               {copied ? <><Check className="h-4 w-4 mr-2 text-green-500" />{t.resourceHub.copiedSuccess}</> : <><Copy className="h-4 w-4 mr-2" />{t.resourceHub.mcpCopyConfig}</>}
             </Button>
-          </div>
-
-          {/* Service Config */}
-          <div className="glass-card p-5 rounded-xl border border-border/50 space-y-4">
-            <h3 className="text-sm font-semibold">{lang === "zh" ? "服务配置" : "Service Configuration"}</h3>
-
-            {/* Remote / Stdio tabs */}
-            <div className="flex rounded-lg border border-border overflow-hidden">
-              <button onClick={() => setConfigTab("remote")} className={`flex-1 px-3 py-1.5 text-xs font-medium transition-colors ${configTab === "remote" ? "bg-primary text-primary-foreground" : "bg-background text-muted-foreground hover:text-foreground"}`}>Remote</button>
-              <button onClick={() => setConfigTab("stdio")} className={`flex-1 px-3 py-1.5 text-xs font-medium transition-colors border-l border-border ${configTab === "stdio" ? "bg-primary text-primary-foreground" : "bg-background text-muted-foreground hover:text-foreground"}`}>Stdio</button>
-            </div>
-
-            <p className="text-[10px] text-muted-foreground">
-              {lang === "zh"
-                ? "Hosted MCP 服务的 Remote URL 是为您分配的专属连接地址，为敏感信息，请勿对外泄漏！"
-                : "The Remote URL for Hosted MCP services is your dedicated connection address. Keep it confidential!"}
-            </p>
-
-            <div className="space-y-2">
-              <div className="flex justify-between text-xs">
-                <span className="text-muted-foreground">{lang === "zh" ? "传输类型" : "Transport"}</span>
-                <span className="font-medium">{configTab === "remote" ? "Remote" : "Stdio"}</span>
-              </div>
-              <div className="flex justify-between text-xs">
-                <span className="text-muted-foreground">{lang === "zh" ? "鉴权类型" : "Auth"}</span>
-                <span className="font-medium">{lang === "zh" ? "无鉴权" : "No Auth"}</span>
-              </div>
-              <div className="flex justify-between text-xs">
-                <span className="text-muted-foreground">{lang === "zh" ? "有效期" : "Validity"}</span>
-                <span className="font-medium">{lang === "zh" ? "24小时有效" : "24h valid"}</span>
-              </div>
-            </div>
-
-            <Button variant="outline" size="sm" className="w-full border-border text-xs">
-              {lang === "zh" ? "使用个人专属云资源部署MCP服务" : "Deploy with personal cloud resources"}
+            <Button variant="outline" size="sm" className="w-full border-border text-xs" onClick={handleShare}>
+              <Share2 className="h-3.5 w-3.5 mr-1.5" />
+              {lang === "zh" ? "分享" : "Share"}
             </Button>
           </div>
 
           {/* Quick info */}
           <div className="glass-card p-5 rounded-xl border border-border/50 space-y-3">
-            <div className="flex justify-between text-xs">
-              <span className="text-muted-foreground">{lang === "zh" ? "部署类型" : "Deployment"}</span>
-              <span className="font-medium">{item.mcpDeployment === "local" ? t.resourceHub.mcpLocal : t.resourceHub.mcpHosted}</span>
-            </div>
-            <div className="flex justify-between text-xs">
-              <span className="text-muted-foreground">{lang === "zh" ? "工具数量" : "Tools"}</span>
-              <span className="font-medium">{item.requiredTools?.length ?? 0}</span>
-            </div>
-            <div className="flex justify-between text-xs">
-              <span className="text-muted-foreground">{lang === "zh" ? "计费方式" : "Pricing"}</span>
-              <span className="font-medium">{t.resourceHub[item.pricing]}</span>
-            </div>
-            {item.mcpLicense && (
-              <div className="flex justify-between text-xs">
-                <span className="text-muted-foreground">{lang === "zh" ? "开源协议" : "License"}</span>
-                <span className="font-medium">{item.mcpLicense}</span>
+            {[
+              { label: lang === "zh" ? "部署类型" : "Deployment", value: item.mcpDeployment === "local" ? t.resourceHub.mcpLocal : t.resourceHub.mcpHosted },
+              { label: lang === "zh" ? "工具数量" : "Tools", value: String(item.requiredTools?.length ?? 0) },
+              { label: lang === "zh" ? "计费方式" : "Pricing", value: t.resourceHub[item.pricing] },
+              ...(item.mcpLicense ? [{ label: lang === "zh" ? "开源协议" : "License", value: item.mcpLicense }] : []),
+              ...(item.mcpDeveloper ? [{ label: lang === "zh" ? "开发者" : "Developer", value: item.mcpDeveloper }] : []),
+            ].map(({ label, value }) => (
+              <div key={label} className="flex justify-between text-xs">
+                <span className="text-muted-foreground">{label}</span>
+                <span className="font-medium">{value}</span>
               </div>
-            )}
-            {item.mcpDeveloper && (
-              <div className="flex justify-between text-xs">
-                <span className="text-muted-foreground">{lang === "zh" ? "开发者" : "Developer"}</span>
-                <span className="font-medium">{item.mcpDeveloper}</span>
-              </div>
-            )}
+            ))}
           </div>
 
           {/* Tags */}
