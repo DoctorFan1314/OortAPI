@@ -393,13 +393,18 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center gap-1.5 shrink-0">
                     <button onClick={() => toggleKeyAnalytics(k.id)}
-                      className={`text-xs px-2 py-1.5 rounded-md transition-colors ${expandedKeyId === k.id ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}>
-                      {lang === "zh" ? "用量" : "Usage"}
+                      className={`text-xs px-2 py-1.5 rounded-md transition-colors whitespace-nowrap ${expandedKeyId === k.id ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}>
+                      {lang === "zh" ? "用量分析" : "Usage"}
                     </button>
-                    <Switch checked={!!k.enabled} onCheckedChange={(checked) => toggleKey(k.id, checked)}
-                      className="border-2 border-border data-[checked]:bg-green-500 data-[unchecked]:bg-muted data-[unchecked]:border-border" />
+                    <div className="flex items-center gap-1">
+                      <span className={`text-[11px] ${k.enabled ? "text-green-500" : "text-muted-foreground/50"}`}>
+                        {k.enabled ? (lang === "zh" ? "已启用" : "On") : (lang === "zh" ? "已禁用" : "Off")}
+                      </span>
+                      <Switch checked={!!k.enabled} onCheckedChange={(checked) => toggleKey(k.id, checked)}
+                        className="border-2 border-border data-[checked]:bg-green-500 data-[unchecked]:bg-muted data-[unchecked]:border-border" />
+                    </div>
                     <div className="w-px h-8 bg-border/50" />
                     <div className="flex flex-col gap-1">
                       <button onClick={() => handleRotateKey(k.id)} className="w-7 h-7 flex items-center justify-center rounded-md text-muted-foreground/60 hover:text-amber-400 hover:bg-muted transition-colors" title={lang === "zh" ? "轮换" : "Rotate"}>
