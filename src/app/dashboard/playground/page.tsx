@@ -184,7 +184,7 @@ function PlaygroundContent() {
   const selectedKeyId = currentSession?.selectedKeyId ?? null;
   const systemPrompt = currentSession?.systemPrompt ?? "";
   const params = currentSession?.params ?? DEFAULT_PARAMS;
-  const selectedKey = keys.find((k) => k.id === selectedKeyId);
+  const selectedKey = keys.find((k) => k.id === selectedKeyId) ?? keys[0] ?? null;
   const presets = lang === "zh" ? PRESETS_ZH : PRESETS_EN;
   const currentModelData = models.find((m) => m.id === selectedModel);
   const modelCaps = (() => {
@@ -698,14 +698,6 @@ function PlaygroundContent() {
               )}
             </div>
           </div>
-
-          {/* No API key warning */}
-          {!selectedKey && (
-            <div className="px-5 py-2 bg-amber-500/10 border-b border-amber-500/20 text-amber-500 text-xs flex items-center gap-2 shrink-0">
-              <Lock className="h-3.5 w-3.5 shrink-0" />
-              <span>{lang === "zh" ? "请在右侧「API Key」下拉框中选择一个密钥，或前往控制台创建新密钥" : "Select an API Key from the right panel dropdown, or create one in the dashboard"}</span>
-            </div>
-          )}
 
           {/* Messages */}
           <div ref={msgContainerRef} className="flex-1 overflow-y-auto p-6 space-y-4 playground-scrollbar">
