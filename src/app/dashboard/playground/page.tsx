@@ -540,9 +540,16 @@ function PlaygroundContent() {
 
           if (delta?.tool_calls) {
             for (const tc of delta.tool_calls) {
-              const existing = toolCalls.find((t) => t.id === tc.id);
-              if (existing) { existing.function.arguments += (tc.function?.arguments || ""); }
-              else if (tc.function?.name) { toolCalls.push({ id: tc.id, type: "function", function: { name: tc.function.name, arguments: tc.function?.arguments || "" } }); }
+              // Match by id first, then by function name for subsequent chunks
+              // where id may be undefined
+              const existing = tc.id
+                ? toolCalls.find((t) => t.id === tc.id)
+                : toolCalls.find((t) => t.function.name === tc.function?.name && !t.function.arguments);
+              if (existing) {
+                existing.function.arguments += (tc.function?.arguments || "");
+              } else if (tc.function?.name) {
+                toolCalls.push({ id: tc.id || `tc-${toolCalls.length}`, type: "function", function: { name: tc.function.name, arguments: tc.function?.arguments || "" } });
+              }
             }
           }
 
