@@ -326,15 +326,15 @@ function PlaygroundContent() {
   const prevMsgLen = useRef(0);
   useEffect(() => {
     const el = msgContainerRef.current;
+    const end = msgEndRef.current;
     if (!el) return;
     const len = chatHistory.length;
     const hasNew = len > 0 && len > (prevMsgLen.current || 0);
     const hasContent = !!(response && response.length > 0) || !!(reasoningContent && reasoningContent.length > 10);
-    if (hasNew) {
-      el.scrollTop = el.scrollHeight;
-    } else if (hasContent) {
+    if (hasNew || hasContent) {
       if (!userScrolledUpRef.current) {
-        el.scrollTop = el.scrollHeight;
+        // Use scrollIntoView for more reliable bottom-scrolling
+        end?.scrollIntoView({ behavior: hasNew ? "auto" : "smooth", block: "end" });
       }
     }
     prevMsgLen.current = len;
@@ -770,17 +770,21 @@ function PlaygroundContent() {
                       </details>
                     </div>
                   )}
-                  {/* Message bubble */}
-                  <div className={cn("glass-card rounded-lg px-4 py-2.5 text-sm leading-relaxed relative", msg.role === "assistant" ? "" : msg.role === "tool" ? "bg-amber-500/5 border-amber-500/20" : "bg-primary/10 border-0")}>
-                    {msg.role === "tool" ? (
+                  {/* Message bubble — skip empty assistant messages (tool call only, no text) */}
+                  {msg.role === "tool" ? (
+                    <div className="glass-card rounded-lg px-4 py-2.5 text-sm leading-relaxed bg-amber-500/5 border-amber-500/20">
                       <details>
                         <summary className="text-xs font-medium text-amber-500/80 cursor-pointer hover:text-amber-500 transition-colors select-none flex items-center gap-1.5">
                           <Wrench className="h-3 w-3" />{msg.name || t.toolCall}
                         </summary>
                         <pre className="mt-2 pt-2 border-t border-amber-500/10 text-[11px] font-mono text-muted-foreground whitespace-pre-wrap max-h-[300px] overflow-y-auto">{msg.content as string}</pre>
                       </details>
-                    ) : <div className="text-xs">{renderContent(msg.content)}</div>}
-                  </div>
+                    </div>
+                  ) : (typeof msg.content === "string" && !msg.content.trim() && msg.tool_calls?.length) ? null : (
+                    <div className={cn("glass-card rounded-lg px-4 py-2.5 text-sm leading-relaxed relative", msg.role === "assistant" ? "" : "bg-primary/10 border-0")}>
+                      <div className="text-xs">{renderContent(msg.content)}</div>
+                    </div>
+                  )}
                   <div className="flex items-center gap-1.5 mt-1 px-1">
                     <span className="text-[10px] text-muted-foreground/60 font-mono">{msg.role === "tool" ? `${msg.name || t.toolCall}` : `${wordCount(flatContent(msg.content))} words`} · {msg.createdAt || nowHHMM()}</span>
                     <span className="flex-1" />
