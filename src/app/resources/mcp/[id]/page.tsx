@@ -23,7 +23,12 @@ export default function McpDetailPage() {
   const [testTool, setTestTool] = useState<string>("");
   const [testArgs, setTestArgs] = useState<Record<string, string>>({});
   const [testResult, setTestResult] = useState<string | null>(null);
+  const [testDemo, setTestDemo] = useState<boolean | null>(null);
   const [testLoading, setTestLoading] = useState(false);
+  const [tavilyKey, setTavilyKey] = useState(() => {
+    if (typeof window === "undefined") return "";
+    try { return localStorage.getItem("oortapi-tavily-key") || ""; } catch { return ""; }
+  });
 
   const item = getResourceById(params.id as string);
 
@@ -62,11 +67,13 @@ export default function McpDetailPage() {
 
   // Tool testing
   const selectedToolDef = item.requiredTools?.find(tool => tool.function.name === testTool);
+  const isSearchTool = testTool === "google_search" || testTool === "google_news" || testTool === "bing_search";
 
   const handleRunTest = async () => {
     if (!testTool) return;
     setTestLoading(true);
     setTestResult(null);
+    setTestDemo(null);
     try {
       const parsedArgs: Record<string, unknown> = {};
       for (const [k, v] of Object.entries(testArgs)) {
@@ -78,12 +85,14 @@ export default function McpDetailPage() {
       const res = await fetch("/api/playground/tools", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tool: testTool, args: parsedArgs, config: {} }),
+        body: JSON.stringify({ tool: testTool, args: parsedArgs, config: { tavilyApiKey: tavilyKey || undefined } }),
       });
       const data = await res.json();
       setTestResult(data.result || data.error || JSON.stringify(data));
+      setTestDemo(data.demo ?? null);
     } catch (e) {
       setTestResult(`Error: ${e instanceof Error ? e.message : "Unknown error"}`);
+      setTestDemo(null);
     } finally {
       setTestLoading(false);
     }
@@ -220,6 +229,19 @@ export default function McpDetailPage() {
               {selectedToolDef && (
                 <div className="space-y-4">
                   <p className="text-xs text-muted-foreground">{selectedToolDef.function.description}</p>
+
+                  {/* API key input for search tools */}
+                  {isSearchTool && (
+                    <div className="p-3 rounded-lg bg-muted/20 border border-border/30">
+                      <label className="text-xs text-muted-foreground mb-1.5 block">{t.resourceHub.mcpTavilyKeyLabel}</label>
+                      <Input type="password" value={tavilyKey} placeholder="tvly-..."
+                        onChange={e => { setTavilyKey(e.target.value); try { localStorage.setItem("oortapi-tavily-key", e.target.value); } catch {} }}
+                        className="text-xs font-mono" />
+                      <p className="text-[10px] text-muted-foreground mt-1">{t.resourceHub.mcpTavilyKeyHint}</p>
+                    </div>
+                  )}
+
+                  {/* Parameter inputs */}
                   {(() => {
                     const toolParams = selectedToolDef.function.parameters as Record<string, unknown> | undefined;
                     const props = toolParams?.properties as Record<string, Record<string, unknown>> | undefined;
@@ -241,12 +263,20 @@ export default function McpDetailPage() {
                       </div>
                     );
                   })()}
+
                   <Button onClick={handleRunTest} disabled={testLoading || !testTool} className="bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20">
                     {testLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Play className="h-4 w-4 mr-2" />}
-                    {lang === "zh" ? "运行测试" : "Run Test"}
+                    {t.resourceHub.mcpRunTest}
                   </Button>
+
+                  {/* Result */}
                   {testResult !== null && (
-                    <div className="relative group">
+                    <div className="space-y-2">
+                      {testDemo !== null && (
+                        <div className={`inline-flex items-center gap-1.5 text-[10px] px-2 py-1 rounded-full ${testDemo ? "bg-amber-500/10 text-amber-400 border border-amber-500/20" : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"}`}>
+                          {testDemo ? `⚠️ ${t.resourceHub.mcpDemoMode}` : `✅ ${t.resourceHub.mcpRealExecution}`}
+                        </div>
+                      )}
                       <pre className="bg-zinc-950 rounded-lg p-4 overflow-x-auto text-xs leading-relaxed border border-zinc-800">
                         <code className="text-zinc-300 font-mono whitespace-pre">{testResult}</code>
                       </pre>
@@ -254,7 +284,7 @@ export default function McpDetailPage() {
                   )}
                 </div>
               )}
-              {!testTool && <p className="text-sm text-muted-foreground py-8 text-center">{lang === "zh" ? "选择一个工具开始测试" : "Select a tool to start testing"}</p>}
+              {!testTool && <p className="text-sm text-muted-foreground py-8 text-center">{t.resourceHub.mcpSelectTool}</p>}
             </div>
           )}
 

@@ -744,6 +744,12 @@ export interface Dictionary {
     mcpCategoryLabel: string;
     mcpGo: string;
     mcpCopyFailed: string;
+    mcpTavilyKeyLabel: string;
+    mcpTavilyKeyHint: string;
+    mcpDemoMode: string;
+    mcpRealExecution: string;
+    mcpRunTest: string;
+    mcpSelectTool: string;
     // Sort
     sortBy: string;
     sortFeatured: string;
