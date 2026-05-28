@@ -367,13 +367,7 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
               <Fragment key={k.id}>
               <div className={`rounded-xl border transition-all ${isExpired ? "border-red-500/30 bg-red-500/[0.02]" : "border-border/50 hover:border-border hover:shadow-sm"}`}>
                 <div className="flex items-center gap-3 px-4 py-3">
-                  <div className="flex flex-col items-center gap-1 shrink-0">
-                    <input type="checkbox" checked={selectedKeys.has(k.id)} onChange={() => toggleSelectKey(k.id)} className="rounded border-border" />
-                    <button onClick={() => toggleKeyAnalytics(k.id)}
-                      className={`text-[10px] px-1 py-0.5 rounded transition-colors ${expandedKeyId === k.id ? "bg-primary/10 text-primary" : "text-muted-foreground/40 hover:text-foreground"}`}>
-                      {lang === "zh" ? "用量" : "Usage"}
-                    </button>
-                  </div>
+                  <input type="checkbox" checked={selectedKeys.has(k.id)} onChange={() => toggleSelectKey(k.id)} className="rounded border-border shrink-0" />
                   <div className="flex-1 min-w-0 space-y-1">
                     <div className="flex items-center gap-2">
                       <span className="font-semibold text-sm">{k.name}</span>
@@ -400,6 +394,10 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
                     </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
+                    <button onClick={() => toggleKeyAnalytics(k.id)}
+                      className={`text-xs px-2 py-1.5 rounded-md transition-colors ${expandedKeyId === k.id ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}>
+                      {lang === "zh" ? "用量" : "Usage"}
+                    </button>
                     <Switch checked={!!k.enabled} onCheckedChange={(checked) => toggleKey(k.id, checked)}
                       className="border-2 border-border data-[checked]:bg-green-500 data-[unchecked]:bg-muted data-[unchecked]:border-border" />
                     <div className="w-px h-8 bg-border/50" />
