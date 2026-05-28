@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, memo } from "react";
 import useSWR from "swr";
 import { dashboardSWRConfig } from "@/lib/swr-fetcher";
 import { RESOURCE_ITEMS, getResourcesByType, type ResourceItem, type ResourceType } from "@/lib/resource-registry";
@@ -56,10 +56,10 @@ function getDetailHref(item: ResourceItem): string | null {
   return null;
 }
 
-function ResourceCard({ item, copiedId, onLaunch, onCopy, t, lang }: { item: ResourceItem; copiedId: string | null; onLaunch: (i: ResourceItem) => void; onCopy: (i: ResourceItem) => void; t: ReturnType<typeof useI18n>["t"]; lang: string }) {
+const ResourceCard = memo(function ResourceCard({ item, copiedId, onLaunch, onCopy, t, lang, index }: { item: ResourceItem; copiedId: string | null; onLaunch: (i: ResourceItem) => void; onCopy: (i: ResourceItem) => void; t: ReturnType<typeof useI18n>["t"]; lang: string; index?: number }) {
   const detailHref = getDetailHref(item);
   return (
-    <div className="glass-card glass-card-hover p-5 h-full group flex flex-col relative">
+    <div className="glass-card glass-card-hover p-5 h-full group flex flex-col relative animate-page-fade-in" style={index != null ? { animationDelay: `${index * 50}ms` } : undefined}>
       <div className="flex items-center gap-2 mb-3">
         <Badge className={`${BADGE_STYLES[item.type]} border text-[10px] font-medium`}>
           {t.resourceHub[BADGE_I18N[item.type]]}
@@ -110,7 +110,7 @@ function ResourceCard({ item, copiedId, onLaunch, onCopy, t, lang }: { item: Res
       </div>
     </div>
   );
-}
+});
 
 export default function ResourcesPage() {
   const { lang, t, tFormat } = useI18n();
@@ -135,6 +135,12 @@ export default function ResourcesPage() {
       return name.toLowerCase().includes(q) || desc.toLowerCase().includes(q) || i.tags.some(tag => tag.toLowerCase().includes(q));
     });
   }, [searchQuery, lang]);
+
+  // Unified instant search results (M3)
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    return searchFilter(RESOURCE_ITEMS).slice(0, 8);
+  }, [searchQuery, searchFilter]);
 
   // "全部" tab: show OVERVIEW_PER_TYPE per type
   const overviewSections = useMemo(() => {
@@ -198,11 +204,32 @@ export default function ResourcesPage() {
         </div>
       </div>
 
-      {/* Search */}
+      {/* Search with instant dropdown */}
       <div className="relative max-w-md mb-6">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
         <Input placeholder={t.resourceHub.searchPlaceholder} value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-10 pr-9 bg-secondary border-border text-foreground" />
-        {searchQuery && <button onClick={() => setSearchQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /></button>}
+        {searchQuery && <button onClick={() => setSearchQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground z-10"><X className="h-4 w-4" /></button>}
+        {/* Instant search dropdown */}
+        {searchResults.length > 0 && (
+          <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-xl shadow-xl z-50 max-h-80 overflow-y-auto">
+            {searchResults.map(item => {
+              const detailHref = getDetailHref(item);
+              const name = lang === "zh" ? item.nameZh : item.name;
+              const desc = lang === "zh" ? item.descriptionZh : item.description;
+              return (
+                <Link key={item.id} href={detailHref || "#"} onClick={() => setSearchQuery("")}
+                  className="flex items-center gap-3 px-4 py-2.5 hover:bg-muted transition-colors border-b border-border/30 last:border-0">
+                  <Badge className={`${BADGE_STYLES[item.type]} border text-[9px] shrink-0`}>{t.resourceHub[BADGE_I18N[item.type]]}</Badge>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium truncate">{name}</p>
+                    <p className="text-[11px] text-muted-foreground truncate">{desc}</p>
+                  </div>
+                  <ArrowRight className="h-3 w-3 text-muted-foreground shrink-0" />
+                </Link>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Tabs */}
@@ -237,7 +264,7 @@ export default function ResourcesPage() {
                 <p className="text-sm text-muted-foreground py-6">{t.resourceHub.noResults}</p>
               ) : (
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {sec.items.map(item => <ResourceCard key={item.id} item={item} copiedId={copiedId} onLaunch={handleLaunch} onCopy={handleCopy} t={t} lang={lang} />)}
+                  {sec.items.map((item, i) => <ResourceCard key={item.id} item={item} copiedId={copiedId} onLaunch={handleLaunch} onCopy={handleCopy} t={t} lang={lang} index={i} />)}
                 </div>
               )}
             </div>
@@ -251,7 +278,7 @@ export default function ResourcesPage() {
           ) : (
             <>
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-                {visibleItems.map(item => <ResourceCard key={item.id} item={item} copiedId={copiedId} onLaunch={handleLaunch} onCopy={handleCopy} t={t} lang={lang} />)}
+                {visibleItems.map((item, i) => <ResourceCard key={item.id} item={item} copiedId={copiedId} onLaunch={handleLaunch} onCopy={handleCopy} t={t} lang={lang} index={i} />)}
               </div>
               {hasMore && (
                 <div className="text-center mb-12">

@@ -9,6 +9,7 @@ import { agentSkills } from "./mock-agent-skills";
 // 3. client-skill: JSON config for local agent clients (copy only)
 
 export type ResourceType = "prompt-template" | "mcp" | "client-skill";
+export type McpCategory = "search" | "browser" | "developer" | "knowledge" | "location" | "media" | "productivity";
 
 export interface ResourceItem {
   id: string;
@@ -27,7 +28,7 @@ export interface ResourceItem {
   clientConfigJson?: string;         // client-skill only
   // MCP ecosystem metadata
   mcpDeployment?: "hosted" | "local";
-  mcpCategory?: string;
+  mcpCategory?: McpCategory;
   mcpDeveloper?: string;
   mcpLicense?: string;
   mcpGithub?: string;
@@ -193,8 +194,6 @@ export const RESOURCE_ITEMS: ResourceItem[] = [
 ];
 
 // ─── MCP Category Definitions ─────────────────────────────
-
-export type McpCategory = "search" | "browser" | "developer" | "knowledge" | "location" | "media" | "productivity";
 
 export const MCP_CATEGORIES: { key: McpCategory | "all"; i18nKey: string }[] = [
   { key: "all", i18nKey: "mcpCatAll" },
