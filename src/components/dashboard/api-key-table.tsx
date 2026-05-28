@@ -310,10 +310,10 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <CardTitle className="text-lg flex items-center gap-2">
             {t.title}
-            {!isLoading && <Badge variant="secondary" className="text-xs">{keys.length}</Badge>}
+            <Badge variant="secondary" className="text-xs font-mono">{keys.length}</Badge>
           </CardTitle>
           <div className="flex items-center gap-2 w-full sm:w-auto">
-            <div className="relative flex-1 sm:w-48">
+            <div className="relative flex-1 sm:w-36">
               <input value={keySearch} onChange={e => setKeySearch(e.target.value)}
                 placeholder={t.searchKeys}
                 className="w-full h-9 px-3 pl-8 rounded-lg border border-border/60 bg-background text-sm focus:border-primary focus:outline-none" />
@@ -418,16 +418,22 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
                     </button>
                   )}
                 </div>
-                <div className="flex items-center gap-1">
-                  <button onClick={() => toggleKey(k.id, !k.enabled)} className="text-muted-foreground hover:text-foreground" aria-label={k.enabled ? "Disable key" : "Enable key"}>
+                <div className="flex items-center gap-0.5">
+                  <Button size="icon-sm" variant="ghost" onClick={() => toggleKey(k.id, !k.enabled)}
+                    className="h-8 w-8 text-muted-foreground hover:text-foreground data-[state=active]:text-green-500"
+                    title={k.enabled ? (lang === "zh" ? "禁用" : "Disable") : (lang === "zh" ? "启用" : "Enable")}>
                     {k.enabled ? <ToggleRight className="h-5 w-5 text-green-500" /> : <ToggleLeft className="h-5 w-5" />}
-                  </button>
-                  <button onClick={() => handleRotateKey(k.id)} className="text-muted-foreground hover:text-amber-400" aria-label="Rotate key">
-                    <RefreshCw className="h-3.5 w-3.5" />
-                  </button>
-                  <button onClick={() => setDeleteTarget(k.id)} className="text-muted-foreground hover:text-red-500" aria-label="Delete key">
+                  </Button>
+                  <Button size="icon-sm" variant="ghost" onClick={() => handleRotateKey(k.id)}
+                    className="h-8 w-8 text-muted-foreground hover:text-amber-400"
+                    title={lang === "zh" ? "轮换 Key" : "Rotate key"}>
+                    <RefreshCw className="h-4 w-4" />
+                  </Button>
+                  <Button size="icon-sm" variant="ghost" onClick={() => setDeleteTarget(k.id)}
+                    className="h-8 w-8 text-muted-foreground hover:text-red-500"
+                    title={lang === "zh" ? "删除" : "Delete"}>
                     <Trash2 className="h-4 w-4" />
-                  </button>
+                  </Button>
                 </div>
               </div>
               {expandedKeyId === k.id && (
