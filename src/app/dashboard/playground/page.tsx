@@ -879,9 +879,9 @@ function PlaygroundContent() {
                 <button onClick={() => setQuoteMessage(null)} className="p-0.5 rounded hover:bg-destructive/20 shrink-0"><X className="h-3.5 w-3.5 text-destructive/70 hover:text-destructive" /></button>
               </div>
             )}
-            <div className="flex gap-2 items-start">
+            <div className="flex gap-2 items-center">
               {/* "+" button */}
-              <div className="relative pt-1.5">
+              <div className="relative">
                 <button onClick={() => setShowToolbar(!showToolbar)} className="w-9 h-9 rounded-md border border-border/60 bg-muted/20 hover:bg-muted flex items-center justify-center transition-colors shrink-0">
                   <Plus className="h-4 w-4 text-muted-foreground" />
                 </button>
@@ -893,7 +893,7 @@ function PlaygroundContent() {
               </div>
 
               {/* Tool manager button */}
-              <button onClick={() => setShowToolManager(true)} className="relative w-9 h-9 rounded-md border border-border/60 bg-muted/20 hover:bg-muted flex items-center justify-center transition-colors shrink-0 mt-1.5" title={dict.resourceHub.toolManager}>
+              <button onClick={() => setShowToolManager(true)} className="relative w-9 h-9 rounded-md border border-border/60 bg-muted/20 hover:bg-muted flex items-center justify-center transition-colors shrink-0" title={dict.resourceHub.toolManager}>
                 <Wrench className="h-4 w-4 text-muted-foreground" />
                 {(currentSession?.activeMcpTools?.length ?? 0) > 0 && (
                   <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold px-1">
