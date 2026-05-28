@@ -463,6 +463,21 @@
   --tw-prose-pre-bg: var(--muted);
 }
 
+/* ===== CODE BLOCK SCROLL PROTECTION ===== */
+pre, code {
+  overflow-x: auto;
+  word-break: normal;
+  overflow-wrap: normal;
+}
+
+@media (max-width: 640px) {
+  pre {
+    font-size: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+  }
+}
+
 /* ===== PRINT ===== */
 @media print {
   .glass-card, .glass-card-hover {

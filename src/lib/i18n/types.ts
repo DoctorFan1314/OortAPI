@@ -617,6 +617,22 @@ export interface Dictionary {
     nginxConfig: string;
     envVarTitle: string;
     envVarDesc: string;
+    // Docs landing page groups
+    groupGettingStarted: string;
+    groupApiReference: string;
+    groupAdvancedGuides: string;
+    // AI tools sandbox
+    aiToolsTitle: string;
+    aiToolsSubtitle: string;
+    aiToolStep1: string;
+    aiToolStep1Desc: string;
+    aiToolStep2: string;
+    aiToolStep2Desc: string;
+    aiToolStep3: string;
+    aiToolStep3Desc: string;
+    aiToolSelectTool: string;
+    aiToolCopyConfig: string;
+    aiToolCopied: string;
   };
   resources: {
     title: string;

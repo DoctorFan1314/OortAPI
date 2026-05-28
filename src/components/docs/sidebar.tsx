@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/contexts/i18n-context";
 import { BookOpen, ChevronDown, Search, Zap, Key, Code, Activity, Book, Server, DollarSign, AlertTriangle, Gauge, Layout, Menu, X, GitCommit } from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 interface NavItem {
   href: string;
@@ -49,15 +50,7 @@ const NAV_SECTIONS: NavSection[] = [
   {
     sectionKey: "navAiTools",
     items: [
-      { href: "/docs/ai-tools", labelKey: "navAiToolsOverview", icon: Book, exact: true },
-      { href: "/docs/ai-tools/openai-codex", labelKey: "navOpenAICodex", icon: Book, exact: true },
-      { href: "/docs/ai-tools/opencode", labelKey: "navOpenCode", icon: Book, exact: true },
-      { href: "/docs/ai-tools/claude-code", labelKey: "navClaudeCode", icon: Book, exact: true },
-      { href: "/docs/ai-tools/cursor", labelKey: "navCursor", icon: Book, exact: true },
-      { href: "/docs/ai-tools/openclaw", labelKey: "navOpenClaw", icon: Book, exact: true },
-      { href: "/docs/ai-tools/qwen-code", labelKey: "navQwenCode", icon: Book, exact: true },
-      { href: "/docs/ai-tools/hermes", labelKey: "navHermes", icon: Book, exact: true },
-      { href: "/docs/ai-tools/windsurf", labelKey: "navWindsurf", icon: Book, exact: true },
+      { href: "/docs/ai-tools", labelKey: "navAiTools", icon: Book, exact: true },
     ],
   },
   {
@@ -80,14 +73,16 @@ export function DocsSidebar() {
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Set<string>>(() => {
-    // Only expand the section containing the current page
     const activeSection = NAV_SECTIONS.find(
       section => section.items.some(item => pathname.startsWith(item.href))
     );
     return new Set(activeSection ? [activeSection.sectionKey] : []);
   });
 
+  const isSearching = searchQuery.length > 0;
+
   const toggleSection = (key: string) => {
+    if (isSearching) return; // Disable manual toggle during search
     setExpandedSections(prev => {
       const next = new Set(prev);
       if (next.has(key)) next.delete(key);
@@ -103,29 +98,27 @@ export function DocsSidebar() {
       .map(section => ({
         ...section,
         items: section.items.filter(item => {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const label = ((t.apiDocs as any)[item.labelKey.replace("apiDocs.", "")] || "") as string;
+          const label = ((t.apiDocs as Record<string, string>)[item.labelKey] || "") as string;
           return label.toLowerCase().includes(q) || item.href.toLowerCase().includes(q);
         }),
       }))
       .filter(s => s.items.length > 0);
   }, [searchQuery, t]);
 
-  // Auto-expand sections with matches when searching
-  useEffect(() => {
-    if (searchQuery) {
-      setExpandedSections(prev => {
-        const next = new Set(prev);
-        filteredSections.forEach(s => next.add(s.sectionKey));
-        return next;
-      });
-    }
-  }, [searchQuery, filteredSections]);
+  // During search: all matched sections are visually expanded (without mutating state)
+  const visibleExpanded = useMemo(() => {
+    if (!isSearching) return expandedSections;
+    const searchExpanded = new Set(expandedSections);
+    filteredSections.forEach(s => searchExpanded.add(s.sectionKey));
+    return searchExpanded;
+  }, [isSearching, expandedSections, filteredSections]);
 
   const isActive = (href: string, exact?: boolean) => {
     if (exact) return pathname === href;
     return pathname.startsWith(href + "/") || pathname === href;
   };
+
+  const Lr = t.apiDocs as Record<string, string>;
 
   const sidebarContent = (
     <nav className="space-y-1" role="navigation" aria-label={t.common.navigation}>
@@ -135,19 +128,24 @@ export function DocsSidebar() {
         <input
           value={searchQuery}
           onChange={e => setSearchQuery(e.target.value)}
-          placeholder={(t.apiDocs as Record<string, string>).navDocsSearchPlaceholder || "Search docs..."}
+          placeholder={Lr.navDocsSearchPlaceholder || "Search docs..."}
           className="w-full pl-8 pr-3 py-1.5 bg-background rounded-lg text-sm border border-border/50 focus:border-primary focus:outline-none"
         />
       </div>
 
       {filteredSections.map(section => {
-        const sectionLabel = (t.apiDocs as Record<string, string>)[section.sectionKey] || section.sectionKey;
-        const isExpanded = expandedSections.has(section.sectionKey);
+        const sectionLabel = Lr[section.sectionKey] || section.sectionKey;
+        const isExpanded = visibleExpanded.has(section.sectionKey);
         return (
           <div key={section.sectionKey}>
             <button
               onClick={() => toggleSection(section.sectionKey)}
-              className="flex items-center justify-between w-full px-2 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground rounded-md transition-colors"
+              className={cn(
+                "flex items-center justify-between w-full px-2 py-1.5 text-xs font-medium rounded-md transition-colors",
+                isSearching
+                  ? "text-muted-foreground/60 cursor-default"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
             >
               {sectionLabel}
               <ChevronDown className={cn("h-3 w-3 transition-transform", isExpanded && "rotate-180")} />
@@ -157,8 +155,7 @@ export function DocsSidebar() {
                 {section.items.map(item => {
                   const active = isActive(item.href, item.exact);
                   const Icon = item.icon;
-                  const key = item.labelKey as string;
-                  const label = (t.apiDocs as Record<string, string>)[key] || key;
+                  const label = Lr[item.labelKey] || item.labelKey;
                   return (
                     <Link
                       key={item.href}
@@ -168,8 +165,7 @@ export function DocsSidebar() {
                         "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-colors",
                         active
                           ? "bg-primary/10 text-primary font-medium"
-                          : "text-muted-foreground hover:text-foreground hover:bg-muted",
-                        searchQuery ? "" : ""
+                          : "text-muted-foreground hover:text-foreground hover:bg-muted"
                       )}
                     >
                       {Icon && <Icon className="h-3.5 w-3.5 shrink-0" />}
@@ -193,22 +189,22 @@ export function DocsSidebar() {
         className="flex items-center justify-between w-full px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted lg:hidden transition-colors"
         aria-expanded={mobileOpen}
       >
-        <span>{(t.apiDocs as Record<string, string>).title || "Docs"}</span>
+        <span>{Lr.title || "Docs"}</span>
         {mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
       </button>
 
-      {/* Mobile overlay */}
-      {mobileOpen && (
-        <div className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm lg:hidden" onClick={() => setMobileOpen(false)} onKeyDown={(e) => { if (e.key === 'Escape') { e.stopPropagation(); setMobileOpen(false); } }} />
-      )}
+      {/* Mobile: Sheet overlay */}
+      <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+        <SheetContent side="left" className="w-64 p-4">
+          <SheetHeader className="mb-4">
+            <SheetTitle>{Lr.title || "Docs"}</SheetTitle>
+          </SheetHeader>
+          {sidebarContent}
+        </SheetContent>
+      </Sheet>
 
-      {/* Sidebar panel */}
-      <aside className={cn(
-        "w-64 shrink-0",
-        mobileOpen
-          ? "fixed inset-y-0 left-0 z-50 bg-card/80 backdrop-blur-xl border-r border-border p-4 overflow-y-auto lg:relative lg:inset-auto lg:z-auto lg:border-none"
-          : "hidden lg:block lg:sticky lg:top-20 lg:h-[calc(100vh-5rem)] lg:overflow-y-auto"
-      )}>
+      {/* Desktop: sticky sidebar */}
+      <aside className="hidden lg:block w-64 shrink-0 lg:sticky lg:top-20 lg:h-[calc(100vh-5rem)] lg:overflow-y-auto">
         {sidebarContent}
       </aside>
     </>

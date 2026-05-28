@@ -6,6 +6,27 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## 2026-05-28 — Documentation Center Industrial Refactor
+
+### Architecture
+- **Data-driven landing page** — Replaced hardcoded `Array.slice()` grouping with `group` typed field on DocCard, pure `.filter()` rendering
+- **Sidebar search state machine** — Introduced `isSearching` computed variable; search no longer mutates `expandedSections`, eliminating input flicker
+- **Mobile Sheet drawer** — Sidebar mobile menu upgraded from manual overlay to Shadcn UI `Sheet` with body scroll lock and Portal rendering
+- **AI Tools consolidated sandbox** — 8 AI tool sub-pages merged into single `/docs/ai-tools` page with left tool selector + right 3-step config wizard, URL deep-linking (`?tool=cursor`)
+
+### Visual
+- **Hero glassmorphic banner** — Gradient glow + dark grid overlay + centered search
+- **Card hover glow** — `hover:shadow-primary/5` + `hover:border-primary/40` transition animations
+- **Code block syntax highlighting** — CodeBlock integrated with `react-syntax-highlighter`, language labels, hover copy button
+- **Horizontal scroll protection** — `min-w-0` + `overflow-x-auto` loop preventing mobile code overflow
+
+### Engineering
+- **Full i18n coverage** — 15 new `apiDocs` dictionary keys (zh/en), zero hardcoded strings
+- **Suspense boundary** — AI tools page `useSearchParams` wrapped in `<Suspense>` for production build safety
+- **Deleted 8 redundant sub-routes** — `claude-code/`, `cursor/`, `hermes/` etc. 8 physical directories removed
+
+---
+
 ## 2026-05-28 — Resource Center Refactor & MCP Ecosystem Integration
 
 ### New Features

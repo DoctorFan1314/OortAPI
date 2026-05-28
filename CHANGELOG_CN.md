@@ -6,6 +6,27 @@
 
 ---
 
+## 2026-05-28 — 文档中心工业级重构
+
+### 架构升级
+- **文档落地页数据驱动** — 废除硬编码 `Array.slice()` 分组，DocCard 接口新增 `group` 强类型字段，前台纯 `.filter()` 动态渲染
+- **侧边栏搜索状态机** — 引入 `isSearching` 计算变量，搜索期间禁止改写 `expandedSections`，彻底根治输入闪烁 Bug
+- **移动端 Sheet 抽屉** — 侧边栏移动端响应式菜单从手动浮层升级为 Shadcn UI `Sheet` 组件，自带滚动锁和 Portal 渲染
+- **AI 工具聚合沙盒** — 8 个 AI 工具子页面收拢至单页 `/docs/ai-tools`，左侧工具选择器 + 右侧三步配置向导，支持 URL 深度链接 (`?tool=cursor`)
+
+### 视觉升级
+- **Hero 毛玻璃横幅** — 渐变光环 + 暗色网格背景 + 居中搜索框
+- **卡片悬浮发光** — `hover:shadow-primary/5` + `hover:border-primary/40` 过渡动画
+- **代码块语法高亮** — CodeBlock 组件接入 `react-syntax-highlighter`，支持语言标签、右上角悬浮复制按钮
+- **横向滚动保护** — `min-w-0` + `overflow-x-auto` 闭环，杜绝移动端代码撑破布局
+
+### 工程改进
+- **i18n 全量覆盖** — 新增 15 个 `apiDocs` 字典词条（zh/en），零硬编码
+- **Suspense 边界** — AI 工具页 `useSearchParams` 包裹 `<Suspense>` 确保生产构建安全
+- **删除 8 个冗余子路由** — `claude-code/`、`cursor/`、`hermes/` 等 8 个物理目录移除
+
+---
+
 ## 2026-05-28 — 资源中心重构 & MCP 生态链深度打通
 
 ### 新增功能
