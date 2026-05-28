@@ -149,6 +149,8 @@ export function generateApiKey(): string {
 
 // --- AES-256-GCM Encryption for channel API keys ---
 
+const DEFAULT_ENCRYPTION_KEY = 'oortapi-default-encryption-key-32b!';
+
 export function hashApiKey(key: string): string {
   // Use SHA-256 directly (not HMAC) so the hash is deterministic
   // regardless of process.env changes across server reloads.
