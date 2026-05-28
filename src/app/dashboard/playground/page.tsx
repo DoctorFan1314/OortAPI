@@ -463,8 +463,12 @@ function PlaygroundContent() {
             if (!tc.function.arguments || tc.function.arguments.trim() === "" || tc.function.arguments === "{}") {
               const userMsg = currentMsgs.findLast((m) => m.role === "user");
               const userText = typeof userMsg?.content === "string" ? userMsg.content : "";
-              if (userText && tc.function.name === "web_search") {
-                tc.function.arguments = JSON.stringify({ query: userText });
+              if (userText && (tc.function.name === "web_search" || tc.function.name === "google_search" || tc.function.name === "bing_search")) {
+                // Append today's date for time-relevant searches
+                const today = new Date().toISOString().split("T")[0];
+                const hasTimeHint = /今天|今日|today|latest|最新|recent/i.test(userText);
+                const query = hasTimeHint ? `${userText} ${today}` : userText;
+                tc.function.arguments = JSON.stringify({ query, count: 5 });
               } else if (userText && tc.function.name === "fetch_url") {
                 const urlMatch = userText.match(/https?:\/\/[^\s]+/);
                 tc.function.arguments = JSON.stringify({ url: urlMatch ? urlMatch[0] : userText });

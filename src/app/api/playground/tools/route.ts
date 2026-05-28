@@ -81,10 +81,15 @@ async function handleWebSearch(
   }
 
   try {
+    // Auto-detect time-sensitive queries and limit to recent results
+    const isTimeSensitive = /今天|今日|today|latest|最新|recent|breaking/i.test(query);
+    const tavilyBody: Record<string, unknown> = { api_key: config.tavilyApiKey, query, search_depth: 'basic', include_answer: true, max_results: count };
+    if (isTimeSensitive) tavilyBody.days = 1; // Limit to last 24 hours
+
     const res = await fetch('https://api.tavily.com/search', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ api_key: config.tavilyApiKey, query, search_depth: 'basic', include_answer: true, max_results: count }),
+      body: JSON.stringify(tavilyBody),
     });
     if (!res.ok) return NextResponse.json({ result: `Tavily search failed: HTTP ${res.status}` });
 
@@ -148,10 +153,14 @@ async function handleGoogleSearch(
   }
 
   try {
+    const isTimeSensitive = /今天|今日|today|latest|最新|recent|breaking/i.test(query);
+    const tavilyBody: Record<string, unknown> = { api_key: config.tavilyApiKey, query, search_depth: 'basic', include_answer: true, max_results: count };
+    if (isTimeSensitive) tavilyBody.days = 1;
+
     const res = await fetch('https://api.tavily.com/search', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ api_key: config.tavilyApiKey, query, search_depth: 'basic', include_answer: true, max_results: count }),
+      body: JSON.stringify(tavilyBody),
     });
     if (!res.ok) return NextResponse.json({ result: `Search failed: HTTP ${res.status}`, demo: false });
 
