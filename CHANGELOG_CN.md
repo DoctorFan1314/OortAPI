@@ -77,6 +77,29 @@
 - **filteredSections 依赖修正** — 移除冗余的 `lang` 依赖项
 - **复制失败 Toast** — MCP 详情页 `handleCopy` 添加错误 Toast 提示
 
+### 测试场（Playground）深度修复与工具系统重构
+
+#### 工具管理器重构
+- **Switch 开关组件** — 新增 `@base-ui/react` Switch 组件，替换原生 checkbox
+- **工具卡片 UI 升级** — 圆角 xl、悬浮阴影、左侧图标+名称+描述、右侧 Switch 开关
+- **模型能力联动** — 模型不支持工具调用时 Switch 禁用 + tooltip 提示；模型未配置能力时显示警告条
+- **MCP 工具门控** — `buildRequestBody` 中 MCP 工具也受 `modelCaps.tools` 控制，不支持的模型不发送工具
+- **空状态优化** — 无 MCP 工具时显示图标+标题+引导文案
+
+#### 工具执行修复
+- **流式解析器修复** — `readStream` 中 tool_calls 的 arguments 在流式传输时累积失败（id 匹配逻辑），导致所有工具参数为空
+- **空参数兜底** — 模型返回空 arguments 时，自动从用户消息中提取搜索关键词，并追加当天日期
+- **搜索时效性** — Tavily API 自动检测时间敏感查询，添加 `days: 1` 参数限制最近 24 小时结果
+- **真实工具执行** — MCP 工具接入 Tavily 搜索 API、GitHub Code Search API，配置 Key 后返回真实结果
+
+#### 测试场 UI 修复
+- **工具调用显示** — 替换原始 JSON 为紧凑行内卡片（工具名+参数摘要），工具结果改为折叠卡片
+- **发送按钮禁用** — 修复 localStorage 中 stale `selectedKeyId` 导致发送按钮永远禁用的 Bug
+- **发送按钮对齐** — 输入栏工具按钮与输入框居中对齐
+- **聊天滚动** — 修复长回复无法滚动到底部的问题，改用 `scrollIntoView`
+- **空白气泡** — 修复工具调用后出现空白助手消息气泡的问题
+- **工具设置面板** — 合并为单一 Sheet（Tavily Key + 内置工具开关 + MCP 工具列表）
+
 ---
 
 ## [v3.3.4.19] — 2026-05-25

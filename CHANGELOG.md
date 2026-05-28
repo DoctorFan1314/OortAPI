@@ -77,6 +77,29 @@ All notable changes to this project will be documented in this file.
 - **filteredSections deps** — Removed redundant `lang` dependency from useMemo
 - **Copy failure toast** — MCP detail page `handleCopy` now shows error toast on failure
 
+### Playground Deep Fix & Tool System Refactor
+
+#### Tool Manager Redesign
+- **Switch component** — New `@base-ui/react` Switch component replacing native checkboxes
+- **Tool card UI upgrade** — Rounded-xl, hover shadow, left icon+name+desc, right Switch toggle
+- **Model capability linkage** — Switch disabled when model lacks tool support + tooltip hint; warning banner for unknown capabilities
+- **MCP tool gating** — `buildRequestBody` now gates MCP tools behind `modelCaps.tools` (same as built-in)
+- **Empty state polish** — Icon + title + description when no MCP tools loaded
+
+#### Tool Execution Fixes
+- **Stream parser fix** — `readStream` tool_calls arguments failed to accumulate during streaming (id matching bug), resulting in empty arguments for all tools
+- **Empty argument fallback** — When model returns empty arguments, auto-extract search query from user message and append today's date
+- **Search freshness** — Tavily API auto-detects time-sensitive queries, adds `days: 1` parameter for last 24h results
+- **Real tool execution** — MCP tools now use Tavily search API and GitHub Code Search API when keys configured
+
+#### Playground UI Fixes
+- **Tool call display** — Replaced raw JSON with compact inline cards (tool name + argument summary), tool results in collapsible cards
+- **Send button disabled** — Fixed stale `selectedKeyId` in localStorage causing send button to be permanently disabled
+- **Input alignment** — Toolbar buttons now center-aligned with textarea
+- **Chat scroll** — Fixed long responses not scrolling to bottom, switched to `scrollIntoView`
+- **Empty bubble** — Fixed blank assistant message bubble appearing after tool calls
+- **Tool settings panel** — Merged into single Sheet (Tavily Key + built-in toggles + MCP tool list)
+
 ---
 
 ## [v3.3.4.19] — 2026-05-25
