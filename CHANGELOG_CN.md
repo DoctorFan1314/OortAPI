@@ -9,7 +9,8 @@
 ## 2026-05-28 — 资源中心体验优化
 
 ### 功能改进
-- **MCP 详情页** — 全新 `/resources/mcp/[id]` 详情页，采用与 Agent 技能详情页一致的布局（面包屑、标题+统计行、Tab 切换：服务详情/可用工具/服务配置），可用工具以表格展示参数名/类型/必需/说明，服务配置区展示传输类型和工具定义 JSON
+- **MCP 详情页** — 全新 `/resources/mcp/[id]` 详情页，对标魔搭社区布局：左侧主内容区（面包屑、标题+部署badge、统计行、GitHub 链接、描述、分类badge、协议/开发者信息、三 Tab 切换：服务详情/可用工具/交流反馈）+ 右侧操作边栏（获取MCP服务器按钮、服务配置 Remote/Stdio 切换、快速信息卡片）
+- **MCP 元数据扩展** — ResourceItem 新增 mcpDeveloper/mcpLicense/mcpGithub/mcpLastUpdated/mcpUsageCount/mcpUserCount/mcpToolDescription 字段，17 个 MCP 节点全部填充
 - **MCP 广场详情入口** — 生态广场每张卡片新增「详情」按钮，跳转至对应的 MCP 详情页
 - **详情页入口** — 所有卡片均支持「详情」按钮：Prompt → `/prompts/{id}`，Skill → `/skills/{id}`，MCP → `/resources/mcp/{id}`
 - **真实 Agent 技能** — 客户端技能卡片数据源从硬编码 Mock 切换为 Agent 技能市场真实数据（8 个技能），详情链接不再 404

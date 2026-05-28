@@ -9,7 +9,8 @@ All notable changes to this project will be documented in this file.
 ## 2026-05-28 — Resource Center UX Polish
 
 ### Improvements
-- **MCP detail page** — New `/resources/mcp/[id]` page following Agent Skill detail layout (breadcrumb, title+stats row, 3-tab switcher: Service Details / Available Tools / Configuration), tools shown in parameter table, config section with transport type and tool definition JSON
+- **MCP detail page** — New `/resources/mcp/[id]` page inspired by ModelScope: left content area (breadcrumb, title+badge, stats row, GitHub link, description, category/license/developer, 3-tab: Service Details/Available Tools/Feedback) + right action sidebar (Get MCP Server button, Service Config with Remote/Stdio toggle, quick info card)
+- **MCP metadata expansion** — ResourceItem extended with mcpDeveloper/mcpLicense/mcpGithub/mcpLastUpdated/mcpUsageCount/mcpUserCount/mcpToolDescription, all 17 MCP nodes populated
 - **MCP square detail links** — Each card in the MCP ecosystem square now has a "Details" button linking to the detail page
 - **Detail links on all cards** — Prompt → `/prompts/{id}`, Skill → `/skills/{id}`, MCP → `/resources/mcp/{id}`
 - **Real Agent Skills** — Client skill cards now source from Agent Skills marketplace (8 real skills), detail links no longer 404
