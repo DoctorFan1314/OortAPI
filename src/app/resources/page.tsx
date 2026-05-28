@@ -52,6 +52,7 @@ const OVERVIEW_PER_TYPE = 3;
 function getDetailHref(item: ResourceItem): string | null {
   if (item.type === "prompt-template") return `/prompts/${item.id.replace(/^prompt-/, "")}`;
   if (item.type === "client-skill") return `/skills/${item.id.replace(/^skill-/, "")}`;
+  if (item.type === "mcp") return `/resources/mcp/${item.id}`;
   return null;
 }
 
@@ -82,18 +83,20 @@ function ResourceCard({ item, copiedId, onLaunch, onCopy, t, lang }: { item: Res
         ))}
       </div>
       <p className="text-[10px] text-muted-foreground mb-3">{t.resourceHub[item.pricing]}</p>
-      <div className="flex gap-2 mt-auto">
+      <div className="flex flex-col gap-2 mt-auto">
+        {/* Row 1: Detail link */}
         {detailHref && (
-          <Link href={detailHref} className="flex items-center justify-center gap-1 px-3 py-1.5 text-xs rounded-md border border-border bg-secondary text-secondary-foreground hover:bg-muted transition-colors shrink-0">
+          <Link href={detailHref} className="flex items-center justify-center gap-1 px-3 py-1.5 text-xs rounded-md border border-border bg-secondary text-secondary-foreground hover:bg-muted transition-colors">
             {t.resourceHub.viewDetail}
           </Link>
         )}
+        {/* Row 2: Action button */}
         {(item.type === "mcp" || item.type === "prompt-template") ? (
-          <Button size="sm" className="flex-1 bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20" onClick={() => onLaunch(item)}>
+          <Button size="sm" className="w-full bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20" onClick={() => onLaunch(item)}>
             <Rocket className="h-3.5 w-3.5 mr-1.5" />{t.resourceHub.launchPlayground}
           </Button>
         ) : (
-          <Button size="sm" variant="secondary" className="flex-1 border border-border" onClick={() => onCopy(item)}>
+          <Button size="sm" variant="secondary" className="w-full border border-border" onClick={() => onCopy(item)}>
             {copiedId === item.id ? <><Check className="h-3.5 w-3.5 mr-1.5 text-green-500" />{t.resourceHub.copiedSuccess}</> : <><Copy className="h-3.5 w-3.5 mr-1.5" />{t.resourceHub.copyConfig}</>}
           </Button>
         )}

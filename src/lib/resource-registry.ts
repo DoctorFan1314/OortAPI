@@ -1,5 +1,6 @@
 import type { ToolDefinition } from "./playground-tools";
 import { skills } from "./mock-data";
+import { agentSkills } from "./mock-agent-skills";
 
 // ─── Resource Type System ─────────────────────────────────
 // Three strictly separated dimensions:
@@ -148,13 +149,26 @@ const mcpEcosystemNodes: ResourceItem[] = [
   { id: "mcp-weread", type: "mcp", name: "WeRead MCP", nameZh: "微信读书 MCP", description: "Sync reading notes and highlights from WeRead. Search your book library.", descriptionZh: "同步微信读书阅读笔记与划线数据，搜索个人书库。", category: "production", tags: ["reading", "notes", "books", "weread"], pricing: "pricingPlatformDeduct", featured: false, requiredTools: wereadTools, mcpDeployment: "hosted", mcpCategory: "knowledge" },
 ];
 
-// ─── Client Skills ────────────────────────────────────────
+// ─── Client Skills (from Agent Skills marketplace) ───────
 
-const clientSkillItems: ResourceItem[] = [
-  { id: "skill-file-manager", type: "client-skill", name: "Local File Manager", nameZh: "本地文件管理器", description: "Read, write, and manage local files. Works with Claude Code, Cursor, and other agent clients.", descriptionZh: "读取、写入和管理本地文件。兼容 Claude Code、Cursor 等客户端。", category: "development", tags: ["filesystem", "local", "file-operations"], pricing: "pricingClientOnly", featured: false, clientConfigJson: JSON.stringify({ name: "file-manager", version: "1.0.0", tools: [{ name: "read_file" }, { name: "write_file" }, { name: "list_directory" }] }, null, 2) },
-  { id: "skill-git-workflow", type: "client-skill", name: "Git Workflow", nameZh: "Git 工作流助手", description: "Automate git operations: commit, branch, merge, rebase, and conflict resolution.", descriptionZh: "自动化 Git 操作：提交、分支、合并、变基和冲突解决。", category: "development", tags: ["git", "version-control", "workflow"], pricing: "pricingClientOnly", featured: false, clientConfigJson: JSON.stringify({ name: "git-workflow", version: "1.0.0", tools: [{ name: "git_status" }, { name: "git_commit" }, { name: "git_branch" }, { name: "git_log" }] }, null, 2) },
-  { id: "skill-system-monitor", type: "client-skill", name: "System Monitor", nameZh: "系统监控工具", description: "Monitor CPU, memory, disk, and network usage on the local machine.", descriptionZh: "监控本机 CPU、内存、磁盘和网络使用情况。", category: "analytics", tags: ["monitoring", "system", "performance"], pricing: "pricingClientOnly", featured: false, clientConfigJson: JSON.stringify({ name: "system-monitor", version: "1.0.0", tools: [{ name: "cpu_usage" }, { name: "memory_usage" }, { name: "disk_usage" }] }, null, 2) },
-];
+const clientSkillItems: ResourceItem[] = agentSkills.map((skill) => ({
+  id: `skill-${skill.id}`,
+  type: "client-skill" as const,
+  name: skill.name,
+  nameZh: skill.title,
+  description: skill.description.split("\n").find(l => l && !l.startsWith("#") && !l.startsWith("-"))?.slice(0, 200) || skill.description.slice(0, 200),
+  descriptionZh: skill.description.split("\n").find(l => l && !l.startsWith("#") && !l.startsWith("-"))?.slice(0, 200) || skill.description.slice(0, 200),
+  category: "development",
+  tags: skill.tags || [],
+  pricing: "pricingClientOnly" as const,
+  featured: skill.featured || false,
+  clientConfigJson: JSON.stringify({
+    name: skill.name,
+    version: skill.version,
+    installCommand: skill.installCommand,
+    description: skill.description.split("\n").find(l => l && !l.startsWith("#") && !l.startsWith("-"))?.slice(0, 200) || "",
+  }, null, 2),
+}));
 
 // ─── Resource Registry ────────────────────────────────────
 

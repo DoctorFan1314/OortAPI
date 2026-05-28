@@ -9,9 +9,12 @@ All notable changes to this project will be documented in this file.
 ## 2026-05-28 — Resource Center UX Polish
 
 ### Improvements
-- **Detail page links** — Prompt template cards now show "Details" button linking to `/prompts/{id}`, client skill cards link to `/skills/{id}`
-- **Paginated display** — "All" tab shows 3 per type (MCP/Prompt/Skill) with section headers and "View More" links to specific tabs; specific tabs default to 9 with expand
-- **Tab reordering** — Changed to All → Cloud MCP → Prompt Templates → Client Skills
+- **MCP detail page** — New `/resources/mcp/[id]` page with service details, available tools with parameter docs, deployment type, pricing, 2-row button layout (detail + activate)
+- **Detail links on all cards** — Prompt → `/prompts/{id}`, Skill → `/skills/{id}`, MCP → `/resources/mcp/{id}`
+- **Real Agent Skills** — Client skill cards now source from Agent Skills marketplace (8 real skills), detail links no longer 404
+- **2-row button layout** — Card actions split into 2 rows: "Details" on top, "Launch in Playground" / "Copy Config" below
+- **Paginated display** — "All" tab shows 3 per type with section headers and "View More" links
+- **Tab reordering** — All → Cloud MCP → Prompt Templates → Client Skills
 - **i18n** — Added `viewDetail`, `viewMore` dictionary keys
 
 ---
