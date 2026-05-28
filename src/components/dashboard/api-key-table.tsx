@@ -309,12 +309,15 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
     <Card className="glass-card">
       <CardHeader>
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             {filteredKeys.length > 0 && (
-              <input type="checkbox" checked={selectedKeys.size === filteredKeys.length && filteredKeys.length > 0}
-                onChange={toggleSelectAll} className="rounded border-border" title={lang === "zh" ? "全选" : "Select all"} />
+              <label className="flex items-center gap-1.5 text-xs text-muted-foreground cursor-pointer select-none">
+                <input type="checkbox" checked={selectedKeys.size === filteredKeys.length && filteredKeys.length > 0}
+                  onChange={toggleSelectAll} className="rounded border-border" />
+                {lang === "zh" ? "全选" : "All"}
+              </label>
             )}
-            <Badge variant="secondary" className="text-xs font-mono">{keys.length}</Badge>
+            <span className="text-xs text-muted-foreground">{lang === "zh" ? `共 ${keys.length} 个 Key` : `${keys.length} keys`}</span>
             {selectedKeys.size > 0 && (
               <Button size="sm" variant="outline" onClick={batchDelete} disabled={batchDeleting} className="text-red-500 text-xs h-7 ml-1">
                 {batchDeleting
@@ -414,15 +417,17 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
                     </button>
                   )}
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="text-xs text-muted-foreground">{k.enabled ? t.enabled : t.disabled}</span>
-                  <Switch checked={!!k.enabled} onCheckedChange={(checked) => toggleKey(k.id, checked)}
-                    className="data-[checked]:bg-green-500" />
-                  <button onClick={() => handleRotateKey(k.id)} className="p-1.5 rounded-md text-muted-foreground hover:text-amber-400 hover:bg-muted transition-colors" title={lang === "zh" ? "轮换 Key" : "Rotate"}>
-                    <RefreshCw className="h-4 w-4" />
+                <div className="flex items-center gap-2.5">
+                  <div className="flex items-center gap-1.5">
+                    <Switch checked={!!k.enabled} onCheckedChange={(checked) => toggleKey(k.id, checked)}
+                      className="border-2 border-border data-[checked]:bg-green-500 data-[unchecked]:bg-muted data-[unchecked]:border-border" />
+                    <span className="text-xs text-muted-foreground">{k.enabled ? t.enabled : t.disabled}</span>
+                  </div>
+                  <button onClick={() => handleRotateKey(k.id)} className="w-7 h-7 flex items-center justify-center rounded-md text-muted-foreground hover:text-amber-400 hover:bg-muted transition-colors" title={lang === "zh" ? "轮换 Key" : "Rotate"}>
+                    <RefreshCw className="h-3.5 w-3.5" />
                   </button>
-                  <button onClick={() => setDeleteTarget(k.id)} className="p-1.5 rounded-md text-muted-foreground hover:text-red-500 hover:bg-muted transition-colors" title={lang === "zh" ? "删除" : "Delete"}>
-                    <Trash2 className="h-4 w-4" />
+                  <button onClick={() => setDeleteTarget(k.id)} className="w-7 h-7 flex items-center justify-center rounded-md text-muted-foreground hover:text-red-500 hover:bg-muted transition-colors" title={lang === "zh" ? "删除" : "Delete"}>
+                    <Trash2 className="h-3.5 w-3.5" />
                   </button>
                 </div>
               </div>
