@@ -714,5 +714,7 @@ export interface Dictionary {
     toolSource: string;
     toolSourceBuiltin: string;
     toolSourceMcp: string;
+    viewDetail: string;
+    viewMore: string;
   };
 }

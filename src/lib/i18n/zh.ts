@@ -1175,5 +1175,7 @@ export const zh: Dictionary = {
     toolSource: "来源",
     toolSourceBuiltin: "内置",
     toolSourceMcp: "MCP",
+    viewDetail: "详情",
+    viewMore: "查看更多",
   },
 };

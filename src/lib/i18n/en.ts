@@ -1175,5 +1175,7 @@ export const en: Dictionary = {
     toolSource: "Source",
     toolSourceBuiltin: "Built-in",
     toolSourceMcp: "MCP",
+    viewDetail: "Details",
+    viewMore: "View More",
   },
 };
