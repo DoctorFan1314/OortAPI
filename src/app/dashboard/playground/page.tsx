@@ -459,6 +459,19 @@ function PlaygroundContent() {
           setResponse("");
 
           for (const tc of toolCalls) {
+            // Fallback: if model returned empty arguments, try to extract from user message
+            if (!tc.function.arguments || tc.function.arguments.trim() === "" || tc.function.arguments === "{}") {
+              const userMsg = currentMsgs.findLast((m) => m.role === "user");
+              const userText = typeof userMsg?.content === "string" ? userMsg.content : "";
+              if (userText && tc.function.name === "web_search") {
+                tc.function.arguments = JSON.stringify({ query: userText });
+              } else if (userText && tc.function.name === "fetch_url") {
+                const urlMatch = userText.match(/https?:\/\/[^\s]+/);
+                tc.function.arguments = JSON.stringify({ url: urlMatch ? urlMatch[0] : userText });
+              } else if (userText) {
+                tc.function.arguments = JSON.stringify({ query: userText });
+              }
+            }
             const toolResult = await executeTool(tc);
             const toolMsg: ChatMessage = { role: "tool", content: toolResult, createdAt: nowHHMM(), tool_call_id: tc.id, name: tc.function.name };
             currentMsgs = [...currentMsgs, { role: "assistant" as const, content: fullText || "", tool_calls: [tc] }, { role: "tool" as const, content: toolResult, tool_call_id: tc.id, name: tc.function.name }];
