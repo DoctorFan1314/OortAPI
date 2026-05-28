@@ -6,64 +6,53 @@
 
 ---
 
-## 2026-05-28 — 资源中心体验优化
+## [v3.3.5.0] — 2026-05-28
 
-### 功能改进
-- **MCP 详情页** — 全新 `/resources/mcp/[id]` 详情页，对标魔搭社区布局：左侧主内容区（面包屑、标题+部署badge、统计行、合集+GitHub 链接、描述、分类badge、协议/开发者信息、三 Tab：服务详情/可用工具/交流反馈）+ 右侧操作边栏（获取MCP服务器/复制配置/分享按钮、快速信息卡片、标签）
-- **交流反馈系统** — MCP 详情页「交流反馈」Tab 复用 Agent 技能的 CommentSection 组件，支持评分、评论、点赞、回复
-- **MCP 元数据扩展** — ResourceItem 新增 mcpDeveloper/mcpLicense/mcpGithub/mcpLastUpdated/mcpUsageCount/mcpUserCount/mcpToolDescription 字段，17 个 MCP 节点全部填充
-- **MCP 广场详情入口** — 生态广场每张卡片新增「详情」按钮，跳转至对应的 MCP 详情页
-- **详情页入口** — 所有卡片均支持「详情」按钮：Prompt → `/prompts/{id}`，Skill → `/skills/{id}`，MCP → `/resources/mcp/{id}`
-- **真实 Agent 技能** — 客户端技能卡片数据源从硬编码 Mock 切换为 Agent 技能市场真实数据（8 个技能），详情链接不再 404
+### 资源中心重构 & MCP 生态链深度打通
+
+#### 新增功能
+- **云端 MCP 生态广场** — 全新独立页 `/resources/mcp`，双栏布局，侧边分类过滤器（9 大垂直领域），部署类型筛选（Hosted/Local），搜索功能
+- **MCP 详情页** — `/resources/mcp/[id]` 对标魔搭社区布局：标题+部署badge、统计行、合集+GitHub 链接、描述、分类/协议/开发者信息、三 Tab（服务详情/可用工具/交流反馈），右侧操作边栏（获取MCP服务器/复制配置/分享、快速信息卡片）
+- **交流反馈系统** — MCP 详情页复用 Agent 技能 CommentSection 组件，支持评分、评论、点赞、回复
+- **MCP 元数据** — 17 个 MCP 节点全部填充 developer/license/github/lastUpdated/usageCount/userCount 字段
+- **17 个 MCP 节点** — 谷歌搜索、GitHub 助手、PostgreSQL、高德地图、必应搜索、Supabase、RollingGo 酒店预订、抖音运营、ChatPPT、麦当劳、12306、Chrome DevTools、AntVis 图表、MemOS 记忆、微信读书、Fetch 内容抓取
+- **测试场工具管理器** — 输入栏新增工具按钮（带红色数字气泡），Sheet 面板列出已挂载 MCP 工具与内置工具，支持一键移除
+- **28+ 真实 Prompt 模板** — 全量对接提示词市场数据集，替代原有 3 个硬编码示例
+- **真实 Agent 技能** — 客户端技能数据源切换为 Agent 技能市场真实数据（8 个技能），详情链接不再 404
+
+#### 资源中心体验优化
+- **详情页入口** — 所有卡片支持「详情」按钮：Prompt → `/prompts/{id}`，Skill → `/skills/{id}`，MCP → `/resources/mcp/{id}`
 - **双行按钮布局** — 卡片操作区改为两行：第一行「详情」，第二行「一键激活至测试场」或「复制配置」
 - **分页展示** — 「全部」Tab 每类展示 3 张卡片，带分区标题和「查看更多」跳转至对应 Tab
-- **Tab 重排序** — 调整为「全部 → 云端 MCP → Prompt 模板 → 客户端技能」
+- **Tab 重排序** — 全部 → 云端 MCP → Prompt 模板 → 客户端技能
 
----
+#### 跨页面联动
+- **资源中心 → 测试场** — 点击「一键激活至测试场」自动创建新会话，注入 systemPrompt 或 activeMcpTools，Toast 通知确认
+- **MCP 广场 → 测试场** — 工具定义直接挂载到会话的 body.tools
+- **工具实时管理** — 测试场内可实时查看、移除已挂载的 MCP 工具
 
-## 2026-05-28 — 文档中心工业级重构
-
-### 架构升级
-- **文档落地页数据驱动** — 废除硬编码 `Array.slice()` 分组，DocCard 接口新增 `group` 强类型字段，前台纯 `.filter()` 动态渲染
-- **侧边栏搜索状态机** — 引入 `isSearching` 计算变量，搜索期间禁止改写 `expandedSections`，彻底根治输入闪烁 Bug
-- **移动端 Sheet 抽屉** — 侧边栏移动端响应式菜单从手动浮层升级为 Shadcn UI `Sheet` 组件，自带滚动锁和 Portal 渲染
-- **AI 工具聚合沙盒** — 8 个 AI 工具子页面收拢至单页 `/docs/ai-tools`，左侧工具选择器 + 右侧三步配置向导，支持 URL 深度链接 (`?tool=cursor`)
-
-### 视觉升级
-- **Hero 毛玻璃横幅** — 渐变光环 + 暗色网格背景 + 居中搜索框
-- **卡片悬浮发光** — `hover:shadow-primary/5` + `hover:border-primary/40` 过渡动画
-- **代码块语法高亮** — CodeBlock 组件接入 `react-syntax-highlighter`，支持语言标签、右上角悬浮复制按钮
-- **横向滚动保护** — `min-w-0` + `overflow-x-auto` 闭环，杜绝移动端代码撑破布局
-
-### 工程改进
-- **i18n 全量覆盖** — 新增 15 个 `apiDocs` 字典词条（zh/en），零硬编码
-- **Suspense 边界** — AI 工具页 `useSearchParams` 包裹 `<Suspense>` 确保生产构建安全
-- **删除 8 个冗余子路由** — `claude-code/`、`cursor/`、`hermes/` 等 8 个物理目录移除
-
----
-
-## 2026-05-28 — 资源中心重构 & MCP 生态链深度打通
-
-### 新增功能
-- **云端 MCP 生态广场** — 全新独立页 `/resources/mcp`，双栏布局，侧边分类过滤器（9 大垂直领域），部署类型筛选（Hosted/Local），搜索功能
-- **17 个 MCP 节点** — 谷歌搜索、GitHub 助手、PostgreSQL、高德地图、必应搜索、Supabase、RollingGo 酒店预订、抖音运营、ChatPPT、麦当劳、12306、Chrome DevTools、AntVis 图表、MemOS 记忆、微信读书、Fetch 内容抓取
-- **测试场工具管理器** — 输入栏新增工具按钮（带红色数字气泡），点击弹出 Sheet 面板，列出所有已挂载 MCP 工具与内置工具，支持一键移除
-- **28+ 真实 Prompt 模板** — 全量对接提示词市场数据集（小红书笔记、翻译器、周报生成器、会议纪要、代码审查等），替代原有 3 个硬编码示例
-
-### 跨页面联动
-- **资源中心 → 测试场** — 点击「一键激活至测试场」自动创建新会话，注入 systemPrompt（Prompt 模板）或 activeMcpTools（MCP 工具集），Toast 通知确认
-- **MCP 广场 → 测试场** — 同样支持一键激活，工具定义直接挂载到会话的 body.tools
-- **工具实时管理** — 测试场内可实时查看、移除已挂载的 MCP 工具，变更立即反映到下一次请求
-
-### 视觉升级
-- **资源中心 Hero 看板** — 渐变光环暗色网格背景，动态统计徽章（MCP 节点数 / 工具数）
-- **Tab 标签导航** — 全部 / 云端 MCP / 客户端技能 / Prompt 模板 四分类
+#### 视觉升级
+- **资源中心 Hero 看板** — 渐变光环暗色网格背景，动态统计徽章
 - **毛玻璃卡片** — 类型专属发光 Badge（MCP 紫色 / 客户端技能蓝色 / Prompt 翡翠绿），MCP 卡片显示工具名微标签
 
-### 工程改进
-- **Suspense 边界** — Playground 页面包裹 `<Suspense>` 确保 `useSearchParams` 生产构建安全
+### 文档中心工业级重构
+
+#### 架构升级
+- **文档落地页数据驱动** — 废除硬编码 `Array.slice()` 分组，DocCard 接口新增 `group` 强类型字段，前台纯 `.filter()` 动态渲染
+- **侧边栏搜索状态机** — 引入 `isSearching` 计算变量，搜索期间禁止改写 `expandedSections`，彻底根治输入闪烁 Bug
+- **移动端 Sheet 抽屉** — 侧边栏移动端响应式菜单升级为 Shadcn UI `Sheet` 组件，自带滚动锁和 Portal 渲染
+- **AI 工具聚合沙盒** — 8 个 AI 工具子页面收拢至单页 `/docs/ai-tools`，左侧工具选择器 + 右侧三步配置向导，支持 URL 深度链接
+
+#### 视觉升级
+- **Hero 毛玻璃横幅** — 渐变光环 + 暗色网格背景 + 居中搜索框
+- **代码块语法高亮** — CodeBlock 组件接入 `react-syntax-highlighter`，支持语言标签、悬浮复制按钮
+- **横向滚动保护** — `min-w-0` + `overflow-x-auto` 闭环，杜绝移动端代码撑破布局
+
+#### 工程改进
+- **Suspense 边界** — Playground 和 AI 工具页 `useSearchParams` 包裹 `<Suspense>` 确保生产构建安全
 - **i18n 全量覆盖** — 所有新增 UI 文本通过字典系统（zh/en），零硬编码
 - **LocalStorage 兼容** — `activeMcpTools` 可选字段，老会话反序列化安全（`?? []` 短路保护）
+- **删除 8 个冗余子路由** — `claude-code/`、`cursor/`、`hermes/` 等 8 个物理目录移除
 
 ---
 

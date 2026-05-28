@@ -6,65 +6,53 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## 2026-05-28 — Resource Center UX Polish
+## [v3.3.5.0] — 2026-05-28
 
-### Improvements
-- **MCP detail page** — New `/resources/mcp/[id]` page inspired by ModelScope: left content (breadcrumb, title+badge, stats, collection+GitHub, description, category/license/developer, 3 tabs: Service Details/Available Tools/Feedback) + right sidebar (Get MCP Server/Copy Config/Share buttons, quick info card, tags)
-- **Feedback system** — MCP detail page "Feedback" tab reuses Agent Skill's CommentSection component with ratings, comments, likes, replies
-- **MCP metadata expansion** — ResourceItem extended with mcpDeveloper/mcpLicense/mcpGithub/mcpLastUpdated/mcpUsageCount/mcpUserCount/mcpToolDescription, all 17 MCP nodes populated
-- **MCP square detail links** — Each card in the MCP ecosystem square now has a "Details" button linking to the detail page
+### Resource Center Refactor & MCP Ecosystem Integration
+
+#### New Features
+- **Cloud MCP Ecosystem Square** — New standalone page `/resources/mcp` with dual-column layout, sidebar category filters (9 verticals), deployment type filters (Hosted/Local), and search
+- **MCP Detail Page** — `/resources/mcp/[id]` inspired by ModelScope: title+badge, stats row, collection+GitHub link, description, category/license/developer, 3 tabs (Service Details/Available Tools/Feedback), right sidebar (Get MCP Server/Copy Config/Share, quick info card)
+- **Feedback System** — MCP detail page reuses Agent Skill's CommentSection with ratings, comments, likes, replies
+- **MCP Metadata** — All 17 MCP nodes populated with developer/license/github/lastUpdated/usageCount/userCount
+- **17 MCP Nodes** — Google Search, GitHub Assistant, PostgreSQL, Amap, Bing Search, Supabase, RollingGo Hotels, Douyin Assistant, ChatPPT, McDonald's, 12306, Chrome DevTools, AntVis Charts, MemOS Memory, WeRead, Fetch Content
+- **Playground Tool Manager** — Wrench button with red count badge, Sheet panel listing mounted MCP and built-in tools with one-click remove
+- **28+ Real Prompt Templates** — Full integration with prompt marketplace dataset, replacing 3 hardcoded examples
+- **Real Agent Skills** — Client skill cards sourced from Agent Skills marketplace (8 real skills), detail links no longer 404
+
+#### Resource Center UX
 - **Detail links on all cards** — Prompt → `/prompts/{id}`, Skill → `/skills/{id}`, MCP → `/resources/mcp/{id}`
-- **Real Agent Skills** — Client skill cards now source from Agent Skills marketplace (8 real skills), detail links no longer 404
 - **2-row button layout** — Card actions split into 2 rows: "Details" on top, "Launch in Playground" / "Copy Config" below
 - **Paginated display** — "All" tab shows 3 per type with section headers and "View More" links
 - **Tab reordering** — All → Cloud MCP → Prompt Templates → Client Skills
-- **i18n** — Added `viewDetail`, `viewMore` dictionary keys
 
----
+#### Cross-Page Integration
+- **Resource Center → Playground** — "Launch in Playground" auto-creates session, injects systemPrompt or activeMcpTools, toast confirmation
+- **MCP Square → Playground** — Tool definitions mounted directly to session's body.tools
+- **Real-time Tool Management** — View and remove mounted MCP tools from Playground
 
-## 2026-05-28 — Documentation Center Industrial Refactor
+#### Visual Upgrades
+- **Hero Dashboard** — Gradient glow ring, dark grid background, dynamic stat badges
+- **Glassmorphic Cards** — Type-specific glowing badges (MCP purple / Client Skill blue / Prompt emerald green), tool name micro-tags
 
-### Architecture
-- **Data-driven landing page** — Replaced hardcoded `Array.slice()` grouping with `group` typed field on DocCard, pure `.filter()` rendering
-- **Sidebar search state machine** — Introduced `isSearching` computed variable; search no longer mutates `expandedSections`, eliminating input flicker
-- **Mobile Sheet drawer** — Sidebar mobile menu upgraded from manual overlay to Shadcn UI `Sheet` with body scroll lock and Portal rendering
-- **AI Tools consolidated sandbox** — 8 AI tool sub-pages merged into single `/docs/ai-tools` page with left tool selector + right 3-step config wizard, URL deep-linking (`?tool=cursor`)
+### Documentation Center Industrial Refactor
 
-### Visual
+#### Architecture
+- **Data-driven landing page** — Replaced hardcoded `Array.slice()` grouping with `group` typed field, pure `.filter()` rendering
+- **Sidebar search state machine** — `isSearching` computed variable eliminates input flicker
+- **Mobile Sheet drawer** — Sidebar upgraded to Shadcn UI `Sheet` with body scroll lock and Portal rendering
+- **AI Tools consolidated sandbox** — 8 sub-pages merged into single `/docs/ai-tools` with URL deep-linking
+
+#### Visual
 - **Hero glassmorphic banner** — Gradient glow + dark grid overlay + centered search
-- **Card hover glow** — `hover:shadow-primary/5` + `hover:border-primary/40` transition animations
-- **Code block syntax highlighting** — CodeBlock integrated with `react-syntax-highlighter`, language labels, hover copy button
-- **Horizontal scroll protection** — `min-w-0` + `overflow-x-auto` loop preventing mobile code overflow
+- **Code block syntax highlighting** — CodeBlock integrated with `react-syntax-highlighter`, hover copy button
+- **Horizontal scroll protection** — `min-w-0` + `overflow-x-auto` preventing mobile code overflow
 
-### Engineering
-- **Full i18n coverage** — 15 new `apiDocs` dictionary keys (zh/en), zero hardcoded strings
-- **Suspense boundary** — AI tools page `useSearchParams` wrapped in `<Suspense>` for production build safety
-- **Deleted 8 redundant sub-routes** — `claude-code/`, `cursor/`, `hermes/` etc. 8 physical directories removed
-
----
-
-## 2026-05-28 — Resource Center Refactor & MCP Ecosystem Integration
-
-### New Features
-- **Cloud MCP Ecosystem Square** — New standalone page `/resources/mcp` with dual-column layout, sidebar category filters (9 verticals), deployment type filters (Hosted/Local), and search
-- **17 MCP Nodes** — Google Search, GitHub Assistant, PostgreSQL, Amap, Bing Search, Supabase, RollingGo Hotels, Douyin Assistant, ChatPPT, McDonald's, 12306, Chrome DevTools, AntVis Charts, MemOS Memory, WeRead, Fetch Content
-- **Playground Tool Manager** — New wrench button in chat input toolbar with red count badge, opens Sheet panel listing all mounted MCP and built-in tools with one-click remove
-- **28+ Real Prompt Templates** — Full integration with prompt marketplace dataset (Xiaohongshu notes, translator, weekly reports, meeting minutes, code review, etc.), replacing 3 hardcoded examples
-
-### Cross-Page Integration
-- **Resource Center → Playground** — "Launch in Playground" button auto-creates a new session, injects systemPrompt (prompt templates) or activeMcpTools (MCP toolsets), with toast confirmation
-- **MCP Square → Playground** — Same one-click activation, tool definitions mounted directly to session's body.tools
-- **Real-time Tool Management** — View and remove mounted MCP tools from within the Playground, changes reflect immediately in next request
-
-### Visual Upgrades
-- **Hero Dashboard Banner** — Gradient glow ring with dark grid background, dynamic stat badges (MCP nodes / tools count)
-- **Tab Navigation** — All / Cloud MCP / Client Skills / Prompt Templates four-category tabs
-- **Glassmorphic Cards** — Type-specific glowing badges (MCP purple / Client Skill blue / Prompt emerald green), MCP cards show tool name micro-tags
-
-### Engineering
-- **Suspense Boundary** — Playground page wrapped in `<Suspense>` for `useSearchParams` production build safety
-- **Full i18n Coverage** — All new UI text goes through dictionary system (zh/en), zero hardcoded strings
-- **LocalStorage Compatibility** — `activeMcpTools` optional field with `?? []` short-circuit guard for safe deserialization of legacy sessions
+#### Engineering
+- **Suspense boundaries** — Playground and AI tools pages wrapped in `<Suspense>` for production build safety
+- **Full i18n coverage** — All new UI text through dictionary system (zh/en), zero hardcoded strings
+- **LocalStorage compatibility** — `activeMcpTools` optional field with `?? []` guard for legacy sessions
+- **Deleted 8 redundant sub-routes** — `claude-code/`, `cursor/`, `hermes/` etc. removed
 
 ---
 
