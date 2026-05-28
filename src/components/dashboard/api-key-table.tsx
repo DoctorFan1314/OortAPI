@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Copy, Plus, Trash2, ToggleLeft, ToggleRight, RefreshCw, Key, Check } from "lucide-react";
+import { Copy, Plus, Trash2, RefreshCw, Key } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/contexts/toast-context";
 import { dashboardSWRConfig } from "@/lib/swr-fetcher";
@@ -365,70 +365,54 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
               const calcDaysLeft = k.expires_at ? Math.ceil((new Date(k.expires_at + 'T23:59:59').getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) : null;
               return (
               <Fragment key={k.id}>
-              <div className={`flex items-center gap-4 p-3 rounded-lg border transition-colors ${isExpired ? "border-red-500/30 bg-red-500/5" : "border-border/50 hover:bg-muted/50"}`}>
-                <input type="checkbox" checked={selectedKeys.has(k.id)} onChange={() => toggleSelectKey(k.id)} className="rounded border-border shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-medium text-sm">{k.name}</span>
-                    <button onClick={() => toggleKeyAnalytics(k.id)}
-                      className={`text-xs px-1.5 py-0.5 rounded transition-colors ${expandedKeyId === k.id ? "bg-primary/20 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}>
-                      {t.keyAnalytics}
-                    </button>
-                    <StatusBadge variant={k.enabled ? "success" : "error"} label={k.enabled ? t.enabled : t.disabled} />
-                    {isExpired && (
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-red-500/10 text-red-500">{t.expired}</span>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <code className="text-xs font-mono text-muted-foreground break-all">
-                      {k.key_value}
-                    </code>
-                    <button onClick={() => copyKey(k.key_value)} className="text-muted-foreground hover:text-foreground shrink-0" aria-label="Copy key">
-                      <Copy className="h-3 w-3" />
-                    </button>
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-1">
-                    {k.expires_at ? (
-                      <span className={isExpired ? "text-red-500" : ""}>
-                        {t.expires}: {new Date(k.expires_at + "Z").toLocaleDateString()}
-                        {isExpired ? ` (${t.expired})` : calcDaysLeft !== null ? ` (${t.expiresIn.replace('{days}', String(calcDaysLeft))})` : ""}
-                      </span>
-                    ) : (
-                      <span>{t.expires}: {t.neverExpires}</span>
-                    )}
-                  </div>
-                </div>
-                <div className="text-right text-xs text-muted-foreground shrink-0">
-                  <div>{t.calls}: {k.total_calls.toLocaleString()}</div>
-                  <div>{t.lastUsed}: {formatLastUsed(k.last_used_at)}</div>
-                  {editingRateId === k.id ? (
-                    <div className="flex items-center gap-1 mt-1">
-                      <Input type="number" value={editRateValue} onChange={e => setEditRateValue(e.target.value)}
-                        className="w-16 h-6 text-xs px-1" min={1} max={10000}
-                        onKeyDown={e => { if (e.key === 'Enter') saveRateLimit(k.id); if (e.key === 'Escape') setEditingRateId(null); }}
-                        autoFocus />
-                      <button onClick={() => saveRateLimit(k.id)} className="text-green-500 hover:text-green-400 text-xs">{t.save}</button>
-                      <button onClick={() => setEditingRateId(null)} className="text-muted-foreground hover:text-foreground text-xs">{t.cancel}</button>
+              <div className={`rounded-xl border transition-all ${isExpired ? "border-red-500/30 bg-red-500/[0.02]" : "border-border/50 hover:border-border hover:shadow-sm"}`}>
+                {/* Main row */}
+                <div className="flex items-center gap-3 px-4 py-3">
+                  <input type="checkbox" checked={selectedKeys.has(k.id)} onChange={() => toggleSelectKey(k.id)} className="rounded border-border shrink-0" />
+                  <div className="flex-1 min-w-0 space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-sm">{k.name}</span>
+                      <StatusBadge variant={k.enabled ? "success" : "error"} label={k.enabled ? t.enabled : t.disabled} />
+                      {isExpired && <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-red-500/10 text-red-500 font-medium">{t.expired}</span>}
+                      <button onClick={() => toggleKeyAnalytics(k.id)}
+                        className={`ml-auto text-xs px-2 py-0.5 rounded-md transition-colors ${expandedKeyId === k.id ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}>
+                        {t.keyAnalytics}
+                      </button>
                     </div>
-                  ) : (
-                    <button onClick={() => { setEditingRateId(k.id); setEditRateValue(String(k.rate_limit)); }}
-                      className="mt-1 hover:text-foreground cursor-pointer" title={t.rateLimit}>
-                      {t.rateLimit}: {k.rate_limit} {t.rpm}
-                    </button>
-                  )}
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <div className="flex items-center gap-1.5">
-                    <Switch checked={!!k.enabled} onCheckedChange={(checked) => toggleKey(k.id, checked)}
-                      className="border-2 border-border data-[checked]:bg-green-500 data-[unchecked]:bg-muted data-[unchecked]:border-border" />
-                    <span className="text-xs text-muted-foreground">{k.enabled ? t.enabled : t.disabled}</span>
+                    <div className="flex items-center gap-1.5">
+                      <code className="text-[11px] font-mono text-muted-foreground/70 select-all">{k.key_value}</code>
+                      <button onClick={() => copyKey(k.key_value)} className="p-1 rounded text-muted-foreground/50 hover:text-foreground hover:bg-muted transition-colors" aria-label="Copy key">
+                        <Copy className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                    <div className="flex items-center gap-3 text-[11px] text-muted-foreground/60">
+                      <span>{k.total_calls.toLocaleString()} {lang === "zh" ? "次调用" : "calls"}</span>
+                      <span>{t.lastUsed}: {formatLastUsed(k.last_used_at)}</span>
+                      {k.expires_at ? (
+                        <span className={isExpired ? "text-red-500" : ""}>
+                          {k.expires_at ? new Date(k.expires_at + "Z").toLocaleDateString() : ""}
+                          {isExpired ? ` (${t.expired})` : calcDaysLeft !== null ? ` (${t.expiresIn.replace('{days}', String(calcDaysLeft))})` : ""}
+                        </span>
+                      ) : (
+                        <span>{t.neverExpires}</span>
+                      )}
+                    </div>
                   </div>
-                  <button onClick={() => handleRotateKey(k.id)} className="w-7 h-7 flex items-center justify-center rounded-md text-muted-foreground hover:text-amber-400 hover:bg-muted transition-colors" title={lang === "zh" ? "轮换 Key" : "Rotate"}>
-                    <RefreshCw className="h-3.5 w-3.5" />
-                  </button>
-                  <button onClick={() => setDeleteTarget(k.id)} className="w-7 h-7 flex items-center justify-center rounded-md text-muted-foreground hover:text-red-500 hover:bg-muted transition-colors" title={lang === "zh" ? "删除" : "Delete"}>
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <div className="flex flex-col items-end gap-1">
+                      <Switch checked={!!k.enabled} onCheckedChange={(checked) => toggleKey(k.id, checked)}
+                        className="border-2 border-border data-[checked]:bg-green-500 data-[unchecked]:bg-muted data-[unchecked]:border-border" />
+                    </div>
+                    <div className="w-px h-8 bg-border/50" />
+                    <div className="flex flex-col gap-1">
+                      <button onClick={() => handleRotateKey(k.id)} className="w-7 h-7 flex items-center justify-center rounded-md text-muted-foreground/60 hover:text-amber-400 hover:bg-muted transition-colors" title={lang === "zh" ? "轮换" : "Rotate"}>
+                        <RefreshCw className="h-3.5 w-3.5" />
+                      </button>
+                      <button onClick={() => setDeleteTarget(k.id)} className="w-7 h-7 flex items-center justify-center rounded-md text-muted-foreground/60 hover:text-red-500 hover:bg-muted transition-colors" title={lang === "zh" ? "删除" : "Delete"}>
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
               {expandedKeyId === k.id && (
