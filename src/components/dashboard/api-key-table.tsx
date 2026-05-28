@@ -107,8 +107,6 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
   const [batchDeleting, setBatchDeleting] = useState(false);
   const [editingRateId, setEditingRateId] = useState<number | null>(null);
   const [editRateValue, setEditRateValue] = useState("60");
-  const [expandedKeyId, setExpandedKeyId] = useState<number | null>(null);
-  const [keyStats, setKeyStats] = useState<Record<number, { calls: number; cost: number; tokens: number; avg_latency: number | null; error_rate: number; by_model?: { model: string; calls: number; cost: number; tokens: number }[] }>>({});
   const { toast: showToast } = useToast();
   const [keySearch, setKeySearch] = useState("");
   const t = LABELS[lang];
@@ -222,23 +220,6 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
       mutate();
     } catch {
       showToast("Network error", "error");
-    }
-  };
-
-  const toggleKeyAnalytics = async (id: number) => {
-    if (expandedKeyId === id) {
-      setExpandedKeyId(null);
-      return;
-    }
-    setExpandedKeyId(id);
-    if (!keyStats[id]) {
-      try {
-        const res = await fetch(`/api/dashboard/keys/${id}/stats`, { credentials: "include" });
-        if (res.ok) {
-          const data = await res.json();
-          setKeyStats(prev => ({ ...prev, [id]: data }));
-        }
-      } catch {}
     }
   };
 
@@ -393,17 +374,13 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    <button onClick={() => toggleKeyAnalytics(k.id)}
-                      className={`text-xs px-2 py-1.5 rounded-md transition-colors whitespace-nowrap ${expandedKeyId === k.id ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}>
-                      {lang === "zh" ? "用量分析" : "Usage"}
-                    </button>
-                    <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-2 shrink-0">
+                    <div className="flex items-center gap-1.5">
+                      <Switch checked={!!k.enabled} onCheckedChange={(checked) => toggleKey(k.id, checked)}
+                        className="border-2 border-border data-[checked]:bg-green-500 data-[unchecked]:bg-muted data-[unchecked]:border-border" />
                       <span className={`text-[11px] ${k.enabled ? "text-green-500" : "text-muted-foreground/50"}`}>
                         {k.enabled ? (lang === "zh" ? "已启用" : "On") : (lang === "zh" ? "已禁用" : "Off")}
                       </span>
-                      <Switch checked={!!k.enabled} onCheckedChange={(checked) => toggleKey(k.id, checked)}
-                        className="border-2 border-border data-[checked]:bg-green-500 data-[unchecked]:bg-muted data-[unchecked]:border-border" />
                     </div>
                     <div className="w-px h-8 bg-border/50" />
                     <div className="flex flex-col gap-1">
@@ -416,52 +393,6 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
                     </div>
                   </div>
                 </div>
-                {/* Analytics panel INSIDE the card */}
-                {expandedKeyId === k.id && (
-                  <div className="px-4 pb-4 pt-0">
-                    {keyStats[k.id] ? (() => {
-                      const s = keyStats[k.id];
-                      return (<>
-                      <div className="grid grid-cols-4 gap-4 p-4 bg-muted/20 rounded-xl">
-                        <div className="text-center">
-                          <p className="text-[11px] text-muted-foreground">{t.recentCalls}</p>
-                          <p className="text-lg font-bold font-mono mt-0.5">{s.calls.toLocaleString()}</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-[11px] text-muted-foreground">{t.recentTokens}</p>
-                          <p className="text-lg font-bold font-mono mt-0.5">{s.tokens.toLocaleString()}</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-[11px] text-muted-foreground">{t.avgLatency}</p>
-                          <p className="text-lg font-bold font-mono mt-0.5">{s.avg_latency != null ? `${Math.round(s.avg_latency)}ms` : "-"}</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-[11px] text-muted-foreground">{t.errorRate}</p>
-                          <p className={`text-lg font-bold font-mono mt-0.5 ${s.error_rate > 10 ? "text-red-500" : s.error_rate > 0 ? "text-amber-500" : "text-green-500"}`}>
-                            {s.error_rate}%
-                          </p>
-                        </div>
-                      </div>
-                      {s.by_model && s.by_model.length > 0 && (
-                        <div className="mt-3 p-3 rounded-xl bg-muted/10 border border-border/30">
-                          <p className="text-[11px] font-medium text-muted-foreground mb-2">{lang === "zh" ? "按模型分布" : "By Model"}</p>
-                          <div className="space-y-1.5 max-h-32 overflow-y-auto">
-                            {s.by_model.slice(0, 5).map(m => (
-                              <div key={m.model} className="flex items-center justify-between text-xs">
-                                <span className="font-mono text-muted-foreground truncate max-w-[160px]">{m.model}</span>
-                                <span className="font-mono text-muted-foreground/70">{m.calls.toLocaleString()} {lang === "zh" ? "次" : "calls"}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                      </>
-                      );
-                    })() : (
-                      <div className="h-16 animate-pulse bg-muted/30 rounded-xl" />
-                    )}
-                  </div>
-                )}
               </div>
               </Fragment>
               );
