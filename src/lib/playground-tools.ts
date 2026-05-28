@@ -55,23 +55,6 @@ export const BUILTIN_TOOLS: Record<string, ToolDefinition> = {
       },
     },
   },
-  sequential_thinking: {
-    type: "function",
-    function: {
-      name: "sequential_thinking",
-      description: "Break down a complex problem into sequential reasoning steps. Use this for math, logic, planning, or any multi-step analysis.",
-      parameters: {
-        type: "object",
-        properties: {
-          thought: { type: "string", description: "The current reasoning step content" },
-          nextThought: { type: "string", description: "What the next reasoning step should explore" },
-          thoughtNumber: { type: "number", description: "Current thought number (starts at 1)" },
-          totalThoughts: { type: "number", description: "Estimated total thoughts needed" },
-        },
-        required: ["thought", "nextThought"],
-      },
-    },
-  },
 };
 
 export const DEFAULT_TOOL_CONFIG: ToolConfig = {

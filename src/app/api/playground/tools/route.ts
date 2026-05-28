@@ -17,8 +17,6 @@ export async function POST(request: NextRequest) {
         return await handleWebSearch(args, config);
       case 'fetch_url':
         return await handleFetchUrl(args);
-      case 'sequential_thinking':
-        return handleSequentialThinking(args);
 
       // MCP tools — real execution where possible, demo fallback
       case 'google_search':
@@ -135,29 +133,6 @@ async function handleFetchUrl(args: Record<string, unknown>) {
     .slice(0, 8000);
 
   return NextResponse.json({ result: text || 'No readable content found.' });
-}
-
-function handleSequentialThinking(args: Record<string, unknown>) {
-  const thought = String(args.thought || '').trim();
-  const nextThought = String(args.nextThought || '').trim();
-  const thoughtNumber = Number(args.thoughtNumber) || 1;
-  const totalThoughts = Number(args.totalThoughts) || 1;
-
-  // If model sent empty arguments, tell it to proceed without the tool
-  if (!thought && !nextThought) {
-    return NextResponse.json({
-      result: 'No reasoning data received. Proceed with the original task using your own knowledge and provide a direct answer to the user.',
-    });
-  }
-
-  const isNearEnd = thoughtNumber >= totalThoughts - 1;
-  const guidance = isNearEnd
-    ? '\n\nYou have enough information now. Please synthesize your analysis and provide a complete answer to the user.'
-    : '\n\nContinue to the next thinking step.';
-
-  return NextResponse.json({
-    result: `Step ${thoughtNumber}/${totalThoughts}: ${thought}\n\nNext: ${nextThought}${guidance}`,
-  });
 }
 
 // ── MCP Tools with Real Execution ──────────────────────
