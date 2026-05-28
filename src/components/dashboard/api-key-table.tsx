@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Copy, Plus, Trash2, ToggleLeft, ToggleRight, RefreshCw } from "lucide-react";
+import { Copy, Plus, Trash2, ToggleLeft, ToggleRight, RefreshCw, Key } from "lucide-react";
 import { useToast } from "@/contexts/toast-context";
 import { dashboardSWRConfig } from "@/lib/swr-fetcher";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
@@ -99,6 +99,7 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
   const [newKeyName, setNewKeyName] = useState("");
   const [newKeyExpires, setNewKeyExpires] = useState("");
   const [creating, setCreating] = useState(false);
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
   const [newKeyFull, setNewKeyFull] = useState<string | null>(null);
   const [selectedKeys, setSelectedKeys] = useState<Set<number>>(new Set());
@@ -128,6 +129,7 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
         const data = await res.json();
         setNewKeyName("");
         setNewKeyExpires("");
+        setShowCreateDialog(false);
         mutate();
         if (data.full_key) {
           setNewKeyFull(data.full_key);
@@ -304,32 +306,39 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
 
   return (
     <Card className="glass-card">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-lg flex items-center gap-2">{t.title}{!isLoading && <Badge variant="secondary" className="ml-1 text-xs">{keys.length}</Badge>}</CardTitle>
-        <div className="flex items-center gap-2">
-          <Input
-            placeholder={t.name}
-            value={newKeyName}
-            onChange={e => setNewKeyName(e.target.value)}
-            className="w-40 h-9"
-          />
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <span>{t.expires}:</span>
-            <input type="date" value={newKeyExpires} onChange={e => setNewKeyExpires(e.target.value)}
-              min={new Date().toISOString().split('T')[0]}
-              className="h-9 px-2 rounded-md border border-input bg-background text-sm" />
+      <CardHeader>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <CardTitle className="text-lg flex items-center gap-2">
+            {t.title}
+            {!isLoading && <Badge variant="secondary" className="text-xs">{keys.length}</Badge>}
+          </CardTitle>
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <div className="relative flex-1 sm:w-48">
+              <input value={keySearch} onChange={e => setKeySearch(e.target.value)}
+                placeholder={t.searchKeys}
+                className="w-full h-9 px-3 pl-8 rounded-lg border border-border/60 bg-background text-sm focus:border-primary focus:outline-none" />
+              <svg className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            </div>
+            <Button size="sm" onClick={() => setShowCreateDialog(true)} className="shrink-0 bg-primary text-primary-foreground hover:bg-primary/90">
+              <Plus className="h-4 w-4 mr-1" />
+              {t.create}
+            </Button>
           </div>
-          <Button size="sm" onClick={createKey} disabled={creating}>
-            <Plus className="h-4 w-4 mr-1" />
-            {t.create}
-          </Button>
         </div>
       </CardHeader>
       <CardContent>
         {filteredKeys.length === 0 && keys.length > 0 ? (
           <div className="text-center py-8 text-muted-foreground text-sm">{lang === "zh" ? "无匹配的 Key" : "No matching keys"}</div>
         ) : keys.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground text-sm">{t.noKeys}</div>
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="w-16 h-16 rounded-2xl bg-muted/50 flex items-center justify-center mb-4">
+              <Key className="h-8 w-8 text-muted-foreground/40" />
+            </div>
+            <p className="text-sm text-muted-foreground mb-1">{t.noKeys}</p>
+            <Button size="sm" variant="outline" onClick={() => setShowCreateDialog(true)} className="mt-2">
+              <Plus className="h-4 w-4 mr-1" />{t.create}
+            </Button>
+          </div>
         ) : (
           <div className="space-y-3">
             <div className="flex items-center gap-2 mb-2">
@@ -351,9 +360,6 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
                   )}
                 </>
               )}
-              <input value={keySearch} onChange={e => setKeySearch(e.target.value)}
-                placeholder={t.searchKeys}
-                className="flex-1 h-8 px-3 rounded-md border border-input bg-background text-sm ml-auto" />
             </div>
             {filteredKeys.map((k) => {
               const isExpired = k.expires_at ? new Date(k.expires_at + 'T23:59:59') < new Date() : false;
@@ -479,6 +485,36 @@ export function ApiKeyTable({ lang = "zh" }: { lang?: "zh" | "en" }) {
           </div>
         )}
       </CardContent>
+
+      {/* Create Key Dialog */}
+      <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2"><Key className="h-5 w-5" />{t.title}</DialogTitle>
+            <DialogDescription>{lang === "zh" ? "创建新的 API Key。Key 名称用于标识用途。可选设置过期时间。" : "Create a new API key. Name it for identification. Optionally set an expiration date."}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div>
+              <label className="text-sm font-medium text-foreground block mb-1.5">{lang === "zh" ? "名称" : "Key Name"} <span className="text-red-500">*</span></label>
+              <Input value={newKeyName} onChange={e => setNewKeyName(e.target.value)} placeholder={lang === "zh" ? "例如：开发环境、生产环境" : "e.g. Dev, Production"} autoFocus className="rounded-xl"
+                onKeyDown={e => { if (e.key === 'Enter') createKey(); }} />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground block mb-1.5">{lang === "zh" ? "过期时间（可选）" : "Expires (optional)"}</label>
+              <input type="date" value={newKeyExpires} onChange={e => setNewKeyExpires(e.target.value)}
+                min={new Date().toISOString().split('T')[0]}
+                className="w-full h-10 px-3 rounded-xl border border-input bg-background text-sm focus:border-primary focus:outline-none" />
+              <p className="text-xs text-muted-foreground mt-1">{lang === "zh" ? "留空则永不过期" : "Leave empty for no expiration"}</p>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2 pt-2">
+            <Button variant="outline" onClick={() => setShowCreateDialog(false)}>{t.cancel}</Button>
+            <Button onClick={createKey} disabled={creating || !newKeyName.trim()}>
+              {creating ? (lang === "zh" ? "创建中..." : "Creating...") : <><Plus className="h-4 w-4 mr-1" />{t.create}</>}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <ConfirmDialog
         open={deleteTarget !== null}
