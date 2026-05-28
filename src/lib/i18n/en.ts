@@ -1173,7 +1173,7 @@ export const en: Dictionary = {
     toolRemove: "Remove",
     toolEmpty: "No MCP tools loaded in this session",
     toolSource: "Source",
-    toolSourceBuiltin: "Built-in",
+    toolSourceBuiltin: "Built-in MCP",
     toolSourceMcp: "MCP",
     viewDetail: "Details",
     viewMore: "View More",

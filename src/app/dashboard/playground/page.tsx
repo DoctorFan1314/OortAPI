@@ -951,27 +951,27 @@ function PlaygroundContent() {
           <div className="px-4 py-3 space-y-5 overflow-y-auto flex-1">
             {/* ── Section 1: Tavily API Key ── */}
             <div>
-              <label className="text-xs font-medium text-foreground mb-1.5 block">{t.tavilyKey}</label>
+              <label className="text-sm font-medium text-foreground mb-1.5 block">{t.tavilyKey}</label>
               <Input type="password" value={toolConfig.tavilyApiKey} placeholder="tvly-..."
                 onChange={e => {
                   const newConfig = { ...toolConfig, tavilyApiKey: e.target.value };
                   setToolConfig(newConfig);
                   saveToolConfig(newConfig);
                 }}
-                className="text-xs font-mono" />
-              <p className="text-[10px] text-muted-foreground mt-1">
+                className="text-sm font-mono" />
+              <p className="text-xs text-muted-foreground mt-1">
                 {lang === "zh" ? "联网搜索工具需要。获取免费 Key：tavily.com" : "Required for web search. Get a free key at tavily.com"}
               </p>
             </div>
 
-            {/* ── Section 2: Built-in tool toggles ── */}
+            {/* ── Section 2: Built-in MCP tool toggles ── */}
             <div>
-              <label className="text-xs font-medium text-foreground mb-2 block">{dict.resourceHub.toolSourceBuiltin}</label>
+              <label className="text-sm font-medium text-foreground mb-2 block">{dict.resourceHub.toolSourceBuiltin}</label>
               <div className="space-y-1.5">
                 {Object.entries(BUILTIN_TOOLS).map(([name, def]) => {
                   const enabled = toolConfig.enabledTools.includes(name);
                   return (
-                    <label key={name} className="flex items-center gap-3 p-2 rounded-lg bg-muted/20 border border-border/40 cursor-pointer hover:bg-muted/40 transition-colors">
+                    <label key={name} className="flex items-center gap-3 p-2.5 rounded-lg bg-muted/20 border border-border/40 cursor-pointer hover:bg-muted/40 transition-colors">
                       <input type="checkbox" checked={enabled}
                         onChange={() => {
                           const newEnabled = enabled
@@ -983,8 +983,8 @@ function PlaygroundContent() {
                         }}
                         className="rounded border-border" />
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs font-medium font-mono">{name}</p>
-                        <p className="text-[10px] text-muted-foreground truncate">{def.function.description}</p>
+                        <p className="text-sm font-medium font-mono">{name}</p>
+                        <p className="text-xs text-muted-foreground">{def.function.description}</p>
                       </div>
                     </label>
                   );
@@ -994,23 +994,23 @@ function PlaygroundContent() {
 
             {/* ── Section 3: MCP Tools (from resource hub) ── */}
             <div>
-              <label className="text-xs font-medium text-foreground mb-2 block">{dict.resourceHub.toolSourceMcp}</label>
+              <label className="text-sm font-medium text-foreground mb-2 block">{dict.resourceHub.toolSourceMcp}</label>
               {(currentSession?.activeMcpTools?.length ?? 0) > 0 ? (
                 <div className="space-y-1.5">
                   {currentSession!.activeMcpTools!.map(tool => (
-                    <div key={tool.function.name} className="flex items-center justify-between gap-2 p-2 rounded-lg bg-muted/20 border border-border/40">
+                    <div key={tool.function.name} className="flex items-center justify-between gap-2 p-2.5 rounded-lg bg-muted/20 border border-border/40">
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs font-medium font-mono truncate">{tool.function.name}</p>
-                        <p className="text-[10px] text-muted-foreground truncate mt-0.5">{tool.function.description}</p>
+                        <p className="text-sm font-medium font-mono truncate">{tool.function.name}</p>
+                        <p className="text-xs text-muted-foreground truncate mt-0.5">{tool.function.description}</p>
                       </div>
                       <button onClick={() => removeMcpTool(tool.function.name)} className="p-1 rounded hover:bg-destructive/20 transition-colors shrink-0" title={dict.resourceHub.toolRemove}>
-                        <X className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
+                        <X className="h-4 w-4 text-muted-foreground hover:text-destructive" />
                       </button>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-[10px] text-muted-foreground py-4 text-center">{dict.resourceHub.toolEmpty}</p>
+                <p className="text-xs text-muted-foreground py-4 text-center">{dict.resourceHub.toolEmpty}</p>
               )}
             </div>
           </div>

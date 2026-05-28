@@ -1173,7 +1173,7 @@ export const zh: Dictionary = {
     toolRemove: "移除",
     toolEmpty: "当前会话未挂载任何 MCP 工具",
     toolSource: "来源",
-    toolSourceBuiltin: "内置",
+    toolSourceBuiltin: "内置 MCP",
     toolSourceMcp: "MCP",
     viewDetail: "详情",
     viewMore: "查看更多",
