@@ -750,6 +750,11 @@ export interface Dictionary {
     mcpRealExecution: string;
     mcpRunTest: string;
     mcpSelectTool: string;
+    // Tool manager
+    toolModelNoSupport: string;
+    toolModelUnknown: string;
+    toolNoMcpTitle: string;
+    toolNoMcpDesc: string;
     // Sort
     sortBy: string;
     sortFeatured: string;

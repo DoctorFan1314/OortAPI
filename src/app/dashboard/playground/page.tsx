@@ -9,9 +9,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import { CopyButton } from "@/components/shared/copy-button";
 import { MarkdownRenderer } from "@/components/shared/markdown-renderer";
-import { Play, Send, Bot, User, Loader2, Square, Zap, Settings2, Trash2, Download, RefreshCw, Plus, MessageSquare, X, Image, Link2, Brain, Wrench, Search, Copy, Check, Quote, Lock, ChevronDown } from "lucide-react";
+import { Play, Send, Bot, User, Loader2, Square, Zap, Settings2, Trash2, Download, RefreshCw, Plus, MessageSquare, X, Image, Link2, Brain, Wrench, Search, Copy, Check, Quote, Lock, ChevronDown, Cloud } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BUILTIN_TOOLS, getEnabledToolDefinitions, loadToolConfig, saveToolConfig, getModelCaps, type ToolConfig, type ToolDefinition, type ToolCall } from "@/lib/playground-tools";
 import { getResourceById } from "@/lib/resource-registry";
@@ -381,8 +382,9 @@ function PlaygroundContent() {
 
   // ── Build request body ──
   const buildRequestBody = (msgs: ReturnType<typeof buildMessages>, extra: Record<string, unknown> = {}) => {
+    // Only include tools if model supports tool calling
     const builtinTools = modelCaps.tools ? getEnabledToolDefinitions(toolConfigRef.current) : [];
-    const mcpTools = currentSession?.activeMcpTools ?? [];
+    const mcpTools = modelCaps.tools ? (currentSession?.activeMcpTools ?? []) : [];
     const seen = new Set<string>();
     const enabledTools = [...builtinTools, ...mcpTools].filter(t => {
       if (seen.has(t.function.name)) return false;
@@ -998,7 +1000,7 @@ function PlaygroundContent() {
 
       {/* Combined Tool Manager + Settings Sheet */}
       <Sheet open={showToolManager} onOpenChange={(open) => { setShowToolManager(open); if (!open) { setTimeout(() => msgContainerRef.current?.querySelector("textarea")?.focus(), 100); } }}>
-        <SheetContent side="right" className="w-80 sm:max-w-80">
+        <SheetContent side="right" className="w-96 sm:max-w-96">
           <SheetHeader>
             <SheetTitle className="flex items-center gap-2">
               <Wrench className="h-4 w-4" />
@@ -1006,69 +1008,93 @@ function PlaygroundContent() {
             </SheetTitle>
             <SheetDescription>{dict.resourceHub.toolManagerDesc}</SheetDescription>
           </SheetHeader>
-          <div className="px-4 py-3 space-y-5 overflow-y-auto flex-1">
+          <div className="px-4 py-3 space-y-6 overflow-y-auto flex-1">
+            {/* ── Model capability warning ── */}
+            {currentModelData && !currentModelData.tags?.includes("fc") && !currentModelData.tags?.length && (
+              <div className="flex items-start gap-2.5 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-400">
+                <Lock className="h-4 w-4 shrink-0 mt-0.5" />
+                <span>{dict.resourceHub.toolModelUnknown}</span>
+              </div>
+            )}
+
             {/* ── Section 1: Tavily API Key ── */}
-            <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">{t.tavilyKey}</label>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground block">{t.tavilyKey}</label>
               <Input type="password" value={toolConfig.tavilyApiKey} placeholder="tvly-..."
                 onChange={e => {
                   const newConfig = { ...toolConfig, tavilyApiKey: e.target.value };
                   setToolConfig(newConfig);
                   saveToolConfig(newConfig);
                 }}
-                className="text-sm font-mono" />
-              <p className="text-xs text-muted-foreground mt-1">
+                className="text-sm font-mono rounded-xl" />
+              <p className="text-xs text-muted-foreground">
                 {lang === "zh" ? "联网搜索工具需要。获取免费 Key：tavily.com" : "Required for web search. Get a free key at tavily.com"}
               </p>
             </div>
 
-            {/* ── Section 2: Built-in MCP tool toggles ── */}
-            <div>
-              <label className="text-sm font-medium text-foreground mb-2 block">{dict.resourceHub.toolSourceBuiltin}</label>
-              <div className="space-y-1.5">
+            {/* ── Section 2: Built-in tool toggles ── */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground block">{dict.resourceHub.toolSourceBuiltin}</label>
+              <div className="space-y-2">
                 {Object.entries(BUILTIN_TOOLS).map(([name, def]) => {
                   const enabled = toolConfig.enabledTools.includes(name);
+                  const toolsDisabled = !modelCaps.tools;
                   return (
-                    <label key={name} className="flex items-center gap-3 p-2.5 rounded-lg bg-muted/20 border border-border/40 cursor-pointer hover:bg-muted/40 transition-colors">
-                      <input type="checkbox" checked={enabled}
-                        onChange={() => {
-                          const newEnabled = enabled
-                            ? toolConfig.enabledTools.filter(n => n !== name)
-                            : [...toolConfig.enabledTools, name];
+                    <div key={name} className={`flex items-center gap-3 p-4 rounded-xl border transition-all ${enabled ? "bg-primary/5 border-primary/20 hover:shadow-md hover:border-primary/40" : "bg-muted/20 border-border/50 hover:bg-muted/30 hover:shadow-md hover:border-primary/30"}`}>
+                      <div className="w-9 h-9 rounded-lg bg-muted/50 flex items-center justify-center shrink-0">
+                        <Wrench className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-semibold font-mono">{name}</p>
+                        <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">{def.function.description}</p>
+                      </div>
+                      <Switch
+                        checked={enabled}
+                        disabled={toolsDisabled}
+                        onCheckedChange={(checked) => {
+                          const newEnabled = checked
+                            ? [...toolConfig.enabledTools, name]
+                            : toolConfig.enabledTools.filter(n => n !== name);
                           const newConfig = { ...toolConfig, enabledTools: newEnabled };
                           setToolConfig(newConfig);
                           saveToolConfig(newConfig);
                         }}
-                        className="rounded border-border" />
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium font-mono">{name}</p>
-                        <p className="text-xs text-muted-foreground">{def.function.description}</p>
-                      </div>
-                    </label>
+                        title={toolsDisabled ? dict.resourceHub.toolModelNoSupport : undefined}
+                      />
+                    </div>
                   );
                 })}
               </div>
             </div>
 
             {/* ── Section 3: MCP Tools (from resource hub) ── */}
-            <div>
-              <label className="text-sm font-medium text-foreground mb-2 block">{dict.resourceHub.toolSourceMcp}</label>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground block">{dict.resourceHub.toolSourceMcp}</label>
               {(currentSession?.activeMcpTools?.length ?? 0) > 0 ? (
-                <div className="space-y-1.5">
+                <div className="space-y-2">
                   {currentSession!.activeMcpTools!.map(tool => (
-                    <div key={tool.function.name} className="flex items-center justify-between gap-2 p-2.5 rounded-lg bg-muted/20 border border-border/40">
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium font-mono truncate">{tool.function.name}</p>
-                        <p className="text-xs text-muted-foreground truncate mt-0.5">{tool.function.description}</p>
+                    <div key={tool.function.name} className="flex items-center gap-3 p-4 rounded-xl border border-purple-500/20 bg-purple-500/5 hover:shadow-md hover:border-purple-500/40 transition-all">
+                      <div className="w-9 h-9 rounded-lg bg-purple-500/10 flex items-center justify-center shrink-0">
+                        <Cloud className="h-4 w-4 text-purple-400" />
                       </div>
-                      <button onClick={() => removeMcpTool(tool.function.name)} className="p-1 rounded hover:bg-destructive/20 transition-colors shrink-0" title={dict.resourceHub.toolRemove}>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-semibold font-mono truncate">{tool.function.name}</p>
+                        <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">{tool.function.description}</p>
+                      </div>
+                      <button onClick={() => removeMcpTool(tool.function.name)} className="p-1.5 rounded-lg hover:bg-destructive/10 transition-colors shrink-0" title={dict.resourceHub.toolRemove}>
                         <X className="h-4 w-4 text-muted-foreground hover:text-destructive" />
                       </button>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-xs text-muted-foreground py-4 text-center">{dict.resourceHub.toolEmpty}</p>
+                <div className="flex flex-col items-center justify-center py-8 text-center">
+                  <div className="w-14 h-14 rounded-2xl bg-muted/30 flex items-center justify-center mb-3">
+                    <Cloud className="h-7 w-7 text-muted-foreground/30" />
+                  </div>
+                  <p className="text-sm font-medium text-muted-foreground mb-1">{dict.resourceHub.toolNoMcpTitle}</p>
+                  <p className="text-xs text-muted-foreground/70 max-w-[200px]">{dict.resourceHub.toolNoMcpDesc}</p>
+                </div>
               )}
             </div>
           </div>
