@@ -141,6 +141,7 @@ export function getUserSessions(userId: number): { id: number; ip_address: strin
 // --- Generate API Key ---
 
 export function generateApiKey(): string {
+  // 32 random bytes → 64 hex chars → sk-oort- prefix = always 71 chars total
   const random = randomBytes(32).toString('hex');
   return `sk-oort-${random}`;
 }
