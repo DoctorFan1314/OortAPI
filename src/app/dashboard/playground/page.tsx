@@ -750,25 +750,39 @@ function PlaygroundContent() {
                   {msg.role === "assistant" ? <Bot className="h-4 w-4" /> : msg.role === "tool" ? <Wrench className="h-4 w-4 text-amber-500" /> : <User className="h-4 w-4" />}
                 </div>
                 <div className="max-w-[80%]">
-                  {msg.tool_calls && msg.tool_calls.length > 0 && (
-                    <div className="glass-card rounded-lg px-3 py-2 mb-1 border border-amber-500/20">
-                      <div className="text-[11px] font-mono text-amber-500 flex items-center gap-1.5 mb-1"><Wrench className="h-3 w-3" />{t.toolCall}: {msg.tool_calls.map((tc) => tc.function.name).join(", ")}</div>
-                      {msg.tool_calls.map((tc) => (<pre key={tc.id} className="text-[10px] text-muted-foreground font-mono whitespace-pre-wrap overflow-hidden max-h-[100px]">{tc.function.arguments}</pre>))}
-                    </div>
-                  )}
+                  {/* Tool call cards — clean design like ChatBox/Claude */}
+                  {msg.tool_calls && msg.tool_calls.length > 0 && msg.tool_calls.map((tc) => {
+                    let argSummary = "";
+                    try { const a = JSON.parse(tc.function.arguments || "{}"); argSummary = Object.entries(a).map(([k, v]) => `${k}: ${typeof v === "string" ? v.slice(0, 60) : JSON.stringify(v)}`).join(", "); } catch { argSummary = tc.function.arguments || ""; }
+                    return (
+                      <div key={tc.id} className="flex items-center gap-2 px-3 py-2 mb-1.5 rounded-lg bg-amber-500/5 border border-amber-500/20 text-xs">
+                        <Wrench className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+                        <span className="font-mono font-medium text-amber-500">{tc.function.name}</span>
+                        {argSummary && <span className="text-muted-foreground truncate">{argSummary}</span>}
+                      </div>
+                    );
+                  })}
                   {msg.reasoningContent && (
                     <div className="rounded-lg px-4 py-3 mb-2 border border-amber-500/20 bg-amber-500/[0.02]">
-                      <details open>
-                        <summary className="text-sm font-semibold text-amber-500 font-mono cursor-pointer hover:opacity-80 transition-opacity select-none"><Brain className="h-4 w-4 inline mr-1.5" />{t.reasoning}</summary>
-                        <div className="mt-2 pt-2 border-t border-amber-500/10 text-[12px] text-muted-foreground/90 [&_p]:!text-[12px] [&_li]:!text-[12px] [&_strong]:!text-[12px] [&_em]:!text-[12px] [&_h1]:!text-sm [&_h2]:!text-sm [&_h3]:!text-xs"><MarkdownRenderer content={msg.reasoningContent} /></div>
+                      <details>
+                        <summary className="text-xs font-medium text-amber-500/80 cursor-pointer hover:text-amber-500 transition-colors select-none"><Brain className="h-3.5 w-3.5 inline mr-1" />{t.reasoning}</summary>
+                        <div className="mt-2 pt-2 border-t border-amber-500/10 text-[12px] text-muted-foreground/90 [&_p]:!text-[12px] [&_li]:!text-[12px]"><MarkdownRenderer content={msg.reasoningContent} /></div>
                       </details>
                     </div>
                   )}
+                  {/* Message bubble */}
                   <div className={cn("glass-card rounded-lg px-4 py-2.5 text-sm leading-relaxed relative", msg.role === "assistant" ? "" : msg.role === "tool" ? "bg-amber-500/5 border-amber-500/20" : "bg-primary/10 border-0")}>
-                    {msg.role === "tool" ? <pre className="text-[11px] font-mono text-muted-foreground whitespace-pre-wrap max-h-[200px] overflow-y-auto">{msg.content as string}</pre> : <div className="text-xs">{renderContent(msg.content)}</div>}
+                    {msg.role === "tool" ? (
+                      <details>
+                        <summary className="text-xs font-medium text-amber-500/80 cursor-pointer hover:text-amber-500 transition-colors select-none flex items-center gap-1.5">
+                          <Wrench className="h-3 w-3" />{msg.name || t.toolCall}
+                        </summary>
+                        <pre className="mt-2 pt-2 border-t border-amber-500/10 text-[11px] font-mono text-muted-foreground whitespace-pre-wrap max-h-[300px] overflow-y-auto">{msg.content as string}</pre>
+                      </details>
+                    ) : <div className="text-xs">{renderContent(msg.content)}</div>}
                   </div>
                   <div className="flex items-center gap-1.5 mt-1 px-1">
-                    <span className="text-[10px] text-muted-foreground/60 font-mono">{wordCount(flatContent(msg.content))} words · {msg.createdAt || nowHHMM()}</span>
+                    <span className="text-[10px] text-muted-foreground/60 font-mono">{msg.role === "tool" ? `${msg.name || t.toolCall}` : `${wordCount(flatContent(msg.content))} words`} · {msg.createdAt || nowHHMM()}</span>
                     <span className="flex-1" />
                     <button onClick={() => setQuoteMessage(msg)} className="text-sm text-muted-foreground/70 hover:text-foreground transition-colors w-7 h-7 rounded hover:bg-muted/50 flex items-center justify-center" title={lang === "zh" ? "引用" : "Quote"} aria-label={lang === "zh" ? "引用" : "Quote"}><Quote className="h-3 w-3" /></button>
                     {msg.role === "assistant" && (
