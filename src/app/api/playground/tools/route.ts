@@ -143,11 +143,15 @@ function handleSequentialThinking(args: Record<string, unknown>) {
   const thoughtNumber = Number(args.thoughtNumber) || 1;
   const totalThoughts = Number(args.totalThoughts) || 1;
 
-  // This is a reasoning aid — it structures the model's thinking process.
-  // The model uses this to break down complex problems step by step.
-  // We return a confirmation so the tool loop continues.
+  // Guide the model to complete its reasoning and provide a final answer.
+  // If this is the last step or close to it, encourage synthesis.
+  const isNearEnd = thoughtNumber >= totalThoughts - 1;
+  const guidance = isNearEnd
+    ? '\n\nYou have enough information now. Please synthesize your analysis and provide a complete answer to the user.'
+    : '\n\nContinue to the next thinking step.';
+
   return NextResponse.json({
-    result: `Thinking step ${thoughtNumber}/${totalThoughts} recorded.\n\nCurrent: ${thought}\n\nNext: ${nextThought}`,
+    result: `Step ${thoughtNumber}/${totalThoughts}: ${thought}\n\nNext: ${nextThought}${guidance}`,
   });
 }
 

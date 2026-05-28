@@ -460,25 +460,36 @@ function PlaygroundContent() {
           updateSession((s) => ({ ...s, messages: [...s.messages, assistantMsg] }));
           setResponse("");
 
+          // Track consecutive duplicate tool calls to prevent infinite loops
+          const recentToolNames = currentMsgs.filter(m => m.role === "tool").slice(-3).map(m => m.name);
+
           for (const tc of toolCalls) {
-            // Fallback: if model returned empty arguments, try to extract from user message
+            // Skip if this tool was called in the last 2 iterations (prevent loops)
+            const recentCount = recentToolNames.filter(n => n === tc.function.name).length;
+            if (recentCount >= 2) {
+              const skipMsg: ChatMessage = { role: "tool", content: `Tool "${tc.function.name}" was called ${recentCount} times recently. Skipping to prevent loop. Please provide your answer based on the information already gathered.`, createdAt: nowHHMM(), tool_call_id: tc.id, name: tc.function.name };
+              currentMsgs = [...currentMsgs, { role: "assistant" as const, content: fullText || "", tool_calls: [tc] }, { role: "tool" as const, content: skipMsg.content, tool_call_id: tc.id, name: tc.function.name }];
+              updateSession((s) => ({ ...s, messages: [...s.messages, skipMsg] }));
+              continue;
+            }
+
+            // Fallback: if model returned empty arguments for search tools only
             if (!tc.function.arguments || tc.function.arguments.trim() === "" || tc.function.arguments === "{}") {
               const userMsg = currentMsgs.findLast((m) => m.role === "user");
               const userText = typeof userMsg?.content === "string" ? userMsg.content : "";
-              if (userText && (tc.function.name === "web_search" || tc.function.name === "google_search" || tc.function.name === "bing_search")) {
-                // Append today's date for time-relevant searches
+              const searchTools = ["web_search", "google_search", "bing_search"];
+              if (userText && searchTools.includes(tc.function.name)) {
                 const today = new Date().toISOString().split("T")[0];
                 const hasTimeHint = /今天|今日|today|latest|最新|recent/i.test(userText);
-                const query = hasTimeHint ? `${userText} ${today}` : userText;
-                tc.function.arguments = JSON.stringify({ query, count: 5 });
+                tc.function.arguments = JSON.stringify({ query: hasTimeHint ? `${userText} ${today}` : userText, count: 5 });
               } else if (userText && tc.function.name === "fetch_url") {
                 const urlMatch = userText.match(/https?:\/\/[^\s]+/);
                 tc.function.arguments = JSON.stringify({ url: urlMatch ? urlMatch[0] : userText });
-              } else if (userText) {
-                tc.function.arguments = JSON.stringify({ query: userText });
               }
+              // sequential_thinking and other tools: leave arguments as-is (server handles empty)
             }
             const toolResult = await executeTool(tc);
+            recentToolNames.push(tc.function.name);
             const toolMsg: ChatMessage = { role: "tool", content: toolResult, createdAt: nowHHMM(), tool_call_id: tc.id, name: tc.function.name };
             currentMsgs = [...currentMsgs, { role: "assistant" as const, content: fullText || "", tool_calls: [tc] }, { role: "tool" as const, content: toolResult, tool_call_id: tc.id, name: tc.function.name }];
             updateSession((s) => ({ ...s, messages: [...s.messages, toolMsg] }));
