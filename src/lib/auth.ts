@@ -1,4 +1,4 @@
-import { createHmac, randomBytes, pbkdf2Sync, timingSafeEqual, createCipheriv, createDecipheriv } from 'crypto';
+import { createHash, createHmac, randomBytes, pbkdf2Sync, timingSafeEqual, createCipheriv, createDecipheriv } from 'crypto';
 
 const DEFAULT_SECRET = 'oortapi-default-secret-change-in-production';
 const JWT_SECRET = process.env.JWT_SECRET || DEFAULT_SECRET;
@@ -149,11 +149,12 @@ export function generateApiKey(): string {
 
 // --- AES-256-GCM Encryption for channel API keys ---
 
-const DEFAULT_ENCRYPTION_KEY = 'oortapi-default-encryption-key-32b!';
-const API_KEY_HMAC_KEY = process.env.ENCRYPTION_KEY || DEFAULT_ENCRYPTION_KEY;
-
 export function hashApiKey(key: string): string {
-  return createHmac('sha256', API_KEY_HMAC_KEY).update(key).digest('hex');
+  // Use SHA-256 directly (not HMAC) so the hash is deterministic
+  // regardless of process.env changes across server reloads.
+  // HMAC with process.env.ENCRYPTION_KEY caused keys created before
+  // a reload to have different hashes than after reload.
+  return createHash('sha256').update(key).digest('hex');
 }
 
 function getEncryptionKey(): Buffer {

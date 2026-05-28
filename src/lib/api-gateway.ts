@@ -1,5 +1,6 @@
 import db from './db';
 import type { DBApiKey, DBUser } from './db';
+import { createHmac } from 'crypto';
 import { verifyToken, getTokenFromCookie, decrypt, hashApiKey } from './auth';
 import { checkRateLimit, type RateLimitResult } from './rate-limiter';
 import { deductBalance, deductCreditsOrBalance, calculateCost, logUsage, getEffectiveMultiplier, getActiveSubscription, dispatchWebhook } from './billing-engine';
@@ -65,30 +66,25 @@ export function validateApiKey(authHeader: string | null): { valid: boolean; api
     return { valid: false, error: 'Empty API key' };
   }
 
-  // Try hash-based lookup first
-  const keyHash = hashApiKey(keyValue);
-  let apiKey = db.prepare('SELECT * FROM api_keys WHERE key_hash = ? AND enabled = 1').get(keyHash) as DBApiKey | undefined;
+  // Try hash-based lookup (new: SHA-256, deterministic)
+  const newHash = hashApiKey(keyValue);
+  let apiKey = db.prepare('SELECT * FROM api_keys WHERE key_hash = ? AND enabled = 1').get(newHash) as DBApiKey | undefined;
 
-  // Fallback: plaintext match for legacy keys (lazy migration)
+  // Fallback: old HMAC-SHA256 hash (for keys created before the hash algorithm change)
   if (!apiKey) {
-    apiKey = db.prepare('SELECT * FROM api_keys WHERE key_value = ? AND enabled = 1').get(keyValue) as DBApiKey | undefined;
+    const oldHash = createHmac('sha256', 'oortapi-default-encryption-key-32b!').update(keyValue).digest('hex');
+    apiKey = db.prepare('SELECT * FROM api_keys WHERE key_hash = ? AND enabled = 1').get(oldHash) as DBApiKey | undefined;
     if (apiKey) {
-      // Migrate: store hash, mask the plaintext value
-      try {
-        db.prepare('UPDATE api_keys SET key_hash = ?, key_value = ? WHERE id = ?').run(keyHash, keyValue.slice(0, 10) + '****', apiKey.id);
-      } catch { /* key_hash column may not exist yet */ }
+      try { db.prepare('UPDATE api_keys SET key_hash = ? WHERE id = ?').run(newHash, apiKey.id); } catch {}
     }
   }
 
-  // Second fallback: key was already migrated (value masked), find by prefix
+  // Last fallback: key_value prefix match (for keys with mismatched hash from earlier bugs)
   if (!apiKey) {
     const prefix = keyValue.slice(0, 10);
     apiKey = db.prepare('SELECT * FROM api_keys WHERE key_value LIKE ? AND enabled = 1').get(prefix + '%') as DBApiKey | undefined;
     if (apiKey) {
-      // Re-hash with correct algorithm
-      try {
-        db.prepare('UPDATE api_keys SET key_hash = ? WHERE id = ?').run(keyHash, apiKey.id);
-      } catch { /* ignore */ }
+      try { db.prepare('UPDATE api_keys SET key_hash = ? WHERE id = ?').run(newHash, apiKey.id); } catch {}
     }
   }
 
