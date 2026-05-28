@@ -66,12 +66,13 @@ export async function PATCH(request: NextRequest) {
     const key = db.prepare('SELECT * FROM api_keys WHERE id = ? AND user_id = ?').get(id, auth.user.id) as { id: number; key_value: string } | undefined;
     if (!key) return NextResponse.json({ error: 'Key not found' }, { status: 404 });
 
-    // Key rotation: generate new key, disable old one, return new value
+    // Key rotation: generate new key, store hash + masked value, return full key
     if (action === 'rotate') {
       const newKey = generateApiKey();
-      const hashed = hashApiKey(newKey);
-      db.prepare('UPDATE api_keys SET key_value = ?, enabled = 1 WHERE id = ?').run(hashed, id);
-      return NextResponse.json({ key: { id, full_key: newKey, key_value: `sk-oort-${newKey.slice(7, 17)}...` } });
+      const keyHash = hashApiKey(newKey);
+      const maskedValue = newKey.slice(0, 10) + '****';
+      db.prepare('UPDATE api_keys SET key_value = ?, key_hash = ?, enabled = 1 WHERE id = ?').run(maskedValue, keyHash, id);
+      return NextResponse.json({ key: { id, full_key: newKey, key_value: maskedValue } });
     }
 
     const updates: string[] = [];
