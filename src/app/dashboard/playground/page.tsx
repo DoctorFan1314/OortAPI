@@ -699,6 +699,14 @@ function PlaygroundContent() {
             </div>
           </div>
 
+          {/* No API key warning */}
+          {!selectedKey && (
+            <div className="px-5 py-2 bg-amber-500/10 border-b border-amber-500/20 text-amber-500 text-xs flex items-center gap-2 shrink-0">
+              <Lock className="h-3.5 w-3.5 shrink-0" />
+              <span>{lang === "zh" ? "请在右侧「API Key」下拉框中选择一个密钥，或前往控制台创建新密钥" : "Select an API Key from the right panel dropdown, or create one in the dashboard"}</span>
+            </div>
+          )}
+
           {/* Messages */}
           <div ref={msgContainerRef} className="flex-1 overflow-y-auto p-6 space-y-4 playground-scrollbar">
             {chatHistory.length === 0 && !response && !error && (
@@ -848,7 +856,7 @@ function PlaygroundContent() {
               
                 <div className="flex flex-col gap-1.5 self-center">
                   <div className="flex gap-1.5">
-                    {isSending ? <button onClick={handleStop} className="w-10 h-full min-h-[2.5rem] rounded-md border border-destructive/30 bg-destructive/10 text-destructive flex items-center justify-center shrink-0 hover:bg-destructive/20 transition-colors"><Loader2 className="h-5 w-5 animate-spin" /></button> : <button onClick={handleSend} disabled={!message.trim() || !selectedModel || !selectedKey} className="w-10 h-full min-h-[2.5rem] rounded-md border border-primary/30 bg-primary/10 text-primary flex items-center justify-center shrink-0 hover:bg-primary/20 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"><Send className="h-5 w-5" /></button>}
+                    {isSending ? <button onClick={handleStop} className="w-10 h-full min-h-[2.5rem] rounded-md border border-destructive/30 bg-destructive/10 text-destructive flex items-center justify-center shrink-0 hover:bg-destructive/20 transition-colors"><Loader2 className="h-5 w-5 animate-spin" /></button> : <button onClick={handleSend} disabled={!message.trim() || !selectedModel || !selectedKey} title={!selectedKey ? (lang === "zh" ? "请先在右侧选择 API Key" : "Please select an API Key in the right panel") : !selectedModel ? (lang === "zh" ? "请先选择模型" : "Please select a model") : !message.trim() ? (lang === "zh" ? "请输入消息" : "Type a message") : ""} className="w-10 h-full min-h-[2.5rem] rounded-md border border-primary/30 bg-primary/10 text-primary flex items-center justify-center shrink-0 hover:bg-primary/20 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"><Send className="h-5 w-5" /></button>}
                   </div>
                 </div>
             </div>
