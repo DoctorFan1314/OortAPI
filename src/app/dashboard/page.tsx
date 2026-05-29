@@ -53,7 +53,7 @@ const LABELS = {
 };
 
 export default function DashboardPage() {
-  const { lang } = useI18n();
+  const { lang, t: dict } = useI18n();
   const { user } = useAuth();
   const t = LABELS[lang];
   const { data: keysData, error: keysError, mutate: mutateKeys } = useSWR<{ keys: { id: number }[] }>("/api/dashboard/keys", dashboardSWRConfig);
@@ -105,16 +105,16 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl md:text-2xl font-bold">{lang === "zh" ? "控制台" : "Dashboard"}</h1>
+        <h1 className="text-xl md:text-2xl font-bold">{dict.dashboard.title}</h1>
         <div className="flex items-center gap-3">
           {lastUpdated && (
             <span className="text-xs text-muted-foreground">
-              {lang === "zh" ? "上次更新" : "Last updated"}: {lastUpdated.toLocaleDateString(lang)} {lastUpdated.toLocaleTimeString(lang)}
+              {dict.dashboard.lastUpdated}: {lastUpdated.toLocaleDateString(lang)} {lastUpdated.toLocaleTimeString(lang)}
             </span>
           )}
           <Button variant="outline" size="sm" onClick={handleRefresh} className="gap-1">
             <RefreshCw className="h-3.5 w-3.5" />
-            {lang === "zh" ? "刷新" : "Refresh"}
+            {dict.dashboard.refresh}
           </Button>
         </div>
       </div>
@@ -125,15 +125,15 @@ export default function DashboardPage() {
           <AlertTriangle className="h-5 w-5 text-red-400 shrink-0" />
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-red-400">
-              {lang === "zh" ? "部分数据加载失败" : "Failed to load some data"}
+              {dict.dashboard.loadFailed}
             </p>
             <p className="text-xs text-muted-foreground">
-              {lang === "zh" ? "请检查网络连接后重试" : "Check your connection and retry"}
+              {dict.dashboard.checkConnection}
             </p>
           </div>
           <Button size="sm" variant="outline" onClick={handleRefresh} className="shrink-0 border-red-500/30 text-red-400 hover:bg-red-500/10 gap-1">
             <RefreshCw className="h-3.5 w-3.5" />
-            {lang === "zh" ? "重试" : "Retry"}
+            {dict.dashboard.retry}
           </Button>
         </div>
       )}
@@ -150,12 +150,12 @@ export default function DashboardPage() {
               }
             </p>
             <p className="text-xs text-muted-foreground">
-              {lang === "zh" ? "自动续费已关闭，请及时续费以避免服务中断" : "Auto-renew is off. Renew now to avoid service interruption"}
+              {dict.dashboard.autoRenewOff}
             </p>
           </div>
           <Link href="/dashboard/token-plan">
             <Button size="sm" variant="outline" className="shrink-0 border-amber-500/30 text-amber-400 hover:bg-amber-500/10">
-              {lang === "zh" ? "续费" : "Renew"}
+              {dict.dashboard.renew}
             </Button>
           </Link>
         </div>
@@ -186,7 +186,7 @@ export default function DashboardPage() {
                 </div>
                 <p className="text-xs text-muted-foreground">{t.step1Desc}</p>
                 {hasKeys ? (
-                  <span className="text-xs text-emerald-400 font-medium mt-auto">{lang === "zh" ? "已完成" : "Done"}</span>
+                  <span className="text-xs text-emerald-400 font-medium mt-auto">{dict.dashboard.done}</span>
                 ) : (
                   <Link href="/dashboard/keys" className="mt-auto">
                     <Button size="sm" className="w-full gap-1">
@@ -228,11 +228,11 @@ export default function DashboardPage() {
             </div>
             {/* Progress bar */}
             <div className="mt-5 flex items-center gap-3 text-xs text-muted-foreground">
-              <span className="shrink-0">{lang === "zh" ? "设置进度" : "Progress"}: {getOnboardProgress()}%</span>
+              <span className="shrink-0">{dict.dashboard.progress}: {getOnboardProgress()}%</span>
               <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
                 <div className="h-full bg-gradient-to-r from-primary to-purple-500 rounded-full transition-all duration-500" style={{ width: `${getOnboardProgress()}%` }} />
               </div>
-              {getOnboardProgress() === 100 && <span className="text-emerald-400 shrink-0">{lang === "zh" ? "✅ 已完成" : "✅ Complete"}</span>}
+              {getOnboardProgress() === 100 && <span className="text-emerald-400 shrink-0">{dict.dashboard.done}</span>}
             </div>
           </CardContent>
         </Card>

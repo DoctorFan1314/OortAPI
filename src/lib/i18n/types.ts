@@ -392,6 +392,17 @@ export interface Dictionary {
     tokens: string;
     noUsage: string;
     noUsageDesc: string;
+    refresh: string;
+    lastUpdated: string;
+    loadFailed: string;
+    checkConnection: string;
+    retry: string;
+    progress: string;
+    done: string;
+    renew: string;
+    autoRenewOff: string;
+    subscriptionExpiring: string;
+    subscriptionExpired: string;
     createApiKey: string;
     keyName: string;
     keyNamePlaceholder: string;
