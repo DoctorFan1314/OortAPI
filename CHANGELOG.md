@@ -49,8 +49,12 @@ All notable changes to this project will be documented in this file.
 #### Resource Center UX
 - **Detail links on all cards** — Prompt → `/prompts/{id}`, Skill → `/skills/{id}`, MCP → `/resources/mcp/{id}`
 - **2-row button layout** — Card actions split into 2 rows: "Details" on top, "Launch in Playground" / "Copy Config" below
+- **Deployment badge** — MCP cards show Hosted (purple) / Local (blue) badge
+- **Sort dropdown** — Featured / Name / Usage sorting, visible when specific tab selected
 - **Paginated display** — "All" tab shows 3 per type with section headers and "View More" links
 - **Tab reordering** — All → Cloud MCP → Prompt Templates → Client Skills
+- **Tab URL persistence** — Tab state synced to URL (`?tab=mcp`), survives refresh and share
+- **Search dropdown close** — Closes on outside click
 
 #### Cross-Page Integration
 - **Resource Center → Playground** — "Launch in Playground" auto-creates session, injects systemPrompt or activeMcpTools, toast confirmation

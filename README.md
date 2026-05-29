@@ -189,7 +189,7 @@ Supports full `tool_use` / `tool_result` conversion between Anthropic and OpenAI
 - **Usage trend charts** — ECharts bar chart with cost/tokens/calls toggle, filter-linked
 - **System monitor** — Admin dashboard: QPS, error rate, P50/P95 latency, per-provider health
 - **API Playground** — Interactive testing: select model + key, multi-turn conversation, configurable parameters, streaming response, MCP Tool Loop, Switch-based tool manager with model capability linkage
-- **Resource Center** — AI App Store: 17 cloud MCP nodes, 28+ prompt templates, client skills, one-click activation to Playground
+- **Resource Center** — AI App Store: 17 real open-source MCP nodes (from modelcontextprotocol/servers), 28+ prompt templates, client skills, one-click activation to Playground
 - **Multi-page documentation** — Data-driven grouped docs center, sidebar search state machine (no flicker), AI tools consolidated sandbox (8 tools single-page config wizard), code block syntax highlighting with hover copy
 - **Shared component library** — StatCard, StatusBadge, ConfirmDialog, LoadingSkeleton, and more reusable components
 - **Channel routing matrix** — Visual model-to-channel mapping with priority/weight
