@@ -10,10 +10,7 @@ import { useToast } from "@/contexts/toast-context";
 import { useI18n } from "@/contexts/i18n-context";
 import { Loader2, Eye, EyeOff } from "lucide-react";
 
-function safeReturnUrl(url: string | null): string {
-  if (!url || !url.startsWith("/") || url.includes("://")) return "/";
-  return url;
-}
+import { safeReturnUrl } from "@/lib/auth-utils";
 
 export default function RegisterClient() {
   const [username, setUsername] = useState("");
