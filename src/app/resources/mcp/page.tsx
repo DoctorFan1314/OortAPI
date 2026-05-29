@@ -20,6 +20,7 @@ export default function McpEcosystemPage() {
   const [activeCategory, setActiveCategory] = useState<McpCategory | "all">("all");
   const [deploymentFilter, setDeploymentFilter] = useState<"all" | "hosted" | "local">("all");
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [visibleCount, setVisibleCount] = useState(9);
 
   const filteredNodes = useMemo(() => {
     let items = getMcpNodesByCategory(activeCategory);
@@ -137,14 +138,14 @@ export default function McpEcosystemPage() {
             {tFormat(t.resourceHub.mcpNodeCount, { count: filteredNodes.length })}
           </p>
 
-          {/* Cards grid */}
+          {/* Cards grid with pagination */}
           {filteredNodes.length === 0 ? (
             <div className="text-center py-16 text-muted-foreground">
               <p className="text-sm">{t.resourceHub.noResults}</p>
             </div>
           ) : (
             <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
-              {filteredNodes.map(item => (
+              {filteredNodes.slice(0, visibleCount).map(item => (
                 <div key={item.id} className="glass-card glass-card-hover p-5 h-full group flex flex-col">
                   {/* Header */}
                   <div className="flex items-start justify-between gap-2 mb-2">
@@ -204,6 +205,14 @@ export default function McpEcosystemPage() {
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+          {/* Load More */}
+          {filteredNodes.length > visibleCount && (
+            <div className="text-center mt-6">
+              <Button variant="secondary" className="border border-border" onClick={() => setVisibleCount(prev => prev + 9)}>
+                {t.resourceHub.viewMore} ({filteredNodes.length - visibleCount})
+              </Button>
             </div>
           )}
         </div>
