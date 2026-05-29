@@ -8,6 +8,29 @@ All notable changes to this project will be documented in this file.
 
 ## [v3.3.5.0] — 2026-05-28
 
+### Resource Center Audit Fixes (30 Issues)
+
+#### MCP Ecosystem Square
+- **Pagination** — 9 items per page with "Load More" button, resets on filter change
+- **Featured badge** — Amber star badge on featured MCP cards
+- **Search dropdown** — Closes on outside click (useRef + mousedown handler)
+- **Tab URL persistence** — Tab state synced to URL (`?tab=mcp`), survives refresh and share
+- **i18n fixes** — "Service Type" and "Category" headings use i18n keys
+- **Tag search** — Case-insensitive tag matching
+
+#### MCP Detail Page
+- **Real feedback system** — CommentSection component with ratings, comments, likes, replies
+- **Featured indicator** — Amber star badge in header
+- **Tips box accuracy** — Different text for local vs hosted MCP
+- **Copy failure toast** — Error toast on clipboard failure
+- **i18n compliance** — All 20+ hardcoded ternaries replaced with i18n keys
+
+#### Resource Registry
+- **Real MCP servers** — All 17 nodes from `modelcontextprotocol/servers` (MIT) and established repos
+- **Type safety** — `mcpCategory` typed as `McpCategory` union
+- **Empty categories** — Removed `communication` and `finance` (no items)
+- **Client skill descriptions** — `descriptionZh` uses Chinese title from agent skills
+
 ### Resource Center Refactor & MCP Ecosystem Integration
 
 #### New Features
