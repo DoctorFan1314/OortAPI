@@ -35,6 +35,8 @@ export default function McpEcosystemPage() {
         return name.toLowerCase().includes(q) || desc.toLowerCase().includes(q) || i.tags.some(tag => tag.toLowerCase().includes(q));
       });
     }
+    // Reset pagination when filters change
+    setVisibleCount(9);
     return items;
   }, [activeCategory, deploymentFilter, searchQuery, lang]);
 
