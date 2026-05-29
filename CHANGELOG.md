@@ -16,7 +16,7 @@ All notable changes to this project will be documented in this file.
 - **Tool Testing Sandbox** — New interactive tab on MCP detail page: auto-generates input form from parameter schema, runs real test against `/api/playground/tools`, displays response
 - **Feedback System** — MCP detail page reuses Agent Skill's CommentSection with ratings, comments, likes, replies
 - **MCP Metadata** — All 17 MCP nodes populated with developer/license/github/lastUpdated/usageCount/userCount
-- **17 MCP Nodes** — Google Search, GitHub Assistant, PostgreSQL, Amap, Bing Search, Supabase, RollingGo Hotels, Douyin Assistant, ChatPPT, McDonald's, 12306, Chrome DevTools, AntVis Charts, MemOS Memory, WeRead, Fetch Content
+- **17 Real MCP Nodes** — All from `modelcontextprotocol/servers` (MIT) and established repos: Fetch, Filesystem, Memory, GitHub, Brave Search, Google Maps, Puppeteer, Slack, PostgreSQL, SQLite, Git, Everything (testing), Playwright, Supabase, Sequential Thinking, Time, Redis
 - **Playground Tool Manager** — Wrench button with red count badge, Sheet panel listing mounted MCP and built-in tools with one-click remove
 - **28+ Real Prompt Templates** — Full integration with prompt marketplace dataset, replacing 3 hardcoded examples
 - **Real Agent Skills** — Client skill cards sourced from Agent Skills marketplace (8 real skills), detail links no longer 404

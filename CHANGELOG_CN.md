@@ -16,7 +16,7 @@
 - **工具测试沙盒** — MCP 详情页新增交互式工具测试 Tab，自动根据参数 Schema 生成输入表单，点击运行测试真实调用 `/api/playground/tools`，展示返回结果
 - **交流反馈系统** — MCP 详情页复用 Agent 技能 CommentSection 组件，支持评分、评论、点赞、回复
 - **MCP 元数据** — 17 个 MCP 节点全部填充 developer/license/github/lastUpdated/usageCount/userCount 字段
-- **17 个 MCP 节点** — 谷歌搜索、GitHub 助手、PostgreSQL、高德地图、必应搜索、Supabase、RollingGo 酒店预订、抖音运营、ChatPPT、麦当劳、12306、Chrome DevTools、AntVis 图表、MemOS 记忆、微信读书、Fetch 内容抓取
+- **17 个真实 MCP 节点** — 全部来自 `modelcontextprotocol/servers` (MIT) 及 established repos：Fetch、Filesystem、Memory、GitHub、Brave Search、Google Maps、Puppeteer、Slack、PostgreSQL、SQLite、Git、Everything (testing)、Playwright、Supabase、Sequential Thinking、Time、Redis
 - **测试场工具管理器** — 输入栏新增工具按钮（带红色数字气泡），Sheet 面板列出已挂载 MCP 工具与内置工具，支持一键移除
 - **28+ 真实 Prompt 模板** — 全量对接提示词市场数据集，替代原有 3 个硬编码示例
 - **真实 Agent 技能** — 客户端技能数据源切换为 Agent 技能市场真实数据（8 个技能），详情链接不再 404
