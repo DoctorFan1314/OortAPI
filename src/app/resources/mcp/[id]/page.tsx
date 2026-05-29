@@ -8,6 +8,7 @@ import { useToast } from "@/contexts/toast-context";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getResourceById, type ResourceItem } from "@/lib/resource-registry";
 import { CommentSection } from "@/components/skill/comment-section";
 import Link from "next/link";
@@ -149,14 +150,13 @@ export default function McpDetailPage() {
           </div>
 
           {/* Tabs */}
-          <div role="tablist" className="flex items-center gap-0 border-b border-border mb-6 overflow-x-auto">
-            {tabs.map(({ key, label }) => (
-              <button key={key} role="tab" aria-selected={activeTab === key} onClick={() => setActiveTab(key)}
-                className={`px-5 py-3 text-sm border-b-2 transition-colors whitespace-nowrap ${activeTab === key ? "border-primary text-foreground font-medium" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
-                {label}
-              </button>
-            ))}
-          </div>
+          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as typeof activeTab)} className="mb-6">
+            <TabsList variant="line">
+              {tabs.map(({ key, label }) => (
+                <TabsTrigger key={key} value={key}>{label}</TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
 
           {/* Tab: Service Details */}
           {activeTab === "details" && (
