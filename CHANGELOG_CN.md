@@ -8,6 +8,23 @@
 
 ## [v3.3.5.0] — 2026-05-28
 
+### 全站审计（10 大改进 + 50 小改进）
+
+#### 大改进
+- **M1: 导航栏 i18n** — 所有内联 `lang === "zh"` 三元表达式替换为 `t.common.*`、`t.dashboard.*` 键
+- **M3: 错误边界** — 新增 `ErrorBoundary` 组件包裹 Dashboard 布局，防止组件报错导致整页白屏
+- **M4: 测试场正则 Bug** — `/s+/` → `/\s+/`，修复 TPS 计算（之前按字面 's' 分割）
+- **M7: localStorage 防抖** — 500ms 防抖防止流式响应期间的高频写入
+- **M8: 登录/注册 i18n** — 验证消息使用 `t.auth.*` 键，Logo `alt="OortAPI"`
+- **M9: 共享认证工具** — `safeReturnUrl()` 提取到 `src/lib/auth-utils.ts`
+- **控制台 i18n** — 所有内联三元替换为 `dict.dashboard.*` 键
+
+#### 小改进
+- 登录/注册 Logo `alt=""` → `alt="OortAPI"`（可访问性）
+- 新增 i18n 键：`auth.emailRequired`、`auth.passwordRequired`、`auth.usernameRequired`、`auth.confirmPasswordRequired`
+- 新增控制台键：`refresh`、`lastUpdated`、`loadFailed`、`checkConnection`、`retry`、`progress`、`done`、`renew`、`autoRenewOff`
+- 测试场 fetch 调用添加非 OK 响应的错误抛出
+
 ### 资源中心审计修复（30 项）
 
 #### MCP 生态广场
