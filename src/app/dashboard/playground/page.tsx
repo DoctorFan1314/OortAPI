@@ -244,23 +244,28 @@ function PlaygroundContent() {
   }, [lang]); // eslint-disable-line
 
   useEffect(() => {
-    fetch("/api/v1/models").then((r) => (r.ok ? r.json() : null)).then((d) => { if (d?.data) { setModels(d.data); setSessions((prev) => prev.map((s) => ({ ...s, selectedModel: s.selectedModel || d.data[0]?.id || "" }))); } }).catch(() => {});
+    fetch("/api/v1/models")
+      .then((r) => { if (!r.ok) throw new Error(`Models: HTTP ${r.status}`); return r.json(); })
+      .then((d) => { if (d?.data) { setModels(d.data); setSessions((prev) => prev.map((s) => ({ ...s, selectedModel: s.selectedModel || d.data[0]?.id || "" }))); } })
+      .catch(() => {});
   }, []);
   useEffect(() => {
-    fetch("/api/dashboard/keys", { credentials: "include" }).then((r) => (r.ok ? r.json() : null)).then((d) => {
-      if (d?.keys) {
-        const enabled = d.keys.filter((k: ApiKey) => k.enabled === 1);
-        setKeys(enabled);
-        if (enabled.length > 0) {
-          const validIds = new Set(enabled.map((k: ApiKey) => k.id));
-          setSessions((prev) => prev.map((s) => ({
-            ...s,
-            // Fix stale selectedKeyId: if it doesn't match any loaded key, reset to first available
-            selectedKeyId: s.selectedKeyId != null && validIds.has(s.selectedKeyId) ? s.selectedKeyId : enabled[0].id,
-          })));
+    fetch("/api/dashboard/keys", { credentials: "include" })
+      .then((r) => { if (!r.ok) throw new Error(`Keys: HTTP ${r.status}`); return r.json(); })
+      .then((d) => {
+        if (d?.keys) {
+          const enabled = d.keys.filter((k: ApiKey) => k.enabled === 1);
+          setKeys(enabled);
+          if (enabled.length > 0) {
+            const validIds = new Set(enabled.map((k: ApiKey) => k.id));
+            setSessions((prev) => prev.map((s) => ({
+              ...s,
+              selectedKeyId: s.selectedKeyId != null && validIds.has(s.selectedKeyId) ? s.selectedKeyId : enabled[0].id,
+            })));
+          }
         }
-      }
-    }).catch(() => {});
+      })
+      .catch(() => {});
   }, []);
 
   // ── Persistence ──
@@ -270,14 +275,24 @@ function PlaygroundContent() {
       if (saved) { const p = JSON.parse(saved); if (p.sessions?.length > 0) setSessions(p.sessions); if (p.currentSessionId) setCurrentSessionId(p.currentSessionId); }
     } catch { /* ignore */ }
   }, []);
+
+  // Debounced localStorage write (prevents rapid writes during streaming)
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
-    if (sessions.length > 0) {
+    if (sessions.length === 0) return;
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(() => {
       try {
         const json = JSON.stringify({ sessions: sessions.slice(-50), currentSessionId });
-        if (json.length > 2_000_000) { const trimmed = sessions.slice(-20).map((s) => ({ ...s, messages: s.messages.slice(-30) })); localStorage.setItem(STORAGE_KEY, JSON.stringify({ sessions: trimmed, currentSessionId })); }
-        else localStorage.setItem(STORAGE_KEY, json);
+        if (json.length > 2_000_000) {
+          const trimmed = sessions.slice(-20).map((s) => ({ ...s, messages: s.messages.slice(-30) }));
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({ sessions: trimmed, currentSessionId }));
+        } else {
+          localStorage.setItem(STORAGE_KEY, json);
+        }
       } catch { /* ignore */ }
-    }
+    }, 500);
+    return () => { if (saveTimerRef.current) clearTimeout(saveTimerRef.current); };
   }, [sessions, currentSessionId]);
 
   // ── Resource Hub injection ──
