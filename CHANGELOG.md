@@ -22,6 +22,9 @@ All notable changes to this project will be documented in this file.
 #### Minor Fixes
 - **Playground i18n** — Replace inline ternaries with LABELS keys (newChat, inputMessage, advanced, toolCallsFailing, searchFallback, maxIterations)
 - **API Keys page** — Title uses `t.dashboard.apiKeys` instead of inline ternary
+- **Navbar aria-labels** — All hardcoded English aria-labels replaced with `t.common.*` keys
+- **MCP detail tabs** — Raw `role="tablist"` replaced with `<Tabs>` component for consistency
+- **MCP square empty state** — Icon + helper text instead of plain text
 - Login/Register logo `alt=""` → `alt="OortAPI"` for accessibility
 - New i18n keys: `auth.emailRequired`, `auth.passwordRequired`, `auth.usernameRequired`, `auth.confirmPasswordRequired`
 - New dashboard keys: `refresh`, `lastUpdated`, `loadFailed`, `checkConnection`, `retry`, `progress`, `done`, `renew`, `autoRenewOff`, `subscriptionExpiring`, `subscriptionExpired`
