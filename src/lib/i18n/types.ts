@@ -225,6 +225,7 @@ export interface Dictionary {
     oauthComingSoon: string; loginWithGoogle: string; loginWithGithub: string;
     comingSoon: string;
     passwordMinLength: string; emailInvalid: string; emailExists: string;
+    emailRequired: string; passwordRequired: string; usernameRequired: string; confirmPasswordRequired: string;
     registerSuccess: string; createAccountDesc: string;
     usernamePlaceholder: string; passwordPlaceholder: string;
     oauthRegisterComingSoon: string; registerWithGoogle: string; registerWithGithub: string;

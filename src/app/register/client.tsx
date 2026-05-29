@@ -35,22 +35,22 @@ export default function RegisterClient() {
   function validate(): boolean {
     const errors: typeof fieldErrors = {};
     if (!username.trim()) {
-      errors.username = lang === "zh" ? "请输入用户名" : "Username is required";
+      errors.username = t.auth.usernameRequired;
     }
     if (!email.trim()) {
-      errors.email = lang === "zh" ? "请输入邮箱" : "Email is required";
+      errors.email = t.auth.emailRequired;
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-      errors.email = lang === "zh" ? "邮箱格式不正确" : "Invalid email format";
+      errors.email = t.auth.emailInvalid;
     }
     if (!password) {
-      errors.password = lang === "zh" ? "请输入密码" : "Password is required";
+      errors.password = t.auth.passwordRequired;
     } else if (password.length < 8) {
-      errors.password = lang === "zh" ? "密码至少 8 个字符" : "Password must be at least 8 characters";
+      errors.password = t.auth.passwordMinLength;
     }
     if (!confirmPassword) {
-      errors.confirmPassword = lang === "zh" ? "请确认密码" : "Please confirm your password";
+      errors.confirmPassword = t.auth.confirmPasswordRequired;
     } else if (password !== confirmPassword) {
-      errors.confirmPassword = lang === "zh" ? "两次密码不一致" : "Passwords do not match";
+      errors.confirmPassword = t.auth.passwordMismatch;
     }
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
@@ -97,7 +97,7 @@ export default function RegisterClient() {
     <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <img src="/logo-icon.svg" alt="" className="h-28 w-28 mx-auto mb-4" />
+          <img src="/logo-icon.svg" alt="OortAPI" className="h-28 w-28 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-foreground mb-2">{t.auth.registerTitle}</h1>
           <p className="text-muted-foreground">{t.auth.createAccountDesc}</p>
         </div>
