@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Puzzle, BookOpen, Server, LayoutGrid, TrendingUp, Tags, ArrowRight, Search, X, Cloud, Rocket, Copy, Sparkles, Wrench, Check, BarChart3, Users } from "lucide-react";
 import { useI18n } from "@/contexts/i18n-context";
 import { useToast } from "@/contexts/toast-context";
@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useState, useMemo, useCallback, memo } from "react";
+import { useState, useMemo, useCallback, memo, useRef, useEffect, Suspense } from "react";
 import useSWR from "swr";
 import { dashboardSWRConfig } from "@/lib/swr-fetcher";
 import { RESOURCE_ITEMS, getResourcesByType, type ResourceItem, type ResourceType } from "@/lib/resource-registry";
@@ -117,10 +117,35 @@ export default function ResourcesPage() {
   const { lang, t, tFormat } = useI18n();
   const { toast } = useToast();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState("all");
+  const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "all");
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [visibleCounts, setVisibleCounts] = useState<Record<string, number>>({});
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  // Close search dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setSearchQuery("");
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Sync tab state to URL
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (activeTab === "all") {
+      params.delete("tab");
+    } else {
+      params.set("tab", activeTab);
+    }
+    const newUrl = params.toString() ? `/resources?${params}` : "/resources";
+    router.replace(newUrl, { scroll: false });
+  }, [activeTab]);
 
   const { data: counts } = useSWR<CountsData>("/api/stats", dashboardSWRConfig);
 
@@ -207,7 +232,7 @@ export default function ResourcesPage() {
       </div>
 
       {/* Search with instant dropdown */}
-      <div className="relative max-w-md mb-6">
+      <div ref={searchRef} className="relative max-w-md mb-6">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
         <Input placeholder={t.resourceHub.searchPlaceholder} value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-10 pr-9 bg-secondary border-border text-foreground" />
         {searchQuery && <button onClick={() => setSearchQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground z-10"><X className="h-4 w-4" /></button>}
