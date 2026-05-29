@@ -68,6 +68,11 @@ const ResourceCard = memo(function ResourceCard({ item, copiedId, onLaunch, onCo
         {item.featured && (
           <Badge className="bg-amber-500/10 text-amber-400 border-amber-500/20 border text-[10px]">★ Featured</Badge>
         )}
+        {item.type === "mcp" && item.mcpDeployment && (
+          <Badge className={`border text-[10px] ${item.mcpDeployment === "local" ? "bg-blue-500/10 text-blue-400 border-blue-500/20" : "bg-purple-500/10 text-purple-400 border-purple-500/20"}`}>
+            {item.mcpDeployment === "local" ? t.resourceHub.mcpLocal : t.resourceHub.mcpHosted}
+          </Badge>
+        )}
       </div>
       <h3 className="text-sm font-semibold mb-1.5 line-clamp-1">{lang === "zh" ? item.nameZh : item.name}</h3>
       <p className="text-xs text-muted-foreground mb-2 line-clamp-2 flex-1">{lang === "zh" ? item.descriptionZh : item.description}</p>
@@ -120,6 +125,7 @@ export default function ResourcesPage() {
   const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "all");
+  const [sortBy, setSortBy] = useState<"featured" | "name" | "usage">("featured");
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [visibleCounts, setVisibleCounts] = useState<Record<string, number>>({});
   const searchRef = useRef<HTMLDivElement>(null);
@@ -176,11 +182,18 @@ export default function ResourcesPage() {
     });
   }, [searchFilter]);
 
-  // Specific tab: filtered + paginated
+  // Specific tab: filtered + sorted + paginated
   const tabFiltered = useMemo(() => {
     if (activeTab === "all") return [];
-    return searchFilter(RESOURCE_ITEMS.filter(i => i.type === activeTab));
-  }, [activeTab, searchFilter]);
+    const filtered = searchFilter(RESOURCE_ITEMS.filter(i => i.type === activeTab));
+    // Sort
+    return [...filtered].sort((a, b) => {
+      if (sortBy === "featured") return (b.featured ? 1 : 0) - (a.featured ? 1 : 0);
+      if (sortBy === "name") return (lang === "zh" ? a.nameZh : a.name).localeCompare(lang === "zh" ? b.nameZh : b.name);
+      if (sortBy === "usage") return (Number(b.mcpUsageCount?.replace(/[^0-9.]/g, '')) || 0) - (Number(a.mcpUsageCount?.replace(/[^0-9.]/g, '')) || 0);
+      return 0;
+    });
+  }, [activeTab, searchFilter, sortBy, lang]);
 
   const currentVisible = visibleCounts[activeTab] ?? DEFAULT_VISIBLE;
   const visibleItems = tabFiltered.slice(0, currentVisible);
@@ -259,15 +272,24 @@ export default function ResourcesPage() {
         )}
       </div>
 
-      {/* Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
-        <TabsList variant="line">
-          <TabsTrigger value="all">{t.resourceHub.tabAll}</TabsTrigger>
-          <TabsTrigger value="mcp">{t.resourceHub.tabMcp}</TabsTrigger>
-          <TabsTrigger value="prompt-template">{t.resourceHub.tabPrompt}</TabsTrigger>
-          <TabsTrigger value="client-skill">{t.resourceHub.tabClientSkill}</TabsTrigger>
-        </TabsList>
-      </Tabs>
+      {/* Tabs + Sort */}
+      <div className="flex items-center justify-between mb-8">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList variant="line">
+            <TabsTrigger value="all">{t.resourceHub.tabAll}</TabsTrigger>
+            <TabsTrigger value="mcp">{t.resourceHub.tabMcp}</TabsTrigger>
+            <TabsTrigger value="prompt-template">{t.resourceHub.tabPrompt}</TabsTrigger>
+            <TabsTrigger value="client-skill">{t.resourceHub.tabClientSkill}</TabsTrigger>
+          </TabsList>
+        </Tabs>
+        {activeTab !== "all" && (
+          <select value={sortBy} onChange={e => setSortBy(e.target.value as "featured" | "name" | "usage")} className="text-xs bg-secondary border border-border rounded-lg px-2 py-1.5 text-muted-foreground focus:outline-none">
+            <option value="featured">{t.resourceHub.sortFeatured}</option>
+            <option value="name">{t.resourceHub.sortName}</option>
+            <option value="usage">{t.resourceHub.sortUsage}</option>
+          </select>
+        )}
+      </div>
 
       {/* Content */}
       {activeTab === "all" ? (
