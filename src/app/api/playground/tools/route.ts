@@ -18,11 +18,12 @@ export async function POST(request: NextRequest) {
       case 'fetch_url':
         return await handleFetchUrl(args);
 
-      // MCP tools — real execution where possible, demo fallback
+      // Real MCP tools
       case 'google_search':
         return await handleGoogleSearch(args, config);
       case 'google_news':
         return await handleGoogleNews(args, config);
+      case 'fetch':
       case 'fetch_content':
         return await handleFetchContent(args);
       case 'search_code':
@@ -33,30 +34,24 @@ export async function POST(request: NextRequest) {
         return handleQueryValidator(args);
       case 'schema_fetch':
         return handleSchemaFetch(args);
-      case 'geocode':
-      case 'route_planning':
-      case 'bing_search':
-      case 'supabase_query':
-      case 'supabase_insert':
-      case 'search_hotels':
-      case 'extract_video_text':
-      case 'get_video_materials':
-      case 'generate_ppt':
-      case 'browse_menu':
-      case 'place_order':
-      case 'search_trains':
-      case 'navigate_url':
-      case 'evaluate_js':
-      case 'get_console_logs':
-      case 'generate_chart':
-      case 'store_memory':
-      case 'recall_memory':
-      case 'get_book_notes':
-      case 'search_books':
-        return handleMcpToolDemo(tool, args);
+      case 'brave_web_search':
+        return await handleBraveSearch(args, config);
+      case 'brave_local_search':
+        return await handleBraveSearch(args, config);
+      case 'echo':
+        return handleEcho(args);
+      case 'add':
+        return handleAdd(args);
+      case 'get_current_time':
+        return handleGetCurrentTime(args);
+      case 'convert_time':
+        return handleConvertTime(args);
+      case 'sequentialthinking':
+        return handleSequentialThinking(args);
 
+      // Demo fallback for tools that need external services
       default:
-        return NextResponse.json({ error: `Unknown tool: ${tool}` }, { status: 400 });
+        return handleMcpToolDemo(tool, args);
     }
   } catch (err) {
     return NextResponse.json({ error: err instanceof Error ? err.message : 'Tool execution failed' }, { status: 500 });
@@ -73,7 +68,7 @@ async function handleWebSearch(
   const count = Math.min(10, Math.max(1, Number(args.count) || 5));
 
   if (!query) {
-    return NextResponse.json({ result: 'Error: No search query provided. Please provide a query parameter.' });
+    return NextResponse.json({ result: 'Error: No search query provided.' });
   }
 
   if (!config.tavilyApiKey) {
@@ -81,10 +76,9 @@ async function handleWebSearch(
   }
 
   try {
-    // Auto-detect time-sensitive queries and limit to recent results
     const isTimeSensitive = /今天|今日|today|latest|最新|recent|breaking/i.test(query);
     const tavilyBody: Record<string, unknown> = { api_key: config.tavilyApiKey, query, search_depth: 'basic', include_answer: true, max_results: count };
-    if (isTimeSensitive) tavilyBody.days = 1; // Limit to last 24 hours
+    if (isTimeSensitive) tavilyBody.days = 1;
 
     const res = await fetch('https://api.tavily.com/search', {
       method: 'POST',
@@ -135,19 +129,18 @@ async function handleFetchUrl(args: Record<string, unknown>) {
   return NextResponse.json({ result: text || 'No readable content found.' });
 }
 
-// ── MCP Tools with Real Execution ──────────────────────
+// ── Real MCP Tool Handlers ──────────────────────────────
 
 async function handleGoogleSearch(
   args: Record<string, unknown>,
   config: { tavilyApiKey?: string },
 ) {
-  // Use Tavily API for real search (same backend as web_search)
   const query = String(args.query || '');
   const count = Math.min(10, Math.max(1, Number(args.num_results) || 5));
 
   if (!config.tavilyApiKey) {
     return NextResponse.json({
-      result: `⚠️ Demo mode — no Tavily API key configured.\n\nTo enable real search, add your Tavily API key in the Playground tool settings.\n\nDemo results for "${query}":\n1. ${query} — Wikipedia\n2. ${query} — Latest News\n3. ${query} — Technical Documentation`,
+      result: `⚠️ Demo mode — no Tavily API key configured.\n\nDemo results for "${query}":\n1. ${query} — Wikipedia\n2. ${query} — Latest News\n3. ${query} — Technical Documentation`,
       demo: true,
     });
   }
@@ -207,12 +200,11 @@ async function handleGoogleNews(
 }
 
 async function handleFetchContent(args: Record<string, unknown>) {
-  // Real URL fetch — same as handleFetchUrl
   const url = String(args.url || '');
   const maxLength = Number(args.max_length) || 8000;
 
   if (!url.startsWith('http://') && !url.startsWith('https://')) {
-    return NextResponse.json({ error: 'Invalid URL', demo: false }, { status: 400 });
+    return NextResponse.json({ result: 'Invalid URL', demo: false }, { status: 400 });
   }
 
   try {
@@ -246,7 +238,6 @@ async function handleSearchCode(
   const repo = String(args.repo || '');
   const language = String(args.language || '');
 
-  // Try real GitHub code search API
   let searchQuery = query;
   if (language) searchQuery += ` language:${language}`;
   if (repo) searchQuery += ` repo:${repo}`;
@@ -336,7 +327,6 @@ async function handleCreateIssue(
 }
 
 function handleQueryValidator(args: Record<string, unknown>) {
-  // SQL validation is inherently local/demo — no external API
   const sql = String(args.sql_query || '');
   const upper = sql.toUpperCase();
 
@@ -365,29 +355,139 @@ function handleSchemaFetch(args: Record<string, unknown>) {
   });
 }
 
+async function handleBraveSearch(
+  args: Record<string, unknown>,
+  config: { tavilyApiKey?: string },
+) {
+  // Use Tavily as backend for Brave Search (same API)
+  const query = String(args.query || '');
+  const count = Math.min(20, Math.max(1, Number(args.count) || 10));
+
+  if (!config.tavilyApiKey) {
+    return NextResponse.json({
+      result: `⚠️ Demo mode — no Tavily API key configured (used as Brave Search backend).\n\nDemo results for "${query}":\n1. ${query} — Example Result\n2. ${query} — Another Result`,
+      demo: true,
+    });
+  }
+
+  try {
+    const res = await fetch('https://api.tavily.com/search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ api_key: config.tavilyApiKey, query, search_depth: 'basic', include_answer: true, max_results: count }),
+    });
+    if (!res.ok) return NextResponse.json({ result: `Search failed: HTTP ${res.status}`, demo: false });
+
+    const data = await res.json();
+    const formatted = data.answer ? `Answer: ${data.answer}\n\n` : '';
+    const results = (data.results || []).map((r: { title: string; url: string; content: string }, i: number) =>
+      `${i + 1}. [${r.title}](${r.url})\n   ${r.content.slice(0, 500)}`
+    ).join('\n\n');
+    return NextResponse.json({ result: formatted + results || 'No results found.', demo: false });
+  } catch (err) {
+    return NextResponse.json({ result: `Search failed: ${err instanceof Error ? err.message : 'Unknown error'}`, demo: false });
+  }
+}
+
+function handleEcho(args: Record<string, unknown>) {
+  const message = String(args.message || '');
+  return NextResponse.json({ result: message || '(empty echo)', demo: false });
+}
+
+function handleAdd(args: Record<string, unknown>) {
+  const a = Number(args.a) || 0;
+  const b = Number(args.b) || 0;
+  return NextResponse.json({ result: `${a} + ${b} = ${a + b}`, demo: false });
+}
+
+function handleGetCurrentTime(args: Record<string, unknown>) {
+  const timezone = String(args.timezone || 'UTC');
+  try {
+    const now = new Date();
+    const formatted = now.toLocaleString('en-US', { timeZone: timezone, dateStyle: 'full', timeStyle: 'long' });
+    return NextResponse.json({ result: `Current time (${timezone}): ${formatted}\nISO: ${now.toISOString()}`, demo: false });
+  } catch {
+    return NextResponse.json({ result: `Current time (UTC): ${new Date().toISOString()}`, demo: false });
+  }
+}
+
+function handleConvertTime(args: Record<string, unknown>) {
+  const time = String(args.time || '');
+  const fromTz = String(args.from_tz || 'UTC');
+  const toTz = String(args.to_tz || 'UTC');
+
+  try {
+    const date = new Date(time);
+    if (isNaN(date.getTime())) {
+      return NextResponse.json({ result: `Invalid time format: "${time}". Use ISO format (e.g. 2026-05-28T14:30:00).`, demo: false });
+    }
+    const fromFormatted = date.toLocaleString('en-US', { timeZone: fromTz, dateStyle: 'full', timeStyle: 'long' });
+    const toFormatted = date.toLocaleString('en-US', { timeZone: toTz, dateStyle: 'full', timeStyle: 'long' });
+    return NextResponse.json({ result: `Converted:\n- ${fromTz}: ${fromFormatted}\n- ${toTz}: ${toFormatted}`, demo: false });
+  } catch (err) {
+    return NextResponse.json({ result: `Conversion failed: ${err instanceof Error ? err.message : 'Unknown error'}`, demo: false });
+  }
+}
+
+function handleSequentialThinking(args: Record<string, unknown>) {
+  const thought = String(args.thought || '').trim();
+  const nextThought = String(args.nextThought || '').trim();
+  const thoughtNumber = Number(args.thoughtNumber) || 1;
+  const totalThoughts = Number(args.totalThoughts) || 1;
+
+  if (!thought && !nextThought) {
+    return NextResponse.json({
+      result: 'No reasoning data received. Proceed with the original task using your own knowledge and provide a direct answer to the user.',
+      demo: false,
+    });
+  }
+
+  const isNearEnd = thoughtNumber >= totalThoughts - 1;
+  const guidance = isNearEnd
+    ? '\n\nYou have enough information now. Please synthesize your analysis and provide a complete answer to the user.'
+    : '\n\nContinue to the next thinking step.';
+
+  return NextResponse.json({
+    result: `Step ${thoughtNumber}/${totalThoughts}: ${thought}\n\nNext: ${nextThought}${guidance}`,
+    demo: false,
+  });
+}
+
 // ── MCP Demo Fallback ──────────────────────────────────
 
 const MCP_DEMO_RESPONSES: Record<string, (args: Record<string, unknown>) => string> = {
-  geocode: (a) => `⚠️ Demo mode — Amap API not configured.\n\nGeocode result for "${a.address}":\n- Latitude: 39.9042\n- Longitude: 116.4074\n- Formatted: Beijing, China`,
-  route_planning: (a) => `⚠️ Demo mode — Amap API not configured.\n\nRoute from "${a.origin}" to "${a.destination}":\n- Distance: 12.5 km\n- Duration: 25 minutes\n- Mode: ${a.mode || 'driving'}`,
-  bing_search: (a) => `⚠️ Demo mode — Bing API not configured.\n\nSearch results for "${a.query}":\n1. Example Result — https://example.com\n2. Another Result — https://example.org`,
-  supabase_query: (a) => `⚠️ Demo mode — Supabase not connected.\n\nQuery result from "${a.table}":\n[\n  { "id": 1, "name": "Example", "status": "active" },\n  { "id": 2, "name": "Demo", "status": "active" }\n]`,
-  supabase_insert: (a) => `⚠️ Demo mode — Supabase not connected.\n\nInserted into "${a.table}": ${JSON.stringify(a.data, null, 2)}`,
-  search_hotels: (a) => `⚠️ Demo mode — RollingGo API not configured.\n\nHotels in "${a.location}" (${a.check_in} to ${a.check_out}):\n1. Grand Hotel — $120/night, 4.5★\n2. City Inn — $85/night, 4.2★\n3. Budget Lodge — $45/night, 3.8★`,
-  extract_video_text: (a) => `⚠️ Demo mode — Douyin API not configured.\n\nExtracted text from ${a.video_url}:\n"这是一个示例视频文案，展示了抖音内容创作的技巧和方法..."`,
-  get_video_materials: (a) => `⚠️ Demo mode — Douyin API not configured.\n\nVideo metadata:\n- Title: 示例视频\n- Likes: 12.5k\n- Comments: 342\n- Tags: #创作 #技巧 #分享`,
-  generate_ppt: (a) => `⚠️ Demo mode — ChatPPT API not configured.\n\nGenerated presentation: "${a.topic}"\n- Slides: ${a.slides || 10}\n- Style: ${a.style || 'business'}\n- Status: Demo preview only`,
-  browse_menu: () => `⚠️ Demo mode — McDonald's API not configured.\n\nMenu items:\n- Big Mac — ¥24.5\n- McChicken — ¥15.0\n- French Fries (L) — ¥12.5\n- Coca-Cola (M) — ¥9.0`,
-  place_order: () => `⚠️ Demo mode — McDonald's API not configured.\n\nDemo order placed:\n- Order #M20260528001\n- Status: Preparing\n- ETA: 25 minutes`,
-  search_trains: (a) => `⚠️ Demo mode — 12306 API not configured.\n\nTrains from "${a.from}" to "${a.to}" on ${a.date}:\n- G1234  08:00→12:30  ¥553.0  二等座\n- G5678  09:30→14:00  ¥553.0  二等座\n- D1234  10:15→15:45  ¥388.0  二等座`,
-  navigate_url: (a) => `⚠️ Demo mode — Chrome DevTools not connected.\n\nNavigated to: ${a.url}\nStatus: Page loaded successfully`,
-  evaluate_js: (a) => `⚠️ Demo mode — Chrome DevTools not connected.\n\nJS evaluation result:\n${a.expression} → undefined`,
-  get_console_logs: () => `⚠️ Demo mode — Chrome DevTools not connected.\n\nConsole logs:\n[INFO] Page loaded\n[LOG] React DevTools connected\n[WARN] Deprecated API usage detected`,
-  generate_chart: (a) => `⚠️ Demo mode — AntVis not configured.\n\nGenerated ${a.chart_type} chart: "${a.title}"\n- Data points: ${Object.keys((a.data as Record<string, unknown>) || {}).length}\n- Status: Demo preview only`,
-  store_memory: (a) => `⚠️ Demo mode — MemOS not connected.\n\nStored memory:\n- Content: "${a.content}"\n- Tags: ${(a.tags as string[] || []).join(', ') || 'none'}\n- ID: mem-${Date.now()}`,
-  recall_memory: (a) => `⚠️ Demo mode — MemOS not connected.\n\nRecalled memories for "${a.query}":\n1. [2026-05-20] Related memory entry\n2. [2026-05-15] Another relevant memory`,
-  get_book_notes: () => `⚠️ Demo mode — WeRead not connected.\n\nBook notes:\n- "这是划线内容 1" — Page 42\n- "这是划线内容 2" — Page 87\n- "这是笔记内容" — Page 103`,
-  search_books: (a) => `⚠️ Demo mode — WeRead not connected.\n\nBooks matching "${a.query}":\n1. 《示例书籍》— 作者名 — 156 条笔记\n2. 《另一本书》— 作者名 — 89 条笔记`,
+  read_file: (a) => `⚠️ Demo mode — Filesystem access is restricted for security.\n\nFile "${a.path}":\n[Content would appear here in a real environment]`,
+  write_file: (a) => `⚠️ Demo mode — Filesystem write is restricted for security.\n\nWould write to "${a.path}"`,
+  list_directory: (a) => `⚠️ Demo mode — Filesystem access is restricted.\n\nDirectory "${a.path}":\n- file1.ts\n- file2.ts\n- subdirectory/`,
+  create_entities: (a) => `⚠️ Demo mode — Memory server not connected.\n\nCreated entities: ${JSON.stringify(a.entities, null, 2)}`,
+  search_nodes: (a) => `⚠️ Demo mode — Memory server not connected.\n\nSearch results for "${a.query}":\n- No results (demo mode)`,
+  open_nodes: (a) => `⚠️ Demo mode — Memory server not connected.\n\nOpened nodes: ${JSON.stringify(a.names)}`,
+  list_repos: (a) => `⚠️ Demo mode — GitHub API not configured.\n\nRepositories for "${a.owner}":\n1. example-repo — A sample repository\n2. another-repo — Another sample`,
+  maps_geocode: (a) => `⚠️ Demo mode — Google Maps API not configured.\n\nGeocode for "${a.address}":\n- Latitude: 37.7749\n- Longitude: -122.4194\n- Formatted: San Francisco, CA, USA`,
+  maps_places: (a) => `⚠️ Demo mode — Google Maps API not configured.\n\nPlaces matching "${a.query}":\n1. Example Place — 123 Main St\n2. Another Place — 456 Oak Ave`,
+  maps_directions: (a) => `⚠️ Demo mode — Google Maps API not configured.\n\nRoute from "${a.origin}" to "${a.destination}":\n- Distance: 5.2 km\n- Duration: 15 minutes\n- Mode: ${a.mode || 'driving'}`,
+  puppeteer_navigate: (a) => `⚠️ Demo mode — Puppeteer not connected.\n\nNavigated to: ${a.url}\nStatus: Page loaded`,
+  puppeteer_screenshot: (a) => `⚠️ Demo mode — Puppeteer not connected.\n\nScreenshot taken: ${a.name}\nSize: ${a.width || 1280}x${a.height || 720}`,
+  puppeteer_click: (a) => `⚠️ Demo mode — Puppeteer not connected.\n\nClicked element: ${a.selector}`,
+  slack_list_channels: () => `⚠️ Demo mode — Slack not connected.\n\nChannels:\n#general — 150 members\n#engineering — 45 members\n#random — 200 members`,
+  slack_post_message: (a) => `⚠️ Demo mode — Slack not connected.\n\nPosted to channel ${a.channel_id}: "${a.text}"`,
+  slack_search_messages: (a) => `⚠️ Demo mode — Slack not connected.\n\nSearch results for "${a.query}":\n1. [2026-05-28] Example message\n2. [2026-05-27] Another message`,
+  query: (a) => `⚠️ Demo mode — Database not connected.\n\nQuery result:\n[\n  { "id": 1, "name": "Example" },\n  { "id": 2, "name": "Demo" }\n]`,
+  list_tables: () => `⚠️ Demo mode — Database not connected.\n\nTables:\n- users\n- orders\n- products`,
+  describe_table: (a) => `⚠️ Demo mode — Database not connected.\n\nSchema for "${a.table_name}":\n| Column | type |\n| id | INTEGER |\n| name | VARCHAR(255) |`,
+  git_log: (a) => `⚠️ Demo mode — Git not available.\n\nRecent commits in "${a.path}":\n1. abc1234 — Latest commit (2 hours ago)\n2. def5678 — Previous commit (1 day ago)`,
+  git_diff: (a) => `⚠️ Demo mode — Git not available.\n\nDiff for "${a.path}":\n\`\`\`diff\n- old line\n+ new line\n\`\`\``,
+  git_commit: (a) => `⚠️ Demo mode — Git not available.\n\nWould commit in "${a.path}" with message: "${a.message}"`,
+  longRunningOperation: (a) => `⚠️ Demo mode — Simulated long operation.\n\nOperation completed after ${a.duration_ms || 5000}ms.`,
+  playwright_navigate: (a) => `⚠️ Demo mode — Playwright not connected.\n\nNavigated to: ${a.url}`,
+  playwright_screenshot: (a) => `⚠️ Demo mode — Playwright not connected.\n\nScreenshot: ${a.name}`,
+  playwright_click: (a) => `⚠️ Demo mode — Playwright not connected.\n\nClicked: ${a.selector}`,
+  query_table: (a) => `⚠️ Demo mode — Supabase not connected.\n\nQuery result from "${a.table}":\n[\n  { "id": 1, "name": "Example", "status": "active" }\n]`,
+  insert_row: (a) => `⚠️ Demo mode — Supabase not connected.\n\nInserted into "${a.table}": ${JSON.stringify(a.data, null, 2)}`,
+  get: (a) => `⚠️ Demo mode — Redis not connected.\n\nKey "${a.key}": (not found in demo)`,
+  set: (a) => `⚠️ Demo mode — Redis not connected.\n\nSet "${a.key}" = "${a.value}"`,
+  delete: (a) => `⚠️ Demo mode — Redis not connected.\n\nDeleted key "${a.key}"`,
+  keys: (a) => `⚠️ Demo mode — Redis not connected.\n\nKeys matching "${a.pattern || '*'}":\n- key1\n- key2`,
 };
 
 function handleMcpToolDemo(tool: string, args: Record<string, unknown>) {
