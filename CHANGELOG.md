@@ -20,9 +20,12 @@ All notable changes to this project will be documented in this file.
 - **Dashboard i18n** — All inline ternaries replaced with `dict.dashboard.*` keys (refresh, lastUpdated, loadFailed, retry, progress, done, renew, autoRenewOff)
 
 #### Minor Fixes
+- **Playground i18n** — Replace inline ternaries with LABELS keys (newChat, inputMessage, advanced, toolCallsFailing, searchFallback, maxIterations)
+- **API Keys page** — Title uses `t.dashboard.apiKeys` instead of inline ternary
 - Login/Register logo `alt=""` → `alt="OortAPI"` for accessibility
 - New i18n keys: `auth.emailRequired`, `auth.passwordRequired`, `auth.usernameRequired`, `auth.confirmPasswordRequired`
 - New dashboard keys: `refresh`, `lastUpdated`, `loadFailed`, `checkConnection`, `retry`, `progress`, `done`, `renew`, `autoRenewOff`, `subscriptionExpiring`, `subscriptionExpired`
+- New playground LABELS: `newChat`, `inputMessage`, `advanced`, `deleteSession`, `exportChat`, `quote`, `regenerate`, `copy`, `toolCallsFailing`, `searchFallback`, `maxIterations`
 - Playground fetch calls add proper error throwing on non-OK responses
 
 ### Resource Center Audit Fixes (30 Issues)
