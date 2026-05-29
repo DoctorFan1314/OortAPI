@@ -107,6 +107,11 @@ const LABELS = {
     reasoning: "思考过程", noCapability: "未配置能力", editCap: "编辑能力",
     capVision: "视觉", capReasoning: "推理", capTools: "工具",
     mcpCustom: "自定义 MCP 服务器", mcpAdd: "添加服务器", mcpComing: "即将支持",
+    newChat: "新会话", inputMessage: "输入消息... (Shift+Enter 换行)", advanced: "高级参数",
+    deleteSession: "删除会话", exportChat: "导出对话", export: "导出",
+    quote: "引用", regenerate: "重新生成", copy: "复制",
+    toolCallsFailing: "工具调用连续失败，当前模型可能不支持工具操作。请尝试其他模型。已基于已有信息为您回答。",
+    searchFallback: "基于搜索结果为您整理：", maxIterations: "工具调用达到最大迭代次数。",
   },
   en: {
     title: "API Playground", send: "Send", sending: "Sending...", stop: "Stop",
@@ -128,6 +133,11 @@ const LABELS = {
     reasoning: "Reasoning", noCapability: "No capabilities configured", editCap: "Edit",
     capVision: "Vision", capReasoning: "Reasoning", capTools: "Tools",
     mcpCustom: "Custom MCP Servers", mcpAdd: "Add Server", mcpComing: "Coming soon",
+    newChat: "New Chat", inputMessage: "Type a message... (Shift+Enter newline)", advanced: "Advanced",
+    deleteSession: "Delete session", exportChat: "Export conversation", export: "Export",
+    quote: "Quote", regenerate: "Regenerate", copy: "Copy",
+    toolCallsFailing: "Tool calls keep failing. This model may not support tool calling. Answering based on available information.",
+    searchFallback: "Based on the search results:", maxIterations: "Tool execution reached maximum iterations.",
   },
 };
 
@@ -204,7 +214,7 @@ function PlaygroundContent() {
   // ── Session management ──
   const createSession = useCallback(() => {
     const id = genId();
-    setSessions((prev) => [...prev, { id, title: lang === "zh" ? "新会话" : "New Chat", messages: [], selectedModel: selectedModel || models[0]?.id || "", selectedKeyId: selectedKeyId ?? keys.find((k) => k.enabled === 1)?.id ?? null, systemPrompt: "", params: { ...DEFAULT_PARAMS } }]);
+    setSessions((prev) => [...prev, { id, title: t.newChat, messages: [], selectedModel: selectedModel || models[0]?.id || "", selectedKeyId: selectedKeyId ?? keys.find((k) => k.enabled === 1)?.id ?? null, systemPrompt: "", params: { ...DEFAULT_PARAMS } }]);
     setCurrentSessionId(id);
     setMessage(""); setResponse(""); setError(""); setUsage(null); setAttachedImages([]); setReasoningContent(""); 
   }, [lang, selectedModel, selectedKeyId, models, keys]);
@@ -215,7 +225,7 @@ function PlaygroundContent() {
     e.stopPropagation();
     setSessions((prev) => {
       const f = prev.filter((s) => s.id !== id);
-      if (f.length === 0) { const ns = { id: genId(), title: lang === "zh" ? "新会话" : "New Chat", messages: [], selectedModel: models[0]?.id || "", selectedKeyId: keys.find((k) => k.enabled === 1)?.id ?? null, systemPrompt: "", params: { ...DEFAULT_PARAMS } }; setCurrentSessionId(ns.id); return [ns]; }
+      if (f.length === 0) { const ns = { id: genId(), title: t.newChat, messages: [], selectedModel: models[0]?.id || "", selectedKeyId: keys.find((k) => k.enabled === 1)?.id ?? null, systemPrompt: "", params: { ...DEFAULT_PARAMS } }; setCurrentSessionId(ns.id); return [ns]; }
       if (currentSessionId === id) setCurrentSessionId(f[0].id);
       return f;
     });
@@ -238,7 +248,7 @@ function PlaygroundContent() {
   useEffect(() => {
     if (sessions.length === 0) {
       const id = genId();
-      setSessions([{ id, title: lang === "zh" ? "新会话" : "New Chat", messages: [], selectedModel: models[0]?.id || "", selectedKeyId: keys.find((k) => k.enabled === 1)?.id ?? null, systemPrompt: "", params: { ...DEFAULT_PARAMS } }]);
+      setSessions([{ id, title: t.newChat, messages: [], selectedModel: models[0]?.id || "", selectedKeyId: keys.find((k) => k.enabled === 1)?.id ?? null, systemPrompt: "", params: { ...DEFAULT_PARAMS } }]);
       setCurrentSessionId(id);
     }
   }, [lang]); // eslint-disable-line
@@ -465,9 +475,9 @@ function PlaygroundContent() {
         if (!res.ok) {
           // If we have a successful tool result, show it as the response instead of error
           if (lastToolResult) {
-            const resultMsg: ChatMessage = { role: "assistant", content: `Based on the search results I found:\n\n${lastToolResult}`, createdAt: nowHHMM() };
+            const resultMsg: ChatMessage = { role: "assistant", content: `${t.searchFallback}\n\n${lastToolResult}`, createdAt: nowHHMM() };
             updateSession((s) => ({ ...s, messages: [...s.messages, resultMsg] }));
-            setResponse(`Based on the search results I found:\n\n${lastToolResult}`);
+            setResponse(`${t.searchFallback}\n\n${lastToolResult}`);
             setError(""); setIsSending(false);
             return;
           }
@@ -525,7 +535,7 @@ function PlaygroundContent() {
             if (isFailedCall) {
               consecutiveEmptyToolCalls++;
               if (consecutiveEmptyToolCalls >= 2) {
-                const warnMsg = { role: "tool" as const, content: lang === "zh" ? "工具调用连续失败，当前模型可能不支持工具操作。请尝试其他模型。已基于已有信息为您回答。" : "Tool calls keep failing. This model may not support tool calling. Answering based on available information.", createdAt: nowHHMM(), tool_call_id: tc.id, name: tc.function.name };
+                const warnMsg = { role: "tool" as const, content: t.toolCallsFailing, createdAt: nowHHMM(), tool_call_id: tc.id, name: tc.function.name };
                 currentMsgs = [...currentMsgs, { role: "assistant" as const, content: fullText || "", tool_calls: [tc] }, warnMsg];
                 updateSession((s) => ({ ...s, messages: [...s.messages, warnMsg] }));
                 break;
@@ -555,7 +565,7 @@ function PlaygroundContent() {
         setIsSending(false); return;
       }
     }
-    setError("Tool execution reached maximum iterations.");
+    setError(t.maxIterations);
     setIsSending(false);
   };
 
@@ -955,7 +965,7 @@ function PlaygroundContent() {
               </button>
 
 
-              <Textarea placeholder={lang === "zh" ? "输入消息... (Shift+Enter 换行)" : "Type a message... (Shift+Enter newline)"} value={message} onChange={(e) => setMessage(e.target.value)} onKeyDown={handleKeyDown} rows={1} className="resize-none flex-1 min-h-[2.5rem] max-h-32 overflow-y-auto" disabled={isSending} />
+              <Textarea placeholder={t.inputMessage} value={message} onChange={(e) => setMessage(e.target.value)} onKeyDown={handleKeyDown} rows={1} className="resize-none flex-1 min-h-[2.5rem] max-h-32 overflow-y-auto" disabled={isSending} />
 
               
                 <div className="flex flex-col gap-1.5 self-center">
@@ -1033,7 +1043,7 @@ function PlaygroundContent() {
             <div className="mt-3 pt-3 border-t border-border/40">
               <button onClick={() => setShowAdvancedParams(!showAdvancedParams)} className="flex items-center gap-1.5 w-full text-left">
                 <ChevronDown className={cn("h-3 w-3 text-muted-foreground transition-transform", showAdvancedParams && "rotate-180")} />
-                <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">{lang === "zh" ? "高级参数" : "Advanced"}</span>
+                <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">{t.advanced}</span>
               </button>
               {showAdvancedParams && (
                 <div className="space-y-3 mt-3 animate-page-fade-in">
