@@ -147,12 +147,12 @@ export function Navbar() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-              <Button variant="ghost" size="icon-sm" onClick={() => { setSearchOpen(false); setSearchQuery(""); }} className="text-muted-foreground hover:text-foreground shrink-0" aria-label="Close search">
+              <Button variant="ghost" size="icon-sm" onClick={() => { setSearchOpen(false); setSearchQuery(""); }} className="text-muted-foreground hover:text-foreground shrink-0" aria-label={t.common.closeSearch}>
                 <X className="h-4 w-4" />
               </Button>
             </form>
           ) : (
-            <Button variant="ghost" size="icon-sm" onClick={() => setSearchOpen(true)} className="lg:hidden text-muted-foreground hover:text-foreground" aria-label="Search">
+            <Button variant="ghost" size="icon-sm" onClick={() => setSearchOpen(true)} className="lg:hidden text-muted-foreground hover:text-foreground" aria-label={t.common.search}>
               <Search className="h-4 w-4" />
             </Button>
           )}
@@ -162,7 +162,7 @@ export function Navbar() {
             size="icon-sm"
             onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
             className="text-muted-foreground hover:text-foreground"
-            aria-label="Toggle theme"
+            aria-label={t.common.toggleTheme}
             suppressHydrationWarning
           >
             <Sun className="h-4 w-4 hidden dark:block" />
@@ -174,7 +174,7 @@ export function Navbar() {
             size="icon-sm"
             onClick={() => setLang(lang === "zh" ? "en" : "zh")}
             className="text-muted-foreground hover:text-foreground text-xs font-medium"
-            aria-label="Switch language"
+            aria-label={t.common.switchLanguage}
           >
             <Languages className="h-4 w-4" />
           </Button>
@@ -255,7 +255,7 @@ export function Navbar() {
           <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
             <SheetTrigger
               render={
-                <Button variant="ghost" size="icon-sm" className="lg:hidden text-muted-foreground hover:text-foreground" aria-label="Open navigation">
+                <Button variant="ghost" size="icon-sm" className="lg:hidden text-muted-foreground hover:text-foreground" aria-label={t.common.openNavigation}>
                   <Menu className="h-5 w-5" />
                 </Button>
               }
@@ -277,7 +277,7 @@ export function Navbar() {
                   <NotificationBell />
                 </div>
               ) : null}
-              <nav className="flex flex-col gap-1 mt-4" aria-label="Navigation menu">
+              <nav className="flex flex-col gap-1 mt-4" aria-label={t.common.navigation}>
                 {navLinks.map((link) => (
                   <Link key={link.href} href={link.href} onClick={() => setSheetOpen(false)} className={`px-4 py-3 transition-colors rounded-md hover:bg-secondary ${
                     pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href))
