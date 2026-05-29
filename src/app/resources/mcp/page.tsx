@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getMcpNodesByCategory, MCP_CATEGORIES, type McpCategory, type ResourceItem } from "@/lib/resource-registry";
+import { Breadcrumb } from "@/components/shared/breadcrumb";
 
 export default function McpEcosystemPage() {
   const { lang, t, tFormat } = useI18n();
@@ -57,6 +58,7 @@ export default function McpEcosystemPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
+      <Breadcrumb items={[{ label: t.resourceHub.title, href: "/resources" }, { label: t.resourceHub.mcpPageTitle }]} />
       {/* Hero */}
       <div className="relative overflow-hidden rounded-2xl glass-card p-8 mb-8">
         <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-primary/5 pointer-events-none" />

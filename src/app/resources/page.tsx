@@ -13,6 +13,7 @@ import { useState, useMemo, useCallback, memo } from "react";
 import useSWR from "swr";
 import { dashboardSWRConfig } from "@/lib/swr-fetcher";
 import { RESOURCE_ITEMS, getResourcesByType, type ResourceItem, type ResourceType } from "@/lib/resource-registry";
+import { Breadcrumb } from "@/components/shared/breadcrumb";
 
 interface CountsData {
   skills?: number;
@@ -185,6 +186,7 @@ export default function ResourcesPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
+      <Breadcrumb items={[{ label: t.resourceHub.title }]} />
       {/* Hero */}
       <div className="relative overflow-hidden rounded-2xl glass-card p-8 mb-8">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-purple-500/5 pointer-events-none" />
