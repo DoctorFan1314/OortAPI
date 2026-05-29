@@ -142,8 +142,12 @@ export default function McpEcosystemPage() {
 
           {/* Cards grid with pagination */}
           {filteredNodes.length === 0 ? (
-            <div className="text-center py-16 text-muted-foreground">
-              <p className="text-sm">{t.resourceHub.noResults}</p>
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <div className="w-14 h-14 rounded-2xl bg-muted/30 flex items-center justify-center mb-3">
+                <Cloud className="h-7 w-7 text-muted-foreground/30" />
+              </div>
+              <p className="text-sm text-muted-foreground mb-1">{t.resourceHub.noResults}</p>
+              <p className="text-xs text-muted-foreground/70">{lang === "zh" ? "尝试调整筛选条件" : "Try adjusting your filters"}</p>
             </div>
           ) : (
             <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
