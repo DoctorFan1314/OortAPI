@@ -462,7 +462,7 @@ function PlaygroundContent() {
         const streamStart = performance.now();
 	        const { fullText, toolCalls, reasoning } = await readStream(res);
 	        const streamDur = (performance.now() - streamStart) / 1000;
-	        const tokCount = fullText ? fullText.split(/s+/).length : 0;
+	        const tokCount = fullText ? fullText.split(/\s+/).length : 0;
 	        const tps = streamDur > 0 ? Math.round(tokCount / streamDur) : null;
 	        setStreamMetrics({ ttfbMs, tokensPerSec: tps });
         setReasoningContent(reasoning);

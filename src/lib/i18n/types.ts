@@ -10,6 +10,14 @@ export interface Dictionary {
     openNavigation: string; navigationMenu: string; close: string; backToTop: string;
     navigation: string;
     popular: string;
+    loggedOut: string;
+    balance: string;
+    tokenPlan: string;
+    models: string;
+    docs: string;
+    resources: string;
+    searchPlaceholder: string;
+    searchPlaceholderMobile: string;
     // New keys
     report: string; reportSubmitted: string; reportReason: string; reportSpam: string;
     reportAbuse: string; reportCopyright: string; reportOther: string;

@@ -28,12 +28,12 @@ export function Navbar() {
   const { lang, setLang, t } = useI18n();
 
   const navLinks = [
-    { href: "/", label: lang === "zh" ? "首页" : "Home" },
-    ...(user ? [{ href: "/dashboard", label: lang === "zh" ? "控制台" : "Dashboard" }] : []),
-    { href: "/token-plan", label: lang === "zh" ? "Token Plan" : "Token Plan" },
-    { href: "/models", label: lang === "zh" ? "模型市场" : "Models" },
-    { href: "/docs", label: lang === "zh" ? "文档" : "Docs" },
-    { href: "/resources", label: lang === "zh" ? "资源中心" : "Resources" },
+    { href: "/", label: t.common.home },
+    ...(user ? [{ href: "/dashboard", label: t.dashboard.title }] : []),
+    { href: "/token-plan", label: t.common.tokenPlan },
+    { href: "/models", label: t.common.models },
+    { href: "/docs", label: t.apiDocs.title },
+    { href: "/resources", label: t.resources.title },
   ];
 
   // Close user menu on outside click
@@ -81,7 +81,7 @@ export function Navbar() {
 
   async function handleLogout() {
     await logout();
-    showToast(lang === "zh" ? "已退出登录" : "Logged out", "info");
+    showToast(t.common.loggedOut, "info");
     setSheetOpen(false);
   }
 
@@ -129,7 +129,7 @@ export function Navbar() {
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/60" />
               <Input
-                placeholder={lang === "zh" ? "搜索模型、文档..." : "Search models, docs..."}
+                placeholder={t.common.searchPlaceholder}
                 className="h-8 w-48 xl:w-56 bg-secondary border-border text-foreground placeholder:text-muted-foreground/60 text-sm pl-8 pr-8"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -141,7 +141,7 @@ export function Navbar() {
           {searchOpen ? (
             <form role="search" onSubmit={handleSearch} className="flex lg:hidden items-center gap-1">
               <Input
-                placeholder={lang === "zh" ? "搜索..." : "Search..."}
+                placeholder={t.common.searchPlaceholderMobile}
                 className="h-8 w-40 bg-secondary border-border text-foreground placeholder:text-muted-foreground text-sm"
                 autoFocus
                 value={searchQuery}
@@ -211,20 +211,20 @@ export function Navbar() {
                     <div className="px-4 py-3 border-b border-border">
                       <p className="text-sm font-medium text-foreground truncate">{user.username}</p>
                       <p className="text-xs text-muted-foreground truncate">{user.email}</p>
-                      <p className="text-xs text-yellow-500 font-mono mt-1">{lang === "zh" ? "余额" : "Balance"}: ${(user.balance ?? 0).toFixed(2)}</p>
+                      <p className="text-xs text-yellow-500 font-mono mt-1">{t.common.balance}: ${(user.balance ?? 0).toFixed(2)}</p>
                     </div>
                     <div className="py-1">
                       <Link href="/dashboard" role="menuitem" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors focus:bg-secondary focus:text-foreground focus-visible:outline-none">
                         <LayoutDashboard className="h-4 w-4" />
-                        {lang === "zh" ? "控制台" : "Dashboard"}
+                        {t.dashboard.title}
                       </Link>
                       <Link href="/profile" role="menuitem" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors focus:bg-secondary focus:text-foreground focus-visible:outline-none">
                         <User className="h-4 w-4" />
-                        {lang === "zh" ? "个人中心" : "Profile"}
+                        {t.common.profile}
                       </Link>
                       <Link href="/dashboard/settings" role="menuitem" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors focus:bg-secondary focus:text-foreground focus-visible:outline-none">
                         <Settings className="h-4 w-4" />
-                        {lang === "zh" ? "设置" : "Settings"}
+                        {t.dashboard.settings}
                       </Link>
                     </div>
                     <div className="border-t border-border py-1">
@@ -234,7 +234,7 @@ export function Navbar() {
                         className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors focus:bg-secondary focus:text-foreground focus-visible:outline-none"
                       >
                         <LogOut className="h-4 w-4" />
-                        {lang === "zh" ? "退出登录" : "Log Out"}
+                        {t.common.logout}
                       </button>
                     </div>
                   </div>
@@ -243,10 +243,10 @@ export function Navbar() {
             ) : (
               <>
                 <Link href="/login">
-                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">{lang === "zh" ? "登录" : "Log In"}</Button>
+                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">{t.common.login}</Button>
                 </Link>
                 <Link href="/register">
-                  <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 font-medium">{lang === "zh" ? "注册" : "Sign Up"}</Button>
+                  <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 font-medium">{t.common.register}</Button>
                 </Link>
               </>
             )}
@@ -261,7 +261,7 @@ export function Navbar() {
               }
             />
             <SheetContent side="right" className="bg-card border-border w-72">
-              <SheetTitle className="text-foreground sr-only">{lang === "zh" ? "导航菜单" : "Navigation Menu"}</SheetTitle>
+              <SheetTitle className="text-foreground sr-only">{t.common.navigationMenu}</SheetTitle>
               {!loaded ? null : user ? (
                 <div className="mt-8 mb-4 px-4 flex items-center justify-between">
                   <Link href="/dashboard" onClick={() => setSheetOpen(false)} className="flex items-center gap-3 min-w-0">
@@ -295,27 +295,27 @@ export function Navbar() {
                     className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
                   >
                     <Languages className="h-4 w-4" />
-                    {lang === "zh" ? "English" : "中文"}
+                    {t.common.switchLanguage}
                   </button>
                   <button
                     onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
                     className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
                   >
                     {resolvedTheme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-                    {resolvedTheme === "dark" ? (lang === "zh" ? "亮色" : "Light") : (lang === "zh" ? "暗色" : "Dark")}
+                    {t.common.toggleTheme}
                   </button>
                 </div>
                 <div className="border-t border-border my-4" />
                 {!loaded ? null : user ? (
                   <>
                     <Link href="/profile" onClick={() => setSheetOpen(false)} className="px-4 py-3 text-muted-foreground hover:text-foreground">
-                      {lang === "zh" ? "个人中心" : "Profile"}
+                      {t.common.profile}
                     </Link>
                     <Link href="/dashboard/settings" onClick={() => setSheetOpen(false)} className="px-4 py-3 text-muted-foreground hover:text-foreground">
-                      {lang === "zh" ? "设置" : "Settings"}
+                      {t.dashboard.settings}
                     </Link>
                     <button onClick={handleLogout} className="px-4 py-3 text-left text-muted-foreground hover:text-foreground">
-                      {lang === "zh" ? "退出登录" : "Log Out"}
+                      {t.common.logout}
                     </button>
                   </>
                 ) : (
