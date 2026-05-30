@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useState, useMemo } from "react";
-import { Cloud, Server, Rocket, Copy, Check, Search, X, ExternalLink } from "lucide-react";
+import { Cloud, Server, Rocket, Copy, Check, Search, X, ExternalLink, ChevronDown } from "lucide-react";
 import { useI18n } from "@/contexts/i18n-context";
 import { useToast } from "@/contexts/toast-context";
 import { Input } from "@/components/ui/input";
@@ -90,8 +90,14 @@ export default function McpEcosystemPage() {
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6">
-        {/* Sidebar filters */}
-        <aside className="lg:w-56 shrink-0 space-y-4 lg:sticky lg:top-20 lg:self-start">
+        {/* Sidebar filters — collapsible on mobile */}
+        <aside className="lg:w-56 shrink-0 lg:sticky lg:top-20 lg:self-start">
+          <details open className="lg:open space-y-4 group">
+            <summary className="flex items-center justify-between px-1 py-2 text-sm font-medium text-muted-foreground cursor-pointer lg:cursor-default lg:pointer-events-none list-none lg:hidden">
+              <span>{lang === "zh" ? "筛选条件" : "Filters"}</span>
+              <ChevronDown className="h-4 w-4 transition-transform group-open:rotate-180" />
+            </summary>
+            <div className="space-y-4">
           {/* Deployment filter */}
           <div className="glass-card p-4 rounded-xl">
             <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">{t.resourceHub.mcpServiceType}</h3>
@@ -115,6 +121,8 @@ export default function McpEcosystemPage() {
               ))}
             </div>
           </div>
+            </div>
+          </details>
         </aside>
 
         {/* Main content */}
