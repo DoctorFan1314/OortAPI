@@ -25,6 +25,7 @@ All notable changes to this project will be documented in this file.
 - **Navbar aria-labels** — All hardcoded English aria-labels replaced with `t.common.*` keys
 - **MCP detail tabs** — Raw `role="tablist"` replaced with `<Tabs>` component for consistency
 - **MCP square empty state** — Icon + helper text instead of plain text
+- **Params panel responsive** — Visible on lg screens (1024px+) instead of xl (1280px+)
 - Login/Register logo `alt=""` → `alt="OortAPI"` for accessibility
 - New i18n keys: `auth.emailRequired`, `auth.passwordRequired`, `auth.usernameRequired`, `auth.confirmPasswordRequired`
 - New dashboard keys: `refresh`, `lastUpdated`, `loadFailed`, `checkConnection`, `retry`, `progress`, `done`, `renew`, `autoRenewOff`, `subscriptionExpiring`, `subscriptionExpired`
