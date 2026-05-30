@@ -25,6 +25,9 @@ All notable changes to this project will be documented in this file.
 - **Playground i18n** — Replace inline ternaries with LABELS keys (newChat, inputMessage, advanced, toolCallsFailing, searchFallback, maxIterations)
 - **API Keys page** — Title uses `t.dashboard.apiKeys` instead of inline ternary
 - **Navbar aria-labels** — All hardcoded English aria-labels replaced with `t.common.*` keys
+- **Dashboard progress bar** — ARIA attributes added (role, aria-valuenow/min/max, label)
+- **Dashboard onboardProgress** — Memoized with useMemo, was called 3x per render
+- **MCP square sidebar** — Collapsible on mobile with `<details>` element
 - **MCP detail tabs** — Raw `role="tablist"` replaced with `<Tabs>` component for consistency
 - **MCP square empty state** — Icon + helper text instead of plain text
 - **Params panel responsive** — Visible on lg screens (1024px+) instead of xl (1280px+)
