@@ -34,6 +34,9 @@ All notable changes to this project will be documented in this file.
 - **Navbar logout error handling** — try/catch with error toast
 - **prefers-reduced-motion** — Global CSS media query disables all animations for motion-sensitive users
 - **Search dropdown keyboard nav** — ArrowUp/Down to navigate, Enter to select, Escape to close, mouse hover sync
+- **Dashboard meta title** — document.title set via useEffect with i18n
+- **Skip-to-content link** — sr-only link in navbar, visible on focus, jumps to #main-content
+- **Navbar search aria-label** — Both desktop and mobile search inputs have aria-label
 - **MCP detail tabs** — Raw `role="tablist"` replaced with `<Tabs>` component for consistency
 - **MCP square empty state** — Icon + helper text instead of plain text
 - **Params panel responsive** — Visible on lg screens (1024px+) instead of xl (1280px+)
