@@ -37,6 +37,8 @@ All notable changes to this project will be documented in this file.
 - **Dashboard meta title** — document.title set via useEffect with i18n
 - **Skip-to-content link** — sr-only link in navbar, visible on focus, jumps to #main-content
 - **Navbar search aria-label** — Both desktop and mobile search inputs have aria-label
+- **Resource center meta tags** — layout.tsx with SEO metadata for /resources and /resources/mcp
+- **Navbar loading skeleton** — Mobile Sheet shows pulse animation while auth loads
 - **MCP detail tabs** — Raw `role="tablist"` replaced with `<Tabs>` component for consistency
 - **MCP square empty state** — Icon + helper text instead of plain text
 - **Params panel responsive** — Visible on lg screens (1024px+) instead of xl (1280px+)
