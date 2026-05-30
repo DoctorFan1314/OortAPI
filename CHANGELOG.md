@@ -30,6 +30,9 @@ All notable changes to this project will be documented in this file.
 - **MCP square sidebar** — Collapsible on mobile with `<details>` element
 - **Playground clear confirm** — ConfirmDialog before clearing conversation, Clear button in status bar
 - **Resource center Ctrl+K** — Keyboard shortcut focuses search input
+- **Playground / Escape shortcut** — Focus message input when not in an input field
+- **Navbar logout error handling** — try/catch with error toast
+- **prefers-reduced-motion** — Global CSS media query disables all animations for motion-sensitive users
 - **MCP detail tabs** — Raw `role="tablist"` replaced with `<Tabs>` component for consistency
 - **MCP square empty state** — Icon + helper text instead of plain text
 - **Params panel responsive** — Visible on lg screens (1024px+) instead of xl (1280px+)
