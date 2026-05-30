@@ -158,7 +158,7 @@ export default function RegisterClient() {
       </div>
       {/* Celebration overlay on successful registration */}
       {showCelebration && (
-        <div className="fixed inset-0 z-[150] pointer-events-none flex items-center justify-center">
+        <div className="fixed inset-0 z-50 pointer-events-none flex items-center justify-center">
           <div className="text-center animate-page-fade-in">
             <div className="text-6xl mb-4 animate-bounce-in">🎉</div>
             <p className="text-lg font-semibold text-foreground">Welcome aboard! 🚀</p>
