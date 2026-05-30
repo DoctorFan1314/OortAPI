@@ -90,6 +90,10 @@ export function Navbar() {
   }
 
   return (
+    <>
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:top-2 focus:left-2 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-lg focus:text-sm">
+        {lang === "zh" ? "跳至主要内容" : "Skip to main content"}
+      </a>
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/60 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 lg:px-8">
         <Link href="/" className="flex items-center gap-2.5 shrink-0">
@@ -336,5 +340,6 @@ export function Navbar() {
         </div>
       </div>
     </header>
+    </>
   );
 }
