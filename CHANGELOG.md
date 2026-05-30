@@ -33,6 +33,7 @@ All notable changes to this project will be documented in this file.
 - **Playground / Escape shortcut** — Focus message input when not in an input field
 - **Navbar logout error handling** — try/catch with error toast
 - **prefers-reduced-motion** — Global CSS media query disables all animations for motion-sensitive users
+- **Search dropdown keyboard nav** — ArrowUp/Down to navigate, Enter to select, Escape to close, mouse hover sync
 - **MCP detail tabs** — Raw `role="tablist"` replaced with `<Tabs>` component for consistency
 - **MCP square empty state** — Icon + helper text instead of plain text
 - **Params panel responsive** — Visible on lg screens (1024px+) instead of xl (1280px+)
