@@ -130,6 +130,7 @@ export default function ResourcesPage() {
   const [visibleCounts, setVisibleCounts] = useState<Record<string, number>>({});
   const searchRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
 
   // Ctrl+K to focus search
   useEffect(() => {
@@ -260,18 +261,28 @@ export default function ResourcesPage() {
       {/* Search with instant dropdown */}
       <div ref={searchRef} className="relative max-w-md mb-6">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
-        <Input ref={searchInputRef} placeholder={t.resourceHub.searchPlaceholder} value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-10 pr-9 bg-secondary border-border text-foreground" />
+        <Input ref={searchInputRef} placeholder={t.resourceHub.searchPlaceholder} value={searchQuery}
+          onChange={e => { setSearchQuery(e.target.value); setHighlightedIndex(-1); }}
+          onKeyDown={e => {
+            if (!searchResults.length) return;
+            if (e.key === "ArrowDown") { e.preventDefault(); setHighlightedIndex(i => Math.min(i + 1, searchResults.length - 1)); }
+            if (e.key === "ArrowUp") { e.preventDefault(); setHighlightedIndex(i => Math.max(i - 1, 0)); }
+            if (e.key === "Enter" && highlightedIndex >= 0) { e.preventDefault(); const item = searchResults[highlightedIndex]; router.push(getDetailHref(item) || "#"); setSearchQuery(""); }
+            if (e.key === "Escape") { setSearchQuery(""); searchInputRef.current?.blur(); }
+          }}
+          className="pl-10 pr-9 bg-secondary border-border text-foreground" />
         {searchQuery && <button onClick={() => setSearchQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground z-10"><X className="h-4 w-4" /></button>}
         {/* Instant search dropdown */}
         {searchResults.length > 0 && (
           <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-xl shadow-xl z-50 max-h-80 overflow-y-auto">
-            {searchResults.map(item => {
+            {searchResults.map((item, idx) => {
               const detailHref = getDetailHref(item);
               const name = lang === "zh" ? item.nameZh : item.name;
               const desc = lang === "zh" ? item.descriptionZh : item.description;
               return (
                 <Link key={item.id} href={detailHref || "#"} onClick={() => setSearchQuery("")}
-                  className="flex items-center gap-3 px-4 py-2.5 hover:bg-muted transition-colors border-b border-border/30 last:border-0">
+                  onMouseEnter={() => setHighlightedIndex(idx)}
+                  className={`flex items-center gap-3 px-4 py-2.5 transition-colors border-b border-border/30 last:border-0 ${idx === highlightedIndex ? "bg-muted" : "hover:bg-muted"}`}>
                   <Badge className={`${BADGE_STYLES[item.type]} border text-[9px] shrink-0`}>{t.resourceHub[BADGE_I18N[item.type]]}</Badge>
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium truncate">{name}</p>
