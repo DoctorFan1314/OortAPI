@@ -506,3 +506,13 @@ pre, code {
 .dark .playground-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); }
 .dark .playground-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.35); }.dark .playground-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.12); }
 .dark .playground-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.25); }
+
+/* ===== REDUCED MOTION ===== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

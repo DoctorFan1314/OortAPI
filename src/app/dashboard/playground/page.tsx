@@ -184,6 +184,7 @@ function PlaygroundContent() {
   const userScrolledUpRef = useRef(false);
   const sentMsgRef = useRef("");
   const imageInputRef = useRef<HTMLInputElement>(null);
+  const messageInputRef = useRef<HTMLTextAreaElement>(null);
   const toolConfigRef = useRef(toolConfig);
   toolConfigRef.current = toolConfig;
 
@@ -308,6 +309,20 @@ function PlaygroundContent() {
     }, 500);
     return () => { if (saveTimerRef.current) clearTimeout(saveTimerRef.current); };
   }, [sessions, currentSessionId]);
+
+  // ── Keyboard shortcut: / or Escape to focus message input ──
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: globalThis.KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.tagName === "SELECT") return;
+      if (e.key === "/" || e.key === "Escape") {
+        e.preventDefault();
+        messageInputRef.current?.focus();
+      }
+    };
+    document.addEventListener("keydown", handleGlobalKeyDown);
+    return () => document.removeEventListener("keydown", handleGlobalKeyDown);
+  }, []);
 
   // ── Resource Hub injection ──
   useEffect(() => {
@@ -973,7 +988,7 @@ function PlaygroundContent() {
               </button>
 
 
-              <Textarea placeholder={t.inputMessage} value={message} onChange={(e) => setMessage(e.target.value)} onKeyDown={handleKeyDown} rows={1} className="resize-none flex-1 min-h-[2.5rem] max-h-32 overflow-y-auto" disabled={isSending} />
+              <Textarea ref={messageInputRef} placeholder={t.inputMessage} value={message} onChange={(e) => setMessage(e.target.value)} onKeyDown={handleKeyDown} rows={1} className="resize-none flex-1 min-h-[2.5rem] max-h-32 overflow-y-auto" disabled={isSending} />
 
               
                 <div className="flex flex-col gap-1.5 self-center">

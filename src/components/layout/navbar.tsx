@@ -80,8 +80,12 @@ export function Navbar() {
   }
 
   async function handleLogout() {
-    await logout();
-    showToast(t.common.loggedOut, "info");
+    try {
+      await logout();
+      showToast(t.common.loggedOut, "info");
+    } catch {
+      showToast(lang === "zh" ? "退出失败" : "Logout failed", "error");
+    }
     setSheetOpen(false);
   }
 
