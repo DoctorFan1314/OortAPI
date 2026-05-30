@@ -129,6 +129,19 @@ export default function ResourcesPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [visibleCounts, setVisibleCounts] = useState<Record<string, number>>({});
   const searchRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Ctrl+K to focus search
+  useEffect(() => {
+    const handleKeyDown = (e: globalThis.KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   // Close search dropdown on outside click
   useEffect(() => {
@@ -247,7 +260,7 @@ export default function ResourcesPage() {
       {/* Search with instant dropdown */}
       <div ref={searchRef} className="relative max-w-md mb-6">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
-        <Input placeholder={t.resourceHub.searchPlaceholder} value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-10 pr-9 bg-secondary border-border text-foreground" />
+        <Input ref={searchInputRef} placeholder={t.resourceHub.searchPlaceholder} value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-10 pr-9 bg-secondary border-border text-foreground" />
         {searchQuery && <button onClick={() => setSearchQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground z-10"><X className="h-4 w-4" /></button>}
         {/* Instant search dropdown */}
         {searchResults.length > 0 && (
