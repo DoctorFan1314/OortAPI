@@ -138,6 +138,7 @@ export function Navbar() {
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/60" />
               <Input
                 placeholder={t.common.searchPlaceholder}
+                aria-label={t.common.search}
                 className="h-8 w-48 xl:w-56 bg-secondary border-border text-foreground placeholder:text-muted-foreground/60 text-sm pl-8 pr-8"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -150,6 +151,7 @@ export function Navbar() {
             <form role="search" onSubmit={handleSearch} className="flex lg:hidden items-center gap-1">
               <Input
                 placeholder={t.common.searchPlaceholderMobile}
+                aria-label={t.common.search}
                 className="h-8 w-40 bg-secondary border-border text-foreground placeholder:text-muted-foreground text-sm"
                 autoFocus
                 value={searchQuery}
