@@ -385,21 +385,33 @@ function PlaygroundContent() {
     prevMsgLen.current = len;
   }, [chatHistory, response, reasoningContent]);
 
-  // Track user scroll direction
+  // Track user scroll direction (mouse wheel + touch gestures)
   useEffect(() => {
     const el = msgContainerRef.current;
     if (!el) return;
+    let lastTouchY = 0;
     const onWheel = (e: WheelEvent) => {
       if (e.deltaY < 0) userScrolledUpRef.current = true;
+    };
+    const onTouchStart = (e: TouchEvent) => {
+      lastTouchY = e.touches[0]?.clientY ?? 0;
+    };
+    const onTouchMove = (e: TouchEvent) => {
+      const currentY = e.touches[0]?.clientY ?? 0;
+      if (currentY > lastTouchY + 5) userScrolledUpRef.current = true; // Swiping down = scrolling up
     };
     const onScroll = () => {
       const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
       if (atBottom) userScrolledUpRef.current = false;
     };
     el.addEventListener("wheel", onWheel, { passive: true });
+    el.addEventListener("touchstart", onTouchStart, { passive: true });
+    el.addEventListener("touchmove", onTouchMove, { passive: true });
     el.addEventListener("scroll", onScroll, { passive: true });
     return () => {
       el.removeEventListener("wheel", onWheel);
+      el.removeEventListener("touchstart", onTouchStart);
+      el.removeEventListener("touchmove", onTouchMove);
       el.removeEventListener("scroll", onScroll);
     };
   }, []);
