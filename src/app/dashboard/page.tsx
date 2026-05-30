@@ -10,7 +10,7 @@ import { CacheSavingsChart } from "@/components/dashboard/cache-savings-chart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Key, CreditCard, ArrowRight, Sparkles, AlertTriangle, RefreshCw, Check, Code } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import useSWR from "swr";
 import Link from "next/link";
 import { dashboardSWRConfig } from "@/lib/swr-fetcher";
@@ -86,12 +86,12 @@ export default function DashboardPage() {
   const isNewUser = !hasKeys && !hasSub;
   const isNewUserAny = !hasKeys || !hasSub;
 
-  const getOnboardProgress = () => {
+  const onboardProgress = useMemo(() => {
     let done = 0;
     if (hasKeys) done++;
     if (hasSub) done++;
     return Math.round((done / 2) * 100);
-  };
+  }, [hasKeys, hasSub]);
 
   // Check for expiring subscription (within 3 days, not auto-renew)
   const expiringSub = subData?.subscriptions?.find(s => {
@@ -228,11 +228,11 @@ export default function DashboardPage() {
             </div>
             {/* Progress bar */}
             <div className="mt-5 flex items-center gap-3 text-xs text-muted-foreground">
-              <span className="shrink-0">{dict.dashboard.progress}: {getOnboardProgress()}%</span>
-              <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-primary to-purple-500 rounded-full transition-all duration-500" style={{ width: `${getOnboardProgress()}%` }} />
+              <span className="shrink-0">{dict.dashboard.progress}: {onboardProgress}%</span>
+              <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden" role="progressbar" aria-valuenow={onboardProgress} aria-valuemin={0} aria-valuemax={100} aria-label={dict.dashboard.progress}>
+                <div className="h-full bg-gradient-to-r from-primary to-purple-500 rounded-full transition-all duration-500" style={{ width: `${onboardProgress}%` }} />
               </div>
-              {getOnboardProgress() === 100 && <span className="text-emerald-400 shrink-0">{dict.dashboard.done}</span>}
+              {onboardProgress === 100 && <span className="text-emerald-400 shrink-0">{dict.dashboard.done}</span>}
             </div>
           </CardContent>
         </Card>
