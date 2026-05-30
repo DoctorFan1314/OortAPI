@@ -12,11 +12,13 @@ All notable changes to this project will be documented in this file.
 
 #### Major Improvements
 - **M1: Navbar i18n** — All inline `lang === "zh"` ternaries replaced with `t.common.*`, `t.dashboard.*` keys
+- **M2: Playground page split** — Extracted `SessionSidebar` and `ParamsPanel` components, reduced from 1153 to 1122 lines
 - **M3: Error Boundary** — New `ErrorBoundary` component wraps dashboard layout, prevents page crash on component errors
 - **M4: Playground regex bug** — `/s+/` → `/\s+/` in TPS calculation (was splitting on literal 's')
 - **M7: localStorage debounce** — 500ms debounce prevents rapid writes during streaming
 - **M8: Login/Register i18n** — Validation messages use `t.auth.*` keys, logo `alt="OortAPI"`
 - **M9: Shared auth utils** — `safeReturnUrl()` extracted to `src/lib/auth-utils.ts`
+- **M10: AI tools page** — All 8 tools now have configCode, i18n fixes
 - **Dashboard i18n** — All inline ternaries replaced with `dict.dashboard.*` keys (refresh, lastUpdated, loadFailed, retry, progress, done, renew, autoRenewOff)
 
 #### Minor Fixes
