@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { CopyButton } from "@/components/shared/copy-button";
 import { MarkdownRenderer } from "@/components/shared/markdown-renderer";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { Play, Send, Bot, User, Loader2, Square, Zap, Settings2, Trash2, Download, RefreshCw, Plus, MessageSquare, X, Image, Link2, Brain, Wrench, Search, Copy, Check, Quote, Lock, ChevronDown, Cloud } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SessionSidebar } from "@/components/playground/session-sidebar";
@@ -174,6 +175,7 @@ function PlaygroundContent() {
   const [copiedIdx, setCopiedIdx] = useState(-1);
   const [showAdvancedParams, setShowAdvancedParams] = useState(false);
   const [showToolManager, setShowToolManager] = useState(false);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
   const { toast } = useToast();
 
   const abortRef = useRef<AbortController | null>(null);
@@ -795,10 +797,16 @@ function PlaygroundContent() {
             </div>
             <div className="flex items-center gap-2">
               {chatHistory.length > 0 && (
-                <button onClick={exportConversation} className="flex items-center gap-1 px-2 py-1 rounded-md text-[11px] text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" title={lang === "zh" ? "导出对话" : "Export conversation"}>
-                  <Download className="h-3 w-3" />
-                  <span className="hidden sm:inline">{lang === "zh" ? "导出" : "Export"}</span>
-                </button>
+                <>
+                  <button onClick={exportConversation} className="flex items-center gap-1 px-2 py-1 rounded-md text-[11px] text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" title={lang === "zh" ? "导出对话" : "Export conversation"}>
+                    <Download className="h-3 w-3" />
+                    <span className="hidden sm:inline">{lang === "zh" ? "导出" : "Export"}</span>
+                  </button>
+                  <button onClick={() => setShowClearConfirm(true)} className="flex items-center gap-1 px-2 py-1 rounded-md text-[11px] text-muted-foreground hover:text-red-400 hover:bg-red-500/10 transition-colors" title={lang === "zh" ? "清空对话" : "Clear conversation"}>
+                    <Trash2 className="h-3 w-3" />
+                    <span className="hidden sm:inline">{lang === "zh" ? "清空" : "Clear"}</span>
+                  </button>
+                </>
               )}
             </div>
           </div>
@@ -1106,6 +1114,17 @@ function PlaygroundContent() {
           </div>
         </SheetContent>
       </Sheet>
+
+      {/* Clear conversation confirm */}
+      <ConfirmDialog
+        open={showClearConfirm}
+        onOpenChange={setShowClearConfirm}
+        title={lang === "zh" ? "清空对话" : "Clear Conversation"}
+        message={lang === "zh" ? "确定要清空当前会话的所有消息吗？此操作不可撤销。" : "Clear all messages in this session? This cannot be undone."}
+        onConfirm={handleClear}
+        confirmLabel={lang === "zh" ? "确认清空" : "Clear"}
+        variant="danger"
+      />
 
       {/* Hidden file inputs */}
       <input ref={imageInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
