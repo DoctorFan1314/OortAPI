@@ -1119,6 +1119,9 @@ export const en: Dictionary = {
     aiToolSelectTool: "Select Tool",
     aiToolCopyConfig: "Copy Config",
     aiToolCopied: "Copied",
+    aiToolInstallation: "Installation",
+    aiToolNotes: "Notes",
+    aiToolProtocol: "Protocol",
   },
   resources: {
     title: "Resources",

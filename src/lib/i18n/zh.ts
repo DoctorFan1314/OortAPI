@@ -1119,6 +1119,9 @@ export const zh: Dictionary = {
     aiToolSelectTool: "选择工具",
     aiToolCopyConfig: "复制配置",
     aiToolCopied: "已复制",
+    aiToolInstallation: "安装步骤",
+    aiToolNotes: "注意事项",
+    aiToolProtocol: "协议",
   },
   resources: {
     title: "资源中心",

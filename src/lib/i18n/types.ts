@@ -653,6 +653,9 @@ export interface Dictionary {
     aiToolSelectTool: string;
     aiToolCopyConfig: string;
     aiToolCopied: string;
+    aiToolInstallation: string;
+    aiToolNotes: string;
+    aiToolProtocol: string;
   };
   resources: {
     title: string;

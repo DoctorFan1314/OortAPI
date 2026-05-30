@@ -29,6 +29,9 @@ const TOOLS: AiTool[] = [
       { zh: "在 OpenAI Codex 中设置自定义 API 端点", en: "Set custom API endpoint in Codex" },
       { zh: "填入你的 API Key 并选择模型", en: "Enter your API Key and select a model" },
     ],
+    configCode: `export OPENAI_BASE_URL=https://api.oortapi.com/v1
+export OPENAI_API_KEY=sk-oort-your-key`,
+    configLanguage: "bash",
   },
   {
     name: "OpenCode", slug: "opencode", protocol: "openai",
@@ -85,6 +88,9 @@ export ANTHROPIC_API_KEY=sk-oort-your-key`,
       { zh: "在工具设置中填入 Base URL 和 API Key", en: "Enter Base URL and API Key in tool settings" },
       { zh: "选择支持的模型后开始使用", en: "Select a supported model and start using" },
     ],
+    configCode: `export OPENAI_BASE_URL=https://api.oortapi.com/v1
+export OPENAI_API_KEY=sk-oort-your-key`,
+    configLanguage: "bash",
   },
   {
     name: "Qwen Code", slug: "qwen-code", protocol: "openai",
@@ -94,6 +100,9 @@ export ANTHROPIC_API_KEY=sk-oort-your-key`,
       { zh: "在工具设置中填入 Base URL 和 API Key", en: "Enter Base URL and API Key in tool settings" },
       { zh: "选择支持的模型后开始使用", en: "Select a supported model and start using" },
     ],
+    configCode: `export OPENAI_BASE_URL=https://api.oortapi.com/v1
+export OPENAI_API_KEY=sk-oort-your-key`,
+    configLanguage: "bash",
   },
   {
     name: "Hermes", slug: "hermes", protocol: "openai",
@@ -103,6 +112,9 @@ export ANTHROPIC_API_KEY=sk-oort-your-key`,
       { zh: "在工具设置中填入 Base URL 和 API Key", en: "Enter Base URL and API Key in tool settings" },
       { zh: "选择支持的模型后开始使用", en: "Select a supported model and start using" },
     ],
+    configCode: `export OPENAI_BASE_URL=https://api.oortapi.com/v1
+export OPENAI_API_KEY=sk-oort-your-key`,
+    configLanguage: "bash",
   },
   {
     name: "Windsurf", slug: "windsurf", protocol: "openai",
@@ -112,6 +124,11 @@ export ANTHROPIC_API_KEY=sk-oort-your-key`,
       { zh: "在工具设置中填入 Base URL 和 API Key", en: "Enter Base URL and API Key in tool settings" },
       { zh: "选择支持的模型后开始使用", en: "Select a supported model and start using" },
     ],
+    configCode: `{
+  "openai.apiKey": "sk-oort-your-key",
+  "openai.baseUrl": "https://api.oortapi.com/v1"
+}`,
+    configLanguage: "json",
   },
 ];
 
@@ -196,7 +213,7 @@ function AiToolsContent() {
             </div>
             {selectedTool.installSteps && (
               <div className="mt-3 space-y-1.5">
-                <p className="text-xs font-medium text-muted-foreground">{lang === "zh" ? "安装步骤" : "Installation"}</p>
+                <p className="text-xs font-medium text-muted-foreground">{L.aiToolInstallation}</p>
                 {selectedTool.installSteps.map((step, i) => (
                   <p key={i} className="text-xs text-muted-foreground">{i + 1}. {step[lang]}</p>
                 ))}
@@ -242,7 +259,7 @@ function AiToolsContent() {
           {/* Notes */}
           {selectedTool.notes && selectedTool.notes.length > 0 && (
             <div className="p-3 rounded-lg bg-amber-500/5 border border-amber-500/20">
-              <p className="text-xs font-semibold text-amber-500/80 mb-1">{lang === "zh" ? "注意事项" : "Notes"}</p>
+              <p className="text-xs font-semibold text-amber-500/80 mb-1">{L.aiToolNotes}</p>
               {selectedTool.notes.map((note, i) => (
                 <p key={i} className="text-xs text-muted-foreground">• {note[lang]}</p>
               ))}
