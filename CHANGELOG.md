@@ -40,6 +40,8 @@ All notable changes to this project will be documented in this file.
 - **Resource center meta tags** — layout.tsx with SEO metadata for /resources and /resources/mcp
 - **Navbar loading skeleton** — Mobile Sheet shows pulse animation while auth loads
 - **z-index consistency** — Standardized overlay layers: z-40 dropdowns, z-50 modals, z-60 progress bar, z-100 skip-to-content
+- **prefers-color-scheme** — Already implemented: theme defaults to system preference via `getSystemTheme()`
+- **Search box labels** — Already implemented: both desktop and mobile inputs have `aria-label`
 - **MCP detail tabs** — Raw `role="tablist"` replaced with `<Tabs>` component for consistency
 - **MCP square empty state** — Icon + helper text instead of plain text
 - **Params panel responsive** — Visible on lg screens (1024px+) instead of xl (1280px+)
