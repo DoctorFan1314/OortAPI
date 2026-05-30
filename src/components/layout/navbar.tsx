@@ -272,7 +272,12 @@ export function Navbar() {
             />
             <SheetContent side="right" className="bg-card border-border w-72">
               <SheetTitle className="text-foreground sr-only">{t.common.navigationMenu}</SheetTitle>
-              {!loaded ? null : user ? (
+              {!loaded ? (
+                <div className="mt-8 mb-4 px-4 flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-muted animate-pulse" />
+                  <div className="h-4 w-24 rounded bg-muted animate-pulse" />
+                </div>
+              ) : user ? (
                 <div className="mt-8 mb-4 px-4 flex items-center justify-between">
                   <Link href="/dashboard" onClick={() => setSheetOpen(false)} className="flex items-center gap-3 min-w-0">
                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-medium overflow-hidden shrink-0">
