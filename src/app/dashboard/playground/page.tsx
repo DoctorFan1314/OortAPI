@@ -978,7 +978,7 @@ function PlaygroundContent() {
         </div>
 
         {/* Column 3: Params */}
-        <aside className="w-72 h-full bg-muted/20 backdrop-blur-sm p-4 space-y-4 hidden xl:block overflow-y-auto shrink-0 border-l border-border/90">
+        <aside className="w-72 h-full bg-muted/20 backdrop-blur-sm p-4 space-y-4 hidden lg:block overflow-y-auto shrink-0 border-l border-border/90">
           {/* Model */}
           <div>
             <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-1.5 block flex items-center gap-2">{t.selectModel}<button onClick={handleRefresh} className="p-0.5 rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"><RefreshCw className="h-3 w-3" /></button></label>
