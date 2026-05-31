@@ -84,7 +84,7 @@ export function Navbar() {
       await logout();
       showToast(t.common.loggedOut, "info");
     } catch {
-      showToast(lang === "zh" ? "退出失败" : "Logout failed", "error");
+      showToast(t.common.logoutFailed, "error");
     }
     setSheetOpen(false);
   }
@@ -332,9 +332,9 @@ export function Navbar() {
                   </>
                 ) : (
                   <>
-                    <Link href="/login" onClick={() => setSheetOpen(false)} className="px-4 py-3 text-muted-foreground hover:text-foreground">{lang === "zh" ? "登录" : "Log In"}</Link>
+                    <Link href="/login" onClick={() => setSheetOpen(false)} className="px-4 py-3 text-muted-foreground hover:text-foreground">{t.common.login}</Link>
                     <Link href="/register" onClick={() => setSheetOpen(false)} className="px-4 py-3">
-                      <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-medium">{lang === "zh" ? "注册" : "Sign Up"}</Button>
+                      <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-medium">{t.common.register}</Button>
                     </Link>
                   </>
                 )}

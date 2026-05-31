@@ -42,6 +42,7 @@ export const en: Dictionary = {
     navigation: "Navigation",
     popular: "Popular",
     loggedOut: "Logged out",
+    logoutFailed: "Logout failed",
     balance: "Balance",
     tokenPlan: "Token Plan",
     models: "Models",

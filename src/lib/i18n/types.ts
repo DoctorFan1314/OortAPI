@@ -11,6 +11,7 @@ export interface Dictionary {
     navigation: string;
     popular: string;
     loggedOut: string;
+    logoutFailed: string;
     balance: string;
     tokenPlan: string;
     models: string;

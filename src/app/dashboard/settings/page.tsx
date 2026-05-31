@@ -5,7 +5,9 @@ import { useAuth } from "@/contexts/auth-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import useSWR from "swr";
+import { dashboardSWRConfig } from "@/lib/swr-fetcher";
 import { useToast } from "@/contexts/toast-context";
 import { Loader2, Settings, Download, Upload, Wallet, Search, Bell } from "lucide-react";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
@@ -35,7 +37,6 @@ export default function SettingsPage() {
   const [confirmExchangeOpen, setConfirmExchangeOpen] = useState(false);
   const [settingsSearch, setSettingsSearch] = useState("");
   const [notifPrefs, setNotifPrefs] = useState<Record<string, boolean>>({ budget: true, key_expiry: true, sub_expiry: true, usage_spike: false });
-  const [notifPrefsLoaded, setNotifPrefsLoaded] = useState(false);
 
   // Search filtering helpers
   const searchLower = settingsSearch.toLowerCase().trim();
@@ -53,35 +54,39 @@ export default function SettingsPage() {
   const budgetPercent = budgetLimit > 0 ? (currentSpend / budgetLimit) * 100 : 0;
   const budgetStatus = budgetLimit > 0 ? (budgetPercent >= 100 ? "exceeded" : budgetPercent >= 80 ? "near" : "ok") : "none";
 
-  useEffect(() => {
-    fetch("/api/dashboard/settings", { credentials: "include" })
-      .then(r => r.json())
-      .then(d => {
-        if (d.settings && user?.role === "admin") {
-          setTimezone(d.settings.timezone || "Asia/Shanghai");
-          setSystemCurrency(d.settings.currency || "USD");
-          setExchangeRate(d.settings.exchange_rate || "7.3");
-          setInitialExchangeRate(d.settings.exchange_rate || "7.3");
-        }
-        if (d.preferences?.monthly_budget) {
-          setMonthlyBudget(String(d.preferences.monthly_budget));
-        }
-        if (d.preferences?.notification_preferences) {
-          setNotifPrefs(prev => ({ ...prev, ...d.preferences.notification_preferences }));
-        }
-        setNotifPrefsLoaded(true);
-      })
-      .catch(() => { setNotifPrefsLoaded(true); });
-    // Fetch current month spending
+  // SWR: fetch settings
+  const { data: settingsData, isLoading: settingsLoading } = useSWR<{
+    settings?: { timezone?: string; currency?: string; exchange_rate?: string };
+    preferences?: { monthly_budget?: number; notification_preferences?: Record<string, boolean> };
+  }>("/api/dashboard/settings", dashboardSWRConfig);
+
+  // SWR: fetch current month spending
+  const billingUrl = useMemo(() => {
     const now = new Date();
     const from = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
-    fetch(`/api/v1/billing/usage?limit=1&from=${from}`, { credentials: "include" })
-      .then(r => r.json())
-      .then(d => {
-        setCurrentSpend(d.total_cost || 0);
-      })
-      .catch(() => {});
-  }, [user]);
+    return `/api/v1/billing/usage?limit=1&from=${from}`;
+  }, []);
+  const { data: billingData } = useSWR<{ total_cost?: number }>(billingUrl, dashboardSWRConfig);
+
+  // Derive local state from SWR data
+  useEffect(() => {
+    if (settingsData?.settings && user?.role === "admin") {
+      setTimezone(settingsData.settings.timezone || "Asia/Shanghai");
+      setSystemCurrency(settingsData.settings.currency || "USD");
+      setExchangeRate(settingsData.settings.exchange_rate || "7.3");
+      setInitialExchangeRate(settingsData.settings.exchange_rate || "7.3");
+    }
+    if (settingsData?.preferences?.monthly_budget) {
+      setMonthlyBudget(String(settingsData.preferences.monthly_budget));
+    }
+    if (settingsData?.preferences?.notification_preferences) {
+      setNotifPrefs(prev => ({ ...prev, ...settingsData.preferences!.notification_preferences! }));
+    }
+  }, [settingsData, user]);
+
+  useEffect(() => {
+    if (billingData) setCurrentSpend(billingData.total_cost || 0);
+  }, [billingData]);
 
   // Budget alert only when newly exceeded (not on every mount, guard against StrictMode double-fire)
   const prevExceeded = useRef(false);
@@ -133,13 +138,13 @@ export default function SettingsPage() {
   }, [lang, showToast]);
 
   useEffect(() => {
-    if (!notifPrefsLoaded) return;
+    if (settingsLoading) return;
     clearTimeout(notifPrefsTimerRef.current);
     notifPrefsTimerRef.current = setTimeout(() => {
       handleSaveNotifPrefs(notifPrefsRef.current);
     }, 2000);
     return () => clearTimeout(notifPrefsTimerRef.current);
-  }, [notifPrefs, notifPrefsLoaded, handleSaveNotifPrefs]);
+  }, [notifPrefs, settingsLoading, handleSaveNotifPrefs]);
 
   const handleSaveSystem = async () => {
     if (exchangeRate !== initialExchangeRate) {

@@ -39,7 +39,7 @@ export default function StatusPage() {
     fetch("/api/health")
       .then((r) => r.json())
       .then((d) => { setHealth(d); setLoading(false); })
-      .catch(() => { setError("Failed to load"); setLoading(false); });
+      .catch(() => { setError(lang === "zh" ? "加载失败" : "Failed to load"); setLoading(false); });
   };
 
   useEffect(() => { fetchHealth(); }, []);

@@ -42,6 +42,7 @@ export const zh: Dictionary = {
     navigation: "导航",
     popular: "热门",
     loggedOut: "已退出登录",
+    logoutFailed: "退出失败",
     balance: "余额",
     tokenPlan: "Token Plan",
     models: "模型市场",

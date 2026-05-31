@@ -322,13 +322,13 @@ export default function ModelsPage() {
               <Input
                 placeholder={t.search}
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => { setSearch(e.target.value); setVisibleCount(20); }}
                 className="pl-9 h-9 bg-background"
              />
             </div>
             <div className="flex gap-1.5 flex-wrap">
               <button
-                onClick={() => setProviderFilter("all")}
+                onClick={() => { setProviderFilter("all"); setVisibleCount(20); }}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
                   providerFilter === "all"
                     ? "bg-primary/10 text-primary border-primary/30"
@@ -342,7 +342,7 @@ export default function ModelsPage() {
                 return (
                   <button
                     key={p}
-                    onClick={() => setProviderFilter(p)}
+                    onClick={() => { setProviderFilter(p); setVisibleCount(20); }}
                     className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
                       providerFilter === p
                         ? `${c.bg} ${c.text} ${c.border}`
@@ -357,7 +357,7 @@ export default function ModelsPage() {
             {/* Capability filter */}
             <div className="flex gap-1.5 flex-wrap">
               <button
-                onClick={() => setTagFilter("all")}
+                onClick={() => { setTagFilter("all"); setVisibleCount(20); }}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
                   tagFilter === "all"
                     ? "bg-primary/10 text-primary border-primary/30"
@@ -369,7 +369,7 @@ export default function ModelsPage() {
               {Object.entries(CAP_CONFIG).map(([key, cfg]) => (
                 <button
                   key={key}
-                  onClick={() => setTagFilter(key)}
+                  onClick={() => { setTagFilter(key); setVisibleCount(20); }}
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
                     tagFilter === key
                       ? cfg.color

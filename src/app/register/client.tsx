@@ -165,16 +165,16 @@ export default function RegisterClient() {
           </div>
           <div className="fixed inset-0 pointer-events-none">
             <style>{`
-              @keyframes cf-0 { 0%{transform:translateY(-10vh) rotate(0deg);opacity:1} 100%{transform:translateY(110vh) rotate(720deg);opacity:0} }
-              @keyframes cf-1 { 0%{transform:translateY(-10vh) rotate(0deg);opacity:1} 100%{transform:translateY(105vh) rotate(540deg);opacity:0} }
-              @keyframes cf-2 { 0%{transform:translateY(-10vh) rotate(0deg);opacity:1} 100%{transform:translateY(115vh) rotate(900deg);opacity:0} }
+              @keyframes register-cf-0 { 0%{transform:translateY(-10vh) rotate(0deg);opacity:1} 100%{transform:translateY(110vh) rotate(720deg);opacity:0} }
+              @keyframes register-cf-1 { 0%{transform:translateY(-10vh) rotate(0deg);opacity:1} 100%{transform:translateY(105vh) rotate(540deg);opacity:0} }
+              @keyframes register-cf-2 { 0%{transform:translateY(-10vh) rotate(0deg);opacity:1} 100%{transform:translateY(115vh) rotate(900deg);opacity:0} }
             `}</style>
             {['#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#a855f7','#f97316'].map((c,i) => (
               <div key={i} style={{
                 position:'fixed', top:'-10px', left:`${8 + i * 15}%`,
                 width:i%2===0?'8px':'6px', height:i%2===0?'8px':'10px',
                 background:c, borderRadius:i%2===0?'50%':'2px',
-                animation:`cf-${i%3} ${1.5 + i*0.1}s ease-in ${i*0.12}s forwards`
+                animation:`register-cf-${i%3} ${1.5 + i*0.1}s ease-in ${i*0.12}s forwards`
               }} />
             ))}
           </div>

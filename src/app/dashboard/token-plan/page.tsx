@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import useSWR from "swr";
+import { dashboardSWRConfig } from "@/lib/swr-fetcher";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -65,7 +67,6 @@ function TokenPlanContent() {
   const { toast: showToast } = useToast();
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
-  const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
   const [cancelTarget, setCancelTarget] = useState<number | null>(null);
@@ -74,26 +75,23 @@ function TokenPlanContent() {
   const [upgradePlanId, setUpgradePlanId] = useState<number>(0);
   const [upgradeLoading, setUpgradeLoading] = useState(false);
 
+  // SWR: fetch subscription, keys, and plans
+  const { data: subData, isLoading: subLoading, mutate: mutateSub } = useSWR<{ subscriptions: Subscription[] }>("/api/dashboard/subscription", dashboardSWRConfig);
+  const { data: keysData, isLoading: keysLoading } = useSWR<{ keys: ApiKey[] }>("/api/dashboard/keys", dashboardSWRConfig);
+  const { data: plansData, isLoading: plansLoading } = useSWR<{ plans: typeof plans }>("/api/plans", dashboardSWRConfig);
+
+  const loading = subLoading || keysLoading || plansLoading;
+
+  // Derive local state from SWR data
   useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const [subRes, keyRes, planRes] = await Promise.all([
-          fetch("/api/dashboard/subscription", { credentials: "include" }),
-          fetch("/api/dashboard/keys", { credentials: "include" }),
-          fetch("/api/plans"),
-        ]);
-        if (cancelled) return;
-        if (subRes.ok) { const d = await subRes.json(); setSubscriptions(d.subscriptions || []); }
-        if (keyRes.ok) { const d = await keyRes.json(); setApiKeys(d.keys || []); }
-        if (planRes.ok) { const d = await planRes.json(); setPlans(d.plans || []); }
-      } catch {
-        showToast(lang === "zh" ? "加载失败，请刷新重试" : "Failed to load. Please refresh.", "error");
-      }
-      if (!cancelled) setLoading(false);
-    })();
-    return () => { cancelled = true; };
-  }, []);
+    if (subData) setSubscriptions(subData.subscriptions || []);
+  }, [subData]);
+  useEffect(() => {
+    if (keysData) setApiKeys(keysData.keys || []);
+  }, [keysData]);
+  useEffect(() => {
+    if (plansData) setPlans(plansData.plans || []);
+  }, [plansData]);
 
   async function handleCancel(subscriptionId: number) {
     setCancelTarget(subscriptionId);
