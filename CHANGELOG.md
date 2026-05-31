@@ -156,6 +156,44 @@ All notable changes to this project will be documented in this file.
 #### i18n
 - New keys: `navFeatures`, `navModelsPricing`, `navFaq` in types, en.ts, zh.ts
 
+### Documentation V2 Refactoring — Visual, Content & Navigation
+
+#### Visual & Component System
+- **CodeBlock line numbers** — New `showLineNumbers` prop via `react-syntax-highlighter`
+- **CodeBlock highlight lines** — New `highlightLines` prop, tinted with `bg-primary/5`
+- **CodeBlock CSS variables** — Replaced hardcoded `bg-[#161b20]` / `border-zinc-800` with `var(--code-bg)` / `var(--code-border)`
+- **CodeBlock filename** — New `filename` prop displays file label in header
+- **CodeBlock i18n** — "Copied!" text now uses `useI18n()` dictionary
+- **LazySyntaxHighlighter** — Passes through `showLineNumbers`, `highlightLines`, `lineNumberStyle`, `lineProps`
+- **CSS design tokens** — Added `--code-bg`, `--code-border`, `--code-foreground`, `--code-inline-bg`, `--docs-content-max-width` to both light/dark themes
+- **CrossLinks component** — Reusable "See Also" section for page bottoms, responsive 1-3 column grid
+
+#### Visual Polish
+- **Landing DocCard** — Added `glass-card-hover` lift effect (already defined in globals.css, was not applied)
+- **Landing hero** — Added `hero-animate-1/2/3` entrance animation classes
+- **Landing GitHub link** — Fixed `anthropics/claude-code/issues` → `DoctorFan1314/OortAPI/issues`
+- **Quickstart step connectors** — Vertical `border-l border-primary/20` line between steps 1-2-3
+- **Quickstart app cards** — Replaced raw `<pre>` with `CodeBlock` (copy button + syntax highlighting)
+- **Quickstart tip callout** — Added `AlertTriangle` icon
+
+#### Content Depth
+- **Quickstart** — Added success response JSON example and Python error handling example
+- **Endpoints** — ParamTable upgraded to 5 columns (added Default column), added response examples for embeddings/images/models, added User endpoint schemas (login/register/me/profile/change-password), added Billing redeem schema, added pagination docs section
+- **Errors** — Added Node.js retry example (was Python-only)
+- **Streaming** — Added Anthropic Node.js SDK streaming example (was Python-only)
+- **Authentication** — Added Python and Node.js SDK examples for both OpenAI and Anthropic (was cURL-only)
+- **Rate Limits** — Added TPM (tokens-per-minute) section with `X-RateLimit-Tokens-*` headers
+- **Security** — New `/docs/security` page: API key security, data privacy, request logging, best practices
+
+#### Navigation & UX
+- **PrevNext component** — Page-to-page navigation at bottom of every docs page, respects sidebar page order
+- **FAQ search** — Client-side real-time filtering of FAQ items by question text
+- **Pricing clarification** — Added prominent link to Models & Pricing page for actual prices
+- **Sidebar** — Added Security & Privacy link
+
+#### i18n
+- New keys: `navSecurity`, `navPrev`, `navNext` in types, en.ts, zh.ts
+
 ### Resource Center Audit Fixes
 
 #### i18n Fixes

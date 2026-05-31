@@ -150,6 +150,44 @@
 #### i18n
 - 新增键：`navFeatures`、`navModelsPricing``navFaq`（types、en.ts、zh.ts）
 
+### 文档 V2 重构 — 视觉、内容与导航
+
+#### 视觉与组件系统
+- **CodeBlock 行号** — 新增 `showLineNumbers` prop，通过 `react-syntax-highlighter` 实现
+- **CodeBlock 高亮行** — 新增 `highlightLines` prop，高亮行使用 `bg-primary/5` 着色
+- **CodeBlock CSS 变量** — 硬编码 `bg-[#161b20]` / `border-zinc-800` 替换为 `var(--code-bg)` / `var(--code-border)`
+- **CodeBlock 文件名** — 新增 `filename` prop，在 header 显示文件名标签
+- **CodeBlock i18n** — "Copied!" 文本使用 `useI18n()` 字典
+- **LazySyntaxHighlighter** — 透传 `showLineNumbers`、`highlightLines`、`lineNumberStyle`、`lineProps`
+- **CSS 设计令牌** — 新增 `--code-bg`、`--code-border`、`--code-foreground`、`--code-inline-bg`、`--docs-content-max-width`（亮/暗主题）
+- **CrossLinks 组件** — 可复用的"相关文档"区域，响应式 1-3 列网格
+
+#### 视觉优化
+- **落地页 DocCard** — 添加 `glass-card-hover` 提升效果（globals.css 已定义但未应用）
+- **落地页 Hero** — 添加 `hero-animate-1/2/3` 入场动画 class
+- **落地页 GitHub 链接** — 修复 `anthropics/claude-code/issues` → `DoctorFan1314/OortAPI/issues`
+- **快速开始步骤连接线** — 步骤 1-2-3 之间添加垂直 `border-l border-primary/20` 连接线
+- **快速开始 App Card** — 原始 `<pre>` 替换为 `CodeBlock`（复制按钮 + 语法高亮）
+- **快速开始提示框** — 添加 `AlertTriangle` 图标
+
+#### 内容深度
+- **快速开始** — 添加成功响应 JSON 示例和 Python 错误处理示例
+- **端点页** — ParamTable 升级为 5 列（新增 Default 列），添加 embeddings/images/models 响应示例，添加 User 端点 Schema（login/register/me/profile/change-password），添加 Billing redeem Schema，添加分页文档
+- **错误码页** — 添加 Node.js 重试示例（之前只有 Python）
+- **流式页** — 添加 Anthropic Node.js SDK 流式示例（之前只有 Python）
+- **认证页** — 添加 Python/Node.js SDK 示例（OpenAI 和 Anthropic，之前只有 cURL）
+- **速率限制页** — 添加 TPM（每分钟 Token 数）说明和 `X-RateLimit-Tokens-*` 响应头
+- **安全页** — 新建 `/docs/security` 页面：API Key 安全、数据隐私、请求日志、最佳实践
+
+#### 导航与体验
+- **PrevNext 组件** — 每个文档页面底部的上一页/下一页导航，遵循侧边栏页面顺序
+- **FAQ 搜索** — 客户端实时过滤 FAQ 条目（按问题文本搜索）
+- **定价页澄清** — 添加醒目的"查看模型价格表"链接指向 Models & Pricing 页
+- **侧边栏** — 新增安全与隐私链接
+
+#### i18n
+- 新增键：`navSecurity`、`navPrev``navNext`（types、en.ts、zh.ts）
+
 ### 资源中心体验审计修复
 
 #### i18n 修复
