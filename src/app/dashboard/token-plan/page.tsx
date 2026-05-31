@@ -155,10 +155,8 @@ function TokenPlanContent() {
       });
       const data = await res.json();
       if (res.ok) {
-        // Refresh subscriptions
-        const subRes = await fetch("/api/dashboard/subscription", { credentials: "include" });
-        const subData = await subRes.json();
-        setSubscriptions(subData.subscriptions || []);
+        // Refresh subscriptions via SWR
+        await mutateSub();
         setUpgradeOpen(false);
       } else {
         showToast(data.error || "Plan change failed", "error");

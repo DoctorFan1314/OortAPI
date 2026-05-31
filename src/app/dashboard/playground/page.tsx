@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
-import { Zap, Trash2, Download, Brain, Wrench, Lock, Cloud, X } from "lucide-react";
+import { Zap, Trash2, Download, Brain, Wrench, Lock, Cloud, X, SlidersHorizontal } from "lucide-react";
 import { SessionSidebar } from "@/components/playground/session-sidebar";
 import { ParamsPanel } from "@/components/playground/params-panel";
 import { BUILTIN_TOOLS, getEnabledToolDefinitions, loadToolConfig, saveToolConfig, getModelCaps, type ToolConfig, type ToolDefinition, type ToolCall } from "@/lib/playground-tools";
@@ -48,6 +48,7 @@ function PlaygroundContent() {
   const [copiedIdx, setCopiedIdx] = useState(-1);
   const [showAdvancedParams, setShowAdvancedParams] = useState(false);
   const [showToolManager, setShowToolManager] = useState(false);
+  const [showParamsMobile, setShowParamsMobile] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const { toast } = useToast();
 
@@ -657,7 +658,7 @@ function PlaygroundContent() {
   // ── Render ──
   return (
     <div className="rounded-xl dark:shadow-[0_0_100px_25px_rgba(0,212,255,0.1)]">
-      <div className="flex h-[calc(100vh-7rem)] w-full overflow-hidden bg-background border border-border/40 rounded-xl shadow-sm dark:border-white/[0.08]">
+      <div className="flex h-[calc(100dvh-7rem)] w-full overflow-hidden bg-background border border-border/40 rounded-xl shadow-sm dark:border-white/[0.08]">
         {/* Column 1: Sessions */}
         <SessionSidebar
           sessions={sessions}
@@ -687,6 +688,10 @@ function PlaygroundContent() {
                   <button onClick={() => setShowClearConfirm(true)} className="flex items-center gap-1 px-2 py-1 rounded-md text-[11px] text-muted-foreground hover:text-red-400 hover:bg-red-500/10 transition-colors" title={lang === "zh" ? "清空对话" : "Clear conversation"}>
                     <Trash2 className="h-3 w-3" />
                     <span className="hidden sm:inline">{lang === "zh" ? "清空" : "Clear"}</span>
+                  </button>
+                  <button onClick={() => setShowParamsMobile(true)} className="flex items-center gap-1 px-2 py-1 rounded-md text-[11px] text-muted-foreground hover:text-foreground hover:bg-muted transition-colors lg:hidden" title={lang === "zh" ? "参数设置" : "Parameters"}>
+                    <SlidersHorizontal className="h-3 w-3" />
+                    <span className="hidden sm:inline">{lang === "zh" ? "参数" : "Params"}</span>
                   </button>
                 </>
               )}
@@ -869,6 +874,42 @@ function PlaygroundContent() {
                 </div>
               )}
             </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Mobile Params Panel */}
+      <Sheet open={showParamsMobile} onOpenChange={setShowParamsMobile}>
+        <SheetContent side="right" className="w-80 sm:max-w-80">
+          <SheetHeader>
+            <SheetTitle className="flex items-center gap-2">
+              <SlidersHorizontal className="h-4 w-4" />
+              {lang === "zh" ? "参数设置" : "Parameters"}
+            </SheetTitle>
+          </SheetHeader>
+          <div className="mt-4 overflow-y-auto flex-1">
+            <ParamsPanel
+              models={models}
+              keys={keys}
+              selectedModel={selectedModel}
+              selectedKeyId={selectedKeyId}
+              endpoint={endpoint}
+              params={params}
+              systemPrompt={systemPrompt}
+              showAdvancedParams={showAdvancedParams}
+              modelCaps={modelCaps}
+              lang={lang}
+              t={t}
+              paramPresets={PARAM_PRESETS}
+              capEntries={capEntries}
+              onRefresh={handleRefresh}
+              onSelectModel={(id) => updateSession((s) => ({ ...s, selectedModel: id }))}
+              onSelectKey={(id) => updateSession((s) => ({ ...s, selectedKeyId: id }))}
+              onSetEndpoint={setEndpoint}
+              onUpdateParams={(updater) => updateSession((s) => ({ ...s, params: updater(s.params) }))}
+              onUpdateSystemPrompt={(value) => updateSession((s) => ({ ...s, systemPrompt: value }))}
+              onToggleAdvanced={() => setShowAdvancedParams(v => !v)}
+            />
           </div>
         </SheetContent>
       </Sheet>

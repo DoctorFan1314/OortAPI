@@ -468,12 +468,12 @@ export default function UsersPage() {
                       <input type="checkbox" checked={users.length > 0 && selectedIds.size === users.filter(u => u.id !== currentUser?.id).length} onChange={toggleSelectAll} className="rounded border-input" />
                     </th>
                     <th className="text-left py-3 px-4 text-muted-foreground font-medium">{t.email}</th>
-                    <th className="text-left py-3 px-4 text-muted-foreground font-medium">{t.username}</th>
+                    <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden md:table-cell">{t.username}</th>
                     <th className="text-center py-3 px-4 text-muted-foreground font-medium">{t.role}</th>
-                    <th className="text-center py-3 px-4 text-muted-foreground font-medium">{lang === "zh" ? "订阅" : "Plan"}</th>
+                    <th className="text-center py-3 px-4 text-muted-foreground font-medium hidden lg:table-cell">{lang === "zh" ? "订阅" : "Plan"}</th>
                     <th className="text-right py-3 px-4 text-muted-foreground font-medium">{t.balance}</th>
                     <th className="text-center py-3 px-4 text-muted-foreground font-medium">{t.status}</th>
-                    <th className="text-right py-3 px-4 text-muted-foreground font-medium">{t.registered}</th>
+                    <th className="text-right py-3 px-4 text-muted-foreground font-medium hidden lg:table-cell">{t.registered}</th>
                     <th className="text-right py-3 px-4 text-muted-foreground font-medium">{t.actions}</th>
                   </tr>
                 </thead>
@@ -486,14 +486,14 @@ export default function UsersPage() {
                         )}
                       </td>
                       <td className="py-3 px-4 font-mono text-xs">{u.email}</td>
-                      <td className="py-3 px-4">{u.username}</td>
+                      <td className="py-3 px-4 hidden md:table-cell">{u.username}</td>
                       <td className="py-3 px-4 text-center">
                         <Badge variant="secondary" className={u.role === "admin" ? "bg-yellow-500/10 text-yellow-500 border-yellow-500/20" : ""}>
                           {u.role === "admin" && <Shield className="h-3 w-3 mr-1" />}
                           {u.role}
                         </Badge>
                       </td>
-                      <td className="py-3 px-4 text-center">
+                      <td className="py-3 px-4 text-center hidden lg:table-cell">
                         {u.subscription ? (
                           <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
                             {u.subscription.plan_display_name}
@@ -508,7 +508,7 @@ export default function UsersPage() {
                           {u.enabled ? t.enabled : t.disabled}
                         </span>
                       </td>
-                      <td className="py-3 px-4 text-right text-xs text-muted-foreground">{new Date(u.created_at + "Z").toLocaleDateString()}</td>
+                      <td className="py-3 px-4 text-right text-xs text-muted-foreground hidden lg:table-cell">{new Date(u.created_at + "Z").toLocaleDateString()}</td>
                       <td className="py-3 px-4 text-right">
                         <div className="flex justify-end gap-1">
                           <Link href={`/dashboard/users/${u.id}`} className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors" title={lang === "zh" ? "查看详情" : "View details"} aria-label={lang === "zh" ? "查看详情" : "View details"}>
