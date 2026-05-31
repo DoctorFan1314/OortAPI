@@ -3,7 +3,7 @@
 import { Plus, Send, Loader2, Wrench, Image, X, Quote } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
-import type { ChatMessage, MessageContent } from "./chat-engine";
+import type { ChatMessage } from "./chat-engine";
 import { flatContent } from "./chat-engine";
 
 // ─── Types ─────────────────────────────────────────────────
