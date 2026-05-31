@@ -197,7 +197,6 @@ except openai.APIError as e:
               ]} />
             </div>
           </section>
-        </div>
       </div>
 
       {/* Success Response */}
