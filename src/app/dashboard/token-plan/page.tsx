@@ -9,7 +9,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { useToast } from "@/contexts/toast-context";
 import { AuthGuard } from "@/components/auth/auth-guard";
 import { SubscriptionCard } from "@/components/shared/subscription-card";
-import { Sparkles, XCircle, CheckCircle, AlertTriangle, Copy, CheckCheck, Key, Globe, Loader2, ChevronDown } from "lucide-react";
+import { Sparkles, XCircle, CheckCircle, AlertTriangle, Copy, CheckCheck, Key, Globe, Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 

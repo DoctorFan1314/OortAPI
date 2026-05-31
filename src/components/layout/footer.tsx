@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useI18n } from "@/contexts/i18n-context";
-import { StatusIndicator } from "@/components/layout/status-indicator";
 
 export function Footer() {
   const { t, lang } = useI18n();

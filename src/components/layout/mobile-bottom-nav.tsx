@@ -4,10 +4,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 import { useI18n } from "@/contexts/i18n-context";
-import { LayoutDashboard, Cpu, BookOpen, CreditCard, User } from "lucide-react";
+import { LayoutDashboard, Home, Cpu, BookOpen, User } from "lucide-react";
 
 const NAV_ITEMS = (user: boolean, lang: string) => [
-  { href: "/", label: lang === "zh" ? "首页" : "Home", icon: LayoutDashboard, exact: true },
+  { href: "/", label: lang === "zh" ? "首页" : "Home", icon: Home, exact: true },
   ...(user ? [{ href: "/dashboard", label: lang === "zh" ? "控制台" : "Dashboard", icon: LayoutDashboard, exact: false }] : []),
   { href: "/models", label: lang === "zh" ? "模型" : "Models", icon: Cpu, exact: false },
   { href: "/docs", label: lang === "zh" ? "文档" : "Docs", icon: BookOpen, exact: false },
@@ -18,10 +18,6 @@ export function MobileBottomNav() {
   const pathname = usePathname();
   const { user } = useAuth();
   const { lang } = useI18n();
-
-  // Only show on mobile
-  // Don't show on playground (full-screen view)
-  if (pathname.includes("/playground")) return null;
 
   const items = NAV_ITEMS(!!user, lang || "en").slice(0, 5);
 

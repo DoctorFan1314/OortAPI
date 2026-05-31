@@ -638,7 +638,6 @@ function PlaygroundContent() {
     sentMsgRef.current = text;
     updateSession((s) => ({ ...s, messages: [...s.messages, { role: "user", content: text, createdAt: nowHHMM() }] }));
     const firstMsgs = buildMessages();
-    const lastMsg = text;
     setMessage("");
     await sendWithTools(firstMsgs);
   }, [chatHistory, selectedModel, selectedKey?.key_value, isSending, endpoint]); // eslint-disable-line

@@ -318,7 +318,7 @@ export default function SettingsPage() {
                 <div className={`w-9 h-5 rounded-full transition-colors relative ${notifPrefs[item.key] ? "bg-primary" : "bg-muted/50 border border-border"}`}>
                   <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-all ${notifPrefs[item.key] ? "left-[18px]" : "left-[2px]"}`} />
                 </div>
-                <input type="checkbox" className="hidden" checked={notifPrefs[item.key]} onChange={() => setNotifPrefs(prev => ({ ...prev, [item.key]: !prev[item.key] }))} />
+                <input type="checkbox" className="sr-only" checked={notifPrefs[item.key]} onChange={() => setNotifPrefs(prev => ({ ...prev, [item.key]: !prev[item.key] }))} />
               </label>
             ))}
           </div>

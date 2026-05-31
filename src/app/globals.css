@@ -49,8 +49,6 @@
 }
 
 :root {
-  --z-dropdown: 50;
-  --z-overlay: 100;
   --z-toast: 110;
   --z-command: 120;
   /* Spotlight — set by JS on card mousemove */
@@ -297,13 +295,6 @@
   }
 
   /* ---------- Micro Typography ---------- */
-  .label-upper {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-weight: 500;
-    color: var(--muted-foreground);
-  }
   .font-mono-force {
     font-family: var(--font-geist-mono), "SFMono-Regular", "JetBrains Mono", ui-monospace, monospace !important;
   }
@@ -317,6 +308,7 @@
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
     }
     .glass-card-hover { transition: none; }
     .glass-card-hover:hover { transform: none; }
@@ -517,12 +509,3 @@ pre, code {
 .dark .playground-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.35); }.dark .playground-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.12); }
 .dark .playground-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.25); }
 
-/* ===== REDUCED MOTION ===== */
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}

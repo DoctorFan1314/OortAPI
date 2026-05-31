@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 import {
   Plus, Pencil, Trash2, Save, Loader2,
   Link as LinkIcon, Unlink, Users, DollarSign,
-  TrendingUp, Star, Crown, Zap, Shield, Sparkles, Diamond,
+  TrendingUp, Star, Crown, Zap, Sparkles,
 } from "lucide-react";
 
 interface Plan {
