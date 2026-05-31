@@ -2,12 +2,17 @@
 
 import { useI18n } from "@/contexts/i18n-context";
 import { useCurrency } from "@/contexts/currency-context";
+import { useTheme } from "@/contexts/theme-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { useEffect, useState, useMemo } from "react";
 import { useParams } from "next/navigation";
-import { Activity, Coins, DollarSign, Key, Shield, TrendingUp, User, Clock } from "lucide-react";
+import { Activity, Coins, DollarSign, Key, Shield, TrendingUp, User, Clock, ArrowLeft, Pencil } from "lucide-react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
+
+const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false });
 
 interface UserDetail {
   id: number;
@@ -126,9 +131,11 @@ const LABELS = {
 export default function UserDetailPage() {
   const { lang } = useI18n();
   const { formatPrice } = useCurrency();
+  const { resolvedTheme } = useTheme();
   const t = LABELS[lang];
   const params = useParams();
   const userId = params.id as string;
+  const isDark = resolvedTheme === "dark";
 
   const [user, setUser] = useState<UserDetail | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
@@ -178,12 +185,27 @@ export default function UserDetailPage() {
 
   const maxCalls = Math.max(...trend.map(d => d.calls), 1);
 
+  const trendChartOption = useMemo(() => {
+    if (trend.length === 0) return null;
+    return {
+      tooltip: { trigger: "axis" as const, backgroundColor: isDark ? "#1c2333" : "#fff", borderColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)", textStyle: { color: isDark ? "#e6edf3" : "#1a1a2e", fontSize: 12 } },
+      grid: { left: 40, right: 20, top: 10, bottom: 30 },
+      xAxis: { type: "category" as const, data: trend.map(d => d.day.slice(5)), axisLabel: { color: isDark ? "#8b949e" : "#64748b", fontSize: 11 }, axisLine: { lineStyle: { color: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)" } } },
+      yAxis: [
+        { type: "value" as const, name: t.calls, nameTextStyle: { color: isDark ? "#8b949e" : "#64748b", fontSize: 11 }, axisLabel: { color: isDark ? "#8b949e" : "#64748b", fontSize: 11 }, splitLine: { lineStyle: { color: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)" } } },
+      ],
+      series: [
+        { name: t.calls, type: "bar", data: trend.map(d => d.calls), itemStyle: { color: "#0891b2", borderRadius: [2, 2, 0, 0] }, barMaxWidth: 20 },
+      ],
+    };
+  }, [trend, isDark, t.calls]);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <Link href="/dashboard/users" className="text-xs text-muted-foreground hover:text-foreground mb-1 inline-block">
-            &larr; {t.back}
+          <Link href="/dashboard/users" className="text-xs text-muted-foreground hover:text-foreground mb-1 inline-flex items-center gap-1">
+            <ArrowLeft className="h-3 w-3" /> {t.back}
           </Link>
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <User className="h-6 w-6" />
@@ -198,6 +220,12 @@ export default function UserDetailPage() {
             {t.registered}: {new Date(user.created_at + "Z").toLocaleDateString()} · {t.status}: {user.enabled ? t.enabled : t.disabled}
           </p>
         </div>
+        <Link href={`/dashboard/users`}>
+          <Button variant="outline" size="sm">
+            <Pencil className="h-3.5 w-3.5 mr-1" />
+            {lang === "zh" ? "编辑" : "Edit"}
+          </Button>
+        </Link>
       </div>
 
       {/* Stats cards */}
@@ -268,24 +296,10 @@ export default function UserDetailPage() {
             <CardTitle className="text-sm">{t.trend7d}</CardTitle>
           </CardHeader>
           <CardContent>
-            {trend.length === 0 ? (
-              <p className="text-sm text-muted-foreground">-</p>
+            {trendChartOption ? (
+              <ReactECharts option={trendChartOption} style={{ height: 200 }} opts={{ renderer: "svg" }} />
             ) : (
-              <div className="space-y-1">
-                {trend.map((d) => (
-                  <div key={d.day} className="flex items-center gap-2 text-xs">
-                    <span className="w-20 text-muted-foreground">{d.day}</span>
-                    <div className="flex-1 h-4 bg-muted rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-primary/60 rounded-full"
-                        style={{ width: `${(d.calls / maxCalls) * 100}%` }}
-                      />
-                    </div>
-                    <span className="w-12 text-right font-mono">{d.calls}</span>
-                    <span className="w-16 text-right font-mono text-muted-foreground">{formatPrice(d.cost)}</span>
-                  </div>
-                ))}
-              </div>
+              <p className="text-sm text-muted-foreground">-</p>
             )}
           </CardContent>
         </Card>

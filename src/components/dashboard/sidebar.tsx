@@ -10,6 +10,7 @@ import {
   LayoutDashboard, Key, BarChart3, Wallet, Radio,
   Settings, Users, Gift, Percent, Sparkles, ListChecks,
   ChevronDown, FileText, Webhook, Activity, Play,
+  Cpu, GitBranch,
 } from "lucide-react";
 import useSWR from "swr";
 import { dashboardSWRConfig } from "@/lib/swr-fetcher";
@@ -56,6 +57,8 @@ const GROUPS: NavGroup[] = [
       { href: "/dashboard/admin/audit", icon: FileText, labelKey: "audit", adminOnly: true },
       { href: "/dashboard/admin/monitor", icon: Activity, labelKey: "monitor", adminOnly: true },
       { href: "/dashboard/admin/webhooks", icon: Webhook, labelKey: "webhooks", adminOnly: true },
+      { href: "/dashboard/admin/models", icon: Cpu, labelKey: "modelManage", adminOnly: true },
+      { href: "/dashboard/admin/routing", icon: GitBranch, labelKey: "routing", adminOnly: true },
     ],
   },
 ];
@@ -82,6 +85,8 @@ const LABELS: Record<string, { zh: string; en: string }> = {
   audit: { zh: "审计日志", en: "Audit Logs" },
   monitor: { zh: "系统监控", en: "System Monitor" },
   webhooks: { zh: "Webhook", en: "Webhooks" },
+  modelManage: { zh: "模型管理", en: "Model Management" },
+  routing: { zh: "智能路由", en: "Smart Routing" },
   playground: { zh: "API 测试", en: "API Playground" },
   settings: { zh: "设置", en: "Settings" },
 };
