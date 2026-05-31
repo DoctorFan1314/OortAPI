@@ -23,17 +23,18 @@ function SchemaSection({ title, children }: { title: string; children: React.Rea
   );
 }
 
-function ParamTable({ params }: { params: { name: string; type: string; required: boolean; desc: string }[] }) {
+function ParamTable({ params }: { params: { name: string; type: string; required: boolean; desc: string; default?: string }[] }) {
   return (
     <div className="rounded-lg border border-border/30 overflow-hidden text-xs mb-3">
-      <div className="grid grid-cols-[1fr_5rem_4rem_1fr] gap-2 px-3 py-2 bg-muted/10 font-semibold text-muted-foreground uppercase tracking-wider border-b border-border/20">
-        <span>Name</span><span>Type</span><span>Req.</span><span>Description</span>
+      <div className="grid grid-cols-[1fr_5rem_4rem_5rem_1fr] gap-2 px-3 py-2 bg-muted/10 font-semibold text-muted-foreground uppercase tracking-wider border-b border-border/20">
+        <span>Name</span><span>Type</span><span>Req.</span><span>Default</span><span>Description</span>
       </div>
       {params.map((p) => (
-        <div key={p.name} className="grid grid-cols-[1fr_5rem_4rem_1fr] gap-2 px-3 py-2 border-b border-border/10 last:border-b-0">
+        <div key={p.name} className="grid grid-cols-[1fr_5rem_4rem_5rem_1fr] gap-2 px-3 py-2 border-b border-border/10 last:border-b-0">
           <code className="font-mono text-emerald-500">{p.name}</code>
           <span className="text-sky-400 font-mono">{p.type}</span>
           <span>{p.required ? <span className="text-amber-400">Yes</span> : <span className="text-muted-foreground">No</span>}</span>
+          <span className="text-muted-foreground font-mono">{p.default ?? "—"}</span>
           <span className="text-muted-foreground">{p.desc}</span>
         </div>
       ))}
@@ -114,9 +115,9 @@ export default function EndpointsPage() {
           <ParamTable params={[
             { name: "model", type: "string", required: true, desc: lang === "zh" ? "模型 ID，如 gpt-4o" : "Model ID, e.g. gpt-4o" },
             { name: "messages", type: "array", required: true, desc: lang === "zh" ? "消息数组，包含 role 和 content" : "Array of message objects with role and content" },
-            { name: "temperature", type: "number", required: false, desc: lang === "zh" ? "采样温度 0-2，默认 1" : "Sampling temperature 0-2, default 1" },
+            { name: "temperature", type: "number", required: false, default: "1", desc: lang === "zh" ? "采样温度 0-2" : "Sampling temperature 0-2" },
             { name: "max_tokens", type: "integer", required: false, desc: lang === "zh" ? "最大输出 token 数" : "Maximum tokens to generate" },
-            { name: "stream", type: "boolean", required: false, desc: lang === "zh" ? "是否启用流式输出，默认 false" : "Enable streaming, default false" },
+            { name: "stream", type: "boolean", required: false, default: "false", desc: lang === "zh" ? "是否启用流式输出" : "Enable streaming" },
             { name: "tools", type: "array", required: false, desc: lang === "zh" ? "工具/函数定义数组" : "Array of tool/function definitions" },
             { name: "response_format", type: "object", required: false, desc: lang === "zh" ? '输出格式，如 {"type":"json_object"}' : 'Output format, e.g. {"type":"json_object"}' },
           ]} />
@@ -159,8 +160,8 @@ export default function EndpointsPage() {
             { name: "messages", type: "array", required: true, desc: lang === "zh" ? "消息数组" : "Array of message objects" },
             { name: "max_tokens", type: "integer", required: true, desc: lang === "zh" ? "最大输出 token 数（必填）" : "Maximum tokens to generate (required)" },
             { name: "system", type: "string", required: false, desc: lang === "zh" ? "系统提示词" : "System prompt" },
-            { name: "temperature", type: "number", required: false, desc: lang === "zh" ? "采样温度 0-1" : "Sampling temperature 0-1" },
-            { name: "stream", type: "boolean", required: false, desc: lang === "zh" ? "是否启用流式输出" : "Enable streaming" },
+            { name: "temperature", type: "number", required: false, default: "1.0", desc: lang === "zh" ? "采样温度 0-1" : "Sampling temperature 0-1" },
+            { name: "stream", type: "boolean", required: false, default: "false", desc: lang === "zh" ? "是否启用流式输出" : "Enable streaming" },
           ]} />
           <CodeBlock code={curlMessages} />
         </SchemaSection>
@@ -198,6 +199,23 @@ export default function EndpointsPage() {
           ]} />
           <CodeBlock code={curlEmbeddings} />
         </SchemaSection>
+        <SchemaSection title={lang === "zh" ? "响应示例" : "Response Example"}>
+          <CodeBlock code={`{
+  "object": "list",
+  "data": [
+    {
+      "object": "embedding",
+      "embedding": [0.0023, -0.0091, 0.0157, ...],
+      "index": 0
+    }
+  ],
+  "model": "text-embedding-3-small",
+  "usage": {
+    "prompt_tokens": 8,
+    "total_tokens": 8
+  }
+}`} />
+        </SchemaSection>
 
         <div className="border-t border-border/20" />
         <EndpointRow method="POST" path="/api/v1/images/generations" description={L.imageGen} />
@@ -205,16 +223,40 @@ export default function EndpointsPage() {
           <ParamTable params={[
             { name: "model", type: "string", required: true, desc: lang === "zh" ? "图像模型，如 dall-e-3" : "Image model, e.g. dall-e-3" },
             { name: "prompt", type: "string", required: true, desc: lang === "zh" ? "图像描述" : "Image description" },
-            { name: "n", type: "integer", required: false, desc: lang === "zh" ? "生成数量，默认 1" : "Number of images, default 1" },
-            { name: "size", type: "string", required: false, desc: lang === "zh" ? "尺寸，如 1024x1024" : "Size, e.g. 1024x1024" },
+            { name: "n", type: "integer", required: false, default: "1", desc: lang === "zh" ? "生成数量" : "Number of images" },
+            { name: "size", type: "string", required: false, default: "1024x1024", desc: lang === "zh" ? "尺寸，如 1024x1024" : "Size, e.g. 1024x1024" },
           ]} />
           <CodeBlock code={curlImages} />
+        </SchemaSection>
+        <SchemaSection title={lang === "zh" ? "响应示例" : "Response Example"}>
+          <CodeBlock code={`{
+  "created": 1700000000,
+  "data": [
+    {
+      "url": "https://...",
+      "revised_prompt": "..."
+    }
+  ]
+}`} />
         </SchemaSection>
 
         <div className="border-t border-border/20" />
         <EndpointRow method="GET" path="/api/v1/models" description={L.modelList} />
         <SchemaSection title={lang === "zh" ? "示例" : "Example"}>
           <CodeBlock code={curlModels} />
+        </SchemaSection>
+        <SchemaSection title={lang === "zh" ? "响应示例" : "Response Example"}>
+          <CodeBlock code={`{
+  "object": "list",
+  "data": [
+    {
+      "id": "gpt-4o",
+      "object": "model",
+      "created": 1700000000,
+      "owned_by": "openai"
+    }
+  ]
+}`} />
         </SchemaSection>
       </div>
 

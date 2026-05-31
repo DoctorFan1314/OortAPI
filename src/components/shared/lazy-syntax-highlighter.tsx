@@ -31,7 +31,14 @@ SyntaxHighlighter.registerLanguage("java", java);
 SyntaxHighlighter.registerLanguage("go", go);
 SyntaxHighlighter.registerLanguage("rust", rust);
 
-export default function LazySyntaxHighlighter({ code, language }: { code: string; language: string }) {
+interface LazySyntaxHighlighterProps {
+  code: string;
+  language: string;
+  showLineNumbers?: boolean;
+  highlightLines?: number[];
+}
+
+export default function LazySyntaxHighlighter({ code, language, showLineNumbers = false, highlightLines }: LazySyntaxHighlighterProps) {
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
@@ -45,8 +52,24 @@ export default function LazySyntaxHighlighter({ code, language }: { code: string
 
   const selectedTheme = isDark ? codeTheme : lightCodeTheme;
 
+  const lineProps = (lineNumber: number) => {
+    const style: React.CSSProperties = {};
+    if (highlightLines?.includes(lineNumber)) {
+      style.backgroundColor = isDark ? "rgba(0, 212, 255, 0.06)" : "rgba(8, 145, 178, 0.06)";
+      style.display = "block";
+    }
+    return { style };
+  };
+
   return (
-    <SyntaxHighlighter language={language || "text"} style={selectedTheme} customStyle={{ margin: 0, fontSize: "0.875rem" }}>
+    <SyntaxHighlighter
+      language={language || "text"}
+      style={selectedTheme}
+      customStyle={{ margin: 0, fontSize: "0.875rem" }}
+      showLineNumbers={showLineNumbers}
+      lineNumberStyle={{ minWidth: "2.5em", paddingRight: "1em", opacity: 0.4, textAlign: "right", userSelect: "none" }}
+      lineProps={lineProps}
+    >
       {code}
     </SyntaxHighlighter>
   );

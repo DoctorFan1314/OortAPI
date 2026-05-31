@@ -99,6 +99,11 @@
   --glow-purple: rgba(139, 92, 246, 0.1);
   --spotlight-color: rgba(8, 145, 178, 0.08);
   --noise-opacity: 0.02;
+  --code-bg: #f6f8fa;
+  --code-border: rgba(0, 0, 0, 0.08);
+  --code-foreground: #1a1a2e;
+  --code-inline-bg: rgba(0, 0, 0, 0.05);
+  --docs-content-max-width: 56rem;
   /* Plan card gradients */
   --plan-spark-from: #667eea;
   --plan-spark-to: #764ba2;
@@ -151,6 +156,11 @@
   --glow-purple: rgba(139, 92, 246, 0.06);
   --spotlight-color: rgba(0, 212, 255, 0.1);
   --noise-opacity: 0.025;
+  --code-bg: #161b20;
+  --code-border: rgba(255, 255, 255, 0.08);
+  --code-foreground: #e6edf3;
+  --code-inline-bg: rgba(255, 255, 255, 0.08);
+  --docs-content-max-width: 56rem;
   /* Plan card gradients */
   --plan-spark-from: #7b8ff7;
   --plan-spark-to: #8b5cf6;

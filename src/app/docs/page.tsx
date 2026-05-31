@@ -42,7 +42,7 @@ const cards: DocCard[] = [
 
 function DocCard({ href, icon: Icon, label, desc }: { href: string; icon: typeof Zap; label: string; desc: string }) {
   return (
-    <Link href={href} className="glass-card backdrop-blur-sm p-5 rounded-xl border border-border/50 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 hover:bg-muted/30 transition-all duration-300 group">
+    <Link href={href} className="glass-card glass-card-hover backdrop-blur-sm p-5 rounded-xl border border-border/50 hover:border-primary/40 transition-all duration-300 group">
       <Icon className="h-5 w-5 text-primary mb-3" />
       <h3 className="font-semibold text-sm mb-1">{label}</h3>
       <p className="text-xs text-muted-foreground">{desc}</p>
@@ -65,12 +65,12 @@ export default function DocsLandingPage() {
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-purple-500/10 pointer-events-none" />
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: "radial-gradient(circle, var(--foreground) 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
         <div className="relative z-10 text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium mb-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium mb-6 hero-animate-1">
             <Sparkles className="h-3 w-3" />
             {lang === "zh" ? "OpenAI + Anthropic 双协议兼容 · 一个 Key 聚合所有 AI 服务" : "OpenAI + Anthropic Dual Protocol · One Key for All AI Services"}
           </div>
-          <h1 className="text-3xl lg:text-4xl font-bold tracking-tight mb-3">{L.title}</h1>
-          <p className="text-base text-muted-foreground max-w-2xl mx-auto mb-6">{L.subtitle}</p>
+          <h1 className="text-3xl lg:text-4xl font-bold tracking-tight mb-3 hero-animate-2">{L.title}</h1>
+          <p className="text-base text-muted-foreground max-w-2xl mx-auto mb-6 hero-animate-3">{L.subtitle}</p>
 
           {/* Quick stat badges */}
           <div className="flex flex-wrap justify-center gap-3 mb-8">
@@ -194,7 +194,7 @@ export default function DocsLandingPage() {
             {lang === "zh" ? "常见问题" : "FAQ"}
           </Link>
           <a
-            href="https://github.com/anthropics/claude-code/issues"
+            href="https://github.com/DoctorFan1314/OortAPI/issues"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border/50 text-sm font-medium hover:bg-muted/30 transition-colors"
