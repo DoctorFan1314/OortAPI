@@ -306,8 +306,7 @@ export default function UsagePage() {
           total_credits_used: d.total_credits_used || 0,
         });
         const trend = d.daily_trend || [];
-        [...trend].reverse(); // API returns DESC (LIMIT 60), frontend expects ASC
-        setDailyTrend(trend);
+        setDailyTrend([...trend].reverse()); // API returns DESC (LIMIT 60), frontend expects ASC
         setModelStats(d.model_stats || []);
         setLoading(false);
       })

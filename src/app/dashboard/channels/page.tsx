@@ -4,7 +4,8 @@ import { useI18n } from "@/contexts/i18n-context";
 import { ChannelCard } from "@/components/dashboard/channel-card";
 import { Card, CardContent } from "@/components/ui/card";
 import { Activity, CheckCircle, AlertTriangle, XCircle } from "lucide-react";
-import { useEffect, useState } from "react";
+import useSWR from "swr";
+import { dashboardSWRConfig } from "@/lib/swr-fetcher";
 
 interface HealthSummary {
   channel_id: number;
@@ -42,18 +43,12 @@ const LABELS = {
 export default function ChannelsPage() {
   const { lang } = useI18n();
   const t = LABELS[lang];
-  const [health, setHealth] = useState<HealthSummary[]>([]);
-  const [healthError, setHealthError] = useState(false);
-  const [healthLoading, setHealthLoading] = useState(true);
+  const { data: healthData, error: healthError, isLoading: healthLoading, mutate: refreshHealth } = useSWR<{ health: HealthSummary[] }>(
+    "/api/dashboard/channels?action=health",
+    dashboardSWRConfig
+  );
 
-  useEffect(() => {
-    fetch("/api/dashboard/channels?action=health", { credentials: "include" })
-      .then(r => r.json())
-      .then(d => { setHealth(d.health || []); setHealthError(false); })
-      .catch(() => setHealthError(true))
-      .finally(() => setHealthLoading(false));
-  }, []);
-
+  const health = healthData?.health || [];
   const totalChannels = health.length;
   const onlineCount = health.filter(h => h.status === "online").length;
   const offlineCount = health.filter(h => h.status === "offline").length;
@@ -93,7 +88,7 @@ export default function ChannelsPage() {
           <CardContent className="p-4 text-center">
             <AlertTriangle className="h-5 w-5 text-destructive mx-auto mb-1" />
             <p className="text-sm text-muted-foreground">{lang === "zh" ? "健康数据加载失败" : "Failed to load health data"}</p>
-            <button onClick={() => { setHealthLoading(true); setHealthError(false); fetch("/api/dashboard/channels?action=health", { credentials: "include" }).then(r => r.json()).then(d => { setHealth(d.health || []); setHealthError(false); }).catch(() => setHealthError(true)).finally(() => setHealthLoading(false)); }} className="text-xs text-primary hover:underline mt-1">{lang === "zh" ? "重试" : "Retry"}</button>
+            <button onClick={() => refreshHealth()} className="text-xs text-primary hover:underline mt-1">{lang === "zh" ? "重试" : "Retry"}</button>
           </CardContent>
         </Card>
       ) : totalChannels > 0 ? (

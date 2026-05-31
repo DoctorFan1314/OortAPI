@@ -64,6 +64,8 @@ const LABELS = {
     lastStatus: "状态码",
     never: "从未",
     deliveryLogs: "投递日志",
+    copySecret: "复制 Secret",
+    secretCopied: "Secret 已复制",
   },
   en: {
     title: "Webhook Management",
@@ -93,6 +95,8 @@ const LABELS = {
     lastStatus: "Status",
     never: "Never",
     deliveryLogs: "Delivery Logs",
+    copySecret: "Copy Secret",
+    secretCopied: "Secret copied",
   },
 };
 
@@ -331,7 +335,7 @@ export default function WebhooksPage() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>{t.deliveryLogs}</DialogTitle>
-            <DialogDescription>{logTarget?.url}</DialogDescription>
+            <DialogDescription className="font-mono text-xs break-all">{logTarget?.url}</DialogDescription>
           </DialogHeader>
           {logTarget && (
             <div className="space-y-3 py-2">
@@ -346,9 +350,34 @@ export default function WebhooksPage() {
                   {logTarget.last_status_code && (logTarget.last_status_code >= 200 && logTarget.last_status_code < 300 ? " ✓" : " ✗")}
                 </span>
               </div>
-              <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border">
+              <div className="p-3 rounded-lg bg-muted/30 border border-border space-y-2">
                 <span className="text-xs text-muted-foreground">{t.events}</span>
-                <span className="text-xs text-foreground">{logTarget.events}</span>
+                <div className="flex flex-wrap gap-1">
+                  {logTarget.events.split(",").map(e => (
+                    <span key={e} className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary font-mono">{e.trim()}</span>
+                  ))}
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => testWebhook(logTarget.id)}
+                  disabled={testing === logTarget.id}
+                  className="flex-1"
+                >
+                  <Send className="h-3 w-3 mr-1" />
+                  {testing === logTarget.id ? (lang === "zh" ? "发送中..." : "Sending...") : t.test}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => { navigator.clipboard.writeText(logTarget.secret); showToast(t.secretCopied, "success"); }}
+                  className="flex-1"
+                >
+                  <Copy className="h-3 w-3 mr-1" />
+                  {t.copySecret}
+                </Button>
               </div>
             </div>
           )}

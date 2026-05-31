@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useToast } from "@/contexts/toast-context";
 import { Loader2, Settings, Download, Upload, Wallet, Search, Bell } from "lucide-react";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
@@ -35,6 +35,19 @@ export default function SettingsPage() {
   const [confirmExchangeOpen, setConfirmExchangeOpen] = useState(false);
   const [settingsSearch, setSettingsSearch] = useState("");
   const [notifPrefs, setNotifPrefs] = useState<Record<string, boolean>>({ budget: true, key_expiry: true, sub_expiry: true, usage_spike: false });
+  const [notifPrefsLoaded, setNotifPrefsLoaded] = useState(false);
+
+  // Search filtering helpers
+  const searchLower = settingsSearch.toLowerCase().trim();
+  const matchSearch = (...texts: string[]) =>
+    !searchLower || texts.some(t => t.toLowerCase().includes(searchLower));
+
+  const sectionMeta = {
+    baseUrl: { zh: ["接入地址", "API 端点", "复制"], en: ["Base URL", "API Endpoint", "Copy"] },
+    budget: { zh: ["预算管理", "月度预算上限", "预算提醒"], en: ["Budget Management", "Monthly Budget Limit", "Budget Alert"] },
+    notif: { zh: ["通知偏好", "预算超限", "Key 即将过期", "套餐到期", "用量异常"], en: ["Notification Preferences", "Budget Exceeded", "Key Expiring", "Plan Expiring", "Usage Spike"] },
+    system: { zh: ["系统设置", "时区", "默认货币", "汇率"], en: ["System Settings", "Timezone", "Default Currency", "Exchange Rate"] },
+  };
 
   const budgetLimit = monthlyBudget ? parseFloat(monthlyBudget) : savedBudget;
   const budgetPercent = budgetLimit > 0 ? (currentSpend / budgetLimit) * 100 : 0;
@@ -53,8 +66,12 @@ export default function SettingsPage() {
         if (d.preferences?.monthly_budget) {
           setMonthlyBudget(String(d.preferences.monthly_budget));
         }
+        if (d.preferences?.notification_preferences) {
+          setNotifPrefs(prev => ({ ...prev, ...d.preferences.notification_preferences }));
+        }
+        setNotifPrefsLoaded(true);
       })
-      .catch(() => {});
+      .catch(() => { setNotifPrefsLoaded(true); });
     // Fetch current month spending
     const now = new Date();
     const from = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
@@ -81,6 +98,7 @@ export default function SettingsPage() {
 
   // Auto-save budget with 2s debounce
   const budgetTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const notifPrefsTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   useEffect(() => {
     if (!monthlyBudget || monthlyBudget === String(savedBudget)) { setAutoSaveStatus("saved"); return; }
     setAutoSaveStatus("unsaved");
@@ -91,6 +109,37 @@ export default function SettingsPage() {
     }, 2000);
     return () => clearTimeout(budgetTimerRef.current);
   }, [monthlyBudget]);
+
+  // Notification prefs: debounced save with 2s delay
+  const notifPrefsRef = useRef(notifPrefs);
+  notifPrefsRef.current = notifPrefs;
+
+  const handleSaveNotifPrefs = useCallback(async (prefs: Record<string, boolean>) => {
+    try {
+      const res = await fetch("/api/dashboard/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ notificationPreferences: prefs }),
+      });
+      if (res.ok) {
+        showToast(lang === "zh" ? "通知偏好已保存" : "Notification preferences saved", "success");
+      } else {
+        showToast(lang === "zh" ? "通知偏好保存失败" : "Failed to save notification preferences", "error");
+      }
+    } catch {
+      showToast(lang === "zh" ? "网络错误" : "Network error", "error");
+    }
+  }, [lang, showToast]);
+
+  useEffect(() => {
+    if (!notifPrefsLoaded) return;
+    clearTimeout(notifPrefsTimerRef.current);
+    notifPrefsTimerRef.current = setTimeout(() => {
+      handleSaveNotifPrefs(notifPrefsRef.current);
+    }, 2000);
+    return () => clearTimeout(notifPrefsTimerRef.current);
+  }, [notifPrefs, notifPrefsLoaded, handleSaveNotifPrefs]);
 
   const handleSaveSystem = async () => {
     if (exchangeRate !== initialExchangeRate) {
@@ -164,6 +213,7 @@ export default function SettingsPage() {
         />
       </div>
 
+      {matchSearch(...sectionMeta.baseUrl[lang]) && (
       <Card className="glass-card">
         <CardHeader>
           <CardTitle className="text-lg">{lang === "zh" ? "接入地址" : "Base URL"}</CardTitle>
@@ -177,8 +227,10 @@ export default function SettingsPage() {
           </div>
         </CardContent>
       </Card>
+      )}
 
       {/* Budget Management */}
+      {matchSearch(...sectionMeta.budget[lang]) && (
       <Card className="glass-card">
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
@@ -239,8 +291,10 @@ export default function SettingsPage() {
           </Button>
         </CardContent>
       </Card>
+      )}
 
       {/* Notification Preferences */}
+      {matchSearch(...sectionMeta.notif[lang]) && (
       <Card className="glass-card">
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
@@ -270,9 +324,10 @@ export default function SettingsPage() {
           </div>
         </CardContent>
       </Card>
+      )}
 
       {/* System Settings (Admin only) */}
-      {user?.role === "admin" && (
+      {user?.role === "admin" && matchSearch(...sectionMeta.system[lang]) && (
         <Card className="glass-card">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">

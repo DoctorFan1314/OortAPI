@@ -10,11 +10,15 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useAuth } from "@/contexts/auth-context";
 import { useToast } from "@/contexts/toast-context";
-import { Wallet, Plus, Gift, Loader2, RefreshCw, TrendingUp, Calendar } from "lucide-react";
-import { useState } from "react";
+import { Wallet, Plus, Gift, Loader2, RefreshCw, TrendingUp, Calendar, BarChart3 } from "lucide-react";
+import { useState, useMemo } from "react";
 import useSWR from "swr";
+import dynamic from "next/dynamic";
+import { useTheme } from "@/contexts/theme-context";
 import { DeltaBadge } from "@/components/shared/delta-badge";
 import { dashboardSWRConfig } from "@/lib/swr-fetcher";
+
+const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false });
 
 interface UsageAggregate {
   total_cost: number;
@@ -32,6 +36,7 @@ export default function BillingPage() {
   const { currency, setCurrency, symbol, exchangeRate, formatPrice } = useCurrency();
   const { user, refreshUser } = useAuth();
   const { toast } = useToast();
+  const { resolvedTheme } = useTheme();
   const t = LABELS[lang];
   const [redeemOpen, setRedeemOpen] = useState(false);
   const [redeemCode, setRedeemCode] = useState("");
@@ -89,6 +94,80 @@ export default function BillingPage() {
   const daysPassed = now.getDate();
   const projectedCost = daysPassed > 0 ? (thisMonthCost / daysPassed) * daysInMonth : 0;
   const costDelta = lastMonthCost > 0 ? ((thisMonthCost - lastMonthCost) / lastMonthCost * 100).toFixed(1) : null;
+
+  // 30-day daily cost trend
+  const thirtyDaysAgo = new Date(now.getTime() - 30 * 86400000).toISOString().slice(0, 10);
+  const today = now.toISOString().slice(0, 10);
+  const { data: dailyUsageData } = useSWR<{ data?: Array<{ cost: number; created_at: string }> }>(
+    `/api/v1/billing/usage?from=${thirtyDaysAgo}&to=${today}&limit=10000`,
+    dashboardSWRConfig,
+  );
+
+  // Aggregate individual log entries into daily cost totals
+  const dailyCostTrend = useMemo(() => {
+    const logs = dailyUsageData?.data;
+    if (!logs || logs.length === 0) return null;
+    const dayMap: Record<string, number> = {};
+    logs.forEach((log) => {
+      const day = log.created_at.slice(0, 10);
+      dayMap[day] = (dayMap[day] || 0) + (log.cost || 0);
+    });
+    const entries = Object.entries(dayMap)
+      .map(([date, cost]) => ({ date, cost: +(cost * exchangeRate).toFixed(4) }))
+      .sort((a, b) => a.date.localeCompare(b.date));
+    return entries.length > 0 ? entries : null;
+  }, [dailyUsageData, exchangeRate]);
+
+  // ECharts option for 30-day spending trend
+  const trendChartOption = useMemo(() => {
+    if (!dailyCostTrend) return null;
+    const dates = dailyCostTrend.map((d) => d.date);
+    const values = dailyCostTrend.map((d) => d.cost);
+    const isDark = resolvedTheme === "dark";
+    return {
+      tooltip: {
+        trigger: "axis" as const,
+        backgroundColor: isDark ? "#1e1e2e" : "#ffffff",
+        borderColor: isDark ? "#333" : "#e5e7eb",
+        textStyle: { color: isDark ? "#e0e0e0" : "#1a1a1a", fontSize: 12 },
+        formatter: (params: { axisValue: string; value: number }[]) => {
+          const p = params[0];
+          return `${p.axisValue}<br/>${symbol}${p.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}`;
+        },
+      },
+      grid: { left: 55, right: 16, top: 10, bottom: 28 },
+      xAxis: {
+        type: "category" as const,
+        data: dates,
+        axisLabel: {
+          fontSize: 11,
+          color: isDark ? "#999" : "#666",
+          formatter: (v: string) => v.slice(5),
+        },
+        axisLine: { lineStyle: { color: isDark ? "#444" : "#d1d5db" } },
+      },
+      yAxis: {
+        type: "value" as const,
+        axisLabel: {
+          fontSize: 11,
+          color: isDark ? "#999" : "#666",
+          formatter: (v: number) => symbol + (v >= 1000 ? (v / 1000).toFixed(0) + "k" : String(v)),
+        },
+        splitLine: { lineStyle: { color: isDark ? "#333" : "#e5e7eb" } },
+      },
+      series: [
+        {
+          type: "bar" as const,
+          data: values,
+          itemStyle: {
+            color: "#8b5cf6",
+            borderRadius: [4, 4, 0, 0],
+          },
+          barMaxWidth: 28,
+        },
+      ],
+    };
+  }, [dailyCostTrend, resolvedTheme, symbol]);
 
   const [showRedeemTooltip, setShowRedeemTooltip] = useState(false);
 
@@ -182,6 +261,21 @@ export default function BillingPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* 30-Day Spending Trend */}
+      {trendChartOption && (
+        <Card className="glass-card">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm flex items-center gap-2">
+              <BarChart3 className="h-4 w-4" />
+              {lang === "zh" ? "最近 30 天消费趋势" : "30-Day Spending Trend"}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <ReactECharts option={trendChartOption} style={{ height: 220 }} opts={{ renderer: "svg" }} />
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid md:grid-cols-3 gap-4">
         <Card className="glass-card flex flex-col">
