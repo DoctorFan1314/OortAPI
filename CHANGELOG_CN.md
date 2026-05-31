@@ -12,18 +12,40 @@
 
 #### 大改进
 - **M1: 导航栏 i18n** — 所有内联 `lang === "zh"` 三元表达式替换为 `t.common.*`、`t.dashboard.*` 键
+- **M2: 测试场页面拆分** — 提取 `SessionSidebar` 和 `ParamsPanel` 组件，从 1153 行减至 1122 行
 - **M3: 错误边界** — 新增 `ErrorBoundary` 组件包裹 Dashboard 布局，防止组件报错导致整页白屏
 - **M4: 测试场正则 Bug** — `/s+/` → `/\s+/`，修复 TPS 计算（之前按字面 's' 分割）
 - **M7: localStorage 防抖** — 500ms 防抖防止流式响应期间的高频写入
 - **M8: 登录/注册 i18n** — 验证消息使用 `t.auth.*` 键，Logo `alt="OortAPI"`
 - **M9: 共享认证工具** — `safeReturnUrl()` 提取到 `src/lib/auth-utils.ts`
+- **M10: AI 工具页完善** — 全部 8 个工具添加 configCode，i18n 修复
 - **控制台 i18n** — 所有内联三元替换为 `dict.dashboard.*` 键
 
 #### 小改进
+- **测试场 i18n** — 内联三元替换为 LABELS 键（newChat、inputMessage、advanced、toolCallsFailing 等）
+- **API Keys 页面** — 标题使用 `t.dashboard.apiKeys`
+- **Navbar aria-labels** — 全部替换为 `t.common.*` 键
+- **Dashboard 进度条** — 添加 ARIA 属性（role、aria-valuenow/min/max）
+- **Dashboard onboardProgress** — useMemo 缓存，之前每次渲染调用 3 次
+- **MCP 广场侧边栏** — 移动端可折叠（`<details>` 元素）
+- **测试场清空确认** — ConfirmDialog 确认清空对话
+- **资源中心 Ctrl+K** — 键盘快捷键聚焦搜索框
+- **测试场 / Escape** — 快捷键聚焦输入框
+- **Navbar 登出错误处理** — try/catch + 错误 Toast
+- **prefers-reduced-motion** — 全局 CSS 媒体查询禁用动画
+- **搜索下拉键盘导航** — ↑↓ 移动、Enter 选择、Escape 关闭
+- **Dashboard meta title** — useEffect 设置 document.title
+- **跳至内容链接** — sr-only 链接，聚焦时可见
+- **搜索框 aria-label** — 桌面端和移动端搜索框均有 aria-label
+- **资源中心 meta 标签** — layout.tsx SEO 元数据
+- **Navbar loading 骨架屏** — 移动端 Sheet 加载时显示 pulse 动画
+- **z-index 一致性** — 标准化覆盖层层级：z-40 下拉、z-50 弹窗、z-60 进度条、z-100 跳至内容
+- **触摸滚动跟踪** — 测试场支持触摸滑动手势的自动滚动控制
+- **MCP 详情 Tab** — 原始 `role="tablist"` 替换为 `<Tabs>` 组件
+- **MCP 广场空状态** — 图标 + 引导文字
+- **参数面板响应式** — lg 屏幕（1024px+）可见
+- **AI 工具页** — 全部 8 个工具 configCode，i18n 修复
 - 登录/注册 Logo `alt=""` → `alt="OortAPI"`（可访问性）
-- 新增 i18n 键：`auth.emailRequired`、`auth.passwordRequired`、`auth.usernameRequired`、`auth.confirmPasswordRequired`
-- 新增控制台键：`refresh`、`lastUpdated`、`loadFailed`、`checkConnection`、`retry`、`progress`、`done`、`renew`、`autoRenewOff`
-- 测试场 fetch 调用添加非 OK 响应的错误抛出
 
 ### 资源中心审计修复（30 项）
 
