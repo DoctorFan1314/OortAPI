@@ -434,7 +434,7 @@ export default function SearchClient() {
           <div className="space-y-12">
             {/* Filter tabs */}
             <div className="flex gap-2 -mt-4" role="tablist" aria-label="Filter by type">
-              {["all", "models", "docs", "errors"].map((tab) => (
+              {["all", "models", "docs"].map((tab) => (
                 <button
                   key={tab}
                   role="tab"
@@ -449,7 +449,6 @@ export default function SearchClient() {
                   {tab === "all" ? (lang === "zh" ? "全部" : "All") : null}
                   {tab === "models" ? (lang === "zh" ? "模型" : "Models") : null}
                   {tab === "docs" ? (lang === "zh" ? "文档" : "Docs") : null}
-                  {tab === "errors" ? (lang === "zh" ? "错误码" : "Error Codes") : null}
                 </button>
               ))}
             </div>
