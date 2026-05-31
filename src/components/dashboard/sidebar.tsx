@@ -105,8 +105,15 @@ export function DashboardSidebar() {
   );
   const activeKeys = keysData?.keys?.filter((k) => k.enabled === 1).length ?? 0;
 
-  const getBadge = (href: string): number | null => {
-    if (href === "/dashboard/keys" && activeKeys > 0) return activeKeys;
+  const { data: statsData } = useSWR<{ today_calls?: number; balance?: number }>(
+    user ? "/api/dashboard/stats" : null,
+    dashboardSWRConfig,
+  );
+
+  const getBadge = (href: string): { value: number | string; variant?: "default" | "destructive" } | null => {
+    if (href === "/dashboard/keys" && activeKeys > 0) return { value: activeKeys };
+    if (href === "/dashboard/usage" && statsData?.today_calls && statsData.today_calls > 0) return { value: statsData.today_calls };
+    if (href === "/dashboard/billing" && statsData?.balance !== undefined && statsData.balance < 1) return { value: "!", variant: "destructive" };
     return null;
   };
 
@@ -164,11 +171,14 @@ export function DashboardSidebar() {
                   >
                     <item.icon className="h-4 w-4 shrink-0" />
                     <span className="flex-1">{LABELS[item.labelKey][lang]}</span>
-                    {getBadge(item.href) !== null && (
-                      <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-mono-force font-medium min-w-[18px] text-center">
-                        {getBadge(item.href)}
-                      </span>
-                    )}
+                    {(() => {
+                      const badge = getBadge(item.href);
+                      return badge ? (
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-mono-force font-medium min-w-[18px] text-center ${badge.variant === "destructive" ? "bg-destructive/10 text-destructive" : "bg-primary/10 text-primary"}`}>
+                          {badge.value}
+                        </span>
+                      ) : null;
+                    })()}
                   </Link>
                 ))}
               </div>

@@ -2,12 +2,13 @@
 
 import { useEffect } from "react";
 import { DashboardSidebar } from "@/components/dashboard/sidebar";
+import { Breadcrumbs } from "@/components/dashboard/breadcrumbs";
 import { AuthGuard } from "@/components/auth/auth-guard";
 import { ErrorBoundary } from "@/components/shared/error-boundary";
 import { useI18n } from "@/contexts/i18n-context";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
 
   useEffect(() => {
     document.title = `${t.dashboard.title} — OortAPI`;
@@ -20,6 +21,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <DashboardSidebar />
           <main id="main-content" className="flex-1 min-w-0">
             <ErrorBoundary>
+              <Breadcrumbs lang={lang} />
               {children}
             </ErrorBoundary>
           </main>

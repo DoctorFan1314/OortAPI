@@ -4,168 +4,22 @@ import { useI18n } from "@/contexts/i18n-context";
 import { useCurrency } from "@/contexts/currency-context";
 import { useToast } from "@/contexts/toast-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Fragment, useEffect, useState, useMemo } from "react";
-import { Activity, Coins, DollarSign, X, Search, Download, Filter, BarChart3, AlertTriangle } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Activity, Coins, DollarSign, BarChart3, AlertTriangle } from "lucide-react";
 import dynamic from "next/dynamic";
+import { UsageLog, DailyTrend, UsageSummary, LABELS } from "./usage-types";
+import { FilterBar } from "./filter-bar";
+import { LogTable } from "./log-table";
+import { TrendChart } from "./trend-chart";
 
 const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false });
 
-interface UsageLog {
-  id: number;
-  model: string;
-  tokens_in: number;
-  tokens_out: number;
-  tokens_in_cache: number;
-  cost: number;
-  credits_used: number;
-  deduction_source: string;
-  credit_rate: number | null;
-  latency_ms: number | null;
-  success: number;
-  cached: number;
-  created_at: string;
-  multiplier: number | null;
-  channel_name: string | null;
-  key_name: string | null;
-  api_key_id: number | null;
-  input_rate: number | null;
-  output_rate: number | null;
-  cache_rate: number | null;
-}
-
-interface DailyTrend {
-  date: string;
-  calls: number;
-  cost: number;
-  tokens: number;
-  tokens_in_noncached: number;
-  tokens_in_cache: number;
-  tokens_out: number;
-}
-
-interface UsageSummary {
-  total_calls: number;
-  total_tokens: number;
-  total_cost: number;
-  total_tokens_in_noncached: number;
-  total_tokens_in_cache: number;
-  total_tokens_out: number;
-  total_credits_used?: number;
-}
-
-const LABELS = {
-  zh: {
-    title: "调用日志",
-    model: "模型",
-    channel: "渠道",
-    tokensIn: "输入(未命中缓存)Tokens",
-    tokensOut: "输出 Tokens",
-    tokensInCache: "输入(命中缓存)Tokens",
-    tokens: "总 Tokens",
-    cost: "费用",
-    latency: "延迟",
-    status: "状态",
-    success: "成功",
-    failed: "失败",
-    multiplier: "倍率",
-    details: "详情",
-    noLogs: "暂无调用记录",
-    time: "时间",
-    totalCalls: "总调用次数",
-    totalTokens: "总 Tokens",
-    totalCost: "总花费",
-    inputCost: "输入费用",
-    outputCost: "输出费用",
-    cacheReadCost: "输入(命中缓存)费用",
-    costBreakdown: "费用明细",
-    noChannel: "无渠道",
-    formula: "计算公式",
-    nonCachedTokens: "非缓存输入",
-    total: "合计",
-    noRateData: "未找到模型费率，使用默认费率",
-    notes: "备注",
-    subUser: "套餐用户",
-    balanceUser: "余额扣费",
-    showing: "显示",
-    prev: "上一页",
-    next: "下一页",
-    filterModel: "按模型筛选",
-    filterStatus: "状态",
-    all: "全部",
-    dateFrom: "开始日期",
-    dateTo: "结束日期",
-    clearFilters: "清除筛选",
-    exportCSV: "导出 CSV",
-    filterBtn: "筛选",
-    apiKey: "API Key",
-    allKeys: "所有 Key",
-    trend: "趋势",
-    byCost: "费用",
-    byTokens: "Token",
-    byCalls: "调用",
-  },
-  en: {
-    title: "Call Logs",
-    model: "Model",
-    channel: "Channel",
-    tokensIn: "Input(non-cached)Tokens",
-    tokensOut: "Output Tokens",
-    tokensInCache: "Input(cache hit)Tokens",
-    tokens: "Total Tokens",
-    cost: "Cost",
-    latency: "Latency",
-    status: "Status",
-    success: "Success",
-    failed: "Failed",
-    multiplier: "Multiplier",
-    details: "Details",
-    noLogs: "No usage logs yet",
-    time: "Time",
-    totalCalls: "Total Calls",
-    totalTokens: "Total Tokens",
-    totalCost: "Total Cost",
-    inputCost: "Input Cost",
-    outputCost: "Output Cost",
-    cacheReadCost: "Input(cache hit)Cost",
-    costBreakdown: "Cost Breakdown",
-    noChannel: "No channel",
-    formula: "Formula",
-    nonCachedTokens: "Non-cached Input",
-    total: "Total",
-    noRateData: "Model rate not found, using default rate",
-    notes: "Notes",
-    subUser: "Subscription",
-    balanceUser: "Balance",
-    showing: "Showing",
-    prev: "Previous",
-    next: "Next",
-    filterModel: "Filter by model",
-    filterStatus: "Status",
-    all: "All",
-    dateFrom: "From",
-    dateTo: "To",
-    clearFilters: "Clear filters",
-    exportCSV: "Export CSV",
-    filterBtn: "Filter",
-    apiKey: "API Key",
-    allKeys: "All Keys",
-    trend: "Trend",
-    byCost: "Cost",
-    byTokens: "Tokens",
-    byCalls: "Calls",
-  },
-};
-
-function formatRate(rate: number | null | undefined, symbol: string, exchangeRate: number): string {
-  if (rate == null || rate === 0) return "-";
-  const value = symbol === "¥" ? rate * exchangeRate : rate;
-  return `${symbol}${value.toFixed(4)}/1M tokens`;
-}
-
 export default function UsagePage() {
   const { lang } = useI18n();
-  const { currency, exchangeRate, formatPrice, symbol } = useCurrency();
+  const { formatPrice } = useCurrency();
   useEffect(() => { document.title = `${lang === "zh" ? "调用日志" : "Call Logs"} — OortAPI`; }, [lang]);
+
+  // Data state
   const [logs, setLogs] = useState<UsageLog[]>([]);
   const [summary, setSummary] = useState<UsageSummary>({ total_calls: 0, total_tokens: 0, total_cost: 0, total_tokens_in_noncached: 0, total_tokens_in_cache: 0, total_tokens_out: 0 });
   const [dailyTrend, setDailyTrend] = useState<DailyTrend[]>([]);
@@ -177,6 +31,7 @@ export default function UsagePage() {
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
+
   // Input state (form fields) — does NOT trigger API calls
   const [inputModel, setInputModel] = useState("");
   const [inputStatus, setInputStatus] = useState("");
@@ -185,6 +40,7 @@ export default function UsagePage() {
   const [inputFrom, setInputFrom] = useState(defaultFrom);
   const [inputTo, setInputTo] = useState(todayStr);
   const [inputKeyId, setInputKeyId] = useState("");
+
   // Applied filter state — triggers API calls only when "Filter" button is clicked
   const [filterModel, setFilterModel] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
@@ -192,13 +48,18 @@ export default function UsagePage() {
   const [filterApplied, setFilterApplied] = useState(false);
   const [filterTo, setFilterTo] = useState(todayStr);
   const [filterKeyId, setFilterKeyId] = useState("");
+
   // API keys & models for filter dropdowns
   const [apiKeys, setApiKeys] = useState<{ id: number; name: string }[]>([]);
   const [filterModels, setFilterModels] = useState<string[]>([]);
+
+  // Sort state
   const [sortKey, setSortKey] = useState<string>("created_at");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+
   const t = LABELS[lang];
 
+  // Fetch API keys and models
   useEffect(() => {
     fetch("/api/dashboard/keys", { credentials: "include" })
       .then(r => r.ok ? r.json() : null)
@@ -211,6 +72,17 @@ export default function UsagePage() {
   }, []);
 
   const { toast: showToast } = useToast();
+
+  // Filter handlers
+  const handleInputChange = (field: string, value: string) => {
+    switch (field) {
+      case "model": setInputModel(value); break;
+      case "status": setInputStatus(value); break;
+      case "from": setInputFrom(value); break;
+      case "to": setInputTo(value); break;
+      case "keyId": setInputKeyId(value); break;
+    }
+  };
 
   const applyFilters = () => {
     if (inputFrom && inputTo && inputFrom > inputTo) {
@@ -243,39 +115,22 @@ export default function UsagePage() {
 
   const hasActiveFilters = filterApplied;
 
-  const chartOption = useMemo(() => {
-    if (dailyTrend.length === 0) return null;
-    const dates = dailyTrend.map(d => d.date);
-    const values = dailyTrend.map(d => {
-      if (chartMetric === "cost") return +(d.cost * exchangeRate).toFixed(4);
-      if (chartMetric === "tokens") return d.tokens;
-      return d.calls;
-    });
-    const color = chartMetric === "cost" ? "#8b5cf6" : chartMetric === "tokens" ? "#22c55e" : "#3b82f6";
-    const label = chartMetric === "cost" ? (currency === "CNY" ? "¥" : "$") : "";
-    return {
-      tooltip: {
-        trigger: "axis" as const,
-        formatter: (params: { axisValue: string; value: number; dataIndex: number }[]) => {
-          const p = params[0];
-          const day = chartMetric === "tokens" ? dailyTrend[p.dataIndex] : null;
-          if (!day || chartMetric !== "tokens") {
-            return `${p.axisValue}<br/>${label}${typeof p.value === "number" ? p.value.toLocaleString() : p.value}`;
-          }
-          let html = `<div style="font-size:12px;font-weight:600;white-space:nowrap">${day.date}</div>`;
-          if (day.tokens_in_noncached > 0) html += `<div style="font-size:11px;white-space:nowrap"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#3b82f6;margin-right:4px"></span>${lang === "zh" ? "输入(未命中缓存)" : "Input(non-cached)"}: ${day.tokens_in_noncached.toLocaleString()}</div>`;
-          if (day.tokens_in_cache > 0) html += `<div style="font-size:11px;white-space:nowrap"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#22c55e;margin-right:4px"></span>${lang === "zh" ? "输入(命中缓存)" : "Input(cache hit)"}: ${day.tokens_in_cache.toLocaleString()}</div>`;
-          if (day.tokens_out > 0) html += `<div style="font-size:11px;white-space:nowrap"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#f97316;margin-right:4px"></span>${lang === "zh" ? "输出" : "Output"}: ${day.tokens_out.toLocaleString()}</div>`;
-          return html;
-        },
-      },
-      grid: { left: 60, right: 20, top: 10, bottom: 30 },
-      xAxis: { type: "category" as const, data: dates, axisLabel: { fontSize: 11 } },
-      yAxis: { type: "value" as const, axisLabel: { fontSize: 11, formatter: (v: number) => label + (v >= 1000 ? (v / 1000).toFixed(0) + "k" : v) } },
-      series: [{ type: "bar" as const, data: values, itemStyle: { color, borderRadius: [4, 4, 0, 0] }, barMaxWidth: 32 }],
-    };
-  }, [dailyTrend, chartMetric, exchangeRate, currency, lang]);
+  // Sort handler
+  const handleSort = (field: string) => {
+    if (sortKey === field) {
+      setSortDir(d => d === "asc" ? "desc" : "asc");
+    } else {
+      setSortKey(field);
+      setSortDir("asc");
+    }
+  };
 
+  // Toggle expand handler
+  const handleToggleExpand = (id: number) => {
+    setExpandedId(prev => prev === id ? null : id);
+  };
+
+  // Fetch usage data
   useEffect(() => {
     setLoading(true);
     setError(null);
@@ -285,7 +140,7 @@ export default function UsagePage() {
     if (filterFrom) parts.push(`from=${filterFrom}`);
     if (filterTo) parts.push(`to=${filterTo}`);
     if (filterKeyId) parts.push(`key_id=${filterKeyId}`);
-    const url = `/api/v1/billing/usage?${parts.join('&')}`;
+    const url = `/api/v1/billing/usage?${parts.join("&")}`;
 
     fetch(url, { credentials: "include" })
       .then(res => {
@@ -306,7 +161,7 @@ export default function UsagePage() {
           total_credits_used: d.total_credits_used || 0,
         });
         const trend = d.daily_trend || [];
-        setDailyTrend([...trend].reverse()); // API returns DESC (LIMIT 60), frontend expects ASC
+        setDailyTrend([...trend].reverse());
         setModelStats(d.model_stats || []);
         setLoading(false);
       })
@@ -317,12 +172,12 @@ export default function UsagePage() {
       });
   }, [page, filterModel, filterStatus, filterFrom, filterTo, filterKeyId]);
 
-  // Check subscription status: no subscription → show cost, has subscription → show credits
+  // Check subscription status
   useEffect(() => {
     fetch("/api/dashboard/subscription", { credentials: "include" })
       .then(r => r.json())
       .then(d => {
-        const hasActive = d.subscriptions?.some((s: { status: string }) => s.status === 'active');
+        const hasActive = d.subscriptions?.some((s: { status: string }) => s.status === "active");
         if (hasActive) {
           setIsCreditsUser(true);
           setChartMetric("tokens");
@@ -333,136 +188,7 @@ export default function UsagePage() {
       .catch(() => {});
   }, []);
 
-  const formatTokens = (n: number) => {
-    return n.toLocaleString();
-  };
-
-  // Format cost with higher precision for line items
-  const formatCostDisplay = (usd: number) => formatPrice(usd, 4);
-
-  // Render detailed cost breakdown for a log entry
-  const renderBreakdown = (log: UsageLog) => {
-    const isCredits = log.deduction_source === 'credits';
-    const inputRate = log.input_rate ?? 0.0001;
-    const outputRate = log.output_rate ?? 0.0002;
-    const cacheRate = log.cache_rate ?? 0;
-    const creditRate = log.credit_rate ?? 1.0;
-    const mult = log.multiplier ?? 1.0;
-    const totalTokens = log.tokens_in + log.tokens_out;
-
-    if (isCredits) {
-      // Subscription user — show credits breakdown (cache hits at 50% discount)
-      const CACHE_DISCOUNT = 0.5;
-      const creditsUsed = Math.ceil(Math.max(0, log.tokens_in - log.tokens_in_cache + log.tokens_in_cache * CACHE_DISCOUNT + log.tokens_out) * creditRate);
-      return (
-        <div className="text-xs space-y-3 font-mono">
-          <p className="font-semibold text-sm">{lang === "zh" ? "额度明细" : "Credits Breakdown"}</p>
-          <div className="text-muted-foreground space-y-0.5">
-            <p>{lang === "zh" ? "Credit 倍率" : "Credit Rate"}: 1 token = {creditRate} credits</p>
-          </div>
-          <div className="space-y-1">
-            <div className="flex justify-between gap-4">
-              <span className="text-muted-foreground">{lang === "zh" ? "输入(未命中缓存)Tokens" : "Input(non-cached)Tokens"}: {(log.tokens_in - log.tokens_in_cache).toLocaleString()} × {creditRate}</span>
-              <span>= {((log.tokens_in - log.tokens_in_cache) * creditRate).toLocaleString()} credits</span>
-            </div>
-            <div className="flex justify-between gap-4">
-              <span className="text-muted-foreground">{lang === "zh" ? "输入(命中缓存)Tokens" : "Input(cache hit)Tokens"}: {log.tokens_in_cache.toLocaleString()} × {creditRate} × {CACHE_DISCOUNT}</span>
-              <span>= {(log.tokens_in_cache * creditRate * CACHE_DISCOUNT).toLocaleString()} credits</span>
-            </div>
-            <div className="flex justify-between gap-4">
-              <span className="text-muted-foreground">{lang === "zh" ? "输出 Tokens" : "Output Tokens"}: {log.tokens_out.toLocaleString()} × {creditRate}</span>
-              <span>= {(log.tokens_out * creditRate).toLocaleString()} credits</span>
-            </div>
-          </div>
-          <div className="border-t border-border/30 pt-1">
-            <div className="flex justify-between gap-4 font-semibold text-sm">
-              <span>{lang === "zh" ? "总计消耗" : "Total Credits Used"}</span>
-              <span className="text-amber-400">{creditsUsed.toLocaleString()} credits</span>
-            </div>
-            <p className="text-emerald-500 text-[11px] mt-1">{lang === "zh" ? "套餐用户，不扣余额" : "Subscription user — no balance charged"}</p>
-          </div>
-        </div>
-      );
-    }
-
-    // Non-subscription user — show dollar breakdown
-    const nonCachedIn = Math.max(0, log.tokens_in - log.tokens_in_cache);
-    const inputCost = nonCachedIn * inputRate / 1000000;
-    const cacheHitCost = log.tokens_in_cache * cacheRate / 1000000;
-    const outputCost = log.tokens_out * outputRate / 1000000;
-    const baseCost = inputCost + cacheHitCost + outputCost;
-    const finalCost = baseCost * mult;
-    const rateSource = log.input_rate != null ? "" : ` (${t.noRateData})`;
-
-    return (
-      <div className="text-xs space-y-3 font-mono">
-        <p className="font-semibold text-sm">{t.costBreakdown}</p>
-        <div className="text-muted-foreground space-y-0.5">
-          <p>{lang === "zh" ? "模型费率" : "Model Rates"}{rateSource}:</p>
-          <p className="pl-3">{lang === "zh" ? "输入(未命中缓存)" : "Input(non-cached)"} = {formatRate(inputRate, symbol, exchangeRate)}</p>
-          <p className="pl-3">{lang === "zh" ? "输入(命中缓存)" : "Input(cache hit)"} = {formatRate(cacheRate, symbol, exchangeRate)}</p>
-          <p className="pl-3">{lang === "zh" ? "输出" : "Output"} = {formatRate(outputRate, symbol, exchangeRate)}</p>
-        </div>
-        <div className="space-y-1">
-          {nonCachedIn > 0 && (
-            <div className="flex justify-between gap-4">
-              <span className="text-muted-foreground">{t.inputCost}: {nonCachedIn.toLocaleString()} × {(symbol === "¥" ? inputRate * exchangeRate : inputRate).toFixed(4)} / 1M</span>
-              <span>= {formatCostDisplay(inputCost)}</span>
-            </div>
-          )}
-          {log.tokens_in_cache > 0 && (
-            <div className="flex justify-between gap-4">
-              <span className="text-muted-foreground">{t.cacheReadCost}: {log.tokens_in_cache.toLocaleString()} × {(symbol === "¥" ? cacheRate * exchangeRate : cacheRate).toFixed(4)} / 1M</span>
-              <span>= {formatCostDisplay(cacheHitCost)}</span>
-            </div>
-          )}
-          {log.tokens_out > 0 && (
-            <div className="flex justify-between gap-4">
-              <span className="text-muted-foreground">{t.outputCost}: {log.tokens_out.toLocaleString()} × {(symbol === "¥" ? outputRate * exchangeRate : outputRate).toFixed(4)} / 1M</span>
-              <span>= {formatCostDisplay(outputCost)}</span>
-            </div>
-          )}
-        </div>
-        <div className="border-t border-border/30 pt-1 space-y-1">
-          <div className="flex justify-between gap-4">
-            <span className="text-muted-foreground">{lang === "zh" ? "小计 (base cost)" : "Subtotal (base cost)"}</span>
-            <span>= {formatCostDisplay(baseCost)}</span>
-          </div>
-          {mult !== 1.0 && (
-            <div className="flex justify-between gap-4">
-              <span className="text-muted-foreground">× {lang === "zh" ? "倍率" : "Multiplier"}: {mult.toFixed(2)}x</span>
-              <span></span>
-            </div>
-          )}
-          <div className="flex justify-between gap-4 font-semibold text-sm">
-            <span>{t.total}</span>
-            <span>= {formatCostDisplay(finalCost)}</span>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  const sortedLogs = [...logs].sort((a, b) => {
-    if (sortKey === 'total') {
-      const aTotal = a.tokens_in + a.tokens_out;
-      const bTotal = b.tokens_in + b.tokens_out;
-      return sortDir === 'asc' ? aTotal - bTotal : bTotal - aTotal;
-    }
-    if (sortKey === 'created_at') {
-      const aDate = new Date(a.created_at + 'Z').getTime();
-      const bDate = new Date(b.created_at + 'Z').getTime();
-      return sortDir === 'asc' ? aDate - bDate : bDate - aDate;
-    }
-    const aVal = a[sortKey as keyof UsageLog];
-    const bVal = b[sortKey as keyof UsageLog];
-    if (aVal == null) return 1;
-    if (bVal == null) return -1;
-    if (typeof aVal === 'number' && typeof bVal === 'number') {
-      return sortDir === 'asc' ? aVal - bVal : bVal - aVal;
-    }
-    return 0;
-  });
+  const formatTokens = (n: number) => n.toLocaleString();
 
   return (
     <div className="space-y-6">
@@ -539,33 +265,14 @@ export default function UsagePage() {
       )}
 
       {/* Trend chart */}
-      {chartOption && (
-        <Card className="glass-card">
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-sm flex items-center gap-2">
-                <BarChart3 className="h-4 w-4" />{t.trend}
-              </CardTitle>
-              <div className="flex gap-1">
-                {(["cost", "tokens", "calls"] as const)
-                  .filter(m => !isCreditsUser || m !== "cost")
-                  .map(m => (
-                    <button key={m} onClick={() => setChartMetric(m)}
-                      className={`px-2.5 py-1 text-xs rounded-md transition-colors ${chartMetric === m ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>
-                      {m === "cost" ? t.byCost : m === "tokens" ? t.byTokens : t.byCalls}
-                    </button>
-                  ))}
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <ReactECharts option={chartOption} style={{ height: 220 }} opts={{ renderer: "svg" }} />
-          </CardContent>
-        </Card>
-      )}
+      <TrendChart
+        trendData={dailyTrend}
+        metric={chartMetric}
+        onMetricChange={(m) => setChartMetric(m)}
+        isCreditsUser={isCreditsUser}
+      />
 
-
-      {/* Cost & Tokens by model charts — uses full-period API aggregation */}
+      {/* Cost & Tokens by model charts */}
       {modelStats.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Card className="glass-card">
@@ -578,20 +285,22 @@ export default function UsagePage() {
             </CardHeader>
             <CardContent className="pt-0">
               <ReactECharts option={(() => {
-                const warmColors = ['#ef4444','#f97316','#f59e0b','#eab308','#ec4899','#d946ef','#a855f7','#8b5cf6','#f43f5e','#fb923c','#facc15'];
+                const warmColors = ["#ef4444", "#f97316", "#f59e0b", "#eab308", "#ec4899", "#d946ef", "#a855f7", "#8b5cf6", "#f43f5e", "#fb923c", "#facc15"];
                 const items = modelStats.map(m => ({ name: m.model, value: isCreditsUser ? m.credits_used : m.cost })).filter(x => x.value > 0);
                 items.sort((a, b) => b.value - a.value);
                 const top = items.slice(0, 10);
                 const other = items.slice(10).reduce((s, x) => s + x.value, 0);
                 const data = top.map(({ name, value }, i) => ({ name, value, itemStyle: { color: warmColors[i % warmColors.length] } }));
-                if (other > 0) data.push({ name: lang === "zh" ? "其他" : "Other", value: other, itemStyle: { color: '#94a3b8' } });
+                if (other > 0) data.push({ name: lang === "zh" ? "其他" : "Other", value: other, itemStyle: { color: "#94a3b8" } });
                 return {
                   color: warmColors,
-                  legend: { type: 'scroll', bottom: 0, textStyle: { fontSize: 10 }, pageTextStyle: { fontSize: 9 } },
-                  tooltip: { trigger: "item", formatter: (p: any) => {
-                    const val = isCreditsUser ? `${p.value.toLocaleString()} credits` : formatPrice(p.value);
-                    return `${p.name}: ${val}`;
-                  } },
+                  legend: { type: "scroll", bottom: 0, textStyle: { fontSize: 10 }, pageTextStyle: { fontSize: 9 } },
+                  tooltip: {
+                    trigger: "item", formatter: (p: any) => {
+                      const val = isCreditsUser ? `${p.value.toLocaleString()} credits` : formatPrice(p.value);
+                      return `${p.name}: ${val}`;
+                    }
+                  },
                   series: [{ type: "pie", radius: ["28%", "55%"], center: ["50%", "45%"], data, label: { show: false }, emphasis: { label: { show: true, fontSize: 10 } }, itemStyle: { borderRadius: 4 } }],
                 };
               })()} style={{ height: 280 }} opts={{ renderer: "svg" }} />
@@ -605,7 +314,7 @@ export default function UsagePage() {
             </CardHeader>
             <CardContent className="pt-0">
               <ReactECharts option={(() => {
-                const coolColors = ['#3b82f6','#06b6d4','#22c55e','#10b981','#14b8a6','#0ea5e9','#6366f1','#2dd4bf','#34d399','#60a5fa','#67e8f9'];
+                const coolColors = ["#3b82f6", "#06b6d4", "#22c55e", "#10b981", "#14b8a6", "#0ea5e9", "#6366f1", "#2dd4bf", "#34d399", "#60a5fa", "#67e8f9"];
                 const items = modelStats.map(m => ({
                   name: m.model,
                   total: m.tokens_in + m.tokens_out,
@@ -617,18 +326,20 @@ export default function UsagePage() {
                 const top = items.slice(0, 10);
                 const otherTotal = items.slice(10).reduce((s, x) => s + x.total, 0);
                 const data = top.map(({ name, total }, i) => ({ name, value: total, itemStyle: { color: coolColors[i % coolColors.length] } }));
-                if (otherTotal > 0) data.push({ name: lang === "zh" ? "其他" : "Other", value: otherTotal, itemStyle: { color: '#94a3b8' } });
+                if (otherTotal > 0) data.push({ name: lang === "zh" ? "其他" : "Other", value: otherTotal, itemStyle: { color: "#94a3b8" } });
                 const detailMap = Object.fromEntries(top.map(x => [x.name, x]));
                 return {
                   color: coolColors,
-                  legend: { type: 'scroll', bottom: 0, textStyle: { fontSize: 10 }, pageTextStyle: { fontSize: 9 } },
-                  tooltip: { trigger: "item", formatter: (p: any) => {
-                    const d = detailMap[p.name];
-                    if (d) {
-                      return `${p.name}<br/>  ${p.value.toLocaleString()} tokens<br/>  ■ ${lang === "zh" ? "输入(未命中缓存)" : "Input(non-cached)"}: ${d.noncached.toLocaleString()}<br/>  ■ ${lang === "zh" ? "输入(命中缓存)" : "Input(cache hit)"}: ${d.cache_hit.toLocaleString()}<br/>  ■ ${lang === "zh" ? "输出" : "Output"}: ${d.output.toLocaleString()}`;
+                  legend: { type: "scroll", bottom: 0, textStyle: { fontSize: 10 }, pageTextStyle: { fontSize: 9 } },
+                  tooltip: {
+                    trigger: "item", formatter: (p: any) => {
+                      const d = detailMap[p.name];
+                      if (d) {
+                        return `${p.name}<br/>  ${p.value.toLocaleString()} tokens<br/>  ■ ${lang === "zh" ? "输入(未命中缓存)" : "Input(non-cached)"}: ${d.noncached.toLocaleString()}<br/>  ■ ${lang === "zh" ? "输入(命中缓存)" : "Input(cache hit)"}: ${d.cache_hit.toLocaleString()}<br/>  ■ ${lang === "zh" ? "输出" : "Output"}: ${d.output.toLocaleString()}`;
+                      }
+                      return `${p.name}: ${p.value.toLocaleString()} tokens`;
                     }
-                    return `${p.name}: ${p.value.toLocaleString()} tokens`;
-                  } },
+                  },
                   series: [{ type: "pie", radius: ["28%", "55%"], center: ["50%", "45%"], data, label: { show: false }, emphasis: { label: { show: true, fontSize: 10 } }, itemStyle: { borderRadius: 4 } }],
                 };
               })()} style={{ height: 280 }} opts={{ renderer: "svg" }} />
@@ -637,259 +348,43 @@ export default function UsagePage() {
         </div>
       )}
 
-
       {/* Filter bar */}
-      <div className="flex flex-wrap items-start justify-between gap-3 p-3 bg-muted/30 rounded-lg">
-        <div className="flex flex-wrap items-end gap-3">
-          <div className="w-44">
-            <label className="text-xs text-muted-foreground block mb-1">{t.filterModel}</label>
-            <select value={inputModel} onChange={e => setInputModel(e.target.value)}
-              className="w-full h-8 px-2 rounded-md border border-input bg-background text-sm focus:border-primary focus:outline-none">
-              <option value="">{t.all}</option>
-              {filterModels.map(m => <option key={m} value={m}>{m}</option>)}
-            </select>
-          </div>
-          <div className="w-32">
-            <label className="text-xs text-muted-foreground block mb-1">{t.filterStatus}</label>
-            <select value={inputStatus} onChange={e => setInputStatus(e.target.value)}
-              className="w-full h-8 px-2 rounded-md border border-input bg-background text-sm focus:border-primary focus:outline-none">
-              <option value="">{t.all}</option>
-              <option value="success">{t.success}</option>
-              <option value="failed">{t.failed}</option>
-            </select>
-          </div>
-          <div className="w-40">
-            <label className="text-xs text-muted-foreground block mb-1">{t.apiKey}</label>
-            <select value={inputKeyId} onChange={e => setInputKeyId(e.target.value)}
-              className="w-full h-8 px-2 rounded-md border border-input bg-background text-sm focus:border-primary focus:outline-none">
-              <option value="">{t.allKeys}</option>
-              {apiKeys.map(k => (
-                <option key={k.id} value={k.id}>{k.name || `Key #${k.id}`}</option>
-              ))}
-            </select>
-          </div>
-          <div className="w-36">
-            <label className="text-xs text-muted-foreground block mb-1">{t.dateFrom}</label>
-            <input type="date" value={inputFrom} onChange={e => setInputFrom(e.target.value)}
-              className="w-full h-8 px-2 rounded-md border border-input bg-background text-sm focus:border-primary focus:outline-none" />
-          </div>
-          <div className="w-36">
-            <label className="text-xs text-muted-foreground block mb-1">{t.dateTo}</label>
-            <input type="date" value={inputTo} onChange={e => setInputTo(e.target.value)}
-              className="w-full h-8 px-2 rounded-md border border-input bg-background text-sm focus:border-primary focus:outline-none" />
-          </div>
-          <button onClick={applyFilters}
-            className="h-8 px-4 text-xs bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors flex items-center gap-1.5">
-            <Filter className="h-3.5 w-3.5" />{t.filterBtn}
-          </button>
-          {hasActiveFilters && (
-            <button onClick={clearFilters}
-              className="h-8 px-3 text-xs text-muted-foreground hover:text-foreground border border-border/50 rounded-md hover:bg-muted transition-colors">
-              {t.clearFilters}
-            </button>
-          )}
-        </div>
-        <div>
-          <label className="text-xs text-transparent block mb-1">&nbsp;</label>
-          <button onClick={async () => {
-            const params = [
-              'format=csv',
-              filterModel ? `model=${encodeURIComponent(filterModel)}` : '',
-              filterStatus ? `status=${filterStatus}` : '',
-              filterFrom ? `from=${filterFrom}` : '',
-              filterTo ? `to=${filterTo}` : '',
-              filterKeyId ? `key_id=${filterKeyId}` : '',
-            ].filter(Boolean).join('&');
-            showToast(lang === "zh" ? "正在导出..." : "Exporting...", "info");
-            try {
-              const res = await fetch(`/api/v1/billing/usage?${params}`, { credentials: "include" });
-              if (!res.ok) throw new Error("Export failed");
-              const blob = await res.blob();
-              const url = URL.createObjectURL(blob);
-              const a = document.createElement('a');
-              a.href = url;
-              a.download = `usage-export-${new Date().toISOString().slice(0, 10)}.csv`;
-              document.body.appendChild(a);
-              a.click();
-              document.body.removeChild(a);
-              URL.revokeObjectURL(url);
-              showToast(lang === "zh" ? "导出成功" : "Exported successfully", "success");
-            } catch {
-              showToast(lang === "zh" ? "导出失败" : "Export failed", "error");
-            }
-          }}
-            className="h-8 px-3 text-xs border border-border/50 rounded-md hover:bg-muted transition-colors flex items-center gap-1.5">
-            <Download className="h-3.5 w-3.5" />{t.exportCSV}
-          </button>
-        </div>
-      </div>
+      <FilterBar
+        models={filterModels}
+        keys={apiKeys}
+        inputModel={inputModel}
+        inputStatus={inputStatus}
+        inputKeyId={inputKeyId}
+        inputFrom={inputFrom}
+        inputTo={inputTo}
+        onInputChange={handleInputChange}
+        onApply={applyFilters}
+        onClear={clearFilters}
+        hasActiveFilters={hasActiveFilters}
+        lang={lang}
+        filterModel={filterModel}
+        filterStatus={filterStatus}
+        filterFrom={filterFrom}
+        filterTo={filterTo}
+        filterKeyId={filterKeyId}
+      />
 
-      <Card className="glass-card">
-        <CardHeader>
-          <CardTitle className="text-lg">{t.title}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {error ? (
-            <div className="text-center py-8">
-              <p className="text-red-500 text-sm mb-2">{error}</p>
-              <button onClick={applyFilters} className="text-xs text-primary hover:underline">{lang === "zh" ? "重试" : "Retry"}</button>
-            </div>
-          ) : loading && logs.length === 0 ? (
-            <div className="animate-pulse space-y-2 p-4">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="flex gap-4">
-                  <div className="h-4 bg-muted rounded w-16" />
-                  <div className="h-4 bg-muted rounded w-32" />
-                  <div className="h-4 bg-muted rounded w-20" />
-                  <div className="h-4 bg-muted rounded w-12" />
-                  <div className="h-4 bg-muted rounded w-20" />
-                  <div className="h-4 bg-muted rounded w-16" />
-                  <div className="h-4 bg-muted rounded w-24" />
-                  <div className="h-4 bg-muted rounded w-16" />
-                  <div className="h-4 bg-muted rounded w-16" />
-                  <div className="h-4 bg-muted rounded w-12" />
-                </div>
-              ))}
-            </div>
-          ) : logs.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground text-sm">{hasActiveFilters ? (lang === "zh" ? "无匹配记录，请调整筛选条件" : "No matching records. Adjust your filters.") : t.noLogs}</div>
-          ) : (
-            <>{loading && logs.length > 0 && <div className="h-1 bg-primary/20 rounded-full overflow-hidden mb-2"><div className="h-full bg-primary animate-pulse rounded-full" style={{width: '30%'}} /></div>}
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border/50">
-                    <th scope="col" className="text-left py-2 px-3 text-muted-foreground font-medium sticky left-0 bg-background z-10">{t.channel}</th>
-                    <th scope="col" className="text-left py-2 px-3 text-muted-foreground font-medium">{t.model}</th>
-                    <th scope="col" className="text-right py-2 px-3 text-muted-foreground font-medium cursor-pointer hover:text-foreground select-none"
-                      onClick={() => { setSortKey('tokens_in'); setSortDir(d => d === 'asc' ? 'desc' : 'asc'); }}>
-                      {t.tokensIn}{sortKey === 'tokens_in' ? (sortDir === 'asc' ? ' ↑' : ' ↓') : ''}
-                    </th>
-                    <th scope="col" className="text-right py-2 px-3 text-muted-foreground font-medium cursor-pointer hover:text-foreground select-none"
-                      onClick={() => { setSortKey('tokens_in_cache'); setSortDir(d => d === 'asc' ? 'desc' : 'asc'); }}>
-                      {t.tokensInCache}{sortKey === 'tokens_in_cache' ? (sortDir === 'asc' ? ' ↑' : ' ↓') : ''}
-                    </th>
-                    <th scope="col" className="text-right py-2 px-3 text-muted-foreground font-medium cursor-pointer hover:text-foreground select-none"
-                      onClick={() => { setSortKey('tokens_out'); setSortDir(d => d === 'asc' ? 'desc' : 'asc'); }}>
-                      {t.tokensOut}{sortKey === 'tokens_out' ? (sortDir === 'asc' ? ' ↑' : ' ↓') : ''}
-                    </th>
-                    <th scope="col" className="text-right py-2 px-3 text-muted-foreground font-medium cursor-pointer hover:text-foreground select-none"
-                      onClick={() => { setSortKey('total'); setSortDir(d => d === 'asc' ? 'desc' : 'asc'); }}>
-                      {t.tokens}{sortKey === 'total' ? (sortDir === 'asc' ? ' ↑' : ' ↓') : ''}
-                    </th>
-                    <th scope="col" className="text-center py-2 px-3 text-muted-foreground font-medium">{t.multiplier}</th>
-                    <th scope="col" className="text-right py-2 px-3 text-muted-foreground font-medium cursor-pointer hover:text-foreground select-none"
-                      onClick={() => { setSortKey('cost'); setSortDir(d => d === 'asc' ? 'desc' : 'asc'); }}>
-                      {t.cost}{sortKey === 'cost' ? (sortDir === 'asc' ? ' ↑' : ' ↓') : ''}
-                    </th>
-                    <th scope="col" className="text-center py-2 px-3 text-muted-foreground font-medium">{t.details}</th>
-                    <th scope="col" className="text-center py-2 px-3 text-muted-foreground font-medium">{t.notes}</th>
-                    <th scope="col" className="text-right py-2 px-3 text-muted-foreground font-medium cursor-pointer hover:text-foreground select-none"
-                      onClick={() => { setSortKey('latency_ms'); setSortDir(d => d === 'asc' ? 'desc' : 'asc'); }}>
-                      {t.latency}{sortKey === 'latency_ms' ? (sortDir === 'asc' ? ' ↑' : ' ↓') : ''}
-                    </th>
-                    <th scope="col" className="text-center py-2 px-3 text-muted-foreground font-medium">{t.status}</th>
-                    <th scope="col" className="text-right py-2 px-3 text-muted-foreground font-medium cursor-pointer hover:text-foreground select-none"
-                      onClick={() => { setSortKey('created_at'); setSortDir(d => d === 'asc' ? 'desc' : 'asc'); }}>
-                      {t.time}{sortKey === 'created_at' ? (sortDir === 'asc' ? ' ↑' : ' ↓') : ''}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {sortedLogs.map((log) => (
-                    <Fragment key={log.id}>
-                    <tr className="border-b border-border/20 hover:bg-muted/30">
-                      <td className="py-2 px-3 text-xs text-muted-foreground sticky left-0 bg-card z-10">{log.channel_name || t.noChannel}</td>
-                      <td className="py-2 px-3 font-mono text-xs">{log.model}</td>
-                      <td className="py-2 px-3 text-right font-mono">{Math.max(0, log.tokens_in - log.tokens_in_cache).toLocaleString()}</td>
-                      <td className="py-2 px-3 text-right font-mono">{log.tokens_in_cache > 0 ? log.tokens_in_cache.toLocaleString() : "0"}</td>
-                      <td className="py-2 px-3 text-right font-mono">{log.tokens_out.toLocaleString()}</td>
-                      <td className="py-2 px-3 text-right font-mono">{(log.tokens_in + log.tokens_out).toLocaleString()}</td>
-                      <td className="py-2 px-3 text-center">
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-muted font-mono">
-                          {(log.multiplier ?? 1.0).toFixed(2)}x
-                        </span>
-                      </td>
-                      <td className="py-2 px-3 text-right font-mono">
-                        {log.deduction_source === 'credits' ? (
-                          <span className="text-emerald-500">$0.00</span>
-                        ) : (
-                          formatCostDisplay(log.cost)
-                        )}
-                      </td>
-                      <td className="py-2 px-3 text-center">
-                        <button
-                          onClick={() => setExpandedId(expandedId === log.id ? null : log.id)}
-                          className="text-xs text-primary hover:underline"
-                        >
-                          {t.details}
-                        </button>
-                      </td>
-                      <td className="py-2 px-3 text-center">
-                        {log.deduction_source === 'credits' ? (
-                          <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400">{t.subUser}</span>
-                        ) : (
-                          <span className="text-xs text-muted-foreground">{t.balanceUser}</span>
-                        )}
-                      </td>
-                      <td className={`py-2 px-3 text-right font-mono ${log.latency_ms ? (log.latency_ms < 1000 ? "text-green-500" : log.latency_ms < 5000 ? "text-yellow-500" : "text-red-500") : ""}`}>{log.latency_ms ? `${log.latency_ms}ms` : "-"}</td>
-                      <td className="py-2 px-3 text-center">
-                        <span className={`text-xs px-2 py-0.5 rounded-full ${log.success ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"}`}>
-                          {log.success ? t.success : t.failed}
-                        </span>
-                      </td>
-                      <td className="py-2 px-3 text-right text-xs text-muted-foreground">{new Date(log.created_at + "Z").toLocaleString()}</td>
-                    </tr>
-                    {expandedId === log.id && (
-                      <tr className="border-b border-border/20 bg-muted/20">
-                        <td colSpan={13} className="px-6 py-4">
-                          <div className="flex justify-end mb-2">
-                            <button onClick={() => setExpandedId(null)}
-                              className="text-muted-foreground hover:text-foreground p-1 rounded-md hover:bg-muted transition-colors"
-                              aria-label={lang === "zh" ? "关闭" : "Close"}>
-                              <X className="h-4 w-4" />
-                            </button>
-                          </div>
-                          {renderBreakdown(log)}
-                        </td>
-                      </tr>
-                    )}
-                    </Fragment>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            </>)}
-          {/* Pagination */}
-          {(page > 1 || total > 50) && (
-            <div className="flex items-center justify-between pt-3 border-t border-border/20">
-              <span className="text-xs text-muted-foreground">
-                {t.showing} {logs.length} / {total}
-              </span>
-              <div className="flex items-center gap-2">
-                {page > 1 && (
-                  <button onClick={() => setPage(p => p - 1)} className="px-3 py-1 text-xs rounded-md bg-muted hover:bg-muted/80">
-                    {t.prev}
-                  </button>
-                )}
-                {page * 50 < total && (
-                  <button onClick={() => setPage(p => p + 1)} className="px-3 py-1 text-xs rounded-md bg-muted hover:bg-muted/80">
-                    {t.next}
-                  </button>
-                )}
-                <span className="text-xs text-muted-foreground mx-1">|</span>
-                <label className="flex items-center gap-1 text-xs text-muted-foreground">
-                  {lang === "zh" ? "跳转" : "Go to"}
-                  <input type="number" min={1} max={Math.ceil(total / 50) || 1}
-                    onKeyDown={e => { if (e.key === 'Enter') { const max = Math.ceil(total / 50) || 1; const v = Math.min(Math.max(1, parseInt((e.target as HTMLInputElement).value) || 1), max); setPage(v); } }}
-                    className="w-12 h-7 px-1 rounded border border-border/50 bg-background text-xs text-center focus:border-primary focus:outline-none"
-                  />
-                </label>
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      {/* Log table */}
+      <LogTable
+        logs={logs}
+        total={total}
+        page={page}
+        sortField={sortKey}
+        sortDir={sortDir}
+        onSort={handleSort}
+        expandedId={expandedId}
+        onToggleExpand={handleToggleExpand}
+        onPageChange={setPage}
+        loading={loading}
+        error={error}
+        hasActiveFilters={hasActiveFilters}
+        onRetry={applyFilters}
+      />
     </div>
   );
 }
