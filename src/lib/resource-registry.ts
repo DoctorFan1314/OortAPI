@@ -174,7 +174,7 @@ const postgresContextTools: ToolDefinition[] = [
 
 function mapCategorySlug(slug: string): string {
   const map: Record<string, string> = {
-    content: "production", coding: "development", thinking: "development",
+    content: "production", coding: "development", thinking: "production",
     data: "analytics", productivity: "production", creative: "production",
   };
   return map[slug] ?? "production";

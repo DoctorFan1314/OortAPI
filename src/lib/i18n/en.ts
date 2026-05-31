@@ -1193,6 +1193,8 @@ export const en: Dictionary = {
     mcpHosted: "Cloud Hosted",
     mcpLocal: "Local Integration",
     mcpNodeCount: "{count} MCP Nodes",
+    mcpFilters: "Filters",
+    mcpFiltersHint: "Try adjusting your filters",
     toolManager: "Loaded Tools",
     toolManagerDesc: "Manage MCP and built-in tools attached to this session",
     toolActive: "Enabled",

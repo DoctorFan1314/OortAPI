@@ -1193,6 +1193,8 @@ export const zh: Dictionary = {
     mcpHosted: "云端托管",
     mcpLocal: "本地集成",
     mcpNodeCount: "共 {count} 个 MCP 节点",
+    mcpFilters: "筛选条件",
+    mcpFiltersHint: "尝试调整筛选条件",
     toolManager: "已加载工具",
     toolManagerDesc: "管理当前会话挂载的 MCP 工具与内置工具",
     toolActive: "已启用",

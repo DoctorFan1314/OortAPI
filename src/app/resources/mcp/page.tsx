@@ -21,6 +21,7 @@ export default function McpEcosystemPage() {
   const [deploymentFilter, setDeploymentFilter] = useState<"all" | "hosted" | "local">("all");
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [visibleCount, setVisibleCount] = useState(9);
+  const PAGE_SIZE = 9;
 
   const filteredNodes = useMemo(() => {
     let items = getMcpNodesByCategory(activeCategory);
@@ -94,7 +95,7 @@ export default function McpEcosystemPage() {
         <aside className="lg:w-56 shrink-0 lg:sticky lg:top-20 lg:self-start">
           <details open className="lg:open space-y-4 group">
             <summary className="flex items-center justify-between px-1 py-2 text-sm font-medium text-muted-foreground cursor-pointer lg:cursor-default lg:pointer-events-none list-none lg:hidden">
-              <span>{lang === "zh" ? "筛选条件" : "Filters"}</span>
+              <span>{t.resourceHub.mcpFilters}</span>
               <ChevronDown className="h-4 w-4 transition-transform group-open:rotate-180" />
             </summary>
             <div className="space-y-4">
@@ -155,7 +156,7 @@ export default function McpEcosystemPage() {
                 <Cloud className="h-7 w-7 text-muted-foreground/30" />
               </div>
               <p className="text-sm text-muted-foreground mb-1">{t.resourceHub.noResults}</p>
-              <p className="text-xs text-muted-foreground/70">{lang === "zh" ? "尝试调整筛选条件" : "Try adjusting your filters"}</p>
+              <p className="text-xs text-muted-foreground/70">{t.resourceHub.mcpFiltersHint}</p>
             </div>
           ) : (
             <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">

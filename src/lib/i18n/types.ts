@@ -728,6 +728,8 @@ export interface Dictionary {
     mcpHosted: string;
     mcpLocal: string;
     mcpNodeCount: string;
+    mcpFilters: string;
+    mcpFiltersHint: string;
     // Playground tool manager
     toolManager: string;
     toolManagerDesc: string;
