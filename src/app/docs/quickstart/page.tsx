@@ -127,74 +127,80 @@ except openai.APIError as e:
       {/* Steps with connector line */}
       <div className="space-y-8">
           {/* Step 1: Get API Key */}
-          <section className="space-y-3 relative">
+          <section className="relative">
             {/* Connector line to step 2 */}
             <div className="absolute left-[13px] top-10 bottom-[-2rem] w-px bg-primary/15 hidden sm:block" />
-            <h2 className="text-lg font-bold flex items-center gap-3">
-              <span className="flex items-center justify-center w-7 h-7 rounded-full bg-primary/10 text-primary text-xs font-bold shrink-0 relative z-10 bg-[var(--background)]">
-                1
-              </span>
-              {L.step1Title}
-            </h2>
-            <p className="text-sm text-muted-foreground relative z-10">
-              {L.step1Desc}{" "}
-              <Link href="/dashboard/keys" className="text-primary hover:underline font-medium">
-                {L.step1Mid}
-              </Link>{" "}
-              {L.step1End}
-            </p>
-            <p className="text-sm text-muted-foreground relative z-10">
-              {lang === "zh"
-                ? "你的 API Key 以 "
-                : "Your API Key starts with "}
-              <code className="text-xs px-1.5 py-0.5 rounded bg-muted font-mono text-foreground">
-                sk-oort-
-              </code>
-              {lang === "zh" ? " 开头，请妥善保管。" : " — save it securely."}
-            </p>
+            <div className="pl-10 sm:pl-10 space-y-3">
+              <h2 className="text-lg font-bold flex items-center gap-3">
+                <span className="flex items-center justify-center w-7 h-7 rounded-full bg-primary/10 text-primary text-xs font-bold shrink-0 relative z-10 bg-[var(--background)] absolute left-0 sm:left-0">
+                  1
+                </span>
+                {L.step1Title}
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                {L.step1Desc}{" "}
+                <Link href="/dashboard/keys" className="text-primary hover:underline font-medium">
+                  {L.step1Mid}
+                </Link>{" "}
+                {L.step1End}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {lang === "zh"
+                  ? "你的 API Key 以 "
+                  : "Your API Key starts with "}
+                <code className="text-xs px-1.5 py-0.5 rounded bg-muted font-mono text-foreground">
+                  sk-oort-
+                </code>
+                {lang === "zh" ? " 开头，请妥善保管。" : " — save it securely."}
+              </p>
+            </div>
           </section>
 
           {/* Step 2: Configure Base URL */}
-          <section className="space-y-3 relative">
+          <section className="relative">
             {/* Connector line to step 3 */}
             <div className="absolute left-[13px] top-10 bottom-[-2rem] w-px bg-primary/15 hidden sm:block" />
-            <h2 className="text-lg font-bold flex items-center gap-3">
-              <span className="flex items-center justify-center w-7 h-7 rounded-full bg-primary/10 text-primary text-xs font-bold shrink-0 relative z-10 bg-[var(--background)]">
-                2
-              </span>
-              {L.step2Title}
-            </h2>
-            <p className="text-sm text-muted-foreground">{L.step2Desc}</p>
-            <BaseUrlDisplay />
+            <div className="pl-10 sm:pl-10 space-y-3">
+              <h2 className="text-lg font-bold flex items-center gap-3">
+                <span className="flex items-center justify-center w-7 h-7 rounded-full bg-primary/10 text-primary text-xs font-bold shrink-0 relative z-10 bg-[var(--background)] absolute left-0 sm:left-0">
+                  2
+                </span>
+                {L.step2Title}
+              </h2>
+              <p className="text-sm text-muted-foreground">{L.step2Desc}</p>
+              <BaseUrlDisplay />
 
-            {/* Tip block */}
-            <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-4 text-sm space-y-1.5">
-              <p className="font-medium text-amber-600 dark:text-amber-400 flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4" />
-                {L.tip}
-              </p>
-              <p className="text-muted-foreground">
-                {L.tipOai} <strong>{L.tipOaiBold}</strong>. {L.tipAnt} {L.tipAntDesc} {L.tipEnd}
-              </p>
-              <p className="text-muted-foreground">{L.tipSameKey}</p>
+              {/* Tip block */}
+              <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-4 text-sm space-y-1.5">
+                <p className="font-medium text-amber-600 dark:text-amber-400 flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4" />
+                  {L.tip}
+                </p>
+                <p className="text-muted-foreground">
+                  {L.tipOai} <strong>{L.tipOaiBold}</strong>. {L.tipAnt} {L.tipAntDesc} {L.tipEnd}
+                </p>
+                <p className="text-muted-foreground">{L.tipSameKey}</p>
+              </div>
             </div>
           </section>
 
           {/* Step 3: Start Using */}
-          <section className="space-y-3 relative">
-            <h2 className="text-lg font-bold flex items-center gap-3">
-              <span className="flex items-center justify-center w-7 h-7 rounded-full bg-primary/10 text-primary text-xs font-bold shrink-0 relative z-10">
-                3
-              </span>
-              {L.step3Title}
-            </h2>
-            <p className="text-sm text-muted-foreground">{L.step3Desc}</p>
-            <div className="mt-4">
-              <CodeBlock examples={[
-                { label: "cURL", code: `curl ${process.env.NEXT_PUBLIC_SITE_URL || "https://api.oortapi.com"}/api/v1/chat/completions \\\n  -H "Content-Type: application/json" \\\n  -H "Authorization: Bearer sk-oort-your-key" \\\n  -d '{\n    "model": "gpt-4o",\n    "messages": [{"role": "user", "content": "Hello!"}]\n  }'` },
-                { label: "Python", code: `import openai\nclient = openai.OpenAI(\n  base_url="${process.env.NEXT_PUBLIC_SITE_URL || "https://api.oortapi.com"}/api/v1",\n  api_key="sk-oort-your-key"\n)\nresponse = client.chat.completions.create(\n  model="gpt-4o",\n  messages=[{"role": "user", "content": "Hello!"}]\n)\nprint(response.choices[0].message.content)` },
-                { label: "Node.js", code: `import OpenAI from "openai";\nconst client = new OpenAI({\n  baseURL: "${process.env.NEXT_PUBLIC_SITE_URL || "https://api.oortapi.com"}/api/v1",\n  apiKey: "sk-oort-your-key",\n});\nconst response = await client.chat.completions.create({\n  model: "gpt-4o",\n  messages: [{ role: "user", content: "Hello!" }],\n});\nconsole.log(response.choices[0].message.content);` },
-              ]} />
+          <section className="relative">
+            <div className="pl-10 sm:pl-10 space-y-3">
+              <h2 className="text-lg font-bold flex items-center gap-3">
+                <span className="flex items-center justify-center w-7 h-7 rounded-full bg-primary/10 text-primary text-xs font-bold shrink-0 relative z-10 absolute left-0 sm:left-0">
+                  3
+                </span>
+                {L.step3Title}
+              </h2>
+              <p className="text-sm text-muted-foreground">{L.step3Desc}</p>
+              <div className="mt-4">
+                <CodeBlock examples={[
+                  { label: "cURL", code: `curl ${process.env.NEXT_PUBLIC_SITE_URL || "https://api.oortapi.com"}/api/v1/chat/completions \\\n  -H "Content-Type: application/json" \\\n  -H "Authorization: Bearer sk-oort-your-key" \\\n  -d '{\n    "model": "gpt-4o",\n    "messages": [{"role": "user", "content": "Hello!"}]\n  }'` },
+                  { label: "Python", code: `import openai\nclient = openai.OpenAI(\n  base_url="${process.env.NEXT_PUBLIC_SITE_URL || "https://api.oortapi.com"}/api/v1",\n  api_key="sk-oort-your-key"\n)\nresponse = client.chat.completions.create(\n  model="gpt-4o",\n  messages=[{"role": "user", "content": "Hello!"}]\n)\nprint(response.choices[0].message.content)` },
+                  { label: "Node.js", code: `import OpenAI from "openai";\nconst client = new OpenAI({\n  baseURL: "${process.env.NEXT_PUBLIC_SITE_URL || "https://api.oortapi.com"}/api/v1",\n  apiKey: "sk-oort-your-key",\n});\nconst response = await client.chat.completions.create({\n  model: "gpt-4o",\n  messages: [{ role: "user", content: "Hello!" }],\n});\nconsole.log(response.choices[0].message.content);` },
+                ]} />
+              </div>
             </div>
           </section>
       </div>
