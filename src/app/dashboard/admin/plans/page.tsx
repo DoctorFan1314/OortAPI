@@ -397,9 +397,6 @@ function AdminPlansContent() {
                       {plan.monthly_credits.toLocaleString()}
                     </span>
                     <span className="text-xs text-muted-foreground">Credits / {lang === "zh" ? "月" : "mo"}</span>
-                    <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-mono">
-                      {plan.currency}
-                    </span>
                   </div>
 
                   {/* Stats row */}
