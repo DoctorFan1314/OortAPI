@@ -345,135 +345,106 @@ function AdminPlansContent() {
               <div
                 key={plan.id}
                 className={cn(
-                  "relative rounded-xl overflow-hidden transition-all duration-300",
+                  "relative rounded-xl overflow-hidden transition-all duration-300 bg-card border",
                   !plan.enabled && "opacity-50 grayscale",
-                  isPopular && "scale-[1.02] -translate-y-1 z-10",
+                  isPopular ? "border-transparent" : "border-border/50",
                 )}
                 style={isPopular ? {
-                  boxShadow: `0 0 0 1px ${tier.accent}, 0 0 20px color-mix(in srgb, ${tier.accent} 25%, transparent), 0 8px 32px color-mix(in srgb, ${tier.accent} 15%, transparent)`,
-                } : {
-                  boxShadow: `0 0 0 1px color-mix(in srgb, ${tier.accent} 15%, transparent)`,
-                }}
+                  boxShadow: `0 0 0 1.5px ${tier.accent}, 0 0 16px color-mix(in srgb, ${tier.accent} 20%, transparent)`,
+                } : undefined}
               >
-                {/* Gradient header */}
-                <div className={cn("relative p-5", tier.gradient)}>
-                  {/* Decorative circles */}
-                  <div className="absolute inset-0 opacity-10 pointer-events-none">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-white rounded-full -translate-y-1/2 translate-x-1/4" />
-                    <div className="absolute bottom-0 left-0 w-24 h-24 bg-white rounded-full translate-y-1/2 -translate-x-1/4" />
-                  </div>
+                {/* Gradient top bar */}
+                <div className={cn("h-1", tier.gradient)} />
 
-                  <div className="relative flex items-start justify-between">
+                <div className="p-5 space-y-4">
+                  {/* Header: name + price */}
+                  <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm">
-                        <TierIcon className="h-5 w-5 text-white" />
+                      <div className="flex h-9 w-9 items-center justify-center rounded-lg" style={{ backgroundColor: `color-mix(in srgb, ${tier.accent} 12%, transparent)` }}>
+                        <TierIcon className="h-4.5 w-4.5" style={{ color: tier.accent }} />
                       </div>
                       <div>
-                        <h3 className="text-lg font-bold text-white">{plan.display_name}</h3>
-                        <p className="text-xs text-white/70">{plan.tagline || plan.name}</p>
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-base font-bold text-foreground">{plan.display_name}</h3>
+                          {isPopular && (
+                            <span className="text-[10px] px-1.5 py-0.5 rounded font-medium" style={{ backgroundColor: `color-mix(in srgb, ${tier.accent} 15%, transparent)`, color: tier.accent }}>
+                              {lang === "zh" ? "最受欢迎" : "Popular"}
+                            </span>
+                          )}
+                          {!plan.enabled && (
+                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
+                              Disabled
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground">{plan.tagline || plan.name}</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-2xl font-extrabold text-white">
+                      <p className="text-xl font-bold" style={{ color: tier.accent }}>
                         {fmtDisplay(plan.monthly_price, plan.currency)}
+                        <span className="text-xs font-normal text-muted-foreground">{lang === "zh" ? "/月" : "/mo"}</span>
                       </p>
-                      <p className="text-xs text-white/60">
-                        {lang === "zh" ? "/月" : "/mo"} · {fmtDisplay(plan.yearly_price, plan.currency)}{lang === "zh" ? "/年" : "/yr"}
+                      <p className="text-xs text-muted-foreground">
+                        {fmtDisplay(plan.yearly_price, plan.currency)}{lang === "zh" ? "/年" : "/yr"}
                       </p>
                     </div>
                   </div>
 
-                  {/* Badges row */}
-                  <div className="relative flex items-center gap-2 mt-3">
-                    {isPopular && (
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/20 text-white font-medium backdrop-blur-sm">
-                        {lang === "zh" ? "最受欢迎" : "Most Popular"}
-                      </span>
-                    )}
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/15 text-white/80 font-mono">
+                  {/* Credits — prominent */}
+                  <div className="flex items-center gap-2 p-3 rounded-lg" style={{ backgroundColor: `color-mix(in srgb, ${tier.accent} 6%, transparent)` }}>
+                    <span className="text-sm font-semibold" style={{ color: tier.accent }}>
+                      {plan.monthly_credits.toLocaleString()}
+                    </span>
+                    <span className="text-xs text-muted-foreground">Credits / {lang === "zh" ? "月" : "mo"}</span>
+                    <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-mono">
                       {plan.currency}
                     </span>
-                    {!plan.enabled && (
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/15 text-white/60">
-                        Disabled
-                      </span>
-                    )}
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/15 text-white/80">
-                      {plan.monthly_credits.toLocaleString()} Credits
-                    </span>
                   </div>
-                </div>
 
-                {/* Body */}
-                <div className="p-5 space-y-4 bg-card">
                   {/* Stats row */}
                   {stat && (
                     <div className="space-y-2">
                       <div className="flex items-center justify-between text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1.5">
+                        <span className="flex items-center gap-1">
                           <Users className="h-3 w-3" />
                           {stat.active_subs} {lang === "zh" ? "订阅" : "subs"}
                         </span>
-                        <span>
-                          {lang === "zh" ? "使用率" : "Usage"} {usageRate}%
-                        </span>
-                        <span className="flex items-center gap-1.5">
+                        <span>{lang === "zh" ? "使用率" : "Usage"} {usageRate}%</span>
+                        <span className="flex items-center gap-1">
                           <DollarSign className="h-3 w-3" />
-                          {fmtDisplay(stat.monthly_revenue, "CNY")}
+                          {fmtDisplay(stat.monthly_revenue, plan.currency)}
                         </span>
                       </div>
                       <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
-                        <div
-                          className="h-full rounded-full transition-all"
-                          style={{ width: `${usageRate}%`, backgroundColor: tier.accent }}
-                        />
+                        <div className="h-full rounded-full transition-all" style={{ width: `${usageRate}%`, backgroundColor: tier.accent }} />
                       </div>
                     </div>
                   )}
 
-                  {/* Plan details */}
+                  {/* Details grid */}
                   <div className="grid grid-cols-3 gap-2 text-center">
-                    <div className="p-2 rounded-lg bg-muted/30">
-                      <p className="text-[10px] text-muted-foreground">{lang === "zh" ? "并发" : "Concurrency"}</p>
-                      <p className="text-sm font-semibold">{plan.max_concurrency}</p>
-                    </div>
-                    <div className="p-2 rounded-lg bg-muted/30">
-                      <p className="text-[10px] text-muted-foreground">{lang === "zh" ? "路由" : "Route"}</p>
-                      <p className="text-sm font-semibold">{ROUTE_LABELS[plan.route_priority]?.[lang] || plan.route_priority}</p>
-                    </div>
-                    <div className="p-2 rounded-lg bg-muted/30">
-                      <p className="text-[10px] text-muted-foreground">{lang === "zh" ? "支持" : "Support"}</p>
-                      <p className="text-sm font-semibold">{SUPPORT_LABELS[plan.support_level]?.[lang] || plan.support_level}</p>
-                    </div>
+                    {[
+                      { label: lang === "zh" ? "并发" : "Concurrency", value: plan.max_concurrency },
+                      { label: lang === "zh" ? "路由" : "Route", value: ROUTE_LABELS[plan.route_priority]?.[lang] || plan.route_priority },
+                      { label: lang === "zh" ? "支持" : "Support", value: SUPPORT_LABELS[plan.support_level]?.[lang] || plan.support_level },
+                    ].map(item => (
+                      <div key={item.label} className="p-2 rounded-lg bg-muted/30">
+                        <p className="text-[10px] text-muted-foreground">{item.label}</p>
+                        <p className="text-sm font-semibold">{item.value}</p>
+                      </div>
+                    ))}
                   </div>
 
                   {/* Actions */}
-                  <div className="flex items-center gap-2 pt-1">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1"
-                      onClick={() => { setModelDialogPlan(plan); setNewModel(""); fetchPlanModels(plan.id); }}
-                    >
-                      <LinkIcon className="h-3.5 w-3.5 mr-1" />
-                      {lang === "zh" ? "模型" : "Models"}
+                  <div className="flex items-center gap-2">
+                    <Button variant="outline" size="sm" className="flex-1" onClick={() => { setModelDialogPlan(plan); setNewModel(""); fetchPlanModels(plan.id); }}>
+                      <LinkIcon className="h-3.5 w-3.5 mr-1" />{lang === "zh" ? "模型" : "Models"}
                     </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1"
-                      onClick={() => { setEditPlan({ ...plan }); setEditTab("basic"); }}
-                    >
-                      <Pencil className="h-3.5 w-3.5 mr-1" />
-                      {lang === "zh" ? "编辑" : "Edit"}
+                    <Button variant="outline" size="sm" className="flex-1" onClick={() => { setEditPlan({ ...plan }); setEditTab("basic"); }}>
+                      <Pencil className="h-3.5 w-3.5 mr-1" />{lang === "zh" ? "编辑" : "Edit"}
                     </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-red-400 hover:text-red-300"
-                      onClick={() => setDeletePlan(plan)}
-                      aria-label={lang === "zh" ? "删除" : "Delete"}
-                    >
+                    <Button variant="outline" size="sm" className="text-red-400 hover:text-red-300" onClick={() => setDeletePlan(plan)}>
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>
                   </div>
