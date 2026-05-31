@@ -1,8 +1,9 @@
 "use client";
 
+import { useState, useMemo } from "react";
 import { useI18n } from "@/contexts/i18n-context";
 import { FaqAccordion, FaqItem } from "@/components/docs/faq-accordion";
-import { HelpCircle, Key, CreditCard, Cpu, Settings, Plug } from "lucide-react";
+import { HelpCircle, Key, CreditCard, Cpu, Settings, Plug, Search } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
 /*  Category definitions                                               */
@@ -312,6 +313,21 @@ const categories = [
 
 export default function FaqPage() {
   const { lang } = useI18n();
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredCategories = useMemo(() => {
+    if (!searchQuery.trim()) return categories;
+    const q = searchQuery.toLowerCase();
+    return categories
+      .map(cat => ({
+        ...cat,
+        items: cat.items.filter(item => {
+          const question = (lang === "zh" ? item.questionZh : item.questionEn).toLowerCase();
+          return question.includes(q);
+        }),
+      }))
+      .filter(cat => cat.items.length > 0);
+  }, [searchQuery, lang]);
 
   return (
     <div className="space-y-10">
@@ -330,8 +346,19 @@ export default function FaqPage() {
         </p>
       </div>
 
+      {/* Search */}
+      <div className="relative max-w-md">
+        <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+        <input
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
+          placeholder={lang === "zh" ? "搜索常见问题..." : "Search FAQ..."}
+          className="w-full pl-10 pr-4 py-2 bg-background rounded-lg text-sm border border-border/50 focus:border-primary focus:outline-none"
+        />
+      </div>
+
       {/* FAQ categories */}
-      {categories.map((cat) => {
+      {filteredCategories.map((cat) => {
         const Icon = cat.icon;
         return (
           <section key={cat.anchor} id={cat.anchor} className="space-y-4">

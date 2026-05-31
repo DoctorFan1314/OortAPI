@@ -973,6 +973,8 @@ export const en: Dictionary = {
     navModelsPricing: "Models & Pricing",
     navFaq: "FAQ",
     navSecurity: "Security & Privacy",
+    navPrev: "Previous",
+    navNext: "Next",
     navAiToolsOverview: "AI Tools Overview",
     navOpenAICodex: "OpenAI Codex Config",
     navOpenCode: "OpenCode Config",

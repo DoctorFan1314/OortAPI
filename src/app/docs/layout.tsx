@@ -4,6 +4,7 @@ import { EditThisPage } from "@/components/docs/edit-this-page";
 import { LastUpdated } from "@/components/docs/last-updated";
 import { TableOfContents } from "@/components/docs/table-of-contents";
 import { FeedbackPrompt } from "@/components/docs/feedback-prompt";
+import { PrevNext } from "@/components/docs/prev-next";
 
 export const metadata: Metadata = {
   title: "API Documentation — OortAPI",
@@ -17,6 +18,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
         <DocsSidebar />
         <main className="flex-1 min-w-0 max-w-5xl">
           {children}
+          <PrevNext />
           <FeedbackPrompt />
           <div className="mt-12 pt-6 border-t border-border flex items-center justify-between">
             <EditThisPage />

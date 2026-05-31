@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight, Info } from "lucide-react";
 
 export default function PricingPage() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const L = t.apiDocs;
 
   const tiers = [
@@ -91,7 +91,14 @@ export default function PricingPage() {
       </div>
 
       {/* Model marketplace link */}
-      <div className="flex justify-center">
+      <div className="flex flex-wrap justify-center gap-3">
+        <Link
+          href="/docs/models-pricing"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity"
+        >
+          {lang === "zh" ? "查看模型价格表" : "View Model Pricing Table"}
+          <ArrowRight className="h-4 w-4" />
+        </Link>
         <Link
           href="/models"
           className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-border/50 hover:border-primary/30 hover:bg-muted/30 text-sm font-medium transition-all group"

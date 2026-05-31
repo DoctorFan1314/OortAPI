@@ -505,6 +505,8 @@ export interface Dictionary {
     navModelsPricing: string;
     navFaq: string;
     navSecurity: string;
+    navPrev: string;
+    navNext: string;
     navAiToolsOverview: string;
     navOpenAICodex: string;
     navOpenCode: string;
