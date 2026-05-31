@@ -3,7 +3,8 @@
 import { useState, useMemo } from "react";
 import useSWR from "swr";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowUpRight, ArrowDownLeft, RefreshCw, Gift, Search, X } from "lucide-react";
+import { ArrowUpRight, ArrowDownLeft, RefreshCw, Gift, Search, X, AlertTriangle, Wallet } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useCurrency } from "@/contexts/currency-context";
 import { dashboardSWRConfig } from "@/lib/swr-fetcher";
 import { Input } from "@/components/ui/input";
@@ -35,7 +36,7 @@ export function BillingHistory({ lang = "zh" }: { lang?: "zh" | "en" }) {
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
-  const { data, isValidating } = useSWR<{ records: BillingRecord[]; total: number; has_more: boolean }>(
+  const { data, error: fetchError, isValidating, mutate: refetch } = useSWR<{ records: BillingRecord[]; total: number; has_more: boolean }>(
     `/api/dashboard/billing?limit=50&offset=${(page - 1) * 50}`,
     dashboardSWRConfig,
   );
@@ -93,8 +94,17 @@ export function BillingHistory({ lang = "zh" }: { lang?: "zh" | "en" }) {
         </div>
       </CardHeader>
       <CardContent>
-        {filtered.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground text-sm">{t.noRecords}</div>
+        {fetchError && !data ? (
+          <div className="text-center py-12">
+            <AlertTriangle className="h-8 w-8 text-destructive/40 mx-auto mb-2" />
+            <p className="text-sm text-muted-foreground mb-2">{lang === "zh" ? "加载失败" : "Failed to load"}</p>
+            <Button variant="outline" size="sm" onClick={() => refetch()}>{lang === "zh" ? "重试" : "Retry"}</Button>
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-12">
+            <Wallet className="h-8 w-8 text-muted-foreground/40 mx-auto mb-2" />
+            <p className="text-sm text-muted-foreground">{t.noRecords}</p>
+          </div>
         ) : (
           <div className="space-y-2">
             {filtered.map((r) => {

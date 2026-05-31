@@ -11,7 +11,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import { useToast } from "@/contexts/toast-context";
 import { useCurrency } from "@/contexts/currency-context";
-import { Users, Search, Shield, Loader2, Pencil, Trash2, Wallet, KeyRound, Eye, Power, PowerOff, DollarSign, Download } from "lucide-react";
+import { Users, Search, Shield, Loader2, Pencil, Trash2, Wallet, KeyRound, Eye, Power, PowerOff, DollarSign, Download, AlertTriangle } from "lucide-react";
 
 interface UserItem {
   id: number;
@@ -89,6 +89,7 @@ export default function UsersPage() {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [hasMore, setHasMore] = useState(false);
+  const [fetchError, setFetchError] = useState(false);
 
   // Edit dialog
   const [editUser, setEditUser] = useState<UserItem | null>(null);
@@ -127,6 +128,7 @@ export default function UsersPage() {
 
   const fetchUsers = useCallback(async () => {
     setLoading(true);
+    setFetchError(false);
     const params = new URLSearchParams({ page: String(page), limit: "20" });
     if (debouncedSearch) params.set("search", debouncedSearch);
     if (roleFilter !== "all") params.set("role", roleFilter);
@@ -136,7 +138,7 @@ export default function UsersPage() {
       setUsers(data.users || []);
       setTotal(data.total || 0);
       setHasMore(data.has_more || false);
-    } catch { /* ignore */ }
+    } catch { setFetchError(true); }
     setLoading(false);
   }, [page, debouncedSearch, roleFilter]);
 
@@ -446,8 +448,17 @@ export default function UsersPage() {
           )}
           {loading ? (
             <div className="h-48 animate-pulse bg-muted rounded-lg m-6" />
+          ) : fetchError ? (
+            <div className="text-center py-12">
+              <AlertTriangle className="h-8 w-8 text-destructive/40 mx-auto mb-2" />
+              <p className="text-sm text-muted-foreground mb-2">{lang === "zh" ? "加载失败" : "Failed to load"}</p>
+              <Button variant="outline" size="sm" onClick={() => fetchUsers()}>{lang === "zh" ? "重试" : "Retry"}</Button>
+            </div>
           ) : users.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground text-sm">{t.noUsers}</div>
+            <div className="text-center py-12">
+              <Users className="h-8 w-8 text-muted-foreground/40 mx-auto mb-2" />
+              <p className="text-sm text-muted-foreground">{t.noUsers}</p>
+            </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">

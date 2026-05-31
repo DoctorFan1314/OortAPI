@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useEffect, useState } from "react";
-import { Clock, Layers, Plus, Trash2, Save, AlertTriangle } from "lucide-react";
+import { Clock, Layers, Plus, Trash2, Save, AlertTriangle, BarChart3 } from "lucide-react";
 import { useToast } from "@/contexts/toast-context";
 
 interface MultiplierRule {
@@ -214,9 +214,10 @@ export default function MultiplierPage() {
     return (
       <div className="space-y-6">
         <h1 className="text-2xl font-bold">{t.title}</h1>
-        <div className="flex items-center gap-3 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
-          <AlertTriangle className="h-5 w-5 text-red-400 shrink-0" />
-          <p className="text-sm text-red-400">{lang === "zh" ? "加载失败，请刷新重试" : "Failed to load. Please refresh."}</p>
+        <div className="text-center py-12">
+          <AlertTriangle className="h-8 w-8 text-destructive/40 mx-auto mb-2" />
+          <p className="text-sm text-muted-foreground mb-2">{lang === "zh" ? "加载失败" : "Failed to load"}</p>
+          <Button variant="outline" size="sm" onClick={fetchData}>{lang === "zh" ? "重试" : "Retry"}</Button>
         </div>
       </div>
     );
@@ -366,7 +367,10 @@ export default function MultiplierPage() {
 
           {/* Rules table */}
           {rules.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground text-sm">{t.noRules}</div>
+            <div className="text-center py-12">
+              <BarChart3 className="h-8 w-8 text-muted-foreground/40 mx-auto mb-2" />
+              <p className="text-sm text-muted-foreground">{t.noRules}</p>
+            </div>
           ) : (
             <>
               {selectedRules.size > 0 && (

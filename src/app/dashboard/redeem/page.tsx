@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Badge } from "@/components/ui/badge";
 import { useEffect, useState, useCallback } from "react";
 import { useToast } from "@/contexts/toast-context";
-import { Gift, Loader2, Plus, Trash2, Copy, Check, Power, PowerOff } from "lucide-react";
+import { Gift, Loader2, Plus, Trash2, Copy, Check, Power, PowerOff, AlertTriangle } from "lucide-react";
 
 interface RedeemCode {
   id: number;
@@ -73,6 +73,7 @@ export default function RedeemPage() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [fetchError, setFetchError] = useState(false);
 
   const filteredCodes = searchQuery
     ? codes.filter(c => c.code.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -103,12 +104,13 @@ export default function RedeemPage() {
 
   const fetchCodes = useCallback(async () => {
     setLoading(true);
+    setFetchError(false);
     try {
       const res = await fetch(`/api/dashboard/redeem?page=${page}&limit=50`, { credentials: "include" });
       const data = await res.json();
       setCodes(data.codes || []);
       setHasMore(data.has_more || false);
-    } catch { showToast("Failed to load redeem codes", "error"); }
+    } catch { setFetchError(true); showToast("Failed to load redeem codes", "error"); }
     setLoading(false);
   }, [page]);
 
@@ -301,8 +303,17 @@ export default function RedeemPage() {
           )}
           {loading ? (
             <div className="h-48 animate-pulse bg-muted rounded-lg m-6" />
+          ) : fetchError ? (
+            <div className="text-center py-12">
+              <AlertTriangle className="h-8 w-8 text-destructive/40 mx-auto mb-2" />
+              <p className="text-sm text-muted-foreground mb-2">{lang === "zh" ? "加载失败" : "Failed to load"}</p>
+              <Button variant="outline" size="sm" onClick={() => fetchCodes()}>{lang === "zh" ? "重试" : "Retry"}</Button>
+            </div>
           ) : codes.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground text-sm">{t.noCodes}</div>
+            <div className="text-center py-12">
+              <Gift className="h-8 w-8 text-muted-foreground/40 mx-auto mb-2" />
+              <p className="text-sm text-muted-foreground">{t.noCodes}</p>
+            </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
