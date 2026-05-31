@@ -247,9 +247,11 @@ function AdminPlansContent() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button size="sm" onClick={() => setCreateOpen(true)}>
+          <Button size="sm" onClick={() => setCreateOpen(true)} disabled={plans.length >= 4}>
             <Plus className="h-4 w-4 mr-1" />
-            {lang === "zh" ? "创建套餐" : "Create Plan"}
+            {plans.length >= 4
+              ? (lang === "zh" ? "最多 4 个套餐" : "Max 4 plans")
+              : (lang === "zh" ? "创建套餐" : "Create Plan")}
           </Button>
           <div className="flex items-center gap-1 p-1 bg-muted rounded-full">
             <button
@@ -326,8 +328,8 @@ function AdminPlansContent() {
 
       {/* Plan grid */}
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {[1, 2, 3, 4, 5, 6].map(i => (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {[1, 2, 3, 4].map(i => (
             <div key={i} className="h-64 bg-muted rounded-xl animate-pulse" />
           ))}
         </div>
@@ -336,7 +338,7 @@ function AdminPlansContent() {
           <p className="text-muted-foreground">{lang === "zh" ? "暂无套餐" : "No plans"}</p>
         </CardContent></Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {plans.map(plan => {
             const tc = tierColor(plan.tier);
             const TierIcon = tierIcon(plan.tier);
@@ -351,15 +353,8 @@ function AdminPlansContent() {
                   !plan.enabled && "opacity-50 grayscale"
                 )}
               >
-                {/* Colored top bar */}
-                <div className={cn("h-1", tc.bar)} />
-
-                {/* Popular ribbon */}
-                {plan.popular === 1 && (
-                  <div className="absolute top-3 -right-8 rotate-45 bg-amber-500 text-white text-[10px] font-bold px-8 py-0.5 shadow-sm">
-                    {lang === "zh" ? "推荐" : "Popular"}
-                  </div>
-                )}
+                {/* Colored top bar — gradient for popular plans */}
+                <div className={cn("h-1.5", plan.popular === 1 ? "bg-gradient-to-r from-amber-400 via-orange-400 to-amber-400" : tc.bar)} />
 
                 <CardContent className="p-5 space-y-4">
                   {/* Header */}
