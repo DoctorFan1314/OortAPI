@@ -972,6 +972,7 @@ export const zh: Dictionary = {
     navFeatures: "功能总览",
     navModelsPricing: "模型与定价",
     navFaq: "常见问题",
+    navSecurity: "安全与隐私",
     navAiToolsOverview: "AI 工具总览",
     navOpenAICodex: "OpenAI Codex 配置",
     navOpenCode: "OpenCode 配置",

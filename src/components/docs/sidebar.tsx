@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/contexts/i18n-context";
-import { BookOpen, ChevronDown, Search, Zap, Key, Code, Activity, Book, Server, DollarSign, AlertTriangle, Gauge, Layout, Menu, X, GitCommit, HelpCircle, Layers, Cpu } from "lucide-react";
+import { BookOpen, ChevronDown, Search, Zap, Key, Code, Activity, Book, Server, DollarSign, AlertTriangle, Gauge, Layout, Menu, X, GitCommit, HelpCircle, Layers, Cpu, Shield } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 interface NavItem {
@@ -48,6 +48,7 @@ const NAV_SECTIONS: NavSection[] = [
       { href: "/docs/integrations", labelKey: "navIntegrations", icon: Book, exact: true },
       { href: "/docs/ai-tools", labelKey: "navAiTools", icon: Book, exact: true },
       { href: "/docs/deployment", labelKey: "navDeployment", icon: Server, exact: true },
+      { href: "/docs/security", labelKey: "navSecurity", icon: Shield, exact: true },
     ],
   },
   {

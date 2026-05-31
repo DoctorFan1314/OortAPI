@@ -120,6 +120,25 @@ with client.messages.stream(
     for text in stream.text_stream:
         print(text, end="", flush=True)`;
 
+  const anthropicStreamNode = `import Anthropic from "@anthropic-ai/sdk";
+
+const client = new Anthropic({
+  apiKey: "sk-oortapi-your-key",
+  baseURL: "${baseUrl}/api",
+});
+
+const stream = client.messages.stream({
+  model: "claude-sonnet-4-20250514",
+  max_tokens: 1024,
+  messages: [{ role: "user", content: "Hello!" }],
+});
+
+for await (const event of stream) {
+  if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
+    process.stdout.write(event.delta.text);
+  }
+}`;
+
   const errorHandling = `stream = client.chat.completions.create(
     model="gpt-4o",
     messages=[{"role": "user", "content": "Hello!"}],
@@ -231,6 +250,16 @@ except Exception as e:
         </div>
         <div className="p-5">
           <CodeBlock code={anthropicStreamPy} language="python" />
+        </div>
+      </div>
+
+      {/* Anthropic Node.js SDK */}
+      <div className="rounded-xl border border-amber-500/20 overflow-hidden">
+        <div className="bg-amber-500/5 px-5 py-3 border-b border-amber-500/10">
+          <h2 className="text-sm font-semibold text-amber-400">Anthropic Node.js SDK {lang === "zh" ? "流式" : "Streaming"}</h2>
+        </div>
+        <div className="p-5">
+          <CodeBlock code={anthropicStreamNode} language="javascript" />
         </div>
       </div>
 

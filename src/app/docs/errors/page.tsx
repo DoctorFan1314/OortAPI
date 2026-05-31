@@ -162,6 +162,20 @@ def api_call_with_retry(url, headers, data, max_retries=3):
         return resp
     raise Exception("Max retries exceeded")`;
 
+const retryExampleNode = `async function apiCallWithRetry(url, options, maxRetries = 5) {
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    const resp = await fetch(url, options);
+    if (resp.status === 429) {
+      const wait = Math.min(Math.pow(2, attempt) * 1000, 30000);
+      await new Promise(r => setTimeout(r, wait));
+      continue;
+    }
+    if (!resp.ok) throw new Error(\`API error: \${resp.status}\`);
+    return resp;
+  }
+  throw new Error("Max retries exceeded");
+}`;
+
 export default function ErrorsPage() {
   const { t, lang } = useI18n();
   const L = t.apiDocs;
@@ -214,6 +228,12 @@ export default function ErrorsPage() {
             : "For 429, 500, 502, and 503 errors, use exponential backoff retry. Here's a simple Python example:"}
         </p>
         <CodeBlock code={retryExample} language="python" />
+        <p className="text-sm text-muted-foreground mt-4">
+          {lang === "zh"
+            ? "Node.js 示例："
+            : "Node.js example:"}
+        </p>
+        <CodeBlock code={retryExampleNode} language="javascript" />
       </section>
 
       {/* Error format comparison */}

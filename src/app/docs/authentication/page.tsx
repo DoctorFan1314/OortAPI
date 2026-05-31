@@ -28,6 +28,30 @@ export default function AuthenticationPage() {
     "messages": [{"role": "user", "content": "Hello"}]
   }'`;
 
+  const openaiPythonCode = `import openai
+client = openai.OpenAI(
+    api_key="sk-oort-your-key",
+    base_url="https://your-domain.com/api/v1"
+)`;
+
+  const openaiNodeCode = `import OpenAI from "openai";
+const client = new OpenAI({
+  apiKey: "sk-oort-your-key",
+  baseURL: "https://your-domain.com/api/v1",
+});`;
+
+  const anthropicPythonCode = `import anthropic
+client = anthropic.Anthropic(
+    api_key="sk-oort-your-key",
+    base_url="https://your-domain.com/api"
+)`;
+
+  const anthropicNodeCode = `import Anthropic from "@anthropic-ai/sdk";
+const client = new Anthropic({
+  apiKey: "sk-oort-your-key",
+  baseURL: "https://your-domain.com/api",
+});`;
+
   const anthropicAltCode = `# Alternatively, using Authorization header:
 curl https://your-domain.com/api/v1/messages \\
   -H "Authorization: Bearer sk-oort-xxxxxxxxxxxxxxxx" \\
@@ -60,6 +84,10 @@ curl https://your-domain.com/api/v1/messages \\
           </CardHeader>
           <CardContent className="space-y-3">
             <CodeBlock code={openaiCode} />
+            <p className="text-xs text-muted-foreground pt-2">Python SDK</p>
+            <CodeBlock code={openaiPythonCode} language="python" />
+            <p className="text-xs text-muted-foreground pt-2">Node.js SDK</p>
+            <CodeBlock code={openaiNodeCode} language="javascript" />
           </CardContent>
         </Card>
 
@@ -80,6 +108,10 @@ curl https://your-domain.com/api/v1/messages \\
           <CardContent className="space-y-3">
             <CodeBlock code={anthropicCode} />
             <CodeBlock code={anthropicAltCode} />
+            <p className="text-xs text-muted-foreground pt-2">Python SDK</p>
+            <CodeBlock code={anthropicPythonCode} language="python" />
+            <p className="text-xs text-muted-foreground pt-2">Node.js SDK</p>
+            <CodeBlock code={anthropicNodeCode} language="javascript" />
           </CardContent>
         </Card>
       </div>

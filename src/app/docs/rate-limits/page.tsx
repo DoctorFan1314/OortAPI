@@ -2,7 +2,7 @@
 
 import { useI18n } from "@/contexts/i18n-context";
 import { CodeBlock } from "@/components/docs/code-block";
-import { Gauge, AlertTriangle, Info } from "lucide-react";
+import { Gauge, AlertTriangle, Info, Coins } from "lucide-react";
 
 const TIER_TABLE = [
   { tier: "Default", rpm: "60", note: "All new keys" },
@@ -58,7 +58,18 @@ def api_call_with_retry(url, headers, data, max_retries=5):
 # Response headers:
 # X-RateLimit-Limit: 60
 # X-RateLimit-Remaining: 42
-# X-RateLimit-Reset: 1700000000`;
+# X-RateLimit-Reset: 1700000000
+# X-RateLimit-Tokens-Remaining: 150000
+# X-RateLimit-Tokens-Reset: 1700000000`;
+
+  const tpmExample = `curl https://your-domain.com/api/v1/chat/completions \\
+  -H "Authorization: Bearer sk-oort-your-key" \\
+  -H "Content-Type: application/json" \\
+  -d '{"model":"gpt-4o","messages":[{"role":"user","content":"Hello"}]}'
+
+# Response headers:
+# X-RateLimit-Tokens-Remaining: 148500
+# X-RateLimit-Tokens-Reset: 1700000060`;
 
   return (
     <div className="space-y-10">
@@ -83,6 +94,49 @@ def api_call_with_retry(url, headers, data, max_retries=5):
               ? "每个 API Key 默认每分钟最多 60 次请求（60 RPM）。你可以在控制台 API Keys 页面为每个 Key 单独调整限制（1-10000 RPM）。"
               : "Each API Key has a default limit of 60 requests per minute (60 RPM). You can adjust this per key in Dashboard → API Keys (1-10000 RPM)."}
           </p>
+        </div>
+      </section>
+
+      {/* TPM (Tokens Per Minute) */}
+      <section className="space-y-4">
+        <h2 className="text-lg font-semibold flex items-center gap-2">
+          <Coins className="h-4 w-4 text-amber-500" />
+          {lang === "zh" ? "TPM（每分钟 Token 数）" : "TPM (Tokens Per Minute)"}
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          {lang === "zh"
+            ? "除了 RPM 限制，部分模型还有每分钟 Token 数（TPM）限制。TPM 统计 1 分钟窗口内所有请求的总 Token 数（输入 + 输出）。"
+            : "In addition to RPM, some models have token-per-minute (TPM) limits. TPM counts total tokens (input + output) across all requests in a 1-minute window."}
+        </p>
+        <ul className="text-sm text-muted-foreground space-y-2.5 list-none pl-0">
+          {[
+            lang === "zh"
+              ? "当 TPM 超限时，API 返回 429 并提示 Token 限制信息"
+              : "When TPM is exceeded, the API returns 429 with a message about token limits",
+            lang === "zh"
+              ? "检查 X-RateLimit-Tokens-Remaining 和 X-RateLimit-Tokens-Reset 响应头"
+              : "Check X-RateLimit-Tokens-Remaining and X-RateLimit-Tokens-Reset headers",
+            lang === "zh"
+              ? "TPM 使用量较高时，使用流式输出（streaming）以在完整响应生成前开始获取输出 Token"
+              : "High TPM usage: use streaming to start getting output tokens before the full response is generated",
+          ].map((item, i) => (
+            <li key={i} className="flex items-start gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 mt-2 shrink-0" />
+              {item}
+            </li>
+          ))}
+        </ul>
+        <CodeBlock code={tpmExample} language="bash" />
+        <div className="grid sm:grid-cols-2 gap-3">
+          {[
+            { header: "X-RateLimit-Tokens-Remaining", desc: lang === "zh" ? "剩余可用 Token 数" : "Remaining tokens available" },
+            { header: "X-RateLimit-Tokens-Reset", desc: lang === "zh" ? "Token 限制重置时间（Unix 时间戳）" : "Token limit reset time (Unix timestamp)" },
+          ].map((item) => (
+            <div key={item.header} className="rounded-lg border border-border/30 p-3">
+              <code className="text-xs font-mono text-primary">{item.header}</code>
+              <p className="text-xs text-muted-foreground mt-1">{item.desc}</p>
+            </div>
+          ))}
         </div>
       </section>
 

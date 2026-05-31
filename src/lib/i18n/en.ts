@@ -972,6 +972,7 @@ export const en: Dictionary = {
     navFeatures: "Features Overview",
     navModelsPricing: "Models & Pricing",
     navFaq: "FAQ",
+    navSecurity: "Security & Privacy",
     navAiToolsOverview: "AI Tools Overview",
     navOpenAICodex: "OpenAI Codex Config",
     navOpenCode: "OpenCode Config",

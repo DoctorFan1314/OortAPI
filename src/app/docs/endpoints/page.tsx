@@ -275,6 +275,15 @@ export default function EndpointsPage() {
   "currency": "CNY"
 }`} />
         </SchemaSection>
+        <SchemaSection title={lang === "zh" ? "兑换请求与响应" : "Redeem Request & Response"}>
+          <ParamTable params={[
+            { name: "code", type: "string", required: true, desc: lang === "zh" ? "兑换码" : "Redeem code" },
+          ]} />
+          <CodeBlock code={`{
+  "balance": 178.50,
+  "added": 50.00
+}`} />
+        </SchemaSection>
       </div>
 
       {/* ========== User Endpoints ========== */}
@@ -284,10 +293,115 @@ export default function EndpointsPage() {
           {L.userEndpoints}
         </div>
         <EndpointRow method="POST" path="/api/auth/login" description="Login" />
+        <SchemaSection title={lang === "zh" ? "请求与响应" : "Request & Response"}>
+          <ParamTable params={[
+            { name: "email", type: "string", required: true, desc: lang === "zh" ? "注册邮箱" : "Registered email" },
+            { name: "password", type: "string", required: true, desc: lang === "zh" ? "账户密码" : "Account password" },
+          ]} />
+          <CodeBlock code={`{
+  "token": "eyJhbGciOiJIUzI1NiIs...",
+  "user": {
+    "id": "usr_xxx",
+    "email": "user@example.com",
+    "username": "demo",
+    "role": "user"
+  }
+}`} />
+        </SchemaSection>
+
+        <div className="border-t border-border/20" />
         <EndpointRow method="POST" path="/api/auth/register" description="Register" />
+        <SchemaSection title={lang === "zh" ? "请求与响应" : "Request & Response"}>
+          <ParamTable params={[
+            { name: "email", type: "string", required: true, desc: lang === "zh" ? "注册邮箱" : "Email address" },
+            { name: "password", type: "string", required: true, desc: lang === "zh" ? "账户密码" : "Account password" },
+            { name: "username", type: "string", required: true, desc: lang === "zh" ? "用户名" : "Username" },
+          ]} />
+          <CodeBlock code={`{
+  "token": "eyJhbGciOiJIUzI1NiIs...",
+  "user": {
+    "id": "usr_xxx",
+    "email": "user@example.com",
+    "username": "demo",
+    "role": "user"
+  }
+}`} />
+        </SchemaSection>
+
+        <div className="border-t border-border/20" />
         <EndpointRow method="GET" path="/api/auth/me" description="Get Current User" />
+        <SchemaSection title={lang === "zh" ? "响应示例" : "Response Example"}>
+          <CodeBlock code={`{
+  "id": "usr_xxx",
+  "email": "user@example.com",
+  "username": "demo",
+  "role": "user"
+}`} />
+        </SchemaSection>
+
+        <div className="border-t border-border/20" />
         <EndpointRow method="PATCH" path="/api/auth/profile" description="Update Profile" />
+        <SchemaSection title={lang === "zh" ? "请求与响应" : "Request & Response"}>
+          <ParamTable params={[
+            { name: "username", type: "string", required: false, desc: lang === "zh" ? "新用户名" : "New username" },
+            { name: "bio", type: "string", required: false, desc: lang === "zh" ? "个人简介" : "Bio / about" },
+          ]} />
+          <CodeBlock code={`{
+  "user": {
+    "id": "usr_xxx",
+    "email": "user@example.com",
+    "username": "new_name",
+    "bio": "Hello world"
+  }
+}`} />
+        </SchemaSection>
+
+        <div className="border-t border-border/20" />
         <EndpointRow method="POST" path="/api/auth/change-password" description="Change Password" />
+        <SchemaSection title={lang === "zh" ? "请求与响应" : "Request & Response"}>
+          <ParamTable params={[
+            { name: "currentPassword", type: "string", required: true, desc: lang === "zh" ? "当前密码" : "Current password" },
+            { name: "newPassword", type: "string", required: true, desc: lang === "zh" ? "新密码" : "New password" },
+          ]} />
+          <CodeBlock code={`{
+  "success": true
+}`} />
+        </SchemaSection>
+      </div>
+
+      {/* ========== Pagination ========== */}
+      <div className="rounded-xl border border-border/50 overflow-hidden">
+        <div className={`${sectionHeader} bg-slate-500/5 text-slate-400 border-slate-500/10`}>
+          <Cpu className="h-4 w-4" />
+          {lang === "zh" ? "分页" : "Pagination"}
+        </div>
+        <div className="px-5 py-4 space-y-4 text-sm text-muted-foreground">
+          <p>
+            {lang === "zh"
+              ? "列表端点（如 GET /api/v1/models、GET /api/v1/billing/usage）支持分页查询，使用以下查询参数："
+              : "List endpoints (e.g. GET /api/v1/models, GET /api/v1/billing/usage) support pagination via the following query parameters:"}
+          </p>
+          <ParamTable params={[
+            { name: "page", type: "integer", required: false, default: "1", desc: lang === "zh" ? "页码，从 1 开始" : "Page number, starts at 1" },
+            { name: "per_page", type: "integer", required: false, default: "20", desc: lang === "zh" ? "每页条数，最大 100" : "Items per page, max 100" },
+          ]} />
+          <p className="text-xs">
+            {lang === "zh"
+              ? "示例：GET /api/v1/models?page=2&per_page=10"
+              : "Example: GET /api/v1/models?page=2&per_page=10"}
+          </p>
+          <SchemaSection title={lang === "zh" ? "分页响应示例" : "Paginated Response Example"}>
+            <CodeBlock code={`{
+  "total": 56,
+  "page": 2,
+  "per_page": 10,
+  "data": [
+    { "id": "gpt-4o", "object": "model", "created": 1700000000, "owned_by": "openai" },
+    ...
+  ]
+}`} />
+          </SchemaSection>
+        </div>
       </div>
     </div>
   );

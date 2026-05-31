@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useI18n } from "@/contexts/i18n-context";
-import { Zap, Code, Key, Activity, Server, DollarSign, AlertTriangle, Gauge, Book, Layout, ArrowRight, Search, Sparkles, HelpCircle, Layers, Cpu, ExternalLink } from "lucide-react";
+import { Zap, Code, Key, Activity, Server, DollarSign, AlertTriangle, Gauge, Book, Layout, ArrowRight, Search, Sparkles, HelpCircle, Layers, Cpu, ExternalLink, Shield } from "lucide-react";
 
 interface DocCard {
   href: string;
@@ -35,6 +35,7 @@ const cards: DocCard[] = [
   { href: "/docs/integrations", icon: Book, labelKey: "navIntegrations", descKey: "appsTitle", group: "guides" },
   { href: "/docs/ai-tools", icon: Book, labelKey: "navAiTools", descKey: "aiToolsTitle", group: "guides" },
   { href: "/docs/deployment", icon: Server, labelKey: "navDeployment", descKey: "deployTitle", group: "guides" },
+  { href: "/docs/security", icon: Shield, labelKey: "navSecurity", descKey: "securityDesc", group: "guides" },
   { href: "/docs/faq", icon: HelpCircle, labelKey: "navFaq", descKey: "faqDesc", group: "resources" },
   { href: "/docs/pricing", icon: DollarSign, labelKey: "navPricing", descKey: "pricing", group: "resources" },
   { href: "/docs/changelog", icon: Zap, labelKey: "navChangelog", descKey: "changelogDesc", group: "resources" },
