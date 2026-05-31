@@ -125,27 +125,25 @@ except openai.APIError as e:
       </div>
 
       {/* Steps with connector line */}
-      <div className="relative">
-        {/* Vertical connector line */}
-        <div className="absolute left-[13px] top-8 bottom-8 w-px bg-primary/20 hidden sm:block" />
-
-        <div className="space-y-8">
+      <div className="space-y-8">
           {/* Step 1: Get API Key */}
           <section className="space-y-3 relative">
+            {/* Connector line to step 2 */}
+            <div className="absolute left-[13px] top-10 bottom-[-2rem] w-px bg-primary/15 hidden sm:block" />
             <h2 className="text-lg font-bold flex items-center gap-3">
-              <span className="flex items-center justify-center w-7 h-7 rounded-full bg-primary/10 text-primary text-xs font-bold shrink-0 relative z-10">
+              <span className="flex items-center justify-center w-7 h-7 rounded-full bg-primary/10 text-primary text-xs font-bold shrink-0 relative z-10 bg-[var(--background)]">
                 1
               </span>
               {L.step1Title}
             </h2>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground relative z-10">
               {L.step1Desc}{" "}
               <Link href="/dashboard/keys" className="text-primary hover:underline font-medium">
                 {L.step1Mid}
               </Link>{" "}
               {L.step1End}
             </p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground relative z-10">
               {lang === "zh"
                 ? "你的 API Key 以 "
                 : "Your API Key starts with "}
@@ -158,8 +156,10 @@ except openai.APIError as e:
 
           {/* Step 2: Configure Base URL */}
           <section className="space-y-3 relative">
+            {/* Connector line to step 3 */}
+            <div className="absolute left-[13px] top-10 bottom-[-2rem] w-px bg-primary/15 hidden sm:block" />
             <h2 className="text-lg font-bold flex items-center gap-3">
-              <span className="flex items-center justify-center w-7 h-7 rounded-full bg-primary/10 text-primary text-xs font-bold shrink-0 relative z-10">
+              <span className="flex items-center justify-center w-7 h-7 rounded-full bg-primary/10 text-primary text-xs font-bold shrink-0 relative z-10 bg-[var(--background)]">
                 2
               </span>
               {L.step2Title}
