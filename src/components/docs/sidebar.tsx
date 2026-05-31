@@ -47,7 +47,7 @@ const NAV_SECTIONS: NavSection[] = [
       { href: "/docs/models-pricing", labelKey: "navModelsPricing", icon: Cpu, exact: true },
       { href: "/docs/integrations", labelKey: "navIntegrations", icon: Book, exact: true },
       { href: "/docs/ai-tools", labelKey: "navAiTools", icon: Book, exact: true },
-      { href: "/docs/deployment", labelKey: "navDeploymentGuide", icon: Server, exact: true },
+      { href: "/docs/deployment", labelKey: "navDeployment", icon: Server, exact: true },
     ],
   },
   {
@@ -55,7 +55,7 @@ const NAV_SECTIONS: NavSection[] = [
     items: [
       { href: "/docs/faq", labelKey: "navFaq", icon: HelpCircle, exact: true },
       { href: "/docs/changelog", labelKey: "navChangelog", icon: GitCommit, exact: true },
-      { href: "/docs/pricing", labelKey: "navPricingInfo", icon: DollarSign, exact: true },
+      { href: "/docs/pricing", labelKey: "navPricing", icon: DollarSign, exact: true },
     ],
   },
 ];
