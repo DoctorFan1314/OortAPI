@@ -2,18 +2,79 @@
 
 import { useI18n } from "@/contexts/i18n-context";
 import { CodeBlock } from "@/components/docs/code-block";
-import { Gauge, AlertTriangle } from "lucide-react";
+import { Gauge, AlertTriangle, Info } from "lucide-react";
+
+const TIER_TABLE = [
+  { tier: "Default", rpm: "60", note: "All new keys" },
+  { tier: "Standard", rpm: "200", note: "Verified users" },
+  { tier: "Pro", rpm: "1,000", note: "Subscription plans" },
+  { tier: "Enterprise", rpm: "10,000", note: "Custom agreement" },
+];
 
 export default function RateLimitsPage() {
   const { lang } = useI18n();
 
-  return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold flex items-center gap-2">
-        <Gauge className="h-6 w-6" />
-        {lang === "zh" ? "速率限制" : "Rate Limits"}
-      </h1>
+  const pythonRetry = `import time
+import requests
 
+def api_call_with_retry(url, headers, data, max_retries=5):
+    for attempt in range(max_retries):
+        resp = requests.post(url, headers=headers, json=data)
+        if resp.status_code == 429:
+            # Exponential backoff: 1s, 2s, 4s, 8s, 16s
+            wait = min(2 ** attempt, 30)
+            remaining = resp.headers.get("X-RateLimit-Reset")
+            if remaining:
+                import time as t
+                wait_from_header = max(int(remaining) - int(t.time()), 1)
+                wait = min(wait_from_header, 30)
+            time.sleep(wait)
+            continue
+        return resp
+    raise Exception("Max retries exceeded")`;
+
+  const nodeRetry = `async function apiCallWithRetry(url, options, maxRetries = 5) {
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    const resp = await fetch(url, options);
+    if (resp.status === 429) {
+      // Exponential backoff: 1s, 2s, 4s, 8s, 16s
+      let wait = Math.min(Math.pow(2, attempt) * 1000, 30000);
+      const resetHeader = resp.headers.get("X-RateLimit-Reset");
+      if (resetHeader) {
+        const waitFromHeader = (parseInt(resetHeader) - Date.now() / 1000) * 1000;
+        wait = Math.min(Math.max(waitFromHeader, 1000), 30000);
+      }
+      await new Promise(r => setTimeout(r, wait));
+      continue;
+    }
+    return resp;
+  }
+  throw new Error("Max retries exceeded");
+}`;
+
+  const checkHeaders = `curl -I https://your-domain.com/api/v1/chat/completions \\
+  -H "Authorization: Bearer sk-oort-your-key"
+
+# Response headers:
+# X-RateLimit-Limit: 60
+# X-RateLimit-Remaining: 42
+# X-RateLimit-Reset: 1700000000`;
+
+  return (
+    <div className="space-y-10">
+      <div>
+        <h1 className="text-2xl font-bold flex items-center gap-2">
+          <Gauge className="h-6 w-6" />
+          {lang === "zh" ? "速率限制" : "Rate Limits"}
+        </h1>
+        <p className="text-muted-foreground mt-2">
+          {lang === "zh"
+            ? "速率限制保护服务稳定性和公平使用。每个 API Key 有独立的请求频率限制。"
+            : "Rate limits protect service stability and fair usage. Each API Key has its own request frequency limit."}
+        </p>
+      </div>
+
+      {/* Default Limits */}
       <section className="space-y-4">
         <h2 className="text-lg font-semibold">{lang === "zh" ? "默认限制" : "Default Limits"}</h2>
         <div className="rounded-lg border border-border/50 p-4 text-sm space-y-2">
@@ -25,8 +86,51 @@ export default function RateLimitsPage() {
         </div>
       </section>
 
+      {/* Tier Comparison */}
       <section className="space-y-4">
-        <h2 className="text-lg font-semibold">{lang === "zh" ? "超限处理" : "Rate Limit Response"}</h2>
+        <h2 className="text-lg font-semibold">{lang === "zh" ? "限流等级" : "Rate Limit Tiers"}</h2>
+        <div className="rounded-xl border border-border/50 overflow-hidden">
+          <div className="grid grid-cols-3 gap-4 px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b border-border/20 bg-muted/10">
+            <span>{lang === "zh" ? "等级" : "Tier"}</span>
+            <span>{lang === "zh" ? "请求/分钟" : "Requests/Min"}</span>
+            <span>{lang === "zh" ? "说明" : "Notes"}</span>
+          </div>
+          {TIER_TABLE.map((row) => (
+            <div key={row.tier} className="grid grid-cols-3 gap-4 px-5 py-3 border-b border-border/20 last:border-b-0 text-sm">
+              <span className="font-medium">{row.tier}</span>
+              <span className="font-mono text-primary">{row.rpm} RPM</span>
+              <span className="text-muted-foreground text-xs">{row.note}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Check Your Limits */}
+      <section className="space-y-4">
+        <h2 className="text-lg font-semibold">{lang === "zh" ? "查看当前限制" : "Check Your Current Limits"}</h2>
+        <p className="text-sm text-muted-foreground">
+          {lang === "zh"
+            ? "所有 API 响应头中会包含当前限流状态。你也可以用 HEAD 请求快速查看："
+            : "All API responses include rate limit headers. You can also use a HEAD request to check quickly:"}
+        </p>
+        <CodeBlock code={checkHeaders} />
+        <div className="grid sm:grid-cols-3 gap-3">
+          {[
+            { header: "X-RateLimit-Limit", desc: lang === "zh" ? "当前 Key 的最大请求数" : "Max requests for this key" },
+            { header: "X-RateLimit-Remaining", desc: lang === "zh" ? "剩余可用请求数" : "Remaining requests available" },
+            { header: "X-RateLimit-Reset", desc: lang === "zh" ? "限制重置时间（Unix 时间戳）" : "Limit reset time (Unix timestamp)" },
+          ].map((item) => (
+            <div key={item.header} className="rounded-lg border border-border/30 p-3">
+              <code className="text-xs font-mono text-primary">{item.header}</code>
+              <p className="text-xs text-muted-foreground mt-1">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Rate Limit Response */}
+      <section className="space-y-4">
+        <h2 className="text-lg font-semibold">{lang === "zh" ? "超限响应" : "Rate Limit Response"}</h2>
         <p className="text-sm text-muted-foreground">
           {lang === "zh"
             ? "当请求频率超过限制时，API 返回 429 状态码："
@@ -34,6 +138,7 @@ export default function RateLimitsPage() {
         </p>
         <CodeBlock code={`HTTP/1.1 429 Too Many Requests
 Content-Type: application/json
+Retry-After: 30
 
 {
   "error": {
@@ -41,62 +146,58 @@ Content-Type: application/json
     "type": "rate_limit_error"
   }
 }`} />
+      </section>
+
+      {/* Retry Strategy */}
+      <section className="space-y-4">
+        <h2 className="text-lg font-semibold">{lang === "zh" ? "推荐的重试策略" : "Recommended Retry Strategy"}</h2>
         <p className="text-sm text-muted-foreground">
           {lang === "zh"
-            ? "所有 API 响应头中会包含当前限流状态："
-            : "All API responses include rate limit headers:"}
+            ? "使用指数退避（Exponential Backoff）策略处理 429 响应。以下是完整示例："
+            : "Use exponential backoff to handle 429 responses. Here are complete examples:"}
         </p>
-        <CodeBlock code={`X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 42
-X-RateLimit-Reset: 1700000000`} />
-      </section>
-
-      <section className="space-y-4">
-        <h2 className="text-lg font-semibold">{lang === "zh" ? "建议的重试策略" : "Recommended Retry Strategy"}</h2>
 
         <h3 className="text-sm font-medium text-muted-foreground">Python</h3>
-        <CodeBlock code={`import time
-import requests
-
-def api_call_with_retry(url, headers, data, max_retries=3):
-    for i in range(max_retries):
-        resp = requests.post(url, headers=headers, json=data)
-        if resp.status_code == 429:
-            wait = int(resp.headers.get("X-RateLimit-Reset", time.time() + 5)) - time.time()
-            wait = max(wait, 1)
-            time.sleep(min(wait, 30))
-            continue
-        return resp
-    raise Exception("Max retries exceeded")`} />
+        <CodeBlock code={pythonRetry} language="python" />
 
         <h3 className="text-sm font-medium text-muted-foreground">Node.js</h3>
-        <CodeBlock code={`async function apiCallWithRetry(url, options, maxRetries = 3) {
-  for (let i = 0; i < maxRetries; i++) {
-    const resp = await fetch(url, options);
-    if (resp.status === 429) {
-      const reset = parseInt(resp.headers.get("X-RateLimit-Reset") || String(Date.now()/1000 + 5));
-      const wait = Math.max(reset - Date.now()/1000, 1) * 1000;
-      await new Promise(r => setTimeout(r, Math.min(wait, 30000)));
-      continue;
-    }
-    return resp;
-  }
-  throw new Error("Max retries exceeded");
-}`} />
+        <CodeBlock code={nodeRetry} language="javascript" />
       </section>
 
+      {/* Best Practices */}
       <section className="space-y-3">
         <h2 className="text-lg font-semibold flex items-center gap-2">
           <AlertTriangle className="h-4 w-4 text-amber-500" />
           {lang === "zh" ? "最佳实践" : "Best Practices"}
         </h2>
-        <ul className="text-sm text-muted-foreground space-y-2 list-disc pl-5">
-          <li>{lang === "zh" ? "使用指数退避（Exponential Backoff）重试 429 响应" : "Use exponential backoff when retrying 429 responses"}</li>
-          <li>{lang === "zh" ? "监控 X-RateLimit-Remaining 头，在接近 0 时降低请求频率" : "Monitor X-RateLimit-Remaining header and slow down when approaching 0"}</li>
-          <li>{lang === "zh" ? "在控制台适当提高高频使用 Key 的速率限制" : "Increase rate limits for high-frequency keys in the dashboard"}</li>
-          <li>{lang === "zh" ? "流式请求（stream: true）也计入速率限制" : "Streaming requests (stream: true) also count toward rate limits"}</li>
+        <ul className="text-sm text-muted-foreground space-y-2.5 list-none pl-0">
+          {[
+            lang === "zh" ? "使用指数退避（Exponential Backoff）重试 429 响应" : "Use exponential backoff when retrying 429 responses",
+            lang === "zh" ? "监控 X-RateLimit-Remaining 头，在接近 0 时降低请求频率" : "Monitor X-RateLimit-Remaining header and slow down when approaching 0",
+            lang === "zh" ? "在控制台适当提高高频使用 Key 的速率限制" : "Increase rate limits for high-frequency keys in the dashboard",
+            lang === "zh" ? "流式请求（stream: true）也计入速率限制" : "Streaming requests (stream: true) also count toward rate limits",
+            lang === "zh" ? "使用请求队列避免突发并发超过限制" : "Use a request queue to avoid burst concurrency exceeding limits",
+            lang === "zh" ? "不同 Key 的限制独立计算，可按用途分配不同 Key" : "Each key's limit is independent — use separate keys for different purposes",
+          ].map((item, i) => (
+            <li key={i} className="flex items-start gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0" />
+              {item}
+            </li>
+          ))}
         </ul>
       </section>
+
+      {/* Info box */}
+      <div className="rounded-lg border border-sky-500/20 bg-sky-500/5 p-4 text-sm">
+        <div className="flex items-start gap-2">
+          <Info className="h-4 w-4 text-sky-500 mt-0.5 shrink-0" />
+          <p className="text-muted-foreground">
+            {lang === "zh"
+              ? "如果你的应用需要更高的速率限制，请联系我们讨论企业级方案。"
+              : "If your application needs higher rate limits, contact us to discuss enterprise plans."}
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

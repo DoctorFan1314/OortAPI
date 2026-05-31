@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/contexts/i18n-context";
-import { BookOpen, ChevronDown, Search, Zap, Key, Code, Activity, Book, Server, DollarSign, AlertTriangle, Gauge, Layout, Menu, X, GitCommit } from "lucide-react";
+import { BookOpen, ChevronDown, Search, Zap, Key, Code, Activity, Book, Server, DollarSign, AlertTriangle, Gauge, Layout, Menu, X, GitCommit, HelpCircle, Layers, Cpu } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 interface NavItem {
@@ -26,7 +26,6 @@ const NAV_SECTIONS: NavSection[] = [
     items: [
       { href: "/docs", labelKey: "navOverview", icon: BookOpen, exact: true },
       { href: "/docs/quickstart", labelKey: "navQuickStart", icon: Zap, exact: true },
-      { href: "/docs/changelog", labelKey: "navChangelog", icon: GitCommit, exact: true },
       { href: "/docs/authentication", labelKey: "navAuthentication", icon: Key, exact: true },
     ],
   },
@@ -44,24 +43,18 @@ const NAV_SECTIONS: NavSection[] = [
   {
     sectionKey: "navGuides",
     items: [
+      { href: "/docs/features", labelKey: "navFeatures", icon: Layers, exact: true },
+      { href: "/docs/models-pricing", labelKey: "navModelsPricing", icon: Cpu, exact: true },
       { href: "/docs/integrations", labelKey: "navIntegrations", icon: Book, exact: true },
-    ],
-  },
-  {
-    sectionKey: "navAiTools",
-    items: [
       { href: "/docs/ai-tools", labelKey: "navAiTools", icon: Book, exact: true },
-    ],
-  },
-  {
-    sectionKey: "navDeployment",
-    items: [
       { href: "/docs/deployment", labelKey: "navDeploymentGuide", icon: Server, exact: true },
     ],
   },
   {
-    sectionKey: "navPricing",
+    sectionKey: "navResources",
     items: [
+      { href: "/docs/faq", labelKey: "navFaq", icon: HelpCircle, exact: true },
+      { href: "/docs/changelog", labelKey: "navChangelog", icon: GitCommit, exact: true },
       { href: "/docs/pricing", labelKey: "navPricingInfo", icon: DollarSign, exact: true },
     ],
   },

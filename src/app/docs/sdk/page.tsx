@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useI18n } from "@/contexts/i18n-context";
 import { CodeBlock } from "@/components/docs/code-block";
 import { BaseUrlDisplay } from "@/components/docs/base-url-display";
-import { Code2, FlaskConical } from "lucide-react";
+import { Code2, FlaskConical, Zap, AlertTriangle } from "lucide-react";
 
 export default function SdkPage() {
   const [origin, setOrigin] = useState("");
@@ -103,6 +103,66 @@ console.log(response.content[0].text);`;
   const curlBalance = `curl ${OAI_BASE}/billing/balance \\
   -H "Authorization: Bearer sk-oortapi-your-key"`;
 
+  const langchainExample = `from langchain_openai import ChatOpenAI
+
+llm = ChatOpenAI(
+    model="gpt-4o",
+    openai_api_key="sk-oortapi-your-key",
+    openai_api_base="${OAI_BASE}"
+)
+
+response = llm.invoke("Hello!")
+print(response.content)`;
+
+  const vercelAiExample = `import { openai } from "@ai-sdk/openai";
+import { generateText } from "ai";
+
+const { text } = await generateText({
+  model: openai("gpt-4o", {
+    baseURL: "${OAI_BASE}",
+    apiKey: "sk-oortapi-your-key",
+  }),
+  prompt: "Hello!",
+});
+console.log(text);`;
+
+  const streamingPython = `import openai
+
+client = openai.OpenAI(
+    api_key="sk-oortapi-your-key",
+    base_url="${OAI_BASE}"
+)
+
+stream = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[{"role": "user", "content": "Write a haiku"}],
+    stream=True
+)
+
+for chunk in stream:
+    if chunk.choices[0].delta.content:
+        print(chunk.choices[0].delta.content, end="", flush=True)`;
+
+  const errorHandlingPython = `import openai
+
+client = openai.OpenAI(
+    api_key="sk-oortapi-your-key",
+    base_url="${OAI_BASE}"
+)
+
+try:
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[{"role": "user", "content": "Hello!"}]
+    )
+    print(response.choices[0].message.content)
+except openai.AuthenticationError:
+    print("Invalid API key")
+except openai.RateLimitError:
+    print("Rate limit exceeded — retry with backoff")
+except openai.APIError as e:
+    print(f"API error: {e.status_code}")`;
+
   const frameworkRow = "flex items-center gap-3 px-5 py-3 border-b border-border/20 last:border-b-0";
 
   return (
@@ -114,11 +174,19 @@ console.log(response.content[0].text);`;
 
       <BaseUrlDisplay />
 
+      {/* Quick Start: OpenAI SDK Drop-in */}
       <section className="space-y-4">
         <h2 className="text-lg font-semibold flex items-center gap-2">
-          <Code2 className="h-5 w-5 text-sky-400" />
-          OpenAI SDK
+          <Zap className="h-5 w-5 text-emerald-400" />
+          {lang === "zh" ? "最快接入：OpenAI SDK 直接替换" : "Fastest Integration: OpenAI SDK Drop-in"}
         </h2>
+        <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-4 text-sm text-muted-foreground">
+          <p>
+            {lang === "zh"
+              ? "只需修改 base_url，无需更改任何其他代码。OortAPI 完全兼容 OpenAI SDK 的所有功能。"
+              : "Just change the base_url — no other code changes needed. OortAPI is fully compatible with all OpenAI SDK features."}
+          </p>
+        </div>
         <div className="space-y-4">
           <div>
             <h3 className="text-sm font-medium text-muted-foreground mb-2">{L.python}</h3>
@@ -131,6 +199,7 @@ console.log(response.content[0].text);`;
         </div>
       </section>
 
+      {/* Anthropic SDK */}
       <section className="space-y-4">
         <h2 className="text-lg font-semibold flex items-center gap-2">
           <Code2 className="h-5 w-5 text-amber-400" />
@@ -148,11 +217,34 @@ console.log(response.content[0].text);`;
         </div>
       </section>
 
+      {/* Framework Integration */}
       <section className="space-y-4">
         <h2 className="text-lg font-semibold flex items-center gap-2">
           <FlaskConical className="h-5 w-5 text-violet-400" />
           {lang === "zh" ? "框架集成" : "Framework Integration"}
         </h2>
+
+        {/* LangChain */}
+        <div className="rounded-xl border border-border/50 overflow-hidden">
+          <div className="bg-muted/10 px-5 py-3 border-b border-border/20">
+            <h3 className="text-sm font-semibold">LangChain</h3>
+          </div>
+          <div className="p-5">
+            <CodeBlock code={langchainExample} language="python" />
+          </div>
+        </div>
+
+        {/* Vercel AI SDK */}
+        <div className="rounded-xl border border-border/50 overflow-hidden">
+          <div className="bg-muted/10 px-5 py-3 border-b border-border/20">
+            <h3 className="text-sm font-semibold">Vercel AI SDK</h3>
+          </div>
+          <div className="p-5">
+            <CodeBlock code={vercelAiExample} language="typescript" />
+          </div>
+        </div>
+
+        {/* Table */}
         <div className="rounded-xl border border-border/50 overflow-hidden">
           <div className="grid grid-cols-3 gap-4 px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b border-border/20 bg-muted/10">
             <span>{lang === "zh" ? "框架" : "Framework"}</span>
@@ -177,6 +269,25 @@ console.log(response.content[0].text);`;
         </div>
       </section>
 
+      {/* Streaming Example */}
+      <section className="space-y-4">
+        <h2 className="text-lg font-semibold flex items-center gap-2">
+          <Code2 className="h-5 w-5 text-sky-400" />
+          {lang === "zh" ? "流式输出示例" : "Streaming Example"}
+        </h2>
+        <CodeBlock code={streamingPython} language="python" />
+      </section>
+
+      {/* Error Handling */}
+      <section className="space-y-4">
+        <h2 className="text-lg font-semibold flex items-center gap-2">
+          <AlertTriangle className="h-5 w-5 text-amber-400" />
+          {lang === "zh" ? "错误处理" : "Error Handling"}
+        </h2>
+        <CodeBlock code={errorHandlingPython} language="python" />
+      </section>
+
+      {/* cURL Examples */}
       <section className="space-y-4">
         <h2 className="text-lg font-semibold flex items-center gap-2">
           <Code2 className="h-5 w-5 text-primary" />

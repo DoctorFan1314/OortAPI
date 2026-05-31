@@ -129,6 +129,33 @@ All notable changes to this project will be documented in this file.
 - **LocalStorage compatibility** — `activeMcpTools` optional field with `?? []` guard for legacy sessions
 - **Deleted 8 redundant sub-routes** — `claude-code/`, `cursor/`, `hermes/` etc. removed
 
+### Documentation Page Major Refactoring
+
+#### New Pages
+- **Features Overview** (`/docs/features`) — Streaming, Function Calling, JSON Mode, Vision, Prompt Caching, Model Routing with code examples
+- **Models & Pricing** (`/docs/models-pricing`) — Popular models table with pricing, billing explanation, API endpoint for listing models
+- **FAQ** (`/docs/faq`) — 15 FAQ items across 5 categories (Account, Billing, Models, Technical, Integration) with collapsible accordion
+
+#### New Components
+- **ResponseSchema** — Collapsible request/response JSON schema display with parameter tables (name, type, required, description)
+- **FaqAccordion** — Deep-linkable accordion with animated expand/collapse, single-open mode via React context
+- **FeedbackPrompt** — "Was this helpful?" widget with thumbs up/down, optional comment textarea, localStorage persistence per page
+
+#### Enriched Pages
+- **Endpoints** — Added expandable request parameters, response JSON examples, and curl examples for each endpoint group
+- **Errors** — Added per-error-code troubleshooting sections (common causes + solutions), general retry strategy with exponential backoff
+- **SDK** — Added "Fastest Integration" OpenAI SDK drop-in section, LangChain/Vercel AI SDK examples, streaming example, error handling example
+- **Streaming** — Added Python/Node.js SDK streaming examples, Anthropic SDK streaming, error handling during streams
+- **Rate Limits** — Added tier comparison table (Default/Standard/Pro/Enterprise), check-your-limits headers section, expanded best practices
+
+#### Restructured
+- **Sidebar** — Reorganized from 6 fragmented sections into 4 logical groups: Getting Started, API Reference, Guides, Resources
+- **Landing page** — Added quick-stat badges, "3 Steps" inline quickstart, reorganized card groups matching new sidebar, "Need Help?" CTA section
+- **Layout** — FeedbackPrompt component added to every docs page
+
+#### i18n
+- New keys: `navFeatures`, `navModelsPricing`, `navFaq` in types, en.ts, zh.ts
+
 ### Resource Center Audit Fixes
 
 #### i18n Fixes
