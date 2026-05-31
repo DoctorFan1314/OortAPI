@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 import {
   Plus, Pencil, Trash2, Save, Loader2,
   Link as LinkIcon, Unlink, Users, DollarSign,
-  TrendingUp, Star, Crown, Zap, Shield,
+  TrendingUp, Star, Crown, Zap, Shield, Sparkles, Diamond,
 } from "lucide-react";
 
 interface Plan {
@@ -34,22 +34,16 @@ interface PlanStat {
   monthly_revenue: number; credits_used: number; credits_usage_rate: number;
 }
 
-const TIER_COLORS: Record<number, { bar: string; bg: string; text: string; icon: string }> = {
-  1: { bar: "bg-sky-500", bg: "bg-sky-500/10", text: "text-sky-500", icon: "text-sky-400" },
-  2: { bar: "bg-violet-500", bg: "bg-violet-500/10", text: "text-violet-500", icon: "text-violet-400" },
-  3: { bar: "bg-amber-500", bg: "bg-amber-500/10", text: "text-amber-500", icon: "text-amber-400" },
-  4: { bar: "bg-emerald-500", bg: "bg-emerald-500/10", text: "text-emerald-500", icon: "text-emerald-400" },
+// Match token-plan tier colors from globals.css (--plan-{tier}-from/to)
+const TIER_MAP: Record<number, { name: string; gradient: string; accent: string; icon: typeof Zap }> = {
+  1: { name: "spark", gradient: "gradient-spark", accent: "var(--plan-spark-from)", icon: Zap },
+  2: { name: "flare", gradient: "gradient-flare", accent: "var(--plan-flare-from)", icon: Sparkles },
+  3: { name: "pulse", gradient: "gradient-pulse", accent: "var(--plan-pulse-from)", icon: Star },
+  4: { name: "nova",  gradient: "gradient-nova",  accent: "var(--plan-nova-from)",  icon: Crown },
 };
 
-function tierColor(tier: number) {
-  return TIER_COLORS[tier] || TIER_COLORS[1];
-}
-
-function tierIcon(tier: number) {
-  if (tier <= 1) return Zap;
-  if (tier === 2) return Star;
-  if (tier === 3) return Crown;
-  return Shield;
+function getTier(tier: number) {
+  return TIER_MAP[tier] || TIER_MAP[1];
 }
 
 const ROUTE_LABELS: Record<string, { zh: string; en: string }> = {
@@ -340,8 +334,8 @@ function AdminPlansContent() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {plans.map(plan => {
-            const tc = tierColor(plan.tier);
-            const TierIcon = tierIcon(plan.tier);
+            const tier = getTier(plan.tier);
+            const TierIcon = tier.icon;
             const stat = planStats.find(s => s.plan_id === plan.id);
             const usageRate = stat?.credits_usage_rate || 0;
 
@@ -353,14 +347,14 @@ function AdminPlansContent() {
                   !plan.enabled && "opacity-50 grayscale"
                 )}
               >
-                {/* Colored top bar — gradient for popular plans */}
-                <div className={cn("h-1.5", plan.popular === 1 ? "bg-gradient-to-r from-amber-400 via-orange-400 to-amber-400" : tc.bar)} />
+                {/* Colored top bar — uses token-plan tier gradients */}
+                <div className={cn("h-1.5", tier.gradient)} />
 
                 <CardContent className="p-5 space-y-4">
                   {/* Header */}
                   <div className="flex items-start gap-3">
-                    <div className={cn("p-2 rounded-lg", tc.bg)}>
-                      <TierIcon className={cn("h-4 w-4", tc.icon)} />
+                    <div className="p-2 rounded-lg" style={{ backgroundColor: `color-mix(in srgb, ${tier.accent} 10%, transparent)` }}>
+                      <TierIcon className="h-4 w-4" style={{ color: tier.accent }} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="text-lg font-bold text-foreground truncate">
@@ -375,8 +369,8 @@ function AdminPlansContent() {
                   {/* Badges */}
                   <div className="flex flex-wrap gap-1.5">
                     {plan.popular === 1 && (
-                      <Badge variant="outline" className="text-amber-400 border-amber-500/20 text-[10px]">
-                        Popular
+                      <Badge variant="outline" className="text-[10px] font-medium" style={{ color: "var(--plan-pulse-from)", borderColor: "color-mix(in srgb, var(--plan-pulse-from) 20%, transparent)" }}>
+                        {lang === "zh" ? "最受欢迎" : "Most Popular"}
                       </Badge>
                     )}
                     <Badge variant="outline" className="text-[10px]">{plan.currency}</Badge>
@@ -422,8 +416,8 @@ function AdminPlansContent() {
                       </div>
                       <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
                         <div
-                          className={cn("h-full rounded-full transition-all", tc.bar)}
-                          style={{ width: `${usageRate}%` }}
+                          className="h-full rounded-full transition-all"
+                          style={{ width: `${usageRate}%`, backgroundColor: tier.accent }}
                         />
                       </div>
                     </div>
