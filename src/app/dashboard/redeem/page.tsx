@@ -33,41 +33,12 @@ interface Plan {
   monthly_credits: number;
 }
 
-const LABELS = {
-  zh: {
-    title: "兑换码管理", generate: "生成兑换码", amount: "面额 ($)", count: "数量", maxUses: "最大使用次数",
-    expiresAt: "过期时间 (可选)", create: "创建", cancel: "取消",
-    code: "兑换码", uses: "使用情况", status: "状态", created: "创建时间", expires: "过期时间", actions: "操作",
-    active: "有效", inactive: "已禁用", expired: "已过期", exhausted: "已用完",
-    disable: "禁用", enable: "启用", delete: "删除",
-    noCodes: "暂无兑换码", deleteConfirm: "确定要删除此兑换码吗？",
-    copyAll: "复制全部", copied: "已复制!", batchResult: "批量生成结果",
-    codeType: "兑换类型", balanceType: "余额充值", subType: "Token Plan 套餐",
-    selectPlan: "选择套餐", duration: "时长（月）", credits: "Credits",
-    selected: "已选择", batchDelete: "批量删除", batchEnable: "批量启用", batchDisable: "批量禁用",
-    batchDeleteConfirm: "确定要删除选中的兑换码吗？此操作不可撤销。",
-    searchCodes: "搜索兑换码...", copyCode: "复制",
-  },
-  en: {
-    title: "Redeem Codes", generate: "Generate Codes", amount: "Amount ($)", count: "Count", maxUses: "Max Uses",
-    expiresAt: "Expires At (optional)", create: "Create", cancel: "Cancel",
-    code: "Code", uses: "Uses", status: "Status", created: "Created", expires: "Expires", actions: "Actions",
-    active: "Active", inactive: "Disabled", expired: "Expired", exhausted: "Exhausted",
-    disable: "Disable", enable: "Enable", delete: "Delete",
-    noCodes: "No redeem codes yet", deleteConfirm: "Delete this redeem code?",
-    copyAll: "Copy All", copied: "Copied!", batchResult: "Batch Result",
-    codeType: "Code Type", balanceType: "Balance Top-up", subType: "Token Plan Subscription",
-    selectPlan: "Select Plan", duration: "Duration (months)", credits: "Credits",
-    selected: "Selected", batchDelete: "Batch Delete", batchEnable: "Batch Enable", batchDisable: "Batch Disable",
-    batchDeleteConfirm: "Delete all selected codes? This cannot be undone.",
-    searchCodes: "Search codes...", copyCode: "Copy",
-  },
-};
 
 export default function RedeemPage() {
-  const { lang } = useI18n();
+  const { lang, t } = useI18n();
+  const L = t.dashboard;
   const { toast: showToast } = useToast();
-  const t = LABELS[lang];
+
   const [codes, setCodes] = useState<RedeemCode[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -258,18 +229,18 @@ export default function RedeemPage() {
   }
 
   function getStatus(code: RedeemCode) {
-    if (!code.enabled) return { label: t.inactive, cls: "bg-gray-500/10 text-gray-400 border-gray-500/20" };
-    if (code.expires_at && new Date(code.expires_at) < new Date()) return { label: t.expired, cls: "bg-red-500/10 text-red-400 border-red-500/20" };
-    if (code.current_uses >= code.max_uses) return { label: t.exhausted, cls: "bg-orange-500/10 text-orange-400 border-orange-500/20" };
-    return { label: t.active, cls: "bg-green-500/10 text-green-400 border-green-500/20" };
+    if (!code.enabled) return { label: L.inactive, cls: "bg-gray-500/10 text-gray-400 border-gray-500/20" };
+    if (code.expires_at && new Date(code.expires_at) < new Date()) return { label: L.expired, cls: "bg-red-500/10 text-red-400 border-red-500/20" };
+    if (code.current_uses >= code.max_uses) return { label: L.exhausted, cls: "bg-orange-500/10 text-orange-400 border-orange-500/20" };
+    return { label: L.active, cls: "bg-green-500/10 text-green-400 border-green-500/20" };
   }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold flex items-center gap-2"><Gift className="h-6 w-6" />{t.title}{!loading && <Badge variant="secondary" className="ml-1 text-xs">{codes.length}</Badge>}</h1>
+        <h1 className="text-2xl font-bold flex items-center gap-2"><Gift className="h-6 w-6" />{L.title}{!loading && <Badge variant="secondary" className="ml-1 text-xs">{codes.length}</Badge>}</h1>
         <Button onClick={() => { setGenOpen(true); setGenResult([]); }} size="sm">
-          <Plus className="h-4 w-4 mr-1.5" />{t.generate}
+          <Plus className="h-4 w-4 mr-1.5" />{L.generate}
         </Button>
       </div>
 
@@ -277,16 +248,16 @@ export default function RedeemPage() {
         <CardContent className="p-0">
           {selectedIds.size > 0 && (
             <div className="flex items-center gap-3 px-4 py-2.5 border-b border-border/50 bg-primary/5">
-              <span className="text-sm text-muted-foreground">{t.selected}: <strong className="text-foreground">{selectedIds.size}</strong></span>
+              <span className="text-sm text-muted-foreground">{L.selected}: <strong className="text-foreground">{selectedIds.size}</strong></span>
               <div className="flex gap-1.5 ml-auto">
                 <Button variant="outline" size="sm" onClick={() => handleBatchAction("enable")} disabled={batchLoading}>
-                  <Power className="h-3.5 w-3.5 mr-1" />{t.batchEnable}
+                  <Power className="h-3.5 w-3.5 mr-1" />{L.batchEnable}
                 </Button>
                 <Button variant="outline" size="sm" onClick={() => handleBatchAction("disable")} disabled={batchLoading}>
-                  <PowerOff className="h-3.5 w-3.5 mr-1" />{t.batchDisable}
+                  <PowerOff className="h-3.5 w-3.5 mr-1" />{L.batchDisable}
                 </Button>
                 <Button variant="destructive" size="sm" onClick={() => setBatchDeleteOpen(true)} disabled={batchLoading}>
-                  <Trash2 className="h-3.5 w-3.5 mr-1" />{t.batchDelete}
+                  <Trash2 className="h-3.5 w-3.5 mr-1" />{L.batchDelete}
                 </Button>
               </div>
             </div>
@@ -294,7 +265,7 @@ export default function RedeemPage() {
           {codes.length > 5 && (
             <div className="px-4 py-2 border-b border-border/50">
               <Input
-                placeholder={t.searchCodes}
+                placeholder={L.searchCodes}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="max-w-xs h-8 text-sm"
@@ -312,7 +283,7 @@ export default function RedeemPage() {
           ) : codes.length === 0 ? (
             <div className="text-center py-12">
               <Gift className="h-8 w-8 text-muted-foreground/40 mx-auto mb-2" />
-              <p className="text-sm text-muted-foreground">{t.noCodes}</p>
+              <p className="text-sm text-muted-foreground">{L.noCodes}</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -322,13 +293,13 @@ export default function RedeemPage() {
                     <th className="text-left py-3 px-2 w-10">
                       <input type="checkbox" checked={filteredCodes.length > 0 && selectedIds.size === filteredCodes.length} onChange={toggleSelectAll} className="rounded border-input" />
                     </th>
-                    <th className="text-left py-3 px-4 text-muted-foreground font-medium">{t.code}</th>
-                    <th className="text-center py-3 px-4 text-muted-foreground font-medium">{t.codeType}</th>
-                    <th className="text-right py-3 px-4 text-muted-foreground font-medium">{t.amount}</th>
-                    <th className="text-center py-3 px-4 text-muted-foreground font-medium">{t.uses}</th>
-                    <th className="text-center py-3 px-4 text-muted-foreground font-medium">{t.status}</th>
-                    <th className="text-right py-3 px-4 text-muted-foreground font-medium">{t.expires}</th>
-                    <th className="text-right py-3 px-4 text-muted-foreground font-medium">{t.actions}</th>
+                    <th className="text-left py-3 px-4 text-muted-foreground font-medium">{L.code}</th>
+                    <th className="text-center py-3 px-4 text-muted-foreground font-medium">{L.codeType}</th>
+                    <th className="text-right py-3 px-4 text-muted-foreground font-medium">{L.amount}</th>
+                    <th className="text-center py-3 px-4 text-muted-foreground font-medium">{L.uses}</th>
+                    <th className="text-center py-3 px-4 text-muted-foreground font-medium">{L.status}</th>
+                    <th className="text-right py-3 px-4 text-muted-foreground font-medium">{L.expires}</th>
+                    <th className="text-right py-3 px-4 text-muted-foreground font-medium">{L.actions}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -347,7 +318,7 @@ export default function RedeemPage() {
                             </span>
                           ) : (
                             <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                              {t.balanceType}
+                              {L.balanceType}
                             </span>
                           )}
                         </td>
@@ -367,13 +338,13 @@ export default function RedeemPage() {
                         </td>
                         <td className="py-3 px-4 text-right">
                           <div className="flex justify-end gap-1">
-                            <button onClick={() => handleToggle(c.id, c.enabled)} className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors text-xs" title={c.enabled ? t.disable : t.enable}>
-                              {c.enabled ? t.disable : t.enable}
+                            <button onClick={() => handleToggle(c.id, c.enabled)} className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors text-xs" title={c.enabled ? L.disable : L.enable}>
+                              {c.enabled ? L.disable : L.enable}
                             </button>
-                            <button onClick={() => { navigator.clipboard.writeText(c.code); showToast(t.copied, "success"); }} className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors" title={t.copyCode} aria-label={t.copyCode}>
+                            <button onClick={() => { navigator.clipboard.writeText(c.code); showToast(L.copied, "success"); }} className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors" title={L.copyCode} aria-label={L.copyCode}>
                               <Copy className="h-3.5 w-3.5" />
                             </button>
-                            <button onClick={() => setDeleteId(c.id)} className="p-1.5 rounded-md hover:bg-red-500/10 text-muted-foreground hover:text-red-500 transition-colors" title={t.delete} aria-label={t.delete}>
+                            <button onClick={() => setDeleteId(c.id)} className="p-1.5 rounded-md hover:bg-red-500/10 text-muted-foreground hover:text-red-500 transition-colors" title={L.delete} aria-label={L.delete}>
                               <Trash2 className="h-3.5 w-3.5" />
                             </button>
                           </div>
@@ -400,34 +371,34 @@ export default function RedeemPage() {
       <Dialog open={genOpen} onOpenChange={(open) => { if (!open) { setGenOpen(false); setGenResult([]); } }}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>{t.generate}</DialogTitle>
+            <DialogTitle>{L.generate}</DialogTitle>
           </DialogHeader>
           {genResult.length === 0 ? (
             <div className="space-y-4 py-2">
               {/* Code type toggle */}
               <div>
-                <label className="text-sm text-foreground mb-1.5 block">{t.codeType}</label>
+                <label className="text-sm text-foreground mb-1.5 block">{L.codeType}</label>
                 <div className="flex gap-2">
-                  <button onClick={() => setGenCodeType("balance")} className={`flex-1 py-2 rounded-lg text-sm font-medium border transition-colors ${genCodeType === "balance" ? "bg-primary/10 text-primary border-primary/30" : "bg-secondary text-muted-foreground border-border"}`}>{t.balanceType}</button>
-                  <button onClick={() => setGenCodeType("subscription")} className={`flex-1 py-2 rounded-lg text-sm font-medium border transition-colors ${genCodeType === "subscription" ? "bg-amber-500/10 text-amber-400 border-amber-500/30" : "bg-secondary text-muted-foreground border-border"}`}>{t.subType}</button>
+                  <button onClick={() => setGenCodeType("balance")} className={`flex-1 py-2 rounded-lg text-sm font-medium border transition-colors ${genCodeType === "balance" ? "bg-primary/10 text-primary border-primary/30" : "bg-secondary text-muted-foreground border-border"}`}>{L.balanceType}</button>
+                  <button onClick={() => setGenCodeType("subscription")} className={`flex-1 py-2 rounded-lg text-sm font-medium border transition-colors ${genCodeType === "subscription" ? "bg-amber-500/10 text-amber-400 border-amber-500/30" : "bg-secondary text-muted-foreground border-border"}`}>{L.subType}</button>
                 </div>
               </div>
 
               {genCodeType === "balance" ? (
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-sm text-foreground mb-1.5 block">{t.amount}</label>
+                    <label className="text-sm text-foreground mb-1.5 block">{L.amount}</label>
                     <Input type="number" min="0.01" step="0.01" value={genAmount} onChange={(e) => setGenAmount(e.target.value)} className="bg-secondary border-border" autoFocus />
                   </div>
                   <div>
-                    <label className="text-sm text-foreground mb-1.5 block">{t.count}</label>
+                    <label className="text-sm text-foreground mb-1.5 block">{L.count}</label>
                     <Input type="number" min="1" max="100" value={genCount} onChange={(e) => setGenCount(e.target.value)} className="bg-secondary border-border" />
                   </div>
                 </div>
               ) : (
                 <div className="space-y-3">
                   <div>
-                    <label className="text-sm text-foreground mb-1.5 block">{t.selectPlan}</label>
+                    <label className="text-sm text-foreground mb-1.5 block">{L.selectPlan}</label>
                     <select className="w-full h-9 px-3 rounded-md border border-input bg-background text-sm" value={genPlanId} onChange={e => setGenPlanId(+e.target.value)}>
                       <option value={0}>{lang === "zh" ? "选择套餐" : "Select plan"}</option>
                       {plans.map(p => <option key={p.id} value={p.id}>{p.display_name} ({p.monthly_credits.toLocaleString()} credits)</option>)}
@@ -435,11 +406,11 @@ export default function RedeemPage() {
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="text-sm text-foreground mb-1.5 block">{t.duration}</label>
+                      <label className="text-sm text-foreground mb-1.5 block">{L.duration}</label>
                       <Input type="number" min="1" max="12" value={genDuration} onChange={(e) => setGenDuration(e.target.value)} className="bg-secondary border-border" />
                     </div>
                     <div>
-                      <label className="text-sm text-foreground mb-1.5 block">{t.count}</label>
+                      <label className="text-sm text-foreground mb-1.5 block">{L.count}</label>
                       <Input type="number" min="1" max="100" value={genCount} onChange={(e) => setGenCount(e.target.value)} className="bg-secondary border-border" />
                     </div>
                   </div>
@@ -448,26 +419,26 @@ export default function RedeemPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-sm text-foreground mb-1.5 block">{t.maxUses}</label>
+                  <label className="text-sm text-foreground mb-1.5 block">{L.maxUses}</label>
                   <Input type="number" min="1" value={genMaxUses} onChange={(e) => setGenMaxUses(e.target.value)} className="bg-secondary border-border" />
                 </div>
                 <div>
-                  <label className="text-sm text-foreground mb-1.5 block">{t.expiresAt}</label>
+                  <label className="text-sm text-foreground mb-1.5 block">{L.expiresAt}</label>
                   <Input type="datetime-local" value={genExpires} onChange={(e) => setGenExpires(e.target.value)} className="bg-secondary border-border" />
                 </div>
               </div>
               <div className="flex gap-2 justify-end">
-                <Button variant="outline" onClick={() => setGenOpen(false)}>{t.cancel}</Button>
-                <Button onClick={handleGenerate} disabled={genLoading || (genCodeType === "subscription" && !genPlanId)}>{genLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : t.create}</Button>
+                <Button variant="outline" onClick={() => setGenOpen(false)}>{L.cancel}</Button>
+                <Button onClick={handleGenerate} disabled={genLoading || (genCodeType === "subscription" && !genPlanId)}>{genLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : L.create}</Button>
               </div>
             </div>
           ) : (
             <div className="space-y-4 py-2">
               <div className="flex items-center justify-between">
-                <p className="text-sm text-muted-foreground">{t.batchResult} ({genResult.length})</p>
+                <p className="text-sm text-muted-foreground">{L.batchResult} ({genResult.length})</p>
                 <Button variant="outline" size="sm" onClick={copyAll}>
                   {copied ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
-                  {copied ? t.copied : t.copyAll}
+                  {copied ? L.copied : L.copyAll}
                 </Button>
               </div>
               <div className="bg-secondary rounded-lg p-3 max-h-60 overflow-y-auto">
@@ -476,7 +447,7 @@ export default function RedeemPage() {
                 ))}
               </div>
               <div className="flex justify-end">
-                <Button onClick={() => { setGenOpen(false); setGenResult([]); }}>{t.cancel}</Button>
+                <Button onClick={() => { setGenOpen(false); setGenResult([]); }}>{L.cancel}</Button>
               </div>
             </div>
           )}
@@ -487,17 +458,17 @@ export default function RedeemPage() {
       <Dialog open={!!deleteId} onOpenChange={(open) => { if (!open) setDeleteId(null); }}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
-            <DialogTitle>{t.delete}</DialogTitle>
+            <DialogTitle>{L.delete}</DialogTitle>
             <DialogDescription>
-              {t.deleteConfirm}
+              {L.deleteConfirm}
               <br />
               <code className="text-xs">{codes.find(c => c.id === deleteId)?.code}</code>
             </DialogDescription>
           </DialogHeader>
           <div className="flex gap-2 justify-end pt-2">
-            <Button variant="outline" onClick={() => setDeleteId(null)}>{t.cancel}</Button>
+            <Button variant="outline" onClick={() => setDeleteId(null)}>{L.cancel}</Button>
             <Button onClick={handleDelete} disabled={deleteLoading} className="bg-red-600 text-white hover:bg-red-700">
-              {deleteLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : t.delete}
+              {deleteLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : L.delete}
             </Button>
           </div>
         </DialogContent>
@@ -507,13 +478,13 @@ export default function RedeemPage() {
       <Dialog open={batchDeleteOpen} onOpenChange={(open) => { if (!open) setBatchDeleteOpen(false); }}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
-            <DialogTitle>{t.batchDelete}</DialogTitle>
-            <DialogDescription>{t.batchDeleteConfirm}</DialogDescription>
+            <DialogTitle>{L.batchDelete}</DialogTitle>
+            <DialogDescription>{L.batchDeleteConfirm}</DialogDescription>
           </DialogHeader>
           <div className="flex gap-2 justify-end pt-2">
-            <Button variant="outline" onClick={() => setBatchDeleteOpen(false)}>{t.cancel}</Button>
+            <Button variant="outline" onClick={() => setBatchDeleteOpen(false)}>{L.cancel}</Button>
             <Button onClick={() => handleBatchAction("delete")} disabled={batchLoading} className="bg-red-600 text-white hover:bg-red-700">
-              {batchLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : t.batchDelete}
+              {batchLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : L.batchDelete}
             </Button>
           </div>
         </DialogContent>

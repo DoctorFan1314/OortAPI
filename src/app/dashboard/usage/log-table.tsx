@@ -5,7 +5,7 @@ import { useCurrency } from "@/contexts/currency-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Fragment } from "react";
 import { X } from "lucide-react";
-import { UsageLog, LABELS, formatRate } from "./usage-types";
+import { UsageLog, formatRate } from "./usage-types";
 
 interface LogTableProps {
   logs: UsageLog[];
@@ -38,9 +38,9 @@ export function LogTable({
   hasActiveFilters,
   onRetry,
 }: LogTableProps) {
-  const { lang } = useI18n();
+  const { lang, t } = useI18n();
+  const L = t.dashboard;
   const { formatPrice, symbol, exchangeRate } = useCurrency();
-  const t = LABELS[lang as keyof typeof LABELS];
 
   const formatCostDisplay = (usd: number) => formatPrice(usd, 4);
 
@@ -118,11 +118,11 @@ export function LogTable({
     const outputCost = (log.tokens_out * outputRate) / 1000000;
     const baseCost = inputCost + cacheHitCost + outputCost;
     const finalCost = baseCost * mult;
-    const rateSource = log.input_rate != null ? "" : ` (${t.noRateData})`;
+    const rateSource = log.input_rate != null ? "" : ` (${L.noRateData})`;
 
     return (
       <div className="text-xs space-y-3 font-mono">
-        <p className="font-semibold text-sm">{t.costBreakdown}</p>
+        <p className="font-semibold text-sm">{L.costBreakdown}</p>
         <div className="text-muted-foreground space-y-0.5">
           <p>{lang === "zh" ? "模型费率" : "Model Rates"}{rateSource}:</p>
           <p className="pl-3">{lang === "zh" ? "输入(未命中缓存)" : "Input(non-cached)"} = {formatRate(inputRate, symbol, exchangeRate)}</p>
@@ -132,19 +132,19 @@ export function LogTable({
         <div className="space-y-1">
           {nonCachedIn > 0 && (
             <div className="flex justify-between gap-4">
-              <span className="text-muted-foreground">{t.inputCost}: {nonCachedIn.toLocaleString()} × {(symbol === "¥" ? inputRate * exchangeRate : inputRate).toFixed(4)} / 1M</span>
+              <span className="text-muted-foreground">{L.inputCost}: {nonCachedIn.toLocaleString()} × {(symbol === "¥" ? inputRate * exchangeRate : inputRate).toFixed(4)} / 1M</span>
               <span>= {formatCostDisplay(inputCost)}</span>
             </div>
           )}
           {log.tokens_in_cache > 0 && (
             <div className="flex justify-between gap-4">
-              <span className="text-muted-foreground">{t.cacheReadCost}: {log.tokens_in_cache.toLocaleString()} × {(symbol === "¥" ? cacheRate * exchangeRate : cacheRate).toFixed(4)} / 1M</span>
+              <span className="text-muted-foreground">{L.cacheReadCost}: {log.tokens_in_cache.toLocaleString()} × {(symbol === "¥" ? cacheRate * exchangeRate : cacheRate).toFixed(4)} / 1M</span>
               <span>= {formatCostDisplay(cacheHitCost)}</span>
             </div>
           )}
           {log.tokens_out > 0 && (
             <div className="flex justify-between gap-4">
-              <span className="text-muted-foreground">{t.outputCost}: {log.tokens_out.toLocaleString()} × {(symbol === "¥" ? outputRate * exchangeRate : outputRate).toFixed(4)} / 1M</span>
+              <span className="text-muted-foreground">{L.outputCost}: {log.tokens_out.toLocaleString()} × {(symbol === "¥" ? outputRate * exchangeRate : outputRate).toFixed(4)} / 1M</span>
               <span>= {formatCostDisplay(outputCost)}</span>
             </div>
           )}
@@ -161,7 +161,7 @@ export function LogTable({
             </div>
           )}
           <div className="flex justify-between gap-4 font-semibold text-sm">
-            <span>{t.total}</span>
+            <span>{L.total}</span>
             <span>= {formatCostDisplay(finalCost)}</span>
           </div>
         </div>
@@ -172,7 +172,7 @@ export function LogTable({
   return (
     <Card className="glass-card">
       <CardHeader>
-        <CardTitle className="text-lg">{t.title}</CardTitle>
+        <CardTitle className="text-lg">{L.title}</CardTitle>
       </CardHeader>
       <CardContent>
         {error ? (
@@ -198,7 +198,7 @@ export function LogTable({
             ))}
           </div>
         ) : logs.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground text-sm">{hasActiveFilters ? (lang === "zh" ? "无匹配记录，请调整筛选条件" : "No matching records. Adjust your filters.") : t.noLogs}</div>
+          <div className="text-center py-8 text-muted-foreground text-sm">{hasActiveFilters ? (lang === "zh" ? "无匹配记录，请调整筛选条件" : "No matching records. Adjust your filters.") : L.noLogs}</div>
         ) : (
           <>
             {loading && logs.length > 0 && <div className="h-1 bg-primary/20 rounded-full overflow-hidden mb-2"><div className="h-full bg-primary animate-pulse rounded-full" style={{ width: "30%" }} /></div>}
@@ -206,39 +206,39 @@ export function LogTable({
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border/50">
-                    <th scope="col" className="text-left py-2 px-3 text-muted-foreground font-medium sticky left-0 bg-background z-10">{t.channel}</th>
-                    <th scope="col" className="text-left py-2 px-3 text-muted-foreground font-medium">{t.model}</th>
+                    <th scope="col" className="text-left py-2 px-3 text-muted-foreground font-medium sticky left-0 bg-background z-10">{L.channel}</th>
+                    <th scope="col" className="text-left py-2 px-3 text-muted-foreground font-medium">{L.model}</th>
                     <th scope="col" className="text-right py-2 px-3 text-muted-foreground font-medium cursor-pointer hover:text-foreground select-none"
                       onClick={() => onSort("tokens_in")}>
-                      {t.tokensIn}{sortField === "tokens_in" ? (sortDir === "asc" ? " ↑" : " ↓") : ""}
+                      {L.tokensIn}{sortField === "tokens_in" ? (sortDir === "asc" ? " ↑" : " ↓") : ""}
                     </th>
                     <th scope="col" className="text-right py-2 px-3 text-muted-foreground font-medium cursor-pointer hover:text-foreground select-none"
                       onClick={() => onSort("tokens_in_cache")}>
-                      {t.tokensInCache}{sortField === "tokens_in_cache" ? (sortDir === "asc" ? " ↑" : " ↓") : ""}
+                      {L.tokensInCache}{sortField === "tokens_in_cache" ? (sortDir === "asc" ? " ↑" : " ↓") : ""}
                     </th>
                     <th scope="col" className="text-right py-2 px-3 text-muted-foreground font-medium cursor-pointer hover:text-foreground select-none"
                       onClick={() => onSort("tokens_out")}>
-                      {t.tokensOut}{sortField === "tokens_out" ? (sortDir === "asc" ? " ↑" : " ↓") : ""}
+                      {L.tokensOut}{sortField === "tokens_out" ? (sortDir === "asc" ? " ↑" : " ↓") : ""}
                     </th>
                     <th scope="col" className="text-right py-2 px-3 text-muted-foreground font-medium cursor-pointer hover:text-foreground select-none"
                       onClick={() => onSort("total")}>
-                      {t.tokens}{sortField === "total" ? (sortDir === "asc" ? " ↑" : " ↓") : ""}
+                      {L.tokens}{sortField === "total" ? (sortDir === "asc" ? " ↑" : " ↓") : ""}
                     </th>
-                    <th scope="col" className="text-center py-2 px-3 text-muted-foreground font-medium">{t.multiplier}</th>
+                    <th scope="col" className="text-center py-2 px-3 text-muted-foreground font-medium">{L.multiplier}</th>
                     <th scope="col" className="text-right py-2 px-3 text-muted-foreground font-medium cursor-pointer hover:text-foreground select-none"
                       onClick={() => onSort("cost")}>
-                      {t.cost}{sortField === "cost" ? (sortDir === "asc" ? " ↑" : " ↓") : ""}
+                      {L.cost}{sortField === "cost" ? (sortDir === "asc" ? " ↑" : " ↓") : ""}
                     </th>
-                    <th scope="col" className="text-center py-2 px-3 text-muted-foreground font-medium">{t.details}</th>
-                    <th scope="col" className="text-center py-2 px-3 text-muted-foreground font-medium">{t.notes}</th>
+                    <th scope="col" className="text-center py-2 px-3 text-muted-foreground font-medium">{L.details}</th>
+                    <th scope="col" className="text-center py-2 px-3 text-muted-foreground font-medium">{L.notes}</th>
                     <th scope="col" className="text-right py-2 px-3 text-muted-foreground font-medium cursor-pointer hover:text-foreground select-none"
                       onClick={() => onSort("latency_ms")}>
-                      {t.latency}{sortField === "latency_ms" ? (sortDir === "asc" ? " ↑" : " ↓") : ""}
+                      {L.latency}{sortField === "latency_ms" ? (sortDir === "asc" ? " ↑" : " ↓") : ""}
                     </th>
-                    <th scope="col" className="text-center py-2 px-3 text-muted-foreground font-medium">{t.status}</th>
+                    <th scope="col" className="text-center py-2 px-3 text-muted-foreground font-medium">{L.status}</th>
                     <th scope="col" className="text-right py-2 px-3 text-muted-foreground font-medium cursor-pointer hover:text-foreground select-none"
                       onClick={() => onSort("created_at")}>
-                      {t.time}{sortField === "created_at" ? (sortDir === "asc" ? " ↑" : " ↓") : ""}
+                      {L.time}{sortField === "created_at" ? (sortDir === "asc" ? " ↑" : " ↓") : ""}
                     </th>
                   </tr>
                 </thead>
@@ -246,7 +246,7 @@ export function LogTable({
                   {sortedLogs.map((log) => (
                     <Fragment key={log.id}>
                       <tr className="border-b border-border/20 hover:bg-muted/30">
-                        <td className="py-2 px-3 text-xs text-muted-foreground sticky left-0 bg-card z-10">{log.channel_name || t.noChannel}</td>
+                        <td className="py-2 px-3 text-xs text-muted-foreground sticky left-0 bg-card z-10">{log.channel_name || L.noChannel}</td>
                         <td className="py-2 px-3 font-mono text-xs">{log.model}</td>
                         <td className="py-2 px-3 text-right font-mono">{Math.max(0, log.tokens_in - log.tokens_in_cache).toLocaleString()}</td>
                         <td className="py-2 px-3 text-right font-mono">{log.tokens_in_cache > 0 ? log.tokens_in_cache.toLocaleString() : "0"}</td>
@@ -269,20 +269,20 @@ export function LogTable({
                             onClick={() => onToggleExpand(log.id)}
                             className="text-xs text-primary hover:underline"
                           >
-                            {t.details}
+                            {L.details}
                           </button>
                         </td>
                         <td className="py-2 px-3 text-center">
                           {log.deduction_source === "credits" ? (
-                            <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400">{t.subUser}</span>
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400">{L.subUser}</span>
                           ) : (
-                            <span className="text-xs text-muted-foreground">{t.balanceUser}</span>
+                            <span className="text-xs text-muted-foreground">{L.balanceUser}</span>
                           )}
                         </td>
                         <td className={`py-2 px-3 text-right font-mono ${log.latency_ms ? (log.latency_ms < 1000 ? "text-green-500" : log.latency_ms < 5000 ? "text-yellow-500" : "text-red-500") : ""}`}>{log.latency_ms ? `${log.latency_ms}ms` : "-"}</td>
                         <td className="py-2 px-3 text-center">
                           <span className={`text-xs px-2 py-0.5 rounded-full ${log.success ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"}`}>
-                            {log.success ? t.success : t.failed}
+                            {log.success ? L.success : L.failed}
                           </span>
                         </td>
                         <td className="py-2 px-3 text-right text-xs text-muted-foreground">{new Date(log.created_at + "Z").toLocaleString()}</td>
@@ -312,17 +312,17 @@ export function LogTable({
         {(page > 1 || total > 50) && (
           <div className="flex items-center justify-between pt-3 border-t border-border/20">
             <span className="text-xs text-muted-foreground">
-              {t.showing} {logs.length} / {total}
+              {L.showing} {logs.length} / {total}
             </span>
             <div className="flex items-center gap-2">
               {page > 1 && (
                 <button onClick={() => onPageChange(page - 1)} className="px-3 py-1 text-xs rounded-md bg-muted hover:bg-muted/80">
-                  {t.prev}
+                  {L.prev}
                 </button>
               )}
               {page * 50 < total && (
                 <button onClick={() => onPageChange(page + 1)} className="px-3 py-1 text-xs rounded-md bg-muted hover:bg-muted/80">
-                  {t.next}
+                  {L.next}
                 </button>
               )}
               <span className="text-xs text-muted-foreground mx-1">|</span>

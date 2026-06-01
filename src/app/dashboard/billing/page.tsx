@@ -26,18 +26,15 @@ interface UsageAggregate {
   last_month_cost?: number;
 }
 
-const LABELS = {
-  zh: { title: "账单中心", balance: "当前余额", recharge: "充值", pricing: "定价说明", free: "免费层", freeDesc: "注册赠送 $10 余额", pro: "按量付费", proDesc: "按实际 Token 用量扣费", enterprise: "企业定制", enterpriseDesc: "联系客服获取专属方案", redeem: "兑换码", redeemTitle: "使用兑换码", redeemDesc: "输入兑换码为账户充值", code: "兑换码", redeemBtn: "兑换", cancel: "取消", redeemSuccess: "兑换成功！", redeemAmount: "充值金额", newBalance: "新余额" },
-  en: { title: "Billing", balance: "Current Balance", recharge: "Recharge", pricing: "Pricing", free: "Free Tier", freeDesc: "$10 bonus on registration", pro: "Pay as you go", proDesc: "Charged by actual token usage", enterprise: "Enterprise", enterpriseDesc: "Contact us for custom plans", redeem: "Redeem Code", redeemTitle: "Redeem Code", redeemDesc: "Enter a redeem code to add balance", code: "Code", redeemBtn: "Redeem", cancel: "Cancel", redeemSuccess: "Redeemed successfully!", redeemAmount: "Amount", newBalance: "New Balance" },
-};
 
 export default function BillingPage() {
-  const { lang } = useI18n();
+  const { lang, t } = useI18n();
+  const L = t.dashboard;
   const { currency, setCurrency, symbol, exchangeRate, formatPrice } = useCurrency();
   const { user, refreshUser } = useAuth();
   const { toast } = useToast();
   const { resolvedTheme } = useTheme();
-  const t = LABELS[lang];
+
   const [redeemOpen, setRedeemOpen] = useState(false);
   const [redeemCode, setRedeemCode] = useState("");
   const [redeemLoading, setRedeemLoading] = useState(false);
@@ -57,7 +54,7 @@ export default function BillingPage() {
       });
       const data = await res.json();
       if (res.ok) {
-        toast(`${t.redeemSuccess} +${symbol}${data.amount?.toFixed(2) ?? "0.00"}`, "success");
+        toast(`${L.redeemSuccess} +${symbol}${data.amount?.toFixed(2) ?? "0.00"}`, "success");
         setRedeemOpen(false);
         setRedeemCode("");
         refreshUser();
@@ -179,14 +176,14 @@ export default function BillingPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">{t.title}</h1>
+      <h1 className="text-2xl font-bold">{L.title}</h1>
 
       <Card className="glass-card">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
-                {t.balance}
+                {L.balance}
                 <button
                   onClick={handleRefreshBalance}
                   disabled={refreshingBalance}
@@ -205,12 +202,12 @@ export default function BillingPage() {
             <div className="flex gap-2">
               <Button variant="outline" className="gap-2" onClick={() => setRedeemOpen(true)}>
                 <Gift className="h-4 w-4" />
-                {t.redeem}
+                {L.redeem}
               </Button>
               <div className="relative" onMouseEnter={() => setShowRedeemTooltip(true)} onMouseLeave={() => setShowRedeemTooltip(false)}>
                 <Button className="gap-2" disabled>
                   <Plus className="h-4 w-4" />
-                  {t.recharge}
+                  {L.recharge}
                 </Button>
                 {showRedeemTooltip && (
                   <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg bg-popover border border-border text-xs text-muted-foreground whitespace-nowrap shadow-lg z-10">
@@ -280,28 +277,28 @@ export default function BillingPage() {
       <div className="grid md:grid-cols-3 gap-4">
         <Card className="glass-card flex flex-col">
           <CardHeader>
-            <CardTitle className="text-base text-green-500">{t.free}</CardTitle>
+            <CardTitle className="text-base text-green-500">{L.free}</CardTitle>
           </CardHeader>
           <CardContent className="flex-1 flex flex-col justify-between gap-3">
-            <p className="text-sm text-muted-foreground">{t.freeDesc}</p>
+            <p className="text-sm text-muted-foreground">{L.freeDesc}</p>
             <Link href="/token-plan"><Button variant="outline" size="sm" className="w-full">{lang === "zh" ? "查看套餐" : "View Plans"}</Button></Link>
           </CardContent>
         </Card>
         <Card className="glass-card border-primary/50 flex flex-col">
           <CardHeader>
-            <CardTitle className="text-base text-primary">{t.pro}</CardTitle>
+            <CardTitle className="text-base text-primary">{L.pro}</CardTitle>
           </CardHeader>
           <CardContent className="flex-1 flex flex-col justify-between gap-3">
-            <p className="text-sm text-muted-foreground">{t.proDesc}</p>
+            <p className="text-sm text-muted-foreground">{L.proDesc}</p>
             <Link href="/token-plan"><Button size="sm" className="w-full">{lang === "zh" ? "订阅套餐" : "Subscribe"}</Button></Link>
           </CardContent>
         </Card>
         <Card className="glass-card flex flex-col">
           <CardHeader>
-            <CardTitle className="text-base text-yellow-500">{t.enterprise}</CardTitle>
+            <CardTitle className="text-base text-yellow-500">{L.enterprise}</CardTitle>
           </CardHeader>
           <CardContent className="flex-1 flex flex-col justify-between gap-3">
-            <p className="text-sm text-muted-foreground">{t.enterpriseDesc}</p>
+            <p className="text-sm text-muted-foreground">{L.enterpriseDesc}</p>
             <a href="mailto:support@oortapi.com"><Button variant="outline" size="sm" className="w-full">{lang === "zh" ? "联系我们" : "Contact Us"}</Button></a>
           </CardContent>
         </Card>
@@ -313,12 +310,12 @@ export default function BillingPage() {
       <Dialog open={redeemOpen} onOpenChange={(open) => { if (!open) { setRedeemOpen(false); setRedeemCode(""); setRedeemError(""); } }}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2"><Gift className="h-5 w-5 text-primary" />{t.redeemTitle}</DialogTitle>
-            <DialogDescription>{t.redeemDesc}</DialogDescription>
+            <DialogTitle className="flex items-center gap-2"><Gift className="h-5 w-5 text-primary" />{L.redeemTitle}</DialogTitle>
+            <DialogDescription>{L.redeemDesc}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div>
-              <label className="text-sm text-foreground mb-1.5 block">{t.code}</label>
+              <label className="text-sm text-foreground mb-1.5 block">{L.code}</label>
               <Input
                 placeholder="RC-XXXXXXXX"
                 value={redeemCode}
@@ -330,9 +327,9 @@ export default function BillingPage() {
             {redeemError && <p className="text-sm text-red-400">{redeemError}</p>}
             <p className="text-[11px] text-muted-foreground">{lang === "zh" ? "兑换码将自动转换为大写" : "Codes are auto-capitalized"}</p>
             <div className="flex gap-2 justify-end">
-              <Button variant="outline" onClick={() => { setRedeemOpen(false); setRedeemCode(""); setRedeemError(""); }}>{t.cancel}</Button>
+              <Button variant="outline" onClick={() => { setRedeemOpen(false); setRedeemCode(""); setRedeemError(""); }}>{L.cancel}</Button>
               <Button onClick={handleRedeem} disabled={redeemLoading || !redeemCode.trim()}>
-                {redeemLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : t.redeemBtn}
+                {redeemLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : L.redeemBtn}
               </Button>
             </div>
           </div>

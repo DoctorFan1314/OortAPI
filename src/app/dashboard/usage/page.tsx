@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import { Activity, Coins, DollarSign, BarChart3, AlertTriangle } from "lucide-react";
 import dynamic from "next/dynamic";
-import { UsageLog, DailyTrend, UsageSummary, LABELS } from "./usage-types";
+import { UsageLog, DailyTrend, UsageSummary } from "./usage-types";
 import { FilterBar } from "./filter-bar";
 import { LogTable } from "./log-table";
 import { TrendChart } from "./trend-chart";
@@ -15,7 +15,8 @@ import { TrendChart } from "./trend-chart";
 const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false });
 
 export default function UsagePage() {
-  const { lang } = useI18n();
+  const { lang, t } = useI18n();
+  const L = t.dashboard;
   const { formatPrice } = useCurrency();
   useEffect(() => { document.title = `${lang === "zh" ? "调用日志" : "Call Logs"} — OortAPI`; }, [lang]);
 
@@ -56,8 +57,6 @@ export default function UsagePage() {
   // Sort state
   const [sortKey, setSortKey] = useState<string>("created_at");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
-
-  const t = LABELS[lang];
 
   // Fetch API keys and models
   useEffect(() => {
@@ -192,7 +191,7 @@ export default function UsagePage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl md:text-2xl font-bold">{t.title}</h1>
+      <h1 className="text-xl md:text-2xl font-bold">{L.title}</h1>
 
       {/* Summary stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -202,7 +201,7 @@ export default function UsagePage() {
               <Activity className="h-4 w-4 text-blue-500" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">{t.totalCalls}</p>
+              <p className="text-xs text-muted-foreground">{L.totalCalls}</p>
               <p className="text-xl font-bold font-mono">{summary.total_calls.toLocaleString()}</p>
             </div>
           </CardContent>
@@ -213,7 +212,7 @@ export default function UsagePage() {
               <div className="p-2 rounded-md bg-green-500/10">
                 <Coins className="h-4 w-4 text-green-500" />
               </div>
-              <span className="text-xs text-muted-foreground">{t.totalTokens}</span>
+              <span className="text-xs text-muted-foreground">{L.totalTokens}</span>
             </div>
             <p className="text-xl font-bold font-mono mb-1">{formatTokens(summary.total_tokens)}</p>
             <div className="space-y-0.5 text-[11px] text-muted-foreground border-t border-border/20 pt-1.5">
@@ -248,7 +247,7 @@ export default function UsagePage() {
                 <DollarSign className="h-4 w-4 text-red-500" />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">{t.totalCost}</p>
+                <p className="text-xs text-muted-foreground">{L.totalCost}</p>
                 <p className="text-xl font-bold font-mono">{formatPrice(summary.total_cost)}</p>
               </div>
             </CardContent>

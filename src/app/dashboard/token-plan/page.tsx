@@ -62,7 +62,8 @@ export default function TokenPlanDashboard() {
 }
 
 function TokenPlanContent() {
-  const { lang } = useI18n();
+  const { lang, t: i18n } = useI18n();
+  const L = i18n.dashboard;
   const { user } = useAuth();
   const { toast: showToast } = useToast();
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
@@ -171,40 +172,6 @@ function TokenPlanContent() {
   const activeSub = subscriptions.find((s) => s.status === "active");
   const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
 
-  const t = {
-    zh: {
-      title: "套餐使用情况", noSub: "暂无订阅", noSubDesc: "浏览套餐方案，选择适合你的 Token Plan",
-      browsePlans: "浏览套餐", validUntil: "有效期至", autoRenew: "自动续费",
-      usage: "当前套餐用量", used: "已使用", apiKey: "专属 API key", quickStart: "快速接入编程工具",
-      apiKeyLabel: "API Key", apiKeyHint: "请妥善保存 API Key，不要与他人共享你的 API Key。",
-      baseUrl: "专属 Base URL", openai: "兼容 OpenAI 接口协议：", anthropic: "兼容 Anthropic 接口协议：",
-      benefits: "套餐权益", models: "模型", credits: "额度", tools: "编程工具", other: "其他权益",
-      offPeak: "非高峰时段系数消耗", cancel: "取消订阅", toggleRenew: "切换自动续费",
-      copy: "复制", copied: "已复制", show: "显示", hide: "隐藏",
-      basicModels: "基础模型", advancedModels: "高级模型", flagshipModels: "旗舰模型", allModels: "全部模型",
-      pastSubs: "历史订阅",
-      changePlan: "更换套餐", upgrade: "升级", downgrade: "降级",
-      selectNewPlan: "选择新套餐", changePlanConfirm: "确认更换套餐？剩余天数的额度将按比例折算到新套餐。",
-      proratedCredits: "折算额度", changing: "更换中...",
-    },
-    en: {
-      title: "Plan Usage", noSub: "No Subscription", noSubDesc: "Browse plans and choose your Token Plan",
-      browsePlans: "Browse Plans", validUntil: "Valid until", autoRenew: "Auto-renew",
-      usage: "Current Plan Usage", used: "Used", apiKey: "Dedicated API Key", quickStart: "Quick Start for Coding Tools",
-      apiKeyLabel: "API Key", apiKeyHint: "Keep your API Key safe. Do not share it with others.",
-      baseUrl: "Dedicated Base URL", openai: "OpenAI-compatible:", anthropic: "Anthropic-compatible:",
-      benefits: "Plan Benefits", models: "Models", credits: "Credits", tools: "Coding Tools", other: "Other Benefits",
-      offPeak: "Off-peak coefficient consumption", cancel: "Cancel Subscription", toggleRenew: "Toggle Auto-Renew",
-      copy: "Copy", copied: "Copied", show: "Show", hide: "Hide",
-      basicModels: "Basic Models", advancedModels: "Advanced Models", flagshipModels: "Flagship Models", allModels: "All Models",
-      pastSubs: "Past Subscriptions",
-      changePlan: "Change Plan", upgrade: "Upgrade", downgrade: "Downgrade",
-      selectNewPlan: "Select New Plan", changePlanConfirm: "Confirm plan change? Remaining credits will be prorated to the new plan.",
-      proratedCredits: "Prorated Credits", changing: "Changing...",
-    },
-  };
-  const text = t[lang];
-
   const modelTierLabel = (name: string) => {
     const map: Record<string, { zh: string; en: string }> = {
       spark: { zh: "基础模型", en: "Basic Models" },
@@ -217,16 +184,16 @@ function TokenPlanContent() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
-      <div className="mb-6"><h1 className="text-xl font-bold text-foreground">{text.title}</h1></div>
+      <div className="mb-6"><h1 className="text-xl font-bold text-foreground">{L.title}</h1></div>
 
       {loading ? (
         <div className="space-y-4">{[1, 2, 3].map(i => <div key={i} className="h-40 bg-muted rounded-xl animate-pulse" />)}</div>
       ) : !activeSub ? (
         <Card><CardContent className="p-10 text-center">
           <Sparkles className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
-          <h3 className="text-base font-semibold text-foreground mb-1">{text.noSub}</h3>
-          <p className="text-sm text-muted-foreground mb-5">{text.noSubDesc}</p>
-          <Link href="/token-plan"><Button>{text.browsePlans}</Button></Link>
+          <h3 className="text-base font-semibold text-foreground mb-1">{L.noSub}</h3>
+          <p className="text-sm text-muted-foreground mb-5">{L.noSubDesc}</p>
+          <Link href="/token-plan"><Button>{L.browsePlans}</Button></Link>
         </CardContent></Card>
       ) : (
         <div className="space-y-4">
@@ -255,21 +222,21 @@ function TokenPlanContent() {
                   {(() => { const I = STATUS_CONFIG[activeSub.status]?.icon || CheckCircle; return <I className={`h-3.5 w-3.5 ${activeSub.status === 'active' ? 'text-emerald-400' : STATUS_CONFIG[activeSub.status]?.color}`} />; })()}
                   <span className={`text-xs font-medium ${activeSub.status === 'active' ? 'text-emerald-400' : STATUS_CONFIG[activeSub.status]?.color}`}>{STATUS_CONFIG[activeSub.status]?.label[lang]}</span>
                 </div>
-                <span className="text-xs text-muted-foreground">{text.validUntil} {formatDate(activeSub.current_period_end)}</span>
+                <span className="text-xs text-muted-foreground">{L.validUntil} {formatDate(activeSub.current_period_end)}</span>
               </div>
               <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
                 <input type="checkbox" checked={!!activeSub.auto_renew} onChange={() => handleToggleAutoRenew(activeSub.id)} disabled={actionLoading === activeSub.id} className="rounded border-border" />
-                {text.autoRenew}
+                {L.autoRenew}
               </label>
             </div>
           </SubscriptionCard>
 
           {/* Usage */}
           <Card><CardContent className="p-5">
-            <h3 className="text-sm font-medium text-foreground mb-3">{text.usage}</h3>
+            <h3 className="text-sm font-medium text-foreground mb-3">{L.usage}</h3>
             <div className="flex items-center justify-between text-sm mb-1.5">
               <span className="text-muted-foreground">{activeSub.credits_remaining.toLocaleString()} <span className="text-xs">credits</span> / {activeSub.credits_total.toLocaleString()} <span className="text-xs">credits</span></span>
-              <span className="font-medium text-foreground">{activeSub.credits_total > 0 ? ((1 - activeSub.credits_remaining / activeSub.credits_total) * 100).toFixed(1) : 0}% {text.used}</span>
+              <span className="font-medium text-foreground">{activeSub.credits_total > 0 ? ((1 - activeSub.credits_remaining / activeSub.credits_total) * 100).toFixed(1) : 0}% {L.used}</span>
             </div>
             <div className="h-2.5 bg-muted rounded-full overflow-hidden">
               <div className="h-full bg-gradient-to-r from-amber-500 to-orange-500 rounded-full transition-all" style={{ width: `${activeSub.credits_total > 0 ? ((activeSub.credits_total - activeSub.credits_remaining) / activeSub.credits_total) * 100 : 0}%` }} />
@@ -278,8 +245,8 @@ function TokenPlanContent() {
 
           {/* API Key */}
           <Card><CardContent className="p-5">
-            <div className="flex items-center gap-2 mb-3"><Key className="h-4 w-4 text-amber-400" /><h3 className="text-sm font-medium text-foreground">{text.apiKey}</h3></div>
-            <p className="text-xs text-muted-foreground mb-3">{text.quickStart}</p>
+            <div className="flex items-center gap-2 mb-3"><Key className="h-4 w-4 text-amber-400" /><h3 className="text-sm font-medium text-foreground">{L.apiKey}</h3></div>
+            <p className="text-xs text-muted-foreground mb-3">{L.quickStart}</p>
             {apiKeys.length === 0 ? (
               <p className="text-sm text-muted-foreground">
                 {lang === "zh" ? "暂无 API Key，请先创建。" : "No API Key yet. Create one first."}{" "}
@@ -300,22 +267,22 @@ function TokenPlanContent() {
                 ))}
               </div>
             )}
-            <p className="text-[11px] text-muted-foreground mt-2">{text.apiKeyHint}</p>
+            <p className="text-[11px] text-muted-foreground mt-2">{L.apiKeyHint}</p>
           </CardContent></Card>
 
           {/* Base URLs */}
           <Card><CardContent className="p-5">
-            <div className="flex items-center gap-2 mb-3"><Globe className="h-4 w-4 text-amber-400" /><h3 className="text-sm font-medium text-foreground">{text.baseUrl}</h3></div>
+            <div className="flex items-center gap-2 mb-3"><Globe className="h-4 w-4 text-amber-400" /><h3 className="text-sm font-medium text-foreground">{L.baseUrl}</h3></div>
             <div className="space-y-2">
               <div className="flex items-center gap-2 p-2.5 rounded-lg bg-muted/50 border border-border">
-                <span className="text-xs text-muted-foreground shrink-0">{text.openai}</span>
+                <span className="text-xs text-muted-foreground shrink-0">{L.openai}</span>
                 <code className="flex-1 text-xs font-mono text-foreground truncate">{baseUrl}/api/v1</code>
                 <button onClick={() => handleCopy(`${baseUrl}/api/v1`, "oai")} className="shrink-0" aria-label="Copy OpenAI base URL">
                   {copied === "oai" ? <CheckCheck className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground" />}
                 </button>
               </div>
               <div className="flex items-center gap-2 p-2.5 rounded-lg bg-muted/50 border border-border">
-                <span className="text-xs text-muted-foreground shrink-0">{text.anthropic}</span>
+                <span className="text-xs text-muted-foreground shrink-0">{L.anthropic}</span>
                 <code className="flex-1 text-xs font-mono text-foreground truncate">{baseUrl}/api/v1/messages</code>
                 <button onClick={() => handleCopy(`${baseUrl}/api/v1/messages`, "ant")} className="shrink-0" aria-label="Copy Anthropic base URL">
                   {copied === "ant" ? <CheckCheck className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground" />}
@@ -329,20 +296,20 @@ function TokenPlanContent() {
             {activeSub.status === "active" && (
               <>
                 <Button variant="outline" size="sm" onClick={() => { setUpgradeOpen(true); setUpgradePlanId(0); }}>
-                  <Sparkles className="h-3.5 w-3.5 mr-1.5" />{text.changePlan}
+                  <Sparkles className="h-3.5 w-3.5 mr-1.5" />{L.changePlan}
                 </Button>
                 <Button variant="outline" size="sm" className="text-red-400 hover:text-red-300" onClick={() => handleCancel(activeSub.id)} disabled={actionLoading === activeSub.id}>
-                  <XCircle className="h-3.5 w-3.5 mr-1.5" />{text.cancel}
+                  <XCircle className="h-3.5 w-3.5 mr-1.5" />{L.cancel}
                 </Button>
               </>
             )}
-            <Link href="/token-plan"><Button variant="outline" size="sm">{text.browsePlans}</Button></Link>
+            <Link href="/token-plan"><Button variant="outline" size="sm">{L.browsePlans}</Button></Link>
           </div>
 
           {/* Past subscriptions */}
           {subscriptions.filter(s => s.id !== activeSub.id).length > 0 && (
             <div className="mt-4">
-              <h3 className="text-sm font-medium text-muted-foreground mb-2">{text.pastSubs}</h3>
+              <h3 className="text-sm font-medium text-muted-foreground mb-2">{L.pastSubs}</h3>
               <div className="space-y-2">
                 {subscriptions.filter(s => s.id !== activeSub.id).map(sub => {
                   const st = STATUS_CONFIG[sub.status] || STATUS_CONFIG.expired;
@@ -375,18 +342,18 @@ function TokenPlanContent() {
       <Dialog open={upgradeOpen} onOpenChange={(open) => { if (!open) setUpgradeOpen(false); }}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>{text.changePlan}</DialogTitle>
-            <DialogDescription>{text.changePlanConfirm}</DialogDescription>
+            <DialogTitle>{L.changePlan}</DialogTitle>
+            <DialogDescription>{L.changePlanConfirm}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div>
-              <label className="text-sm text-foreground mb-1.5 block">{text.selectNewPlan}</label>
+              <label className="text-sm text-foreground mb-1.5 block">{L.selectNewPlan}</label>
               <select
                 className="w-full h-9 px-3 rounded-md border border-input bg-background text-sm focus:border-primary focus:outline-none"
                 value={upgradePlanId}
                 onChange={e => setUpgradePlanId(+e.target.value)}
               >
-                <option value={0}>{text.selectNewPlan}</option>
+                <option value={0}>{L.selectNewPlan}</option>
                 {plans.filter(p => p.id !== activeSub?.plan_id).map(p => (
                   <option key={p.id} value={p.id}>{p.display_name} — {p.monthly_credits.toLocaleString()} credits / ${p.monthly_price}/mo</option>
                 ))}
@@ -404,16 +371,16 @@ function TokenPlanContent() {
                     <span className="font-medium">{newPlan?.display_name}</span>
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    {isUpgrade ? text.upgrade : text.downgrade} • {text.proratedCredits}: {activeSub.credits_remaining.toLocaleString()} → {newPlan?.monthly_credits.toLocaleString()} + prorated
+                    {isUpgrade ? L.upgrade : L.downgrade} • {L.proratedCredits}: {activeSub.credits_remaining.toLocaleString()} → {newPlan?.monthly_credits.toLocaleString()} + prorated
                   </div>
                 </div>
               );
             })()}
             <div className="flex gap-2 justify-end">
-              <Button variant="outline" onClick={() => setUpgradeOpen(false)}>{text.cancel}</Button>
+              <Button variant="outline" onClick={() => setUpgradeOpen(false)}>{L.cancel}</Button>
               <Button onClick={handleChangePlan} disabled={upgradeLoading || !upgradePlanId || upgradePlanId === activeSub?.plan_id}>
                 {upgradeLoading ? <Loader2 className="h-4 w-4 animate-spin mr-1.5" /> : null}
-                {upgradeLoading ? text.changing : text.changePlan}
+                {upgradeLoading ? L.changing : L.changePlan}
               </Button>
             </div>
           </div>

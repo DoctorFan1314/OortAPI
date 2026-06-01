@@ -1,8 +1,8 @@
 "use client";
 
+import { useI18n } from "@/contexts/i18n-context";
 import { useToast } from "@/contexts/toast-context";
 import { Filter, Download } from "lucide-react";
-import { LABELS } from "./usage-types";
 
 interface FilterBarProps {
   models: string[];
@@ -44,56 +44,57 @@ export function FilterBar({
   filterKeyId,
 }: FilterBarProps) {
   const { toast: showToast } = useToast();
-  const t = LABELS[lang as keyof typeof LABELS];
+  const { t } = useI18n();
+  const L = t.dashboard;
 
   return (
     <div className="flex flex-wrap items-start justify-between gap-3 p-3 bg-muted/30 rounded-lg">
       <div className="flex flex-wrap items-end gap-3">
         <div className="w-44">
-          <label className="text-xs text-muted-foreground block mb-1">{t.filterModel}</label>
+          <label className="text-xs text-muted-foreground block mb-1">{L.filterModel}</label>
           <select value={inputModel} onChange={e => onInputChange("model", e.target.value)}
             className="w-full h-8 px-2 rounded-md border border-input bg-background text-sm focus:border-primary focus:outline-none">
-            <option value="">{t.all}</option>
+            <option value="">{L.all}</option>
             {models.map(m => <option key={m} value={m}>{m}</option>)}
           </select>
         </div>
         <div className="w-32">
-          <label className="text-xs text-muted-foreground block mb-1">{t.filterStatus}</label>
+          <label className="text-xs text-muted-foreground block mb-1">{L.filterStatus}</label>
           <select value={inputStatus} onChange={e => onInputChange("status", e.target.value)}
             className="w-full h-8 px-2 rounded-md border border-input bg-background text-sm focus:border-primary focus:outline-none">
-            <option value="">{t.all}</option>
-            <option value="success">{t.success}</option>
-            <option value="failed">{t.failed}</option>
+            <option value="">{L.all}</option>
+            <option value="success">{L.success}</option>
+            <option value="failed">{L.failed}</option>
           </select>
         </div>
         <div className="w-40">
-          <label className="text-xs text-muted-foreground block mb-1">{t.apiKey}</label>
+          <label className="text-xs text-muted-foreground block mb-1">{L.apiKey}</label>
           <select value={inputKeyId} onChange={e => onInputChange("keyId", e.target.value)}
             className="w-full h-8 px-2 rounded-md border border-input bg-background text-sm focus:border-primary focus:outline-none">
-            <option value="">{t.allKeys}</option>
+            <option value="">{L.allKeys}</option>
             {keys.map(k => (
               <option key={k.id} value={k.id}>{k.name || `Key #${k.id}`}</option>
             ))}
           </select>
         </div>
         <div className="w-36">
-          <label className="text-xs text-muted-foreground block mb-1">{t.dateFrom}</label>
+          <label className="text-xs text-muted-foreground block mb-1">{L.dateFrom}</label>
           <input type="date" value={inputFrom} onChange={e => onInputChange("from", e.target.value)}
             className="w-full h-8 px-2 rounded-md border border-input bg-background text-sm focus:border-primary focus:outline-none" />
         </div>
         <div className="w-36">
-          <label className="text-xs text-muted-foreground block mb-1">{t.dateTo}</label>
+          <label className="text-xs text-muted-foreground block mb-1">{L.dateTo}</label>
           <input type="date" value={inputTo} onChange={e => onInputChange("to", e.target.value)}
             className="w-full h-8 px-2 rounded-md border border-input bg-background text-sm focus:border-primary focus:outline-none" />
         </div>
         <button onClick={onApply}
           className="h-8 px-4 text-xs bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors flex items-center gap-1.5">
-          <Filter className="h-3.5 w-3.5" />{t.filterBtn}
+          <Filter className="h-3.5 w-3.5" />{L.filterBtn}
         </button>
         {hasActiveFilters && (
           <button onClick={onClear}
             className="h-8 px-3 text-xs text-muted-foreground hover:text-foreground border border-border/50 rounded-md hover:bg-muted transition-colors">
-            {t.clearFilters}
+            {L.clearFilters}
           </button>
         )}
       </div>
@@ -127,7 +128,7 @@ export function FilterBar({
           }
         }}
           className="h-8 px-3 text-xs border border-border/50 rounded-md hover:bg-muted transition-colors flex items-center gap-1.5">
-          <Download className="h-3.5 w-3.5" />{t.exportCSV}
+          <Download className="h-3.5 w-3.5" />{L.exportCSV}
         </button>
       </div>
     </div>

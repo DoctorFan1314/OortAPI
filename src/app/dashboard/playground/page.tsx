@@ -18,7 +18,7 @@ import {
   type Model, type ApiKey, type Usage, type ContentPart, type MessageContent,
   type ChatMessage, type PlaygroundParams, type ChatSession, type ApiEndpoint,
   estimateTokens, nowHHMM, genId, flatContent,
-  DEFAULT_PARAMS, STORAGE_KEY, PRESETS_ZH, PRESETS_EN, PARAM_PRESETS, LABELS, CAP_COLORS,
+  DEFAULT_PARAMS, STORAGE_KEY, PRESETS_ZH, PRESETS_EN, PARAM_PRESETS, CAP_COLORS,
 } from "./chat-engine";
 import { MessageList } from "./message-list";
 import { InputArea } from "./input-area";
@@ -27,7 +27,7 @@ import { InputArea } from "./input-area";
 
 function PlaygroundContent() {
   const { lang, t: dict } = useI18n();
-  const t = LABELS[lang];
+  const L = dict.dashboard;
 
   const [models, setModels] = useState<Model[]>([]);
   const [keys, setKeys] = useState<ApiKey[]>([]);
@@ -93,7 +93,7 @@ function PlaygroundContent() {
   // ── Session management ──
   const createSession = useCallback(() => {
     const id = genId();
-    setSessions((prev) => [...prev, { id, title: t.newChat, messages: [], selectedModel: selectedModel || models[0]?.id || "", selectedKeyId: selectedKeyId ?? keys.find((k) => k.enabled === 1)?.id ?? null, systemPrompt: "", params: { ...DEFAULT_PARAMS } }]);
+    setSessions((prev) => [...prev, { id, title: L.newChat, messages: [], selectedModel: selectedModel || models[0]?.id || "", selectedKeyId: selectedKeyId ?? keys.find((k) => k.enabled === 1)?.id ?? null, systemPrompt: "", params: { ...DEFAULT_PARAMS } }]);
     setCurrentSessionId(id);
     setMessage(""); setResponse(""); setError(""); setUsage(null); setAttachedImages([]); setReasoningContent("");
   }, [lang, selectedModel, selectedKeyId, models, keys]);
@@ -104,7 +104,7 @@ function PlaygroundContent() {
     e.stopPropagation();
     setSessions((prev) => {
       const f = prev.filter((s) => s.id !== id);
-      if (f.length === 0) { const ns = { id: genId(), title: t.newChat, messages: [], selectedModel: models[0]?.id || "", selectedKeyId: keys.find((k) => k.enabled === 1)?.id ?? null, systemPrompt: "", params: { ...DEFAULT_PARAMS } }; setCurrentSessionId(ns.id); return [ns]; }
+      if (f.length === 0) { const ns = { id: genId(), title: L.newChat, messages: [], selectedModel: models[0]?.id || "", selectedKeyId: keys.find((k) => k.enabled === 1)?.id ?? null, systemPrompt: "", params: { ...DEFAULT_PARAMS } }; setCurrentSessionId(ns.id); return [ns]; }
       if (currentSessionId === id) setCurrentSessionId(f[0].id);
       return f;
     });
@@ -127,7 +127,7 @@ function PlaygroundContent() {
   useEffect(() => {
     if (sessions.length === 0) {
       const id = genId();
-      setSessions([{ id, title: t.newChat, messages: [], selectedModel: models[0]?.id || "", selectedKeyId: keys.find((k) => k.enabled === 1)?.id ?? null, systemPrompt: "", params: { ...DEFAULT_PARAMS } }]);
+      setSessions([{ id, title: L.newChat, messages: [], selectedModel: models[0]?.id || "", selectedKeyId: keys.find((k) => k.enabled === 1)?.id ?? null, systemPrompt: "", params: { ...DEFAULT_PARAMS } }]);
       setCurrentSessionId(id);
     }
   }, [lang]); // eslint-disable-line
@@ -380,9 +380,9 @@ function PlaygroundContent() {
         if (!res.ok) {
           // If we have a successful tool result, show it as the response instead of error
           if (lastToolResult) {
-            const resultMsg: ChatMessage = { role: "assistant", content: `${t.searchFallback}\n\n${lastToolResult}`, createdAt: nowHHMM() };
+            const resultMsg: ChatMessage = { role: "assistant", content: `${L.searchFallback}\n\n${lastToolResult}`, createdAt: nowHHMM() };
             updateSession((s) => ({ ...s, messages: [...s.messages, resultMsg] }));
-            setResponse(`${t.searchFallback}\n\n${lastToolResult}`);
+            setResponse(`${L.searchFallback}\n\n${lastToolResult}`);
             setError(""); setIsSending(false);
             return;
           }
@@ -440,7 +440,7 @@ function PlaygroundContent() {
             if (isFailedCall) {
               consecutiveEmptyToolCalls++;
               if (consecutiveEmptyToolCalls >= 2) {
-                const warnMsg = { role: "tool" as const, content: t.toolCallsFailing, createdAt: nowHHMM(), tool_call_id: tc.id, name: tc.function.name };
+                const warnMsg = { role: "tool" as const, content: L.toolCallsFailing, createdAt: nowHHMM(), tool_call_id: tc.id, name: tc.function.name };
                 currentMsgs = [...currentMsgs, { role: "assistant" as const, content: fullText || "", tool_calls: [tc] }, warnMsg];
                 updateSession((s) => ({ ...s, messages: [...s.messages, warnMsg] }));
                 break;
@@ -470,7 +470,7 @@ function PlaygroundContent() {
         setIsSending(false); return;
       }
     }
-    setError(t.maxIterations);
+    setError(L.maxIterations);
     setIsSending(false);
   };
 
@@ -650,9 +650,9 @@ function PlaygroundContent() {
   };
 
   const capEntries: { key: string; label: string; color: string }[] = [
-    { key: "vision", label: t.capVision, color: CAP_COLORS.vision },
-    { key: "reasoning", label: t.capReasoning, color: CAP_COLORS.reasoning },
-    { key: "tools", label: t.capTools, color: CAP_COLORS.tools },
+    { key: "vision", label: L.capVision, color: CAP_COLORS.vision },
+    { key: "reasoning", label: L.capReasoning, color: CAP_COLORS.reasoning },
+    { key: "tools", label: L.capTools, color: CAP_COLORS.tools },
   ];
 
   // ── Render ──
@@ -666,7 +666,7 @@ function PlaygroundContent() {
           onCreateSession={createSession}
           onSwitchSession={switchSession}
           onDeleteSession={deleteSession}
-          newSessionLabel={t.newSession}
+          newSessionLabel={L.newSession}
           deleteSessionLabel={lang === "zh" ? "删除会话" : "Delete session"}
         />
 
@@ -676,7 +676,7 @@ function PlaygroundContent() {
           <div className="flex items-center justify-between px-5 py-2.5 border-b border-border/90 bg-muted/30 shrink-0">
             <div className="flex items-center gap-2">
               {selectedModel && <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-primary/10 backdrop-blur-sm border border-primary/20 text-[11px] font-mono text-primary"><Zap className="h-3 w-3" />{selectedModel}</span>}
-              {thinkingMode && <span className="text-[11px] text-muted-foreground font-mono"><Brain className="h-3 w-3 inline mr-1" />{t.thinkingOn}</span>}
+              {thinkingMode && <span className="text-[11px] text-muted-foreground font-mono"><Brain className="h-3 w-3 inline mr-1" />{L.thinkingOn}</span>}
             </div>
             <div className="flex items-center gap-2">
               {chatHistory.length > 0 && (
@@ -709,7 +709,7 @@ function PlaygroundContent() {
             streamMetrics={streamMetrics}
             copiedIdx={copiedIdx}
             lang={lang}
-            t={t}
+            t={L}
             presets={presets}
             onSetMessage={setMessage}
             onQuote={setQuoteMessage}
@@ -720,7 +720,7 @@ function PlaygroundContent() {
           />
 
           {/* Error */}
-          {error && <div className="mx-5 mb-2 rounded-lg border border-destructive/30 bg-destructive/10 p-3"><p className="text-xs font-medium text-destructive mb-0.5">{t.error}</p><p className="text-xs text-destructive/80 font-mono">{error}</p></div>}
+          {error && <div className="mx-5 mb-2 rounded-lg border border-destructive/30 bg-destructive/10 p-3"><p className="text-xs font-medium text-destructive mb-0.5">{L.error}</p><p className="text-xs text-destructive/80 font-mono">{error}</p></div>}
 
           {/* Input */}
           <InputArea
@@ -734,7 +734,7 @@ function PlaygroundContent() {
             attachedImages={attachedImages}
             mcpToolCount={currentSession?.activeMcpTools?.length ?? 0}
             lang={lang}
-            t={t}
+            t={L}
             toolManagerLabel={dict.resourceHub.toolManager}
             onSetMessage={setMessage}
             onSend={handleSend}
@@ -761,7 +761,7 @@ function PlaygroundContent() {
             showAdvancedParams={showAdvancedParams}
             modelCaps={modelCaps}
             lang={lang}
-            t={t}
+            t={L}
             paramPresets={PARAM_PRESETS}
             capEntries={capEntries}
             onRefresh={handleRefresh}
@@ -781,7 +781,7 @@ function PlaygroundContent() {
           <SheetHeader>
             <SheetTitle className="flex items-center gap-2">
               <Wrench className="h-4 w-4" />
-              {t.tools}
+              {L.tools}
             </SheetTitle>
             <SheetDescription>{dict.resourceHub.toolManagerDesc}</SheetDescription>
           </SheetHeader>
@@ -796,7 +796,7 @@ function PlaygroundContent() {
 
             {/* ── Section 1: Tavily API Key ── */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground block">{t.tavilyKey}</label>
+              <label className="text-sm font-medium text-foreground block">{L.tavilyKey}</label>
               <Input type="password" value={toolConfig.tavilyApiKey} placeholder="tvly-..."
                 onChange={e => {
                   const newConfig = { ...toolConfig, tavilyApiKey: e.target.value };
@@ -899,7 +899,7 @@ function PlaygroundContent() {
               showAdvancedParams={showAdvancedParams}
               modelCaps={modelCaps}
               lang={lang}
-              t={t}
+              t={L}
               paramPresets={PARAM_PRESETS}
               capEntries={capEntries}
               onRefresh={handleRefresh}

@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart3 } from "lucide-react";
 import { useMemo } from "react";
 import dynamic from "next/dynamic";
-import { DailyTrend, LABELS } from "./usage-types";
+import { DailyTrend } from "./usage-types";
 
 const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false });
 
@@ -18,9 +18,9 @@ interface TrendChartProps {
 }
 
 export function TrendChart({ trendData, metric, onMetricChange, isCreditsUser }: TrendChartProps) {
-  const { lang } = useI18n();
+  const { lang, t } = useI18n();
+  const L = t.dashboard;
   const { currency, exchangeRate } = useCurrency();
-  const t = LABELS[lang as keyof typeof LABELS];
 
   const chartOption = useMemo(() => {
     if (trendData.length === 0) return null;
@@ -62,7 +62,7 @@ export function TrendChart({ trendData, metric, onMetricChange, isCreditsUser }:
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-sm flex items-center gap-2">
-            <BarChart3 className="h-4 w-4" />{t.trend}
+            <BarChart3 className="h-4 w-4" />{L.trend}
           </CardTitle>
           <div className="flex gap-1">
             {(["cost", "tokens", "calls"] as const)
@@ -70,7 +70,7 @@ export function TrendChart({ trendData, metric, onMetricChange, isCreditsUser }:
               .map(m => (
                 <button key={m} onClick={() => onMetricChange(m)}
                   className={`px-2.5 py-1 text-xs rounded-md transition-colors ${metric === m ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>
-                  {m === "cost" ? t.byCost : m === "tokens" ? t.byTokens : t.byCalls}
+                  {m === "cost" ? L.byCost : m === "tokens" ? L.byTokens : L.byCalls}
                 </button>
               ))}
           </div>

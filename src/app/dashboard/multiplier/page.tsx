@@ -27,74 +27,9 @@ interface TimeSettings {
   enabled: number;
 }
 
-const LABELS = {
-  zh: {
-    title: "倍率管理",
-    regular: "常规倍率规则",
-    timeBased: "时段倍率规则",
-    model: "模型名称",
-    multiplier: "倍率",
-    description: "说明",
-    enabled: "启用",
-    actions: "操作",
-    delete: "删除",
-    add: "添加规则",
-    save: "保存",
-    noRules: "暂无常规倍率规则",
-    dayStart: "白天开始",
-    dayEnd: "白天结束",
-    dayRate: "白天倍率",
-    nightRate: "夜间倍率",
-    timezone: "时区",
-    enableTime: "启用时段倍率",
-    timeDesc: "优先级高于常规倍率。设置白天和夜间的不同倍率，适用于按时段差异化定价。",
-    regularDesc: "按模型设置固定倍率，最终价格 = 基础价格 × 倍率。",
-    effectiveInput: "生效输入价",
-    effectiveOutput: "生效输出价",
-    batchEdit: "批量编辑",
-    batchEditTitle: "批量修改倍率",
-    batchEditDesc: "为选中的规则设置新的倍率值",
-    selected: "已选 {count} 个",
-    newMultiplier: "新倍率",
-    apply: "应用",
-    cancel: "取消",
-  },
-  en: {
-    title: "Multiplier Rules",
-    regular: "Regular Multiplier Rules",
-    timeBased: "Time-based Multiplier Rules",
-    model: "Model Name",
-    multiplier: "Multiplier",
-    description: "Description",
-    enabled: "Enabled",
-    actions: "Actions",
-    delete: "Delete",
-    add: "Add Rule",
-    save: "Save",
-    noRules: "No regular multiplier rules yet",
-    dayStart: "Day Start",
-    dayEnd: "Day End",
-    dayRate: "Day Rate",
-    nightRate: "Night Rate",
-    timezone: "Timezone",
-    enableTime: "Enable Time-based Multiplier",
-    timeDesc: "Higher priority than regular rules. Set different multipliers for day and night periods.",
-    regularDesc: "Set a fixed multiplier per model. Final price = base price × multiplier.",
-    effectiveInput: "Effective Input",
-    effectiveOutput: "Effective Output",
-    batchEdit: "Batch Edit",
-    batchEditTitle: "Batch Edit Multiplier",
-    batchEditDesc: "Set a new multiplier value for selected rules",
-    selected: "{count} selected",
-    newMultiplier: "New Multiplier",
-    apply: "Apply",
-    cancel: "Cancel",
-  },
-};
-
 export default function MultiplierPage() {
-  const { lang } = useI18n();
-  const t = LABELS[lang];
+  const { lang, t } = useI18n();
+  const L = t.dashboard;
   const { toast: showToast } = useToast();
   const [rules, setRules] = useState<MultiplierRule[]>([]);
   const [timeSettings, setTimeSettings] = useState<TimeSettings>({
@@ -170,7 +105,7 @@ export default function MultiplierPage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ type: 'time_settings', ...timeSettings }),
     }).then(res => { if (!res.ok) throw new Error(); return res.json(); })
-      .then(() => showToast(lang === "zh" ? "已保存" : "Saved", "success"))
+      .then(() => showToast(L.saved, "success"))
       .catch(() => showToast(lang === "zh" ? "保存失败" : "Failed to save", "error"));
   };
 
@@ -204,7 +139,7 @@ export default function MultiplierPage() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <h1 className="text-xl md:text-2xl font-bold">{t.title}</h1>
+        <h1 className="text-xl md:text-2xl font-bold">{L.title}</h1>
         <div className="h-48 animate-pulse bg-muted rounded-lg" />
       </div>
     );
@@ -213,11 +148,11 @@ export default function MultiplierPage() {
   if (fetchError) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold">{t.title}</h1>
+        <h1 className="text-2xl font-bold">{L.title}</h1>
         <div className="text-center py-12">
           <AlertTriangle className="h-8 w-8 text-destructive/40 mx-auto mb-2" />
-          <p className="text-sm text-muted-foreground mb-2">{lang === "zh" ? "加载失败" : "Failed to load"}</p>
-          <Button variant="outline" size="sm" onClick={fetchData}>{lang === "zh" ? "重试" : "Retry"}</Button>
+          <p className="text-sm text-muted-foreground mb-2">{L.loadFailed}</p>
+          <Button variant="outline" size="sm" onClick={fetchData}>{L.retry}</Button>
         </div>
       </div>
     );
@@ -225,16 +160,16 @@ export default function MultiplierPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">{t.title}</h1>
+      <h1 className="text-2xl font-bold">{L.title}</h1>
 
       {/* Time-based multiplier settings */}
       <Card className="glass-card">
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <Clock className="h-5 w-5" />
-            {t.timeBased}
+            {L.timeBased}
           </CardTitle>
-          <p className="text-sm text-muted-foreground">{t.timeDesc}</p>
+          <p className="text-sm text-muted-foreground">{L.timeDesc}</p>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center gap-3">
@@ -245,12 +180,12 @@ export default function MultiplierPage() {
                 onChange={e => setTimeSettings(s => ({ ...s, enabled: e.target.checked ? 1 : 0 }))}
                 className="rounded"
               />
-              {t.enableTime}
+              {L.enableTime}
             </label>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             <div>
-              <label className="text-xs text-muted-foreground block mb-1">{t.dayStart}</label>
+              <label className="text-xs text-muted-foreground block mb-1">{L.dayStart}</label>
               <input
                 type="time"
                 value={timeSettings.day_start}
@@ -259,7 +194,7 @@ export default function MultiplierPage() {
               />
             </div>
             <div>
-              <label className="text-xs text-muted-foreground block mb-1">{t.dayEnd}</label>
+              <label className="text-xs text-muted-foreground block mb-1">{L.dayEnd}</label>
               <input
                 type="time"
                 value={timeSettings.day_end}
@@ -268,7 +203,7 @@ export default function MultiplierPage() {
               />
             </div>
             <div>
-              <label className="text-xs text-muted-foreground block mb-1">{t.dayRate}</label>
+              <label className="text-xs text-muted-foreground block mb-1">{L.dayRate}</label>
               <input
                 type="number"
                 step="0.01"
@@ -279,7 +214,7 @@ export default function MultiplierPage() {
               />
             </div>
             <div>
-              <label className="text-xs text-muted-foreground block mb-1">{t.nightRate}</label>
+              <label className="text-xs text-muted-foreground block mb-1">{L.nightRate}</label>
               <input
                 type="number"
                 step="0.01"
@@ -290,7 +225,7 @@ export default function MultiplierPage() {
               />
             </div>
             <div>
-              <label className="text-xs text-muted-foreground block mb-1">{t.timezone}</label>
+              <label className="text-xs text-muted-foreground block mb-1">{L.timezone}</label>
               <select
                 value={timeSettings.timezone}
                 onChange={e => setTimeSettings(s => ({ ...s, timezone: e.target.value }))}
@@ -310,7 +245,7 @@ export default function MultiplierPage() {
             className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
           >
             <Save className="h-4 w-4" />
-            {t.save}
+            {L.save}
           </button>
         </CardContent>
       </Card>
@@ -320,15 +255,15 @@ export default function MultiplierPage() {
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <Layers className="h-5 w-5" />
-            {t.regular}
+            {L.regular}
           </CardTitle>
-          <p className="text-sm text-muted-foreground">{t.regularDesc}</p>
+          <p className="text-sm text-muted-foreground">{L.regularDesc}</p>
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Add new rule form */}
           <div className="flex flex-wrap items-end gap-3 p-3 bg-muted/30 rounded-lg">
             <div className="flex-1 min-w-[150px]">
-              <label className="text-xs text-muted-foreground block mb-1">{t.model}</label>
+              <label className="text-xs text-muted-foreground block mb-1">{L.model}</label>
               <input
                 value={newModel}
                 onChange={e => setNewModel(e.target.value)}
@@ -337,7 +272,7 @@ export default function MultiplierPage() {
               />
             </div>
             <div className="w-24">
-              <label className="text-xs text-muted-foreground block mb-1">{t.multiplier}</label>
+              <label className="text-xs text-muted-foreground block mb-1">{L.multiplier}</label>
               <input
                 value={newMultiplier}
                 onChange={e => setNewMultiplier(e.target.value)}
@@ -348,7 +283,7 @@ export default function MultiplierPage() {
               />
             </div>
             <div className="flex-1 min-w-[150px]">
-              <label className="text-xs text-muted-foreground block mb-1">{t.description}</label>
+              <label className="text-xs text-muted-foreground block mb-1">{L.description}</label>
               <input
                 value={newDesc}
                 onChange={e => setNewDesc(e.target.value)}
@@ -361,7 +296,7 @@ export default function MultiplierPage() {
               className="flex items-center gap-1.5 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
             >
               <Plus className="h-4 w-4" />
-              {t.add}
+              {L.add}
             </button>
           </div>
 
@@ -369,14 +304,14 @@ export default function MultiplierPage() {
           {rules.length === 0 ? (
             <div className="text-center py-12">
               <BarChart3 className="h-8 w-8 text-muted-foreground/40 mx-auto mb-2" />
-              <p className="text-sm text-muted-foreground">{t.noRules}</p>
+              <p className="text-sm text-muted-foreground">{L.noRules}</p>
             </div>
           ) : (
             <>
               {selectedRules.size > 0 && (
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="text-xs text-muted-foreground">{t.selected.replace("{count}", String(selectedRules.size))}</span>
-                  <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => setShowBatchDialog(true)}>{t.batchEdit}</Button>
+                  <span className="text-xs text-muted-foreground">{L.selectedCount.replace("{count}", String(selectedRules.size))}</span>
+                  <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => setShowBatchDialog(true)}>{L.batchEdit}</Button>
                 </div>
               )}
               <div className="overflow-x-auto">
@@ -390,13 +325,13 @@ export default function MultiplierPage() {
                           else setSelectedRules(new Set(rules.map(r => r.model_name)));
                         }} className="rounded" />
                     </th>
-                    <th className="text-left py-2 px-3 text-muted-foreground font-medium">{t.model}</th>
-                    <th className="text-right py-2 px-3 text-muted-foreground font-medium">{t.multiplier}</th>
-                    <th className="text-right py-2 px-3 text-muted-foreground font-medium">{t.effectiveInput}</th>
-                    <th className="text-right py-2 px-3 text-muted-foreground font-medium">{t.effectiveOutput}</th>
-                    <th className="text-left py-2 px-3 text-muted-foreground font-medium hidden md:table-cell">{t.description}</th>
-                    <th className="text-center py-2 px-3 text-muted-foreground font-medium">{t.enabled}</th>
-                    <th className="text-center py-2 px-3 text-muted-foreground font-medium">{t.actions}</th>
+                    <th className="text-left py-2 px-3 text-muted-foreground font-medium">{L.model}</th>
+                    <th className="text-right py-2 px-3 text-muted-foreground font-medium">{L.multiplier}</th>
+                    <th className="text-right py-2 px-3 text-muted-foreground font-medium">{L.effectiveInput}</th>
+                    <th className="text-right py-2 px-3 text-muted-foreground font-medium">{L.effectiveOutput}</th>
+                    <th className="text-left py-2 px-3 text-muted-foreground font-medium hidden md:table-cell">{L.description}</th>
+                    <th className="text-center py-2 px-3 text-muted-foreground font-medium">{L.enabled}</th>
+                    <th className="text-center py-2 px-3 text-muted-foreground font-medium">{L.actions}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -427,7 +362,7 @@ export default function MultiplierPage() {
                         <button
                           onClick={() => handleDeleteRule(rule.model_name)}
                           className="text-red-500 hover:text-red-400 transition-colors"
-                          aria-label={lang === "zh" ? "删除" : "Delete"}
+                          aria-label={L.delete}
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
@@ -452,8 +387,8 @@ export default function MultiplierPage() {
             </DialogDescription>
           </DialogHeader>
           <div className="flex gap-2 justify-end pt-2">
-            <Button variant="outline" onClick={() => setDeleteTarget(null)}>{lang === "zh" ? "取消" : "Cancel"}</Button>
-            <Button onClick={confirmDeleteRule} className="bg-red-600 text-white hover:bg-red-700">{lang === "zh" ? "确认删除" : "Delete"}</Button>
+            <Button variant="outline" onClick={() => setDeleteTarget(null)}>{L.cancel}</Button>
+            <Button onClick={confirmDeleteRule} className="bg-red-600 text-white hover:bg-red-700">{L.delete}</Button>
           </div>
         </DialogContent>
       </Dialog>
@@ -462,21 +397,21 @@ export default function MultiplierPage() {
       <Dialog open={showBatchDialog} onOpenChange={setShowBatchDialog}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
-            <DialogTitle>{t.batchEditTitle}</DialogTitle>
-            <DialogDescription>{t.batchEditDesc}</DialogDescription>
+            <DialogTitle>{L.batchEditTitle}</DialogTitle>
+            <DialogDescription>{L.batchEditDesc}</DialogDescription>
           </DialogHeader>
           <div className="space-y-3 py-2">
             <div>
-              <label className="text-xs text-muted-foreground block mb-1">{t.newMultiplier}</label>
+              <label className="text-xs text-muted-foreground block mb-1">{L.newMultiplier}</label>
               <input type="number" step="0.01" min="0.01" max="100" value={batchMultValue}
                 onChange={e => setBatchMultValue(e.target.value)}
                 className="w-full px-3 py-2 bg-background rounded-lg text-sm border border-border/50 focus:border-primary focus:outline-none" />
             </div>
-            <p className="text-xs text-muted-foreground">{t.selected.replace("{count}", String(selectedRules.size))}</p>
+            <p className="text-xs text-muted-foreground">{L.selectedCount.replace("{count}", String(selectedRules.size))}</p>
           </div>
           <div className="flex gap-2 justify-end">
-            <Button variant="outline" onClick={() => setShowBatchDialog(false)}>{t.cancel}</Button>
-            <Button onClick={handleBatchEdit}>{t.apply}</Button>
+            <Button variant="outline" onClick={() => setShowBatchDialog(false)}>{L.cancel}</Button>
+            <Button onClick={handleBatchEdit}>{L.apply}</Button>
           </div>
         </DialogContent>
       </Dialog>

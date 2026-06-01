@@ -41,45 +41,14 @@ interface Plan {
   monthly_price: number;
 }
 
-const LABELS = {
-  zh: {
-    title: "用户管理", search: "搜索邮箱或用户名", all: "全部", admin: "管理员", user: "普通用户",
-    email: "邮箱", username: "用户名", role: "角色", balance: "余额", status: "状态", registered: "注册时间", actions: "操作",
-    edit: "编辑", delete: "删除", topup: "充值", enabled: "正常", disabled: "已禁用",
-    editUser: "编辑用户", changeRole: "角色", addBalance: "充值金额", deductBalance: "扣费金额",
-    save: "保存", cancel: "取消", confirm: "确定", deleteUser: "删除用户",
-    deleteConfirm: "确定要删除用户 {email} 吗？此操作不可撤销，将删除该用户的所有数据（API Keys、用量记录、账单记录）。",
-    noUsers: "暂无用户", selfDisable: "不能禁用自己", selfDemote: "不能降级自己", selfDelete: "不能删除自己",
-    balanceTopup: "用户充值", balanceDeduct: "用户扣费",
-    resetPassword: "重置密码", resetPasswordConfirm: "确认重置密码",
-    resetPasswordSuccess: "密码重置成功，请将新密码告知用户：", copyPassword: "复制密码", copied: "已复制",
-    selected: "已选择", batchEnable: "批量启用", batchDisable: "批量禁用", batchGrant: "批量发放余额",
-    grantAmount: "发放金额 ($)", grantConfirm: "确认为选中用户发放余额？",
-    exportCSV: "导出 CSV",
-  },
-  en: {
-    title: "User Management", search: "Search email or username", all: "All", admin: "Admin", user: "User",
-    email: "Email", username: "Username", role: "Role", balance: "Balance", status: "Status", registered: "Registered", actions: "Actions",
-    edit: "Edit", delete: "Delete", topup: "Top Up", enabled: "Active", disabled: "Disabled",
-    editUser: "Edit User", changeRole: "Role", addBalance: "Top Up Amount", deductBalance: "Deduct Amount",
-    save: "Save", cancel: "Cancel", confirm: "Confirm", deleteUser: "Delete User",
-    deleteConfirm: "Are you sure you want to delete {email}? This cannot be undone and will delete all their data (API Keys, usage logs, billing records).",
-    noUsers: "No users found", selfDisable: "Cannot disable yourself", selfDemote: "Cannot demote yourself", selfDelete: "Cannot delete yourself",
-    balanceTopup: "Top Up Balance", balanceDeduct: "Deduct Balance",
-    resetPassword: "Reset Password", resetPasswordConfirm: "Confirm Password Reset",
-    resetPasswordSuccess: "Password reset successfully. Please share this new password with the user:", copyPassword: "Copy", copied: "Copied",
-    selected: "Selected", batchEnable: "Batch Enable", batchDisable: "Batch Disable", batchGrant: "Batch Grant Balance",
-    grantAmount: "Grant Amount ($)", grantConfirm: "Grant balance to selected users?",
-    exportCSV: "Export CSV",
-  },
-};
 
 export default function UsersPage() {
-  const { lang } = useI18n();
+  const { lang, t } = useI18n();
+  const L = t.dashboard;
   const { user: currentUser } = useAuth();
   const { toast: showToast } = useToast();
   const { formatPrice } = useCurrency();
-  const t = LABELS[lang];
+
   const [users, setUsers] = useState<UserItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -377,15 +346,15 @@ export default function UsersPage() {
   }
 
   const roleFilters = [
-    { key: "all" as const, label: t.all },
-    { key: "admin" as const, label: t.admin },
-    { key: "user" as const, label: t.user },
+    { key: "all" as const, label: L.all },
+    { key: "admin" as const, label: L.admin },
+    { key: "user" as const, label: L.user },
   ];
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold flex items-center gap-2"><Users className="h-6 w-6" />{t.title}</h1>
+        <h1 className="text-2xl font-bold flex items-center gap-2"><Users className="h-6 w-6" />{L.title}</h1>
         <div className="flex items-center gap-2">
           <button onClick={() => {
             const params = [
@@ -396,7 +365,7 @@ export default function UsersPage() {
             window.open(`/api/dashboard/users?${params}`, '_blank');
           }}
             className="h-8 px-3 text-xs border border-border/50 rounded-md hover:bg-muted transition-colors flex items-center gap-1.5">
-            <Download className="h-3.5 w-3.5" />{t.exportCSV}
+            <Download className="h-3.5 w-3.5" />{L.exportCSV}
           </button>
           <Badge variant="secondary">{total}</Badge>
         </div>
@@ -407,7 +376,7 @@ export default function UsersPage() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder={t.search}
+            placeholder={L.search}
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
             className="pl-9 bg-secondary border-border"
@@ -432,16 +401,16 @@ export default function UsersPage() {
         <CardContent className="p-0">
           {selectedIds.size > 0 && (
             <div className="flex items-center gap-3 px-4 py-2.5 border-b border-border/50 bg-primary/5">
-              <span className="text-sm text-muted-foreground">{t.selected}: <strong className="text-foreground">{selectedIds.size}</strong></span>
+              <span className="text-sm text-muted-foreground">{L.selected}: <strong className="text-foreground">{selectedIds.size}</strong></span>
               <div className="flex gap-1.5 ml-auto">
                 <Button variant="outline" size="sm" onClick={() => handleBatchAction("enable")} disabled={batchLoading}>
-                  <Power className="h-3.5 w-3.5 mr-1" />{t.batchEnable}
+                  <Power className="h-3.5 w-3.5 mr-1" />{L.batchEnable}
                 </Button>
                 <Button variant="outline" size="sm" onClick={() => handleBatchAction("disable")} disabled={batchLoading}>
-                  <PowerOff className="h-3.5 w-3.5 mr-1" />{t.batchDisable}
+                  <PowerOff className="h-3.5 w-3.5 mr-1" />{L.batchDisable}
                 </Button>
                 <Button variant="outline" size="sm" onClick={() => setBatchGrantOpen(true)} disabled={batchLoading}>
-                  <DollarSign className="h-3.5 w-3.5 mr-1" />{t.batchGrant}
+                  <DollarSign className="h-3.5 w-3.5 mr-1" />{L.batchGrant}
                 </Button>
               </div>
             </div>
@@ -457,7 +426,7 @@ export default function UsersPage() {
           ) : users.length === 0 ? (
             <div className="text-center py-12">
               <Users className="h-8 w-8 text-muted-foreground/40 mx-auto mb-2" />
-              <p className="text-sm text-muted-foreground">{t.noUsers}</p>
+              <p className="text-sm text-muted-foreground">{L.noUsers}</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -467,14 +436,14 @@ export default function UsersPage() {
                     <th className="text-left py-3 px-2 w-10">
                       <input type="checkbox" checked={users.length > 0 && selectedIds.size === users.filter(u => u.id !== currentUser?.id).length} onChange={toggleSelectAll} className="rounded border-input" />
                     </th>
-                    <th className="text-left py-3 px-4 text-muted-foreground font-medium">{t.email}</th>
-                    <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden md:table-cell">{t.username}</th>
-                    <th className="text-center py-3 px-4 text-muted-foreground font-medium">{t.role}</th>
+                    <th className="text-left py-3 px-4 text-muted-foreground font-medium">{L.email}</th>
+                    <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden md:table-cell">{L.username}</th>
+                    <th className="text-center py-3 px-4 text-muted-foreground font-medium">{L.role}</th>
                     <th className="text-center py-3 px-4 text-muted-foreground font-medium hidden lg:table-cell">{lang === "zh" ? "订阅" : "Plan"}</th>
-                    <th className="text-right py-3 px-4 text-muted-foreground font-medium">{t.balance}</th>
-                    <th className="text-center py-3 px-4 text-muted-foreground font-medium">{t.status}</th>
-                    <th className="text-right py-3 px-4 text-muted-foreground font-medium hidden lg:table-cell">{t.registered}</th>
-                    <th className="text-right py-3 px-4 text-muted-foreground font-medium">{t.actions}</th>
+                    <th className="text-right py-3 px-4 text-muted-foreground font-medium">{L.balance}</th>
+                    <th className="text-center py-3 px-4 text-muted-foreground font-medium">{L.status}</th>
+                    <th className="text-right py-3 px-4 text-muted-foreground font-medium hidden lg:table-cell">{L.registered}</th>
+                    <th className="text-right py-3 px-4 text-muted-foreground font-medium">{L.actions}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -505,7 +474,7 @@ export default function UsersPage() {
                       <td className="py-3 px-4 text-right font-mono">{formatPrice(u.balance)}</td>
                       <td className="py-3 px-4 text-center">
                         <span className={`text-xs px-2 py-0.5 rounded-full ${u.enabled ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"}`}>
-                          {u.enabled ? t.enabled : t.disabled}
+                          {u.enabled ? L.enabled : L.disabled}
                         </span>
                       </td>
                       <td className="py-3 px-4 text-right text-xs text-muted-foreground hidden lg:table-cell">{new Date(u.created_at + "Z").toLocaleDateString()}</td>
@@ -514,10 +483,10 @@ export default function UsersPage() {
                           <Link href={`/dashboard/users/${u.id}`} className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors" title={lang === "zh" ? "查看详情" : "View details"} aria-label={lang === "zh" ? "查看详情" : "View details"}>
                             <Eye className="h-3.5 w-3.5" />
                           </Link>
-                          <button onClick={() => openEdit(u)} className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors" title={t.edit} aria-label={t.edit}>
+                          <button onClick={() => openEdit(u)} className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors" title={L.edit} aria-label={L.edit}>
                             <Pencil className="h-3.5 w-3.5" />
                           </button>
-                          <button onClick={() => setDeleteUser(u)} className="p-1.5 rounded-md hover:bg-red-500/10 text-muted-foreground hover:text-red-500 transition-colors" title={t.delete} aria-label={t.delete}>
+                          <button onClick={() => setDeleteUser(u)} className="p-1.5 rounded-md hover:bg-red-500/10 text-muted-foreground hover:text-red-500 transition-colors" title={L.delete} aria-label={L.delete}>
                             <Trash2 className="h-3.5 w-3.5" />
                           </button>
                         </div>
@@ -544,7 +513,7 @@ export default function UsersPage() {
       <Dialog open={!!editUser} onOpenChange={(open) => { if (!open) setEditUser(null); }}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>{t.editUser}</DialogTitle>
+            <DialogTitle>{L.editUser}</DialogTitle>
             <DialogDescription>{editUser?.email}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
@@ -584,28 +553,28 @@ export default function UsersPage() {
               </div>
             )}
             <div>
-              <label className="text-sm text-foreground mb-1.5 block">{t.changeRole}</label>
+              <label className="text-sm text-foreground mb-1.5 block">{L.changeRole}</label>
               <div className="flex gap-2">
                 <button onClick={() => setEditRole("user")} className={`flex-1 py-2 rounded-lg text-sm font-medium border transition-colors ${editRole === "user" ? "bg-primary/10 text-primary border-primary/30" : "bg-secondary text-muted-foreground border-border"}`}>User</button>
                 <button onClick={() => setEditRole("admin")} className={`flex-1 py-2 rounded-lg text-sm font-medium border transition-colors ${editRole === "admin" ? "bg-yellow-500/10 text-yellow-500 border-yellow-500/30" : "bg-secondary text-muted-foreground border-border"}`}>Admin</button>
               </div>
             </div>
             <div>
-              <label className="text-sm text-foreground mb-1.5 block flex items-center gap-1"><Wallet className="h-3.5 w-3.5" />{t.balanceTopup}</label>
+              <label className="text-sm text-foreground mb-1.5 block flex items-center gap-1"><Wallet className="h-3.5 w-3.5" />{L.balanceTopup}</label>
               <Input type="number" min="0" step="0.01" placeholder="0.00" value={editAdd} onChange={(e) => setEditAdd(e.target.value)} className="bg-secondary border-border" />
             </div>
             <div>
-              <label className="text-sm text-foreground mb-1.5 block">{t.balanceDeduct}</label>
+              <label className="text-sm text-foreground mb-1.5 block">{L.balanceDeduct}</label>
               <Input type="number" min="0" step="0.01" placeholder="0.00" value={editDeduct} onChange={(e) => setEditDeduct(e.target.value)} className="bg-secondary border-border" />
             </div>
             <div className="flex gap-2 justify-between">
               <Button variant="outline" size="sm" onClick={handleResetPassword} disabled={resetLoading} className="text-orange-500 border-orange-500/30 hover:bg-orange-500/10">
                 {resetLoading ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <KeyRound className="h-4 w-4 mr-1" />}
-                {t.resetPassword}
+                {L.resetPassword}
               </Button>
               <div className="flex gap-2">
-                <Button variant="outline" onClick={() => setEditUser(null)}>{t.cancel}</Button>
-                <Button onClick={handleSave} disabled={editSaving}>{editSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : t.save}</Button>
+                <Button variant="outline" onClick={() => setEditUser(null)}>{L.cancel}</Button>
+                <Button onClick={handleSave} disabled={editSaving}>{editSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : L.save}</Button>
               </div>
             </div>
           </div>
@@ -616,13 +585,13 @@ export default function UsersPage() {
       <Dialog open={!!deleteUser} onOpenChange={(open) => { if (!open) setDeleteUser(null); }}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
-            <DialogTitle>{t.deleteUser}</DialogTitle>
-            <DialogDescription>{deleteUser ? t.deleteConfirm.replace("{email}", deleteUser.email) : ""}</DialogDescription>
+            <DialogTitle>{L.deleteUser}</DialogTitle>
+            <DialogDescription>{deleteUser ? L.deleteConfirm.replace("{email}", deleteUser.email) : ""}</DialogDescription>
           </DialogHeader>
           <div className="flex gap-2 justify-end pt-2">
-            <Button variant="outline" onClick={() => setDeleteUser(null)}>{t.cancel}</Button>
+            <Button variant="outline" onClick={() => setDeleteUser(null)}>{L.cancel}</Button>
             <Button onClick={handleDelete} disabled={deleteLoading} className="bg-red-600 text-white hover:bg-red-700">
-              {deleteLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : t.confirm}
+              {deleteLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : L.confirm}
             </Button>
           </div>
         </DialogContent>
@@ -634,12 +603,12 @@ export default function UsersPage() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <KeyRound className="h-5 w-5 text-green-500" />
-              {t.resetPasswordConfirm}
+              {L.resetPasswordConfirm}
             </DialogTitle>
             <DialogDescription>{resetResult?.email}</DialogDescription>
           </DialogHeader>
           <div className="space-y-3 py-2">
-            <p className="text-sm text-muted-foreground">{t.resetPasswordSuccess}</p>
+            <p className="text-sm text-muted-foreground">{L.resetPasswordSuccess}</p>
             <div className="flex items-center gap-2">
               <code className="flex-1 p-3 bg-muted rounded-lg text-sm font-mono break-all select-all">{resetResult?.password}</code>
               <Button
@@ -647,7 +616,7 @@ export default function UsersPage() {
                 size="sm"
                 onClick={() => resetResult && copyToClipboard(resetResult.password)}
               >
-                {copied ? t.copied : t.copyPassword}
+                {copied ? L.copied : L.copyPassword}
               </Button>
             </div>
           </div>
@@ -662,7 +631,7 @@ export default function UsersPage() {
             <DialogDescription>{confirmAction?.label}</DialogDescription>
           </DialogHeader>
           <div className="flex gap-2 justify-end pt-2">
-            <Button variant="outline" onClick={() => setConfirmAction(null)}>{t.cancel}</Button>
+            <Button variant="outline" onClick={() => setConfirmAction(null)}>{L.cancel}</Button>
             <Button
               onClick={() => {
                 if (confirmAction?.type === "cancel") confirmCancelSubscription();
@@ -671,7 +640,7 @@ export default function UsersPage() {
               }}
               disabled={subActionLoading}
             >
-              {subActionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : t.confirm}
+              {subActionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : L.confirm}
             </Button>
           </div>
         </DialogContent>
@@ -681,18 +650,18 @@ export default function UsersPage() {
       <Dialog open={batchGrantOpen} onOpenChange={(open) => { if (!open) { setBatchGrantOpen(false); setBatchGrantAmount(""); } }}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
-            <DialogTitle>{t.batchGrant}</DialogTitle>
-            <DialogDescription>{t.grantConfirm}</DialogDescription>
+            <DialogTitle>{L.batchGrant}</DialogTitle>
+            <DialogDescription>{L.grantConfirm}</DialogDescription>
           </DialogHeader>
           <div className="space-y-3 py-2">
             <div>
-              <label className="text-sm text-foreground mb-1.5 block">{t.grantAmount}</label>
+              <label className="text-sm text-foreground mb-1.5 block">{L.grantAmount}</label>
               <Input type="number" min="0.01" step="0.01" value={batchGrantAmount} onChange={e => setBatchGrantAmount(e.target.value)} className="bg-secondary border-border" />
             </div>
             <div className="flex gap-2 justify-end">
-              <Button variant="outline" onClick={() => { setBatchGrantOpen(false); setBatchGrantAmount(""); }}>{t.cancel}</Button>
+              <Button variant="outline" onClick={() => { setBatchGrantOpen(false); setBatchGrantAmount(""); }}>{L.cancel}</Button>
               <Button onClick={() => handleBatchAction("grant")} disabled={batchLoading || !batchGrantAmount}>
-                {batchLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : t.confirm}
+                {batchLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : L.confirm}
               </Button>
             </div>
           </div>
