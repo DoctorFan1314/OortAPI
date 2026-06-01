@@ -3,10 +3,9 @@
 import { useI18n } from "@/contexts/i18n-context";
 import { ChannelCard } from "@/components/dashboard/channel-card";
 import { RoutingPieChart } from "@/components/dashboard/routing-pie-chart";
-import { ChannelHealthTable } from "@/components/dashboard/channel-health-table";
 import { ModelChannelMap } from "@/components/dashboard/model-channel-map";
 import { Card, CardContent } from "@/components/ui/card";
-import { Activity, CheckCircle, AlertTriangle, XCircle } from "lucide-react";
+import { Activity, CheckCircle, AlertTriangle, XCircle, GitBranch } from "lucide-react";
 import useSWR from "swr";
 import { dashboardSWRConfig } from "@/lib/swr-fetcher";
 import { useMemo } from "react";
@@ -47,23 +46,25 @@ interface ModelItem {
 const LABELS = {
   zh: {
     title: "渠道管理",
-    overview: "健康概览",
     totalChannels: "渠道总数",
     online: "在线",
     offline: "离线",
     avgSuccessRate: "平均成功率",
     avgLatency: "平均延迟",
-    totalCalls24h: "24h 总调用",
+    totalCalls24h: "24h 调用",
+    routingTitle: "路由分析",
+    routingDesc: "渠道路由分布与模型映射关系",
   },
   en: {
     title: "Channel Management",
-    overview: "Health Overview",
     totalChannels: "Total Channels",
     online: "Online",
     offline: "Offline",
     avgSuccessRate: "Avg Success Rate",
     avgLatency: "Avg Latency",
-    totalCalls24h: "24h Total Calls",
+    totalCalls24h: "24h Calls",
+    routingTitle: "Routing Analytics",
+    routingDesc: "Channel routing distribution and model mapping",
   },
 };
 
@@ -109,16 +110,13 @@ export default function ChannelsPage() {
   const modelChannelMap = useMemo(() => {
     const map = new Map<string, { channels: { name: string; priority: number; weight: number; status: string }[]; provider: string }>();
     const models = modelsData?.data || [];
-
     const providerMap = new Map(models.map(m => [m.id, m.owned_by]));
 
     for (const ch of mergedChannels) {
       const parsed = ch.modelsParsed;
-      const modelIds = parsed.length === 0
+      const modelIds = parsed.length === 0 || parsed.includes("*")
         ? models.map(m => m.id)
-        : parsed.includes("*")
-          ? models.map(m => m.id)
-          : parsed;
+        : parsed;
 
       for (const modelId of modelIds) {
         if (!map.has(modelId)) {
@@ -126,12 +124,7 @@ export default function ChannelsPage() {
         }
         const entry = map.get(modelId)!;
         if (!entry.channels.some(c => c.name === ch.name)) {
-          entry.channels.push({
-            name: ch.name,
-            priority: ch.priority,
-            weight: ch.weight,
-            status: ch.live_status,
-          });
+          entry.channels.push({ name: ch.name, priority: ch.priority, weight: ch.weight, status: ch.live_status });
         }
       }
     }
@@ -158,19 +151,27 @@ export default function ChannelsPage() {
     ? Math.round(latenciesWithData.reduce((s, h) => s + h.avg_latency_24h!, 0) / latenciesWithData.length)
     : null;
 
+  const statCards = [
+    { icon: <Activity className="h-4 w-4" />, color: "text-blue-500", bg: "bg-blue-500/10", label: t.totalChannels, value: totalChannels },
+    { icon: <CheckCircle className="h-4 w-4" />, color: "text-green-500", bg: "bg-green-500/10", label: t.online, value: onlineCount },
+    { icon: <XCircle className="h-4 w-4" />, color: "text-red-500", bg: "bg-red-500/10", label: t.offline, value: offlineCount },
+    { icon: <Activity className="h-4 w-4" />, color: "text-purple-500", bg: "bg-purple-500/10", label: t.totalCalls24h, value: totalCalls.toLocaleString() },
+    { icon: <CheckCircle className="h-4 w-4" />, color: "text-emerald-500", bg: "bg-emerald-500/10", label: t.avgSuccessRate, value: avgRate !== null ? `${avgRate.toFixed(1)}%` : "-", warn: avgRate !== null && avgRate < 95 },
+    { icon: <AlertTriangle className="h-4 w-4" />, color: "text-amber-500", bg: "bg-amber-500/10", label: t.avgLatency, value: avgLatency !== null ? `${avgLatency}ms` : "-", warn: avgLatency !== null && avgLatency > 1000 },
+  ];
+
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold">
-        {t.title}
-      </h1>
+    <div className="space-y-5">
+      {/* Header */}
+      <h1 className="text-2xl font-bold">{t.title}</h1>
 
       {/* Health overview cards */}
       {healthLoading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
           {Array.from({ length: 6 }).map((_, i) => (
             <Card key={i} className="glass-card animate-pulse">
               <CardContent className="p-3 flex items-center gap-2">
-                <div className="h-4 w-4 rounded bg-muted" />
+                <div className="h-8 w-8 rounded-lg bg-muted" />
                 <div className="flex-1 space-y-1">
                   <div className="h-2 bg-muted rounded w-12" />
                   <div className="h-5 bg-muted rounded w-8" />
@@ -188,83 +189,34 @@ export default function ChannelsPage() {
           </CardContent>
         </Card>
       ) : totalChannels > 0 ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-          <Card className="glass-card">
-            <CardContent className="p-3 flex items-center gap-2">
-              <Activity className="h-4 w-4 text-blue-500" />
-              <div>
-                <p className="text-xs text-muted-foreground">{t.totalChannels}</p>
-                <p className="text-lg font-bold font-mono">{totalChannels}</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="glass-card">
-            <CardContent className="p-3 flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-green-500" />
-              <div>
-                <p className="text-xs text-muted-foreground">{t.online}</p>
-                <p className="text-lg font-bold font-mono text-green-500">{onlineCount}</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="glass-card">
-            <CardContent className="p-3 flex items-center gap-2">
-              <XCircle className="h-4 w-4 text-red-500" />
-              <div>
-                <p className="text-xs text-muted-foreground">{t.offline}</p>
-                <p className="text-lg font-bold font-mono text-red-500">{offlineCount}</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="glass-card">
-            <CardContent className="p-3 flex items-center gap-2">
-              <Activity className="h-4 w-4 text-purple-500" />
-              <div>
-                <p className="text-xs text-muted-foreground">{t.totalCalls24h}</p>
-                <p className="text-lg font-bold font-mono">{totalCalls.toLocaleString()}</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="glass-card">
-            <CardContent className="p-3 flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-emerald-500" />
-              <div>
-                <p className="text-xs text-muted-foreground">{t.avgSuccessRate}</p>
-                <p className={`text-lg font-bold font-mono ${avgRate !== null && avgRate >= 95 ? "text-green-500" : avgRate !== null && avgRate >= 80 ? "text-yellow-500" : "text-red-500"}`}>
-                  {avgRate !== null ? `${avgRate.toFixed(1)}%` : "-"}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="glass-card">
-            <CardContent className="p-3 flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4 text-amber-500" />
-              <div>
-                <p className="text-xs text-muted-foreground">{t.avgLatency}</p>
-                <p className="text-lg font-bold font-mono">{avgLatency !== null ? `${avgLatency}ms` : "-"}</p>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
+          {statCards.map((card) => (
+            <Card key={card.label} className="glass-card">
+              <CardContent className="p-3 flex items-center gap-2.5">
+                <div className={`p-1.5 rounded-lg ${card.bg}`}>
+                  <span className={card.color}>{card.icon}</span>
+                </div>
+                <div>
+                  <p className="text-[10px] text-muted-foreground leading-tight">{card.label}</p>
+                  <p className={`text-lg font-bold font-mono leading-tight ${card.warn ? "text-amber-500" : ""}`}>{card.value}</p>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       ) : null}
 
       {/* Channel CRUD */}
-      <div className="border-t border-border/30 pt-6">
-        <ChannelCard lang={lang} />
-      </div>
+      <ChannelCard lang={lang} />
 
-      {/* Routing pie chart */}
-      <div className="border-t border-border/30 pt-6">
+      {/* Routing Analytics */}
+      <div className="flex items-center gap-2 mt-2">
+        <GitBranch className="h-4 w-4 text-muted-foreground" />
+        <h2 className="text-sm font-semibold text-muted-foreground">{t.routingTitle}</h2>
+        <span className="text-xs text-muted-foreground/60">· {t.routingDesc}</span>
+      </div>
+      <div className="grid lg:grid-cols-2 gap-4">
         <RoutingPieChart healthData={healthData} lang={lang} />
-      </div>
-
-      {/* Channel health table */}
-      <div className="border-t border-border/30 pt-6">
-        <ChannelHealthTable mergedChannels={mergedChannels} lang={lang} />
-      </div>
-
-      {/* Model-channel mapping */}
-      <div className="border-t border-border/30 pt-6">
         <ModelChannelMap modelChannelMap={modelChannelMap} lang={lang} />
       </div>
     </div>
