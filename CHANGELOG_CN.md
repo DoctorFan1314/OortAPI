@@ -188,6 +188,78 @@
 #### i18n
 - 新增键：`navSecurity`、`navPrev``navNext`（types、en.ts、zh.ts）
 
+### 全站审计 — 56 项修复
+
+#### 功能性 Bug
+- **Changelog** — `JSON.parse` 包裹 try/catch（localStorage 损坏时崩溃）
+- **FAQ** — undefined lang 时添加 fallback（异常语言时崩溃）
+- **Navbar** — 余额显示使用 `useCurrency` 的 symbol/formatPrice（之前硬编码 `$`）
+- **搜索页** — 移除无效的 "Error Codes" 过滤 Tab（无实现）
+- **Mobile nav** — 移除无效的 `/playground` 检查，移除未使用的 `CreditCard` 导入
+- **Register** — Confetti keyframes 添加 `register-` 前缀（全局冲突风险）
+- **Models** — 过滤器变化时 `visibleCount` 重置为 20
+
+#### SEO
+- 为 5 个页面添加 server-component metadata wrapper：models、faq、status、changelog、token-plan
+- Guide 页 metadata 从仅中文改为双语
+
+#### 可访问性
+- Settings 开关：`className="hidden"` → `"sr-only"`（键盘可访问）
+- Dialog：移除硬编码的 `"Close"` 默认标签
+- Navbar：移除重复的 skip-to-content 链接，修复 logo `alt=""` → `alt="OortAPI"`
+
+#### 死代码清理
+- Footer：移除未使用的 `StatusIndicator` 导入
+- Mobile nav：移除未使用的 `CreditCard` 导入、无效 `/playground` 检查
+- Plans admin：移除未使用的 `Shield`、`Diamond` 导入
+- Token-plan：移除未使用的 `ChevronDown` 导入
+- Playground：移除未使用的 `lastMsg` 变量
+- Status 页：移除未使用的 `locale` 参数
+
+#### CSS
+- 合并重复的 `prefers-reduced-motion` 块（添加 `scroll-behavior: auto`）
+- 删除未使用的 `.label-upper` class
+- 删除未使用的 `--z-dropdown`、`--z-overlay` CSS 变量
+
+#### i18n 修复
+- Navbar："退出失败"/"登录"/"注册" → `t.common.*` 键，新增 `logoutFailed` 键
+- Status 页：硬编码 "Failed to load" → 双语内联
+- Footer：移除仅英文的 "Coming soon" fallback
+
+#### SWR 迁移
+- Settings 页：手动 fetch → `useSWR`（settings 和 billing 数据）
+- Token-plan 页：手动 fetch → `useSWR`（subscription、keys、plans）
+
+#### UI/UX
+- Footer：Discord/Twitter 链接添加 `preventDefault`（点击不跳顶部）
+- Models：过滤器变化时 `visibleCount` 重置
+
+#### 移动端
+- Playground：新增移动端参数面板（Sheet，状态栏 SlidersHorizontal 按钮）
+- Playground：`h-[100vh]` → `h-[100dvh]`（适配移动端浏览器）
+- Users 表格：小屏幕隐藏 username（md+）、plan（lg+）、registered（lg+）
+
+### 控制台 i18n 迁移 — 240 个键
+
+#### 字典扩展
+- 新增 211+ 个 `t.dashboard.*` 键到 types.ts、en.ts、zh.ts
+- 按页面组织：Usage（35）、Billing（15）、Users（32）、Redeem（27）、Multiplier（18）、Token-plan（26）、Playground（58）
+- 新增侧边栏键：`groupCore`、`groupBilling`、`groupAdmin`、`tokenPlan`、`planManage`、`modelManage`、`routing`、`audit`、`monitor`、`webhooks`、`channelManage`
+- 新增设置页键：`apiEndpoint`、`copyEndpoint`、`systemSettings`、`currency`、`exchangeRate`、`budget*` 等
+- 新增通用共享键：`cancel`、`search`、`actions`、`user`
+
+#### 已迁移页面（7 组）
+- **billing/page.tsx** — 移除 18 键本地 LABELS，改用 `t.dashboard.*`
+- **users/page.tsx** — 移除 43 键本地 LABELS，改用 `t.dashboard.*`
+- **redeem/page.tsx** — 移除 37 键本地 LABELS，改用 `t.dashboard.*`
+- **multiplier/page.tsx** — 移除 28 键本地 LABELS，改用 `t.dashboard.*`
+- **token-plan/page.tsx** — 移除 35 键本地 `t` 对象，改用 `t.dashboard.*`
+- **usage/** — 从 usage-types.ts 移除 LABELS，迁移 page/filter-bar/log-table/trend-chart
+- **playground/** — 从 chat-engine.ts 移除 LABELS，迁移 page/message-list/input-area
+
+#### 重复键清理
+- 修复 types.ts、en.ts、zh.ts 中的重复键（timezone、multiplier、redeem、confirm、all 等）
+
 ### 资源中心体验审计修复
 
 #### i18n 修复

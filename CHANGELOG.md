@@ -194,6 +194,78 @@ All notable changes to this project will be documented in this file.
 #### i18n
 - New keys: `navSecurity`, `navPrev`, `navNext` in types, en.ts, zh.ts
 
+### Site-Wide Audit — 56 Issues Fixed
+
+#### Functional Bugs
+- **Changelog** — `JSON.parse` wrapped in try/catch (crash on corrupted localStorage)
+- **FAQ** — Fallback for undefined `lang` (crash on unexpected language)
+- **Navbar** — Balance display uses `useCurrency` symbol/formatPrice (was hardcoded `$`)
+- **Search** — Removed broken "Error Codes" filter tab (no implementation)
+- **Mobile nav** — Removed dead `/playground` check, removed unused `CreditCard` import
+- **Register** — Confetti keyframes scoped with `register-` prefix (global collision risk)
+- **Models** — `visibleCount` resets to 20 on filter/search change
+
+#### SEO
+- Added server-component metadata wrappers for 5 pages: models, faq, status, changelog, token-plan
+- Fixed guide page metadata from Chinese-only to bilingual
+
+#### Accessibility
+- Settings toggles: `className="hidden"` → `"sr-only"` (keyboard accessible)
+- Dialog: removed hardcoded `"Close"` default label
+- Navbar: removed duplicate skip-to-content link, fixed logo `alt=""` → `alt="OortAPI"`
+
+#### Dead Code Cleanup
+- Footer: removed unused `StatusIndicator` import
+- Mobile nav: removed unused `CreditCard` import, dead `/playground` check
+- Plans admin: removed unused `Shield`, `Diamond` imports
+- Token-plan: removed unused `ChevronDown` import
+- Playground: removed unused `lastMsg` variable
+- Status page: removed unused `locale` parameter
+
+#### CSS
+- Merged duplicate `prefers-reduced-motion` blocks (added `scroll-behavior: auto`)
+- Removed unused `.label-upper` class
+- Removed unused `--z-dropdown`, `--z-overlay` CSS variables
+
+#### i18n Fixes
+- Navbar: "退出失败"/"登录"/"注册" → `t.common.*` keys, added `logoutFailed` key
+- Status page: hardcoded "Failed to load" → bilingual inline
+- Footer: removed English-only "Coming soon" fallback
+
+#### SWR Migration
+- Settings page: manual fetch → `useSWR` for settings and billing data
+- Token-plan page: manual fetch → `useSWR` for subscription, keys, plans
+
+#### UI/UX
+- Footer: Discord/Twitter links add `preventDefault` (no scroll-to-top)
+- Models: `visibleCount` resets on filter change
+
+#### Mobile
+- Playground: added mobile params panel via Sheet (`SlidersHorizontal` button in status bar)
+- Playground: `h-[100vh]` → `h-[100dvh]` for mobile browser chrome
+- Users table: hidden username (md+), plan (lg+), registered (lg+) on small screens
+
+### Dashboard i18n Migration — 240 Keys
+
+#### Dictionary Expansion
+- Added 211+ new keys to `t.dashboard.*` in types.ts, en.ts, zh.ts
+- Keys organized by page: Usage (35), Billing (15), Users (32), Redeem (27), Multiplier (18), Token-plan (26), Playground (58)
+- Added sidebar keys: `groupCore`, `groupBilling`, `groupAdmin`, `tokenPlan`, `planManage`, `modelManage`, `routing`, `audit`, `monitor`, `webhooks`, `channelManage`
+- Added settings keys: `apiEndpoint`, `copyEndpoint`, `systemSettings`, `currency`, `exchangeRate`, `budget*`, etc.
+- Added common shared keys: `cancel`, `search`, `actions`, `user`
+
+#### Pages Migrated (7 groups)
+- **billing/page.tsx** — Removed 18-key local LABELS, replaced with `t.dashboard.*`
+- **users/page.tsx** — Removed 43-key local LABELS, replaced with `t.dashboard.*`
+- **redeem/page.tsx** — Removed 37-key local LABELS, replaced with `t.dashboard.*`
+- **multiplier/page.tsx** — Removed 28-key local LABELS, replaced with `t.dashboard.*`
+- **token-plan/page.tsx** — Removed 35-key local `t` object, replaced with `t.dashboard.*`
+- **usage/** — Removed LABELS from usage-types.ts, migrated page/filter-bar/log-table/trend-chart
+- **playground/** — Removed LABELS from chat-engine.ts, migrated page/message-list/input-area
+
+#### Duplicate Key Cleanup
+- Removed duplicate keys across types.ts, en.ts, zh.ts (timezone, multiplier, redeem, confirm, all, etc.)
+
 ### Resource Center Audit Fixes
 
 #### i18n Fixes
