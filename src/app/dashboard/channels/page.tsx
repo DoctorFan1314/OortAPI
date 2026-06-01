@@ -69,6 +69,79 @@ const LABELS = {
   },
 };
 
+/* ---------- model routing card ---------- */
+
+function ModelRoutingCard({ modelRows, modelSearch, setModelSearch, mapExpanded, setMapExpanded, t, lang }: {
+  modelRows: { modelId: string; provider: string; channels: { name: string; priority: number; weight: number; status: string }[]; channelCount: number }[];
+  modelSearch: string; setModelSearch: (v: string) => void;
+  mapExpanded: boolean; setMapExpanded: (v: boolean) => void;
+  t: typeof LABELS.zh; lang: string;
+}) {
+  const visibleRows = mapExpanded ? modelRows : modelRows.slice(0, 12);
+  return (
+    <Card className="glass-card">
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <GitBranch className="h-4 w-4" /> {t.mapTitle}
+            <Badge variant="secondary" className="text-[10px] font-mono">{modelRows.length}</Badge>
+          </CardTitle>
+          <div className="relative w-44">
+            <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+            <input type="text" value={modelSearch} onChange={e => setModelSearch(e.target.value)}
+              placeholder={t.searchModels}
+              className="w-full h-7 pl-7 pr-2 rounded-md border border-input bg-background text-xs focus:border-primary focus:outline-none" />
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="pt-0">
+        {modelRows.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground text-sm">{t.noModels}</div>
+        ) : (
+          <>
+            <div className="grid grid-cols-[1fr_5rem_2fr] gap-2 px-2 py-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider border-b border-border/20">
+              <span>{t.model}</span><span className="text-center">{t.channels}</span><span>{t.routing}</span>
+            </div>
+            <div className="divide-y divide-border/10">
+              {visibleRows.map((row) => (
+                <div key={row.modelId} className="grid grid-cols-[1fr_5rem_2fr] gap-2 px-2 py-2 hover:bg-muted/30 items-center">
+                  <div className="min-w-0">
+                    <p className="text-xs font-mono truncate" title={row.modelId}>{row.modelId}</p>
+                    <Badge variant="secondary" className="text-[9px] mt-0.5">{row.provider}</Badge>
+                  </div>
+                  <span className="text-center text-xs font-mono">{row.channelCount}</span>
+                  <div className="flex flex-wrap gap-1">
+                    {row.channels.map((ch) => (
+                      <span key={ch.name} className={cn(
+                        "inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded border font-mono",
+                        ch.status === "online"
+                          ? "border-green-500/30 bg-green-500/5 text-green-600 dark:text-green-400"
+                          : "border-red-500/30 bg-red-500/5 text-red-600 dark:text-red-400",
+                      )} title={`P${ch.priority} / W${ch.weight}`}>
+                        {ch.name}
+                        <span className="text-muted-foreground/60">P{ch.priority}</span>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+            {modelRows.length > 12 && (
+              <button onClick={() => setMapExpanded(!mapExpanded)}
+                className="w-full mt-2 py-1.5 text-xs text-primary hover:underline flex items-center justify-center gap-1">
+                {mapExpanded
+                  ? (lang === "zh" ? "收起" : "Show less")
+                  : (lang === "zh" ? `展开全部 ${modelRows.length} 个模型` : `Show all ${modelRows.length} models`)}
+                <ArrowRight className={cn("h-3 w-3 transition-transform", mapExpanded && "rotate-90")} />
+              </button>
+            )}
+          </>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 /* ---------- page ---------- */
 
 export default function ChannelsPage() {
@@ -241,120 +314,37 @@ export default function ChannelsPage() {
       )}
 
       {/* Channel CRUD */}
-      <Card className="glass-card">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Server className="h-4 w-4" />
-            {t.channelSettings}
-            <span className="text-xs font-normal text-muted-foreground">· {t.channelSettingsDesc}</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <ChannelCard lang={lang} />
-        </CardContent>
-      </Card>
+      <ChannelCard lang={lang} />
 
       {/* Routing Analytics */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 mt-2">
         <GitBranch className="h-4 w-4 text-muted-foreground" />
         <h2 className="text-sm font-semibold">{t.routingTitle}</h2>
         <span className="text-xs text-muted-foreground/60">· {t.routingDesc}</span>
       </div>
 
-      <div className="grid lg:grid-cols-5 gap-4">
-        {/* Pie chart — 2 cols */}
-        <div className="lg:col-span-2">
-          {pieOption ? (
+      {/* Pie chart + model map: 2-col when pie has data, full-width when not */}
+      {pieOption ? (
+        <div className="grid lg:grid-cols-5 gap-4">
+          <div className="lg:col-span-2">
             <Card className="glass-card h-full">
               <CardHeader className="pb-1">
                 <CardTitle className="text-sm flex items-center gap-2">
-                  <Activity className="h-4 w-4" />
-                  {t.pieTitle}
+                  <Activity className="h-4 w-4" /> {t.pieTitle}
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-0 flex items-center justify-center">
                 <ReactECharts option={pieOption} style={{ height: 300, width: "100%" }} opts={{ renderer: "svg" }} />
               </CardContent>
             </Card>
-          ) : (
-            <Card className="glass-card h-full flex items-center justify-center">
-              <CardContent className="text-center py-12">
-                <Activity className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
-                <p className="text-sm text-muted-foreground">{lang === "zh" ? "暂无调用数据" : "No call data yet"}</p>
-              </CardContent>
-            </Card>
-          )}
+          </div>
+          <div className="lg:col-span-3">
+            <ModelRoutingCard modelRows={modelRows} modelSearch={modelSearch} setModelSearch={setModelSearch} mapExpanded={mapExpanded} setMapExpanded={setMapExpanded} t={t} lang={lang} />
+          </div>
         </div>
-
-        {/* Model routing — 3 cols */}
-        <div className="lg:col-span-3">
-          <Card className="glass-card h-full">
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm flex items-center gap-2">
-                  <GitBranch className="h-4 w-4" />
-                  {t.mapTitle}
-                  <Badge variant="secondary" className="text-[10px] font-mono">{modelRows.length}</Badge>
-                </CardTitle>
-                <div className="relative w-44">
-                  <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
-                  <input type="text" value={modelSearch} onChange={e => setModelSearch(e.target.value)}
-                    placeholder={t.searchModels}
-                    className="w-full h-7 pl-7 pr-2 rounded-md border border-input bg-background text-xs focus:border-primary focus:outline-none" />
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-0">
-              {modelRows.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground text-sm">{t.noModels}</div>
-              ) : (
-                <>
-                  {/* Column headers */}
-                  <div className="grid grid-cols-[1fr_5rem_2fr] gap-2 px-2 py-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider border-b border-border/20">
-                    <span>{t.model}</span>
-                    <span className="text-center">{t.channels}</span>
-                    <span>{t.routing}</span>
-                  </div>
-                  {/* Rows */}
-                  <div className="divide-y divide-border/10">
-                    {visibleModelRows.map((row) => (
-                      <div key={row.modelId} className="grid grid-cols-[1fr_5rem_2fr] gap-2 px-2 py-2 hover:bg-muted/30 items-center">
-                        <div className="min-w-0">
-                          <p className="text-xs font-mono truncate" title={row.modelId}>{row.modelId}</p>
-                          <Badge variant="secondary" className="text-[9px] mt-0.5">{row.provider}</Badge>
-                        </div>
-                        <span className="text-center text-xs font-mono">{row.channelCount}</span>
-                        <div className="flex flex-wrap gap-1">
-                          {row.channels.map((ch) => (
-                            <span key={ch.name} className={cn(
-                              "inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded border font-mono",
-                              ch.status === "online"
-                                ? "border-green-500/30 bg-green-500/5 text-green-600 dark:text-green-400"
-                                : "border-red-500/30 bg-red-500/5 text-red-600 dark:text-red-400",
-                            )} title={`P${ch.priority} / W${ch.weight}`}>
-                              {ch.name}
-                              <span className="text-muted-foreground/60">P{ch.priority}</span>
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  {modelRows.length > 12 && (
-                    <button onClick={() => setMapExpanded(!mapExpanded)}
-                      className="w-full mt-2 py-1.5 text-xs text-primary hover:underline flex items-center justify-center gap-1">
-                      {mapExpanded
-                        ? (lang === "zh" ? "收起" : "Show less")
-                        : (lang === "zh" ? `展开全部 ${modelRows.length} 个模型` : `Show all ${modelRows.length} models`)}
-                      <ArrowRight className={cn("h-3 w-3 transition-transform", mapExpanded && "rotate-90")} />
-                    </button>
-                  )}
-                </>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+      ) : (
+        <ModelRoutingCard modelRows={modelRows} modelSearch={modelSearch} setModelSearch={setModelSearch} mapExpanded={mapExpanded} setMapExpanded={setMapExpanded} t={t} lang={lang} />
+      )}
     </div>
   );
 }
