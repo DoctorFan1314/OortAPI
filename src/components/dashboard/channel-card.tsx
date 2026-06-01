@@ -60,7 +60,7 @@ const PROVIDER_LABELS: Record<string, { zh: string; en: string }> = {
 
 const LABELS = {
   zh: {
-    title: "渠道管理",
+    title: "渠道列表",
     add: "添加渠道",
     edit: "编辑",
     test: "测试连接",
@@ -129,7 +129,7 @@ const LABELS = {
     hideRouting: "隐藏路由",
   },
   en: {
-    title: "Channel Management",
+    title: "Channel List",
     add: "Add Channel",
     edit: "Edit",
     test: "Test Connection",
