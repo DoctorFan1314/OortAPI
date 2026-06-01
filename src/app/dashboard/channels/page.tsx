@@ -2,19 +2,46 @@
 
 import { useI18n } from "@/contexts/i18n-context";
 import { ChannelCard } from "@/components/dashboard/channel-card";
+import { RoutingPieChart } from "@/components/dashboard/routing-pie-chart";
+import { ChannelHealthTable } from "@/components/dashboard/channel-health-table";
+import { ModelChannelMap } from "@/components/dashboard/model-channel-map";
 import { Card, CardContent } from "@/components/ui/card";
 import { Activity, CheckCircle, AlertTriangle, XCircle } from "lucide-react";
 import useSWR from "swr";
 import { dashboardSWRConfig } from "@/lib/swr-fetcher";
+import { useMemo } from "react";
+
+/* ---------- types ---------- */
 
 interface HealthSummary {
   channel_id: number;
   name: string;
   status: string;
   fail_count: number;
+  last_fail_at: string | null;
   total_calls_24h: number;
   success_rate_24h: number | null;
   avg_latency_24h: number | null;
+  total_cost_24h: number;
+}
+
+interface Channel {
+  id: number;
+  name: string;
+  type: string;
+  weight: number;
+  enabled: number;
+  models: string;
+  status: string;
+  priority: number;
+  fail_count: number;
+  last_fail_at: string | null;
+}
+
+interface ModelItem {
+  id: string;
+  owned_by: string;
+  display_name: string;
 }
 
 const LABELS = {
@@ -43,11 +70,80 @@ const LABELS = {
 export default function ChannelsPage() {
   const { lang } = useI18n();
   const t = LABELS[lang];
+
+  /* fetch all data */
   const { data: healthData, error: healthError, isLoading: healthLoading, mutate: refreshHealth } = useSWR<{ health: HealthSummary[] }>(
     "/api/dashboard/channels?action=health",
-    dashboardSWRConfig
+    dashboardSWRConfig,
   );
 
+  const { data: channelsData } = useSWR<{ channels: Channel[] }>(
+    "/api/dashboard/channels",
+    dashboardSWRConfig,
+  );
+
+  const { data: modelsData } = useSWR<{ data: ModelItem[] }>(
+    "/api/v1/models",
+    dashboardSWRConfig,
+  );
+
+  /* build merged channel list: config + health */
+  const mergedChannels = useMemo(() => {
+    const channels = channelsData?.channels || [];
+    const healthMap = new Map((healthData?.health || []).map(h => [h.channel_id, h]));
+    return channels.map(ch => {
+      const h = healthMap.get(ch.id);
+      return {
+        ...ch,
+        modelsParsed: (() => { try { return JSON.parse(ch.models || "[]") as string[]; } catch { return []; } })(),
+        total_calls_24h: h?.total_calls_24h ?? 0,
+        success_rate_24h: h?.success_rate_24h ?? null,
+        avg_latency_24h: h?.avg_latency_24h ?? null,
+        total_cost_24h: h?.total_cost_24h ?? 0,
+        live_status: h?.status ?? ch.status,
+      };
+    });
+  }, [channelsData, healthData]);
+
+  /* model -> channel mapping */
+  const modelChannelMap = useMemo(() => {
+    const map = new Map<string, { channels: { name: string; priority: number; weight: number; status: string }[]; provider: string }>();
+    const models = modelsData?.data || [];
+
+    const providerMap = new Map(models.map(m => [m.id, m.owned_by]));
+
+    for (const ch of mergedChannels) {
+      const parsed = ch.modelsParsed;
+      const modelIds = parsed.length === 0
+        ? models.map(m => m.id)
+        : parsed.includes("*")
+          ? models.map(m => m.id)
+          : parsed;
+
+      for (const modelId of modelIds) {
+        if (!map.has(modelId)) {
+          map.set(modelId, { channels: [], provider: providerMap.get(modelId) || ch.type });
+        }
+        const entry = map.get(modelId)!;
+        if (!entry.channels.some(c => c.name === ch.name)) {
+          entry.channels.push({
+            name: ch.name,
+            priority: ch.priority,
+            weight: ch.weight,
+            status: ch.live_status,
+          });
+        }
+      }
+    }
+
+    for (const entry of map.values()) {
+      entry.channels.sort((a, b) => b.priority - a.priority || b.weight - a.weight);
+    }
+
+    return map;
+  }, [mergedChannels, modelsData]);
+
+  /* health stats */
   const health = healthData?.health || [];
   const totalChannels = health.length;
   const onlineCount = health.filter(h => h.status === "online").length;
@@ -152,7 +248,25 @@ export default function ChannelsPage() {
         </div>
       ) : null}
 
-      <ChannelCard lang={lang} />
+      {/* Channel CRUD */}
+      <div className="border-t border-border/30 pt-6">
+        <ChannelCard lang={lang} />
+      </div>
+
+      {/* Routing pie chart */}
+      <div className="border-t border-border/30 pt-6">
+        <RoutingPieChart healthData={healthData} lang={lang} />
+      </div>
+
+      {/* Channel health table */}
+      <div className="border-t border-border/30 pt-6">
+        <ChannelHealthTable mergedChannels={mergedChannels} lang={lang} />
+      </div>
+
+      {/* Model-channel mapping */}
+      <div className="border-t border-border/30 pt-6">
+        <ModelChannelMap modelChannelMap={modelChannelMap} lang={lang} />
+      </div>
     </div>
   );
 }
