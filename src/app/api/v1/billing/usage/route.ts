@@ -87,10 +87,10 @@ export async function GET(request: NextRequest) {
     // Aggregate stats across all matching records (not just current page)
     const agg = db.prepare(
       `SELECT
-        COALESCE(SUM(tokens_in + tokens_out + tokens_in_cache), 0) as total_tokens,
+        COALESCE(SUM(tokens_in + tokens_out), 0) as total_tokens,
         COALESCE(SUM(CASE WHEN deduction_source = 'balance' THEN cost ELSE 0 END), 0) as total_cost,
         COUNT(*) as total_calls,
-        COALESCE(SUM(tokens_in - tokens_in_cache), 0) as total_tokens_in_noncached,
+        COALESCE(SUM(tokens_in - tokens_in_cache - tokens_cache_creation), 0) as total_tokens_in_noncached,
         COALESCE(SUM(tokens_in_cache), 0) as total_tokens_in_cache,
         COALESCE(SUM(tokens_out), 0) as total_tokens_out,
         COALESCE(SUM(credits_used), 0) as total_credits_used
@@ -121,8 +121,8 @@ export async function GET(request: NextRequest) {
         `SELECT DATE(u.created_at, ?) as date,
                 COUNT(*) as calls,
                 COALESCE(SUM(CASE WHEN u.deduction_source = 'balance' THEN u.cost ELSE 0 END), 0) as cost,
-                COALESCE(SUM(u.tokens_in + u.tokens_out + u.tokens_in_cache), 0) as tokens,
-                COALESCE(SUM(u.tokens_in - u.tokens_in_cache), 0) as tokens_in_noncached,
+                COALESCE(SUM(u.tokens_in + u.tokens_out), 0) as tokens,
+                COALESCE(SUM(u.tokens_in - u.tokens_in_cache - u.tokens_cache_creation), 0) as tokens_in_noncached,
                 COALESCE(SUM(u.tokens_in_cache), 0) as tokens_in_cache,
                 COALESCE(SUM(u.tokens_out), 0) as tokens_out
          FROM usage_logs u WHERE ${whereClause}

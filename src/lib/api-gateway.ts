@@ -79,15 +79,6 @@ export function validateApiKey(authHeader: string | null): { valid: boolean; api
     }
   }
 
-  // Last fallback: key_value prefix match (for keys with mismatched hash from earlier bugs)
-  if (!apiKey) {
-    const prefix = keyValue.slice(0, 10);
-    apiKey = db.prepare('SELECT * FROM api_keys WHERE key_value LIKE ? AND enabled = 1').get(prefix + '%') as DBApiKey | undefined;
-    if (apiKey) {
-      try { db.prepare('UPDATE api_keys SET key_hash = ? WHERE id = ?').run(newHash, apiKey.id); } catch {}
-    }
-  }
-
   if (!apiKey) {
     return { valid: false, error: 'Invalid or disabled API key' };
   }
@@ -292,8 +283,8 @@ async function executeChannelRequest(
     const tokensIn = data.usage?.prompt_tokens || data.usage?.input_tokens || estimateTokens(JSON.stringify(req.messages || req.prompt || ''));
     const tokensOut = data.usage?.completion_tokens || data.usage?.output_tokens || estimateTokens(JSON.stringify(data.choices?.[0]?.message?.content || ''));
     const tokensInCache = data.usage?.prompt_tokens_details?.cached_tokens || data.usage?.cache_read_input_tokens || 0;
-    const { multiplier } = getEffectiveMultiplier(req.model);
-    const baseCost = calculateCost(req.model, tokensIn, tokensOut, tokensInCache);
+    const { multiplier } = getEffectiveMultiplier(actualModel);
+    const baseCost = calculateCost(actualModel, tokensIn, tokensOut, tokensInCache);
     const cost = baseCost * multiplier;
 
     const deductResult = deductCreditsOrBalance(userId, req.model, cost, `API call: ${req.model}`, tokensIn, tokensOut, tokensInCache);
@@ -306,7 +297,7 @@ async function executeChannelRequest(
       channelId: channel.id, model: req.model,
       tokensIn, tokensOut, tokensInCache,
       cost: deductResult.source === 'credits' ? 0 : cost,
-      creditsUsed: deductResult.source === 'credits' ? (tokensIn + tokensOut) : 0,
+      creditsUsed: deductResult.creditsUsed || 0,
       deductionSource: deductResult.source,
       latencyMs, success: true, multiplier,
     });

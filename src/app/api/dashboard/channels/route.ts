@@ -68,12 +68,13 @@ export async function GET(request: NextRequest) {
       }
 
       // All channels, latest entry each
+      const clampedDays = Math.max(1, Math.min(days, 365));
       const history = db.prepare(
         `SELECT chl.*, c.name as channel_name FROM channel_health_log chl
          JOIN channels c ON chl.channel_id = c.id
-         WHERE chl.created_at >= datetime('now', '-${days} days')
+         WHERE chl.created_at >= datetime('now', ?)
          ORDER BY chl.created_at DESC LIMIT 200`
-      ).all();
+      ).all(`-${clampedDays} days`);
       return NextResponse.json({ history });
     }
 

@@ -363,9 +363,9 @@ export default function WebhooksPage() {
               <div className="p-3 rounded-lg bg-muted/30 border border-border space-y-2">
                 <span className="text-xs text-muted-foreground">{t.events}</span>
                 <div className="flex flex-wrap gap-1">
-                  {logTarget.events.split(",").map(e => (
-                    <span key={e} className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary font-mono">{e.trim()}</span>
-                  ))}
+                  {(() => { let events: string[]; try { events = JSON.parse(logTarget.events); } catch { events = logTarget.events.split(",").map((e: string) => e.trim()); } return events.map((e: string) => (
+                    <span key={e} className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary font-mono">{e}</span>
+                  )); })()}
                 </div>
               </div>
               <div className="flex gap-2">

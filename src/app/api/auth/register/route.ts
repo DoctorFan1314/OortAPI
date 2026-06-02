@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
-import { hashPassword, generateSalt, signToken, setTokenCookie } from '@/lib/auth';
+import { hashPassword, generateSalt, hashApiKey, signToken, setTokenCookie } from '@/lib/auth';
 import { checkIpRateLimit } from '@/lib/rate-limiter';
 import type { DBUser } from '@/lib/db';
 
@@ -71,9 +71,11 @@ export async function POST(request: NextRequest) {
     // Create a default API key for new user
     const { generateApiKey } = await import('@/lib/auth');
     const keyValue = generateApiKey();
+    const keyHash = hashApiKey(keyValue);
+    const maskedValue = keyValue.slice(0, 10) + '****';
     db.prepare(
-      'INSERT INTO api_keys (user_id, key_value, name) VALUES (?, ?, ?)'
-    ).run(userId, keyValue, 'Default');
+      'INSERT INTO api_keys (user_id, key_value, key_hash, name) VALUES (?, ?, ?, ?)'
+    ).run(userId, maskedValue, keyHash, 'Default');
 
     // Add welcome gift
     db.prepare(
@@ -81,11 +83,11 @@ export async function POST(request: NextRequest) {
     ).run(userId, defaultBalance, 'gift', 'Welcome bonus', defaultBalance);
 
     const user = db.prepare('SELECT * FROM users WHERE id = ?').get(userId) as DBUser;
-    const token = signToken({ userId: user.id, email: user.email, role: user.role });
+    const token = signToken({ userId: user.id, email: user.email, role: user.role, tv: user.token_version || 0 });
     const cookie = setTokenCookie(token);
 
     const { password_hash, salt: s, ...safeUser } = user;
-    const response = NextResponse.json({ user: safeUser });
+    const response = NextResponse.json({ user: safeUser, api_key: keyValue });
     response.headers.set('Set-Cookie', cookie);
     return response;
   } catch (error) {

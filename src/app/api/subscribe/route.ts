@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
       `SELECT us.*, sp.tier as plan_tier, sp.monthly_price as plan_monthly_price, sp.yearly_price as plan_yearly_price
        FROM user_subscriptions us
        JOIN subscription_plans sp ON us.plan_id = sp.id
-       WHERE us.user_id = ? AND us.status = 'active'`
+       WHERE us.user_id = ? AND us.status = 'active' AND us.current_period_end > datetime('now')`
     ).get(user.id) as (DBUserSubscription & { plan_tier: number; plan_monthly_price: number; plan_yearly_price: number }) | undefined;
 
     // Same plan - block
@@ -77,8 +77,9 @@ export async function POST(request: NextRequest) {
       const newBasePrice = billing_cycle === 'yearly' ? plan.yearly_price : plan.monthly_price;
       const newValue = newBasePrice * remainingRatio;
 
-      // Difference
+      // Difference (convert to USD if plan is priced in CNY)
       const diff = newValue - remainingValue;
+      const diffInUSD = plan.currency === 'CNY' ? diff / exchangeRate : diff;
 
       // Check downgrade: if user has consumed more than new plan's monthly credits, block
       if (diff < 0) {
@@ -92,25 +93,26 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      if (diff > 0) {
+      if (diffInUSD > 0) {
         // Upgrade - charge difference
-        if (user.balance < diff) {
+        if (user.balance < diffInUSD) {
           return NextResponse.json({
             error: 'Insufficient balance for upgrade',
-            required: diff,
+            required: diffInUSD,
             available: user.balance,
           }, { status: 402 });
         }
-        finalPrice = diff;
+        finalPrice = diffInUSD;
         action = 'upgrade';
-      } else if (diff < 0) {
+      } else if (diffInUSD < 0) {
         // Downgrade - refund difference (credit to balance)
         finalPrice = 0;
         action = 'downgrade';
         // Add refund to balance
-        db.prepare('UPDATE users SET balance = balance + ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(Math.abs(diff), user.id);
+        db.prepare('UPDATE users SET balance = balance + ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(Math.abs(diffInUSD), user.id);
+        const updatedUser = db.prepare('SELECT balance FROM users WHERE id = ?').get(user.id) as { balance: number };
         db.prepare('INSERT INTO billing_records (user_id, amount, type, description, balance_after) VALUES (?, ?, ?, ?, ?)').run(
-          user.id, Math.abs(diff), 'refund', `Downgrade refund: ${activeSub.plan_tier ? 'previous' : ''} → ${plan.display_name}`, user.balance + Math.abs(diff)
+          user.id, Math.abs(diffInUSD), 'refund', `Downgrade refund: ${activeSub.plan_tier ? 'previous' : ''} → ${plan.display_name}`, updatedUser.balance
         );
       } else {
         finalPrice = 0;

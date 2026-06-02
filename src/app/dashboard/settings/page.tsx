@@ -78,6 +78,7 @@ export default function SettingsPage() {
     }
     if (settingsData?.preferences?.monthly_budget) {
       setMonthlyBudget(String(settingsData.preferences.monthly_budget));
+      setSavedBudget(settingsData.preferences.monthly_budget);
     }
     if (settingsData?.preferences?.notification_preferences) {
       setNotifPrefs(prev => ({ ...prev, ...settingsData.preferences!.notification_preferences! }));
@@ -137,8 +138,13 @@ export default function SettingsPage() {
     }
   }, [lang, showToast]);
 
+  const notifPrefsLoadedRef = useRef(false);
   useEffect(() => {
     if (settingsLoading) return;
+    if (!notifPrefsLoadedRef.current) {
+      notifPrefsLoadedRef.current = true;
+      return;
+    }
     clearTimeout(notifPrefsTimerRef.current);
     notifPrefsTimerRef.current = setTimeout(() => {
       handleSaveNotifPrefs(notifPrefsRef.current);

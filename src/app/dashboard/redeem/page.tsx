@@ -162,8 +162,10 @@ export default function RedeemPage() {
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         showToast(data.error || "Delete failed", "error");
+        setDeleteLoading(false);
+        return;
       }
-    } catch { showToast(L.networkError, "error"); }
+    } catch { showToast(L.networkError, "error"); setDeleteLoading(false); return; }
     setDeleteLoading(false);
     setDeleteId(null);
     mutate();

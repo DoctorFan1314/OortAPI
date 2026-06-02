@@ -275,10 +275,11 @@ export default function UsersPage() {
   }
 
   function toggleSelectAll() {
-    if (selectedIds.size === users.length) {
+    const selectableUsers = users.filter(u => u.id !== currentUser?.id);
+    if (selectedIds.size === selectableUsers.length) {
       setSelectedIds(new Set());
     } else {
-      setSelectedIds(new Set(users.map(u => u.id)));
+      setSelectedIds(new Set(selectableUsers.map(u => u.id)));
     }
   }
 

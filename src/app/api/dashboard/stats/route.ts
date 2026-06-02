@@ -14,13 +14,21 @@ export async function GET(request: NextRequest) {
     const userId = auth.user.id;
     const tzOffset = parseInt(request.nextUrl.searchParams.get('tz') || '0');
 
-    // Today's stats (timezone-adjusted)
-    const today = new Date().toISOString().split('T')[0];
+    // Today/yesterday in user's local timezone
+    const nowUtc = Date.now();
+    const today = new Date(nowUtc + tzOffset * 60 * 1000).toISOString().slice(0, 10);
+    const yesterday = new Date(nowUtc - 86400000 + tzOffset * 60 * 1000).toISOString().slice(0, 10);
+
+    // If user has ANY credit-based usage, cost is always 0 (subscription user)
+    const isCreditUser = db.prepare(
+      "SELECT 1 FROM usage_logs WHERE user_id = ? AND deduction_source = 'credits' LIMIT 1"
+    ).get(userId);
+
     const todayStats = db.prepare(`
       SELECT
         COUNT(*) as total_calls,
         SUM(CASE WHEN success = 1 THEN 1 ELSE 0 END) as success_calls,
-        SUM(CASE WHEN deduction_source = 'balance' THEN cost ELSE 0 END) as total_cost,
+        ${isCreditUser ? '0' : "SUM(CASE WHEN deduction_source = 'balance' THEN cost ELSE 0 END)"} as total_cost,
         SUM(tokens_in + tokens_out) as total_tokens,
         AVG(latency_ms) as avg_latency
       FROM usage_logs
@@ -29,11 +37,6 @@ export async function GET(request: NextRequest) {
 
     // Active API keys count
     const activeKeys = db.prepare('SELECT COUNT(*) as count FROM api_keys WHERE user_id = ? AND enabled = 1').get(userId) as { count: number };
-
-    // If user has ANY credit-based usage, cost is always 0 (subscription user)
-    const isCreditUser = db.prepare(
-      "SELECT 1 FROM usage_logs WHERE user_id = ? AND deduction_source = 'credits' LIMIT 1"
-    ).get(userId);
 
     const monthStats = db.prepare(`
       SELECT
@@ -46,28 +49,25 @@ export async function GET(request: NextRequest) {
         SUM(tokens_cache_creation) as tokens_cache_creation,
         SUM(tokens_out) as tokens_out
       FROM usage_logs
-      WHERE user_id = ? AND DATE(created_at, ?) >= DATE('now', 'start of month', ?)
-    `).get(userId, `${-tzOffset} minutes`, `${-tzOffset} minutes`) as Record<string, number | null>;
+      WHERE user_id = ? AND DATE(created_at, ?) >= DATE(datetime('now', ?), 'start of month')
+    `).get(userId, `${-tzOffset} minutes`, `${tzOffset} minutes`) as Record<string, number | null>;
 
-    // Yesterday's stats (for comparison, timezone-adjusted)
-    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+    // Yesterday's stats (for comparison)
     const yesterdayStats = db.prepare(`
       SELECT
         COUNT(*) as total_calls,
-        SUM(CASE WHEN deduction_source = 'balance' THEN cost ELSE 0 END) as total_cost,
+        ${isCreditUser ? '0' : "SUM(CASE WHEN deduction_source = 'balance' THEN cost ELSE 0 END)"} as total_cost,
         SUM(tokens_in + tokens_out) as total_tokens
       FROM usage_logs
       WHERE user_id = ? AND DATE(created_at, ?) = ?
     `).get(userId, `${-tzOffset} minutes`, yesterday) as Record<string, number | null>;
 
-    // Last month's stats (for comparison)
-    const lastMonthStart = new Date();
-    lastMonthStart.setDate(1);
-    lastMonthStart.setHours(0, 0, 0, 0);
-    lastMonthStart.setMonth(lastMonthStart.getMonth() - 1);
-    const lastMonthEnd = new Date();
-    lastMonthEnd.setDate(1);
-    lastMonthEnd.setHours(0, 0, 0, 0);
+    // Last month's stats (for comparison, user timezone)
+    const nowLocal = new Date(nowUtc + tzOffset * 60 * 1000);
+    const localYear = nowLocal.getUTCFullYear();
+    const localMonth = nowLocal.getUTCMonth();
+    const lastMonthStart = new Date(Date.UTC(localYear, localMonth - 1, 1) - tzOffset * 60 * 1000);
+    const lastMonthEnd = new Date(Date.UTC(localYear, localMonth, 1) - tzOffset * 60 * 1000);
     const lastMonthStats = db.prepare(`
       SELECT COUNT(*) as total_calls, SUM(CASE WHEN deduction_source = 'balance' THEN cost ELSE 0 END) as total_cost, SUM(tokens_in + tokens_out) as total_tokens
       FROM usage_logs

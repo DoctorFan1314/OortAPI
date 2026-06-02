@@ -102,8 +102,7 @@ function AdminPlansContent() {
       if (planRes.ok) { const d = await planRes.json(); setPlans(d.plans || []); }
       if (settingsRes.ok) {
         const d = await settingsRes.json();
-        const rate = d.settings?.find((s: { key: string }) => s.key === "exchange_rate");
-        if (rate) setExchangeRate(parseFloat(rate.value) || 7.3);
+        if (d.settings?.exchange_rate) setExchangeRate(parseFloat(d.settings.exchange_rate) || 7.3);
       }
       if (statsRes.ok) {
         const d = await statsRes.json();
@@ -197,7 +196,7 @@ function AdminPlansContent() {
   async function handleCreate() {
     setCreateSaving(true);
     try {
-      const tier = plans.length > 0 ? Math.max(...plans.map(p => p.tier)) + 1 : 1;
+      const tier = plans.length > 0 ? Math.min(4, Math.max(...plans.map(p => p.tier)) + 1) : 1;
       const res = await fetch("/api/dashboard/admin/plans", {
         method: "POST", headers: { "Content-Type": "application/json" },
         credentials: "include", body: JSON.stringify({ ...createForm, tier }),

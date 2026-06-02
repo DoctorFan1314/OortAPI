@@ -171,6 +171,7 @@ export interface DeductCreditsResult {
   success: boolean;
   source: 'credits' | 'balance' | 'blocked';
   creditsRemaining?: number;
+  creditsUsed?: number;
   newBalance?: number;
   overageMultiplier?: number;
   error?: string;
@@ -220,7 +221,7 @@ export function deductCreditsOrBalance(
 
       const updatedSub = db.prepare('SELECT credits_remaining FROM user_subscriptions WHERE id = ?').get(subscription.id) as { credits_remaining: number };
 
-      return { success: true, source: 'credits', creditsRemaining: updatedSub.credits_remaining };
+      return { success: true, source: 'credits', creditsRemaining: updatedSub.credits_remaining, creditsUsed: creditsCost };
     }
 
     // Insufficient credits — fall back to balance with overage multiplier
@@ -272,7 +273,7 @@ function deductCreditsOrBalance_fallback(
     if (result.changes > 0) {
       db.prepare('INSERT INTO subscription_usage_logs (subscription_id, user_id, model, credits_used, source) VALUES (?, ?, ?, ?, ?)').run(subscription.id, userId, description.replace('API call: ', ''), creditsCost, 'credits');
       const updatedSub = db.prepare('SELECT credits_remaining FROM user_subscriptions WHERE id = ?').get(subscription.id) as { credits_remaining: number };
-      return { success: true, source: 'credits', creditsRemaining: updatedSub.credits_remaining };
+      return { success: true, source: 'credits', creditsRemaining: updatedSub.credits_remaining, creditsUsed: creditsCost };
     }
   }
 
@@ -349,9 +350,12 @@ export function processAutoRenewals(): { renewed: number; failed: number } {
         continue;
       }
 
-      // Deduct balance and renew
+      // Deduct balance and renew (atomic with balance guard)
       const txn = db.transaction(() => {
-        db.prepare('UPDATE users SET balance = balance - ? WHERE id = ?').run(renewCost, sub.user_id);
+        const result = db.prepare('UPDATE users SET balance = balance - ? WHERE id = ? AND balance >= ?').run(renewCost, sub.user_id, renewCost);
+        if (result.changes === 0) {
+          return false;
+        }
 
         const newStart = new Date().toISOString();
         const newEnd = new Date(Date.now() + (sub.billing_cycle === 'yearly' ? 365 : 30) * 86400000).toISOString();
@@ -368,8 +372,19 @@ export function processAutoRenewals(): { renewed: number; failed: number } {
         db.prepare('INSERT INTO billing_records (user_id, amount, type, description, balance_after) VALUES (?, ?, ?, ?, ?)').run(
           sub.user_id, -renewCost, 'deduct', `Subscription renewal: ${sub.plan_name} (${sub.billing_cycle})`, updated.balance
         );
+        return true;
       });
-      txn();
+      if (!txn()) {
+        db.prepare("UPDATE user_subscriptions SET status = 'expired', updated_at = CURRENT_TIMESTAMP WHERE id = ?").run(sub.id);
+        dispatchWebhook('subscription.renewal_failed', {
+          user_id: sub.user_id,
+          subscription_id: sub.id,
+          plan_name: sub.plan_name,
+          reason: 'insufficient_balance',
+        });
+        failed++;
+        continue;
+      }
       renewed++;
     } catch {
       failed++;

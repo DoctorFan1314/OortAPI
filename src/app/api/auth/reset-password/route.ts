@@ -1,12 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { timingSafeEqual } from 'crypto';
 import db from '@/lib/db';
 import { hashPassword, generateSalt } from '@/lib/auth';
+import { checkIpRateLimit } from '@/lib/rate-limiter';
 import type { DBUser } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   try {
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || '127.0.0.1';
+    const rateLimitResult = checkIpRateLimit(`reset-password:${ip}`, 5, 60_000);
+    if (!rateLimitResult.allowed) {
+      return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 });
+    }
+
     const { email, token, password } = await request.json();
 
     if (!email || !token || !password) {
@@ -37,8 +45,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid or expired reset token' }, { status: 400 });
     }
 
-    // Check token match
-    if (storedToken !== token) {
+    // Check token match (timing-safe)
+    const storedBuf = Buffer.from(String(storedToken));
+    const providedBuf = Buffer.from(String(token));
+    if (storedBuf.length !== providedBuf.length || !timingSafeEqual(storedBuf, providedBuf)) {
       return NextResponse.json({ error: 'Invalid or expired reset token' }, { status: 400 });
     }
 

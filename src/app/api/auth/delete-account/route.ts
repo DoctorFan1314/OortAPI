@@ -41,6 +41,8 @@ export async function DELETE(request: NextRequest) {
       db.prepare('DELETE FROM billing_records WHERE user_id = ?').run(auth.user!.id);
       db.prepare('DELETE FROM api_keys WHERE user_id = ?').run(auth.user!.id);
       db.prepare('DELETE FROM sessions WHERE user_id = ?').run(auth.user!.id);
+      db.prepare('DELETE FROM user_subscriptions WHERE user_id = ?').run(auth.user!.id);
+      db.prepare('DELETE FROM subscription_usage_logs WHERE user_id = ?').run(auth.user!.id);
       db.prepare('DELETE FROM users WHERE id = ?').run(auth.user!.id);
     });
     txn();
