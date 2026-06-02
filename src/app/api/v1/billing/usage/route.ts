@@ -68,7 +68,8 @@ export async function GET(request: NextRequest) {
 
     const logs = db.prepare(
       `SELECT u.id, u.model, u.tokens_in, u.tokens_out, u.tokens_in_cache, u.tokens_cache_creation,
-              u.cost, u.credits_used, u.deduction_source, u.latency_ms, u.success, u.cached, u.created_at, u.channel_id, u.multiplier, u.api_key_id,
+              CASE WHEN u.deduction_source = 'balance' THEN u.cost ELSE 0 END as cost,
+              u.credits_used, u.deduction_source, u.latency_ms, u.success, u.cached, u.created_at, u.channel_id, u.multiplier, u.api_key_id,
               c.name as channel_name,
               k.name as key_name,
               m.input_rate, m.output_rate, m.cache_rate, m.cache_creation_rate, m.credit_rate

@@ -237,7 +237,7 @@ export default function UsagePage() {
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">{lang === "zh" ? "已消耗额度" : "Credits Used"}</p>
-                <p className="text-xl font-bold font-mono">{summary.total_credits_used.toLocaleString()}</p>
+                <p className="text-xl font-bold font-mono">{(summary.total_credits_used || 0).toLocaleString()}</p>
               </div>
             </CardContent>
           </Card>

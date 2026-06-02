@@ -122,7 +122,7 @@ export async function POST(request: NextRequest) {
           tokensIn,
           tokensOut,
           tokensInCache,
-          cost,
+          cost: deductResult?.source === 'credits' ? 0 : cost,
           creditsUsed: deductResult?.source === 'credits' ? (tokensIn + tokensOut) : 0,
           deductionSource: deductResult?.source || 'balance',
           latencyMs,
