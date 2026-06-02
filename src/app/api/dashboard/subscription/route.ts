@@ -23,17 +23,6 @@ export async function GET(request: NextRequest) {
        ORDER BY us.created_at DESC`
     ).all(auth.user.id) as (DBUserSubscription & { plan_name: string; plan_display_name: string; plan_tier: number; plan_monthly_credits: number; plan_overage_rate_multiplier: number; plan_support_level: string; plan_monthly_price: number; plan_yearly_price: number; plan_currency: string })[];
 
-    // Sync credits_total with current plan credits for active subscriptions
-    for (const sub of subscriptions) {
-      if (sub.status === 'active' && sub.credits_total !== sub.plan_monthly_credits) {
-        const diff = sub.plan_monthly_credits - sub.credits_total;
-        db.prepare('UPDATE user_subscriptions SET credits_total = ?, credits_remaining = MAX(0, credits_remaining + ?), updated_at = CURRENT_TIMESTAMP WHERE id = ?')
-          .run(sub.plan_monthly_credits, diff, sub.id);
-        sub.credits_total = sub.plan_monthly_credits;
-        sub.credits_remaining = Math.max(0, sub.credits_remaining + diff);
-      }
-    }
-
     return NextResponse.json({ subscriptions });
   } catch (error) {
     console.error('Failed to fetch subscriptions:', error);

@@ -260,7 +260,7 @@ export default function AuditPage() {
           {(page > 1 || hasMore) && (
             <div className="flex items-center justify-between pt-3 border-t border-border/20">
               <span className="text-xs text-muted-foreground">
-                {lang === "zh" ? "第" : "Page"} {page} / {Math.ceil((data?.total || 0) / 50)} ({t.showing} {logs.length} / {data?.total || 0})
+                {lang === "zh" ? "第" : "Page"} {page} / {Math.max(1, Math.ceil((data?.total || 0) / 50))} ({t.showing} {logs.length} / {data?.total || 0})
               </span>
               <div className="flex gap-2">
                 {page > 1 && (

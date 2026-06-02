@@ -27,16 +27,16 @@ export function addBalance(userId: number, amount: number, type: 'recharge' | 'r
   const user = db.prepare('SELECT balance FROM users WHERE id = ?').get(userId) as { balance: number } | undefined;
   if (!user) return { success: false, error: 'User not found' };
 
+  let newBalance = 0;
   const txn = db.transaction(() => {
-    // Atomic: use SQL arithmetic to prevent TOCTOU race on concurrent recharges
     db.prepare('UPDATE users SET balance = balance + ? WHERE id = ?').run(amount, userId);
     const updated = db.prepare('SELECT balance FROM users WHERE id = ?').get(userId) as { balance: number };
+    newBalance = updated.balance;
     db.prepare('INSERT INTO billing_records (user_id, amount, type, description, balance_after) VALUES (?, ?, ?, ?, ?)').run(userId, amount, type, description, updated.balance);
   });
   txn();
 
-  const updated = db.prepare('SELECT balance FROM users WHERE id = ?').get(userId) as { balance: number };
-  return { success: true, newBalance: updated.balance };
+  return { success: true, newBalance };
 }
 
 export function getEffectiveMultiplier(model: string): { multiplier: number; type: string; description: string } {
@@ -61,7 +61,7 @@ export function getEffectiveMultiplier(model: string): { multiplier: number; typ
     // Handle overnight ranges (e.g. 22:00-06:00): use OR logic when start > end
     const isOvernight = timeSettings.day_start > timeSettings.day_end;
     const isDay = isOvernight
-      ? (currentTime >= timeSettings.day_start || currentTime <= timeSettings.day_end)
+      ? !(currentTime >= timeSettings.day_start || currentTime <= timeSettings.day_end)
       : (currentTime >= timeSettings.day_start && currentTime <= timeSettings.day_end);
 
     return {
@@ -314,7 +314,12 @@ export function getAuditLogs(page: number = 1, limit: number = 50): { logs: unkn
 
 // --- Subscription Auto-Renew ---
 
+let _autoRenewRunning = false;
+
 export function processAutoRenewals(): { renewed: number; failed: number } {
+  if (_autoRenewRunning) return { renewed: 0, failed: 0 };
+  _autoRenewRunning = true;
+  try {
   const expired = db.prepare(
     `SELECT us.*, sp.monthly_credits, sp.monthly_price, sp.yearly_price, sp.name as plan_name
      FROM user_subscriptions us
@@ -393,6 +398,9 @@ export function processAutoRenewals(): { renewed: number; failed: number } {
   }
 
   return { renewed, failed };
+  } finally {
+    _autoRenewRunning = false;
+  }
 }
 
 // --- Webhook Dispatch ---
@@ -432,7 +440,7 @@ async function deliverWithRetry(webhookId: number, url: string, init: RequestIni
     } catch { /* ignore */ }
     if (!res.ok && attempt < maxRetries) {
       const delay = Math.pow(2, attempt) * 1000; // 2s, 4s, 8s
-      setTimeout(() => deliverWithRetry(webhookId, url, init, maxRetries, attempt + 1), delay);
+      setTimeout(() => deliverWithRetry(webhookId, url, init, maxRetries, attempt + 1), delay).unref();
     }
   } catch {
     try {
@@ -440,7 +448,7 @@ async function deliverWithRetry(webhookId: number, url: string, init: RequestIni
     } catch { /* ignore */ }
     if (attempt < maxRetries) {
       const delay = Math.pow(2, attempt) * 1000;
-      setTimeout(() => deliverWithRetry(webhookId, url, init, maxRetries, attempt + 1), delay);
+      setTimeout(() => deliverWithRetry(webhookId, url, init, maxRetries, attempt + 1), delay).unref();
     }
   }
 }

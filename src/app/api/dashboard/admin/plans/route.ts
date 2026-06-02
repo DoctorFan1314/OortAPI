@@ -124,19 +124,21 @@ export async function PATCH(request: NextRequest) {
     updates.push('updated_at = CURRENT_TIMESTAMP');
     values.push(id);
 
+    // Read old credits before UPDATE
+    let oldCredits: number | undefined;
+    if (fields.monthly_credits !== undefined) {
+      const oldPlan = db.prepare('SELECT monthly_credits FROM subscription_plans WHERE id = ?').get(id) as { monthly_credits: number } | undefined;
+      oldCredits = oldPlan?.monthly_credits;
+    }
+
     db.prepare(`UPDATE subscription_plans SET ${updates.join(', ')} WHERE id = ?`).run(...values);
 
     // Sync active subscriptions if monthly_credits changed
-    if (fields.monthly_credits !== undefined) {
-      const oldPlan = db.prepare('SELECT monthly_credits FROM subscription_plans WHERE id = ?').get(id) as { monthly_credits: number } | undefined;
-      if (oldPlan) {
-        const newCredits = Number(fields.monthly_credits);
-        // Update credits_total for active subscriptions to match new plan credits
-        // credits_remaining gets the difference added
-        db.prepare(
-          `UPDATE user_subscriptions SET credits_remaining = MAX(0, credits_remaining + (? - credits_total)), credits_total = ?, updated_at = CURRENT_TIMESTAMP WHERE plan_id = ? AND status = 'active'`
-        ).run(newCredits, newCredits, id);
-      }
+    if (fields.monthly_credits !== undefined && oldCredits !== undefined) {
+      const newCredits = Number(fields.monthly_credits);
+      db.prepare(
+        `UPDATE user_subscriptions SET credits_remaining = MAX(0, credits_remaining + (? - credits_total)), credits_total = ?, updated_at = CURRENT_TIMESTAMP WHERE plan_id = ? AND status = 'active'`
+      ).run(newCredits, newCredits, id);
     }
 
     const plan = db.prepare('SELECT * FROM subscription_plans WHERE id = ?').get(id) as DBSubscriptionPlan | undefined;

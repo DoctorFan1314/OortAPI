@@ -501,13 +501,16 @@ function PlaygroundContent() {
 
           if (delta?.content) {
             const content = delta.content;
-            const thinkMatch = content.match(/<think>([\s\S]*?)<\/think>/);
-            if (thinkMatch) {
+            const thinkRegex = /<think>([\s\S]*?)<\/think>/g;
+            let thinkMatch;
+            let hasThink = false;
+            while ((thinkMatch = thinkRegex.exec(content)) !== null) {
               reasoning += thinkMatch[1];
-              const before = content.slice(0, content.indexOf("<think>"));
-              const after = content.slice(content.indexOf("</think>") + 8);
-              if (before) { fullText += before; textBuf += before; }
-              if (after) { fullText += after; textBuf += after; }
+              hasThink = true;
+            }
+            if (hasThink) {
+              const remaining = content.replace(/<think>[\s\S]*?<\/think>/g, '');
+              if (remaining) { fullText += remaining; textBuf += remaining; }
             } else if (content.includes("<think>") && !content.includes("</think>")) {
               inThink = true;
               const before = content.slice(0, content.indexOf("<think>"));
