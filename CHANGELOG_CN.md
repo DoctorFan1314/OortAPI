@@ -8,6 +8,37 @@
 
 ## [v3.3.5.0] — 2026-06-02
 
+### Bug 审计第三轮：修复 35 个 Bug
+
+#### CRITICAL（3）
+- **#1: API Key 过期未执行** — 网关查询添加 `expires_at` 检查，过期 Key 被拒绝
+- **#2: 密码重置未失效 session** — reset-password 路由添加 `token_version` 递增
+- **#8: 免费升级 subscription PATCH** — 添加余额检查和扣费，用户无法免费升级
+
+#### HIGH（8）
+- **#3: 流式计费用错模型** — 传递 `actualModel`（channel 映射后）到流式成本计算
+- **#4: Anthropic system prompt 丢失** — messages 路由添加 `system: body.system`
+- **#5: 流式计费失败静默** — （延期 — 设计层面问题）
+- **#11: 跨币种升级定价错误** — 两个套餐转为同币种后计算差价
+- **B1: 导航栏货币符号重复** — 移除冗余 `{symbol}` 前缀
+- **B2/B3: USD 用户图表 7.3x 膨胀** — 图表和模型费率仅 CNY 时乘以 exchangeRate
+- **B4-5: 日期缺少时区标记** — 概览、token-plan、users 页面添加 "Z" 后缀
+- **B6: CacheSavingsChart 缺货币符号** — 使用 currency context 的 formatPrice
+
+#### MEDIUM（10）
+- **#6: Messages 流式未报告 channel 成功** — 添加 `reportChannelSuccess()` 调用
+- **#7: 月度统计时区符号错误** — 修复 SQL 修饰符符号反转
+- **#9: 信用计算公式错误** — 使用 `credits_total` 而非 `credits_remaining`
+- **#10: GET subscription 有写副作用** — 移除 GET 处理器中的冗余信用同步
+- **B7: 主题切换后图表颜色过期** — useEffect 依赖添加 `resolvedTheme`
+- **B8: 编辑渠道 JSON.parse 崩溃** — 添加 try-catch 保护
+- **B9: 批量操作始终显示成功** — 检查 res.ok 并显示错误 toast
+- **B12: 初始 summary 缺少 total_credits_used** — 添加到初始状态防闪烁
+- **Playground handleRegenerate stale closure** — （已记录，复杂修复延期）
+- **跨页全选丢失选择** — （已记录，复杂修复延期）
+
+---
+
 ### Bug 审计：修复 32 个功能性 Bug
 
 #### CRITICAL（5）

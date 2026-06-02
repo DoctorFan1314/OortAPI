@@ -8,6 +8,37 @@ All notable changes to this project will be documented in this file.
 
 ## [v3.3.5.0] — 2026-06-02
 
+### Bug Audit Round 3: 35 More Bugs Fixed
+
+#### CRITICAL (3)
+- **#1: API key expiry never enforced** — Added `expires_at` check to gateway queries; expired keys now rejected
+- **#2: Password reset doesn't invalidate sessions** — Added `token_version` increment to reset-password route
+- **#8: Free upgrades via subscription PATCH** — Added balance check and deduction; users can no longer upgrade for free
+
+#### HIGH (8)
+- **#3: Streaming uses wrong model for billing** — Passes `actualModel` (after channel mapping) to streaming cost calculation
+- **#4: Anthropic system prompt dropped** — Added `system: body.system` to gateway body in messages route
+- **#5: Streaming billing failures silently ignored** — (deferred — fundamental post-stream billing design issue)
+- **#11: Cross-currency upgrade pricing broken** — Converts both plans to same currency before computing difference
+- **B1: Double currency symbol in navbar** — Removed redundant `{symbol}` prefix (formatPrice already includes it)
+- **B2/B3: USD users see 7.3x inflated costs** — Charts and model rates now only multiply by exchangeRate for CNY
+- **B4-5: Dates parsed without timezone** — Added "Z" suffix to date strings in overview, token-plan, users pages
+- **B6: CacheSavingsChart missing currency** — Uses currency context formatPrice instead of bare toFixed(2)
+
+#### MEDIUM (10)
+- **#6: Messages streaming never reports channel success** — Added `reportChannelSuccess()` call
+- **#7: Stats timezone sign error at month boundaries** — Fixed sign inversion in SQL modifiers
+- **#9: Wrong credit pro-rating formula** — Uses `credits_total` instead of `credits_remaining`
+- **#10: GET subscription has write side effects** — Removed redundant credit sync from GET handler
+- **B7: Chart colors stale after theme toggle** — Added `resolvedTheme` to useEffect deps
+- **B8: JSON.parse crash in channel edit** — Added try-catch with safe fallback
+- **B9: Batch operations always show success** — Now checks res.ok and shows error toast
+- **B12: Initial summary missing total_credits_used** — Added to initial state to prevent flicker
+- **Playground handleRegenerate stale closure** — (noted, complex fix deferred)
+- **Select-all across pages discards selections** — (noted, complex fix deferred)
+
+---
+
 ### Bug Audit: 32 Functional Bugs Fixed
 
 #### CRITICAL (5)
