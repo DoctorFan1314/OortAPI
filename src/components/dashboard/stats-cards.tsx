@@ -25,6 +25,7 @@ interface StatsData {
   month: {
     calls: number;
     cost: number;
+    credits: number;
     tokens: number;
     tokens_in_noncached: number;
     tokens_in_cache: number;
@@ -134,9 +135,18 @@ export function StatsCards({ lang = "zh" }: { lang?: "zh" | "en" }) {
   const dailyRPM = sparkData.map(d => +(d.calls / 1440).toFixed(2));
   const dailyTPM = sparkData.map(d => Math.round(d.tokens / 1440));
 
+  // For credit/subscription users, show credits consumed instead of dollar cost
+  const isCreditsUser = (stats.month?.credits || 0) > 0 && (stats.month?.cost || 0) === 0;
+  const monthlyDisplay = isCreditsUser
+    ? `${(stats.month?.credits || 0).toLocaleString()} credits`
+    : formatPrice(stats.month?.cost || 0);
+  const monthlyLabel = isCreditsUser
+    ? (lang === "zh" ? "本月 Credits" : "Monthly Credits")
+    : t.monthlyCost;
+
   const cards = [
     { icon: Wallet, label: t.balance, value: formatPrice(stats.balance), color: "text-yellow-500", bgColor: "bg-yellow-500/10", hex: "#eab308", href: "/dashboard/billing" },
-    { icon: TrendingDown, label: t.monthlyCost, value: formatPrice(stats.month?.cost || 0), color: "text-red-500", bgColor: "bg-red-500/10", delta: costDelta, hex: "#ef4444", sparkData: dailyCosts, href: "/dashboard/usage" },
+    { icon: TrendingDown, label: monthlyLabel, value: monthlyDisplay, color: "text-red-500", bgColor: "bg-red-500/10", delta: isCreditsUser ? null : costDelta, hex: "#ef4444", sparkData: dailyCosts, href: "/dashboard/usage" },
     { icon: Activity, label: t.monthlyCalls, value: (stats.month?.calls || 0).toLocaleString(), color: "text-blue-500", bgColor: "bg-blue-500/10", delta: callsDelta, hex: "#3b82f6", sparkData: dailyCalls, href: "/dashboard/usage" },
     { icon: Gauge, label: t.rpm, value: avgRPM, color: "text-purple-500", bgColor: "bg-purple-500/10", hex: "#a855f7", sparkData: dailyCalls, href: "/dashboard/usage" },
     { icon: Cpu, label: t.tpm, value: formatTokens(avgTPM), color: "text-cyan-500", bgColor: "bg-cyan-500/10", hex: "#06b6d4", sparkData: dailyTokens, href: "/dashboard/usage" },

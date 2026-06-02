@@ -85,7 +85,7 @@ export async function GET(request: NextRequest) {
     const agg = db.prepare(
       `SELECT
         COALESCE(SUM(tokens_in + tokens_out + tokens_in_cache), 0) as total_tokens,
-        COALESCE(SUM(cost), 0) as total_cost,
+        COALESCE(SUM(CASE WHEN deduction_source = 'balance' THEN cost ELSE 0 END), 0) as total_cost,
         COUNT(*) as total_calls,
         COALESCE(SUM(tokens_in - tokens_in_cache), 0) as total_tokens_in_noncached,
         COALESCE(SUM(tokens_in_cache), 0) as total_tokens_in_cache,
@@ -100,8 +100,8 @@ export async function GET(request: NextRequest) {
     if (format !== 'csv') {
       modelStats = db.prepare(
         `SELECT u.model,
-                COALESCE(SUM(cost), 0) as cost,
-                COALESCE(SUM(credits_used), 0) as credits_used,
+                COALESCE(SUM(CASE WHEN u.deduction_source = 'balance' THEN u.cost ELSE 0 END), 0) as cost,
+                COALESCE(SUM(u.credits_used), 0) as credits_used,
                 COALESCE(SUM(u.tokens_in), 0) as tokens_in,
                 COALESCE(SUM(u.tokens_out), 0) as tokens_out,
                 COALESCE(SUM(u.tokens_in_cache), 0) as tokens_in_cache
@@ -117,7 +117,7 @@ export async function GET(request: NextRequest) {
       dailyTrend = db.prepare(
         `SELECT DATE(u.created_at) as date,
                 COUNT(*) as calls,
-                COALESCE(SUM(cost), 0) as cost,
+                COALESCE(SUM(CASE WHEN u.deduction_source = 'balance' THEN u.cost ELSE 0 END), 0) as cost,
                 COALESCE(SUM(u.tokens_in + u.tokens_out + u.tokens_in_cache), 0) as tokens,
                 COALESCE(SUM(u.tokens_in - u.tokens_in_cache), 0) as tokens_in_noncached,
                 COALESCE(SUM(u.tokens_in_cache), 0) as tokens_in_cache,

@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
       SELECT
         COUNT(*) as total_calls,
         SUM(CASE WHEN success = 1 THEN 1 ELSE 0 END) as success_calls,
-        SUM(cost) as total_cost,
+        SUM(CASE WHEN deduction_source = 'balance' THEN cost ELSE 0 END) as total_cost,
         SUM(tokens_in + tokens_out) as total_tokens,
         AVG(latency_ms) as avg_latency
       FROM usage_logs
@@ -32,7 +32,8 @@ export async function GET(request: NextRequest) {
     const monthStats = db.prepare(`
       SELECT
         COUNT(*) as total_calls,
-        SUM(cost) as total_cost,
+        SUM(CASE WHEN deduction_source = 'balance' THEN cost ELSE 0 END) as total_cost,
+        SUM(CASE WHEN deduction_source = 'credits' THEN credits_used ELSE 0 END) as total_credits,
         SUM(tokens_in + tokens_out) as total_tokens,
         SUM(tokens_in - tokens_in_cache - tokens_cache_creation) as tokens_in_noncached,
         SUM(tokens_in_cache) as tokens_in_cache,
@@ -139,6 +140,7 @@ export async function GET(request: NextRequest) {
       month: {
         calls: monthStats?.total_calls || 0,
         cost: monthStats?.total_cost || 0,
+        credits: monthStats?.total_credits || 0,
         tokens: monthStats?.total_tokens || 0,
         tokens_in_noncached: monthStats?.tokens_in_noncached || 0,
         tokens_in_cache: monthStats?.tokens_in_cache || 0,
