@@ -97,9 +97,9 @@ export function Navbar() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 lg:px-8">
         <Link href="/" className="flex items-center gap-2.5 shrink-0">
           {/* Mobile icon */}
-          <img src={resolvedTheme === "dark" ? "/logo-icon-dark.svg" : "/logo-icon.svg"} alt="OortAPI" className="h-12 w-12 sm:hidden" />
+          <img src={resolvedTheme === "dark" ? "/logo-icon-dark.svg" : "/logo-icon.svg"} alt="OortAPI" className="h-12 w-12 sm:hidden" suppressHydrationWarning />
           {/* Desktop full logo */}
-          <img src={resolvedTheme === "dark" ? "/logo-dark.svg" : "/logo.svg"} alt="OortAPI" className="hidden sm:block h-14 w-auto" />
+          <img src={resolvedTheme === "dark" ? "/logo-dark.svg" : "/logo.svg"} alt="OortAPI" className="hidden sm:block h-14 w-auto" suppressHydrationWarning />
         </Link>
 
         <nav className="hidden lg:flex items-center gap-1">

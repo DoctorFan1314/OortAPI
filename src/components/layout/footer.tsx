@@ -42,7 +42,7 @@ export function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
           <div className="col-span-2 md:col-span-1">
             <div className="mb-4">
-              <img src={resolvedTheme === "dark" ? "/logo-dark.svg" : "/logo.svg"} alt="OortAPI" className="h-14 w-auto" />
+              <img src={resolvedTheme === "dark" ? "/logo-dark.svg" : "/logo.svg"} alt="OortAPI" className="h-14 w-auto" suppressHydrationWarning />
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed mb-6">
               {t.footer.description}
