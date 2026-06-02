@@ -75,12 +75,13 @@ export default function BillingPage() {
   const thisMonthEnd = now.toISOString().slice(0, 10);
   const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0).toISOString().slice(0, 10);
 
+  const tzOffset = -new Date().getTimezoneOffset();
   const { data: thisMonthData } = useSWR<UsageAggregate>(
-    `/api/v1/billing/usage?from=${monthStart}&to=${thisMonthEnd}&limit=1`,
+    `/api/v1/billing/usage?from=${monthStart}&to=${thisMonthEnd}&limit=1&tz=${tzOffset}`,
     dashboardSWRConfig,
   );
   const { data: lastMonthData } = useSWR<UsageAggregate>(
-    `/api/v1/billing/usage?from=${lastMonthStart}&to=${lastMonthEnd}&limit=1`,
+    `/api/v1/billing/usage?from=${lastMonthStart}&to=${lastMonthEnd}&limit=1&tz=${tzOffset}`,
     dashboardSWRConfig,
   );
 
@@ -97,7 +98,7 @@ export default function BillingPage() {
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 86400000).toISOString().slice(0, 10);
   const today = now.toISOString().slice(0, 10);
   const { data: dailyUsageData } = useSWR<{ data?: Array<{ cost: number; created_at: string }> }>(
-    `/api/v1/billing/usage?from=${thirtyDaysAgo}&to=${today}&limit=10000`,
+    `/api/v1/billing/usage?from=${thirtyDaysAgo}&to=${today}&limit=10000&tz=${tzOffset}`,
     dashboardSWRConfig,
   );
 

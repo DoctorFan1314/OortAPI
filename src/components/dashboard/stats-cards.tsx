@@ -76,7 +76,8 @@ const LABELS = {
 };
 
 export function StatsCards({ lang = "zh" }: { lang?: "zh" | "en" }) {
-  const { data: stats, error } = useSWR<StatsData>("/api/dashboard/stats", dashboardSWRConfig);
+  const tzOffset = -new Date().getTimezoneOffset();
+  const { data: stats, error } = useSWR<StatsData>(`/api/dashboard/stats?tz=${tzOffset}`, dashboardSWRConfig);
   const { currency, exchangeRate, symbol, formatPrice } = useCurrency();
   const t = LABELS[lang];
 

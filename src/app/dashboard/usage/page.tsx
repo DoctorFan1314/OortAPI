@@ -134,7 +134,8 @@ export default function UsagePage() {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    const parts = [`limit=50&offset=${(page - 1) * 50}`];
+    const tzOffset = -new Date().getTimezoneOffset(); // e.g., -480 for UTC+8
+    const parts = [`limit=50&offset=${(page - 1) * 50}&tz=${tzOffset}`];
     if (filterModel) parts.push(`model=${encodeURIComponent(filterModel)}`);
     if (filterStatus) parts.push(`status=${filterStatus}`);
     if (filterFrom) parts.push(`from=${filterFrom}`);
@@ -172,21 +173,16 @@ export default function UsagePage() {
       });
   }, [page, filterModel, filterStatus, filterFrom, filterTo, filterKeyId]);
 
-  // Check subscription status
+  // Detect credit user from usage data (more reliable than subscription check)
   useEffect(() => {
-    fetch("/api/dashboard/subscription", { credentials: "include" })
-      .then(r => r.json())
-      .then(d => {
-        const hasActive = d.subscriptions?.some((s: { status: string }) => s.status === "active");
-        if (hasActive) {
-          setIsCreditsUser(true);
-          setChartMetric("tokens");
-        } else {
-          setIsCreditsUser(false);
-        }
-      })
-      .catch(() => {});
-  }, []);
+    if (logs.length > 0) {
+      const hasCredits = logs.some((l: UsageLog & { deduction_source?: string }) => l.deduction_source === "credits");
+      if (hasCredits) {
+        setIsCreditsUser(true);
+        setChartMetric("tokens");
+      }
+    }
+  }, [logs]);
 
   const formatTokens = (n: number) => n.toLocaleString();
 

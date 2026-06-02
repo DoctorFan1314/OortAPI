@@ -12,8 +12,9 @@ export async function GET(request: NextRequest) {
     }
 
     const userId = auth.user.id;
+    const tzOffset = parseInt(request.nextUrl.searchParams.get('tz') || '0');
 
-    // Today's stats
+    // Today's stats (timezone-adjusted)
     const today = new Date().toISOString().split('T')[0];
     const todayStats = db.prepare(`
       SELECT
@@ -23,8 +24,8 @@ export async function GET(request: NextRequest) {
         SUM(tokens_in + tokens_out) as total_tokens,
         AVG(latency_ms) as avg_latency
       FROM usage_logs
-      WHERE user_id = ? AND DATE(created_at) = ?
-    `).get(userId, today) as Record<string, number | null>;
+      WHERE user_id = ? AND DATE(created_at, ?) = ?
+    `).get(userId, `${tzOffset} minutes`, today) as Record<string, number | null>;
 
     // Active API keys count
     const activeKeys = db.prepare('SELECT COUNT(*) as count FROM api_keys WHERE user_id = ? AND enabled = 1').get(userId) as { count: number };
@@ -40,19 +41,19 @@ export async function GET(request: NextRequest) {
         SUM(tokens_cache_creation) as tokens_cache_creation,
         SUM(tokens_out) as tokens_out
       FROM usage_logs
-      WHERE user_id = ? AND created_at >= DATE('now', 'start of month')
-    `).get(userId) as Record<string, number | null>;
+      WHERE user_id = ? AND DATE(created_at, ?) >= DATE('now', 'start of month', ?)
+    `).get(userId, `${tzOffset} minutes`, `${tzOffset} minutes`) as Record<string, number | null>;
 
-    // Yesterday's stats (for comparison)
+    // Yesterday's stats (for comparison, timezone-adjusted)
     const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
     const yesterdayStats = db.prepare(`
       SELECT
         COUNT(*) as total_calls,
-        SUM(cost) as total_cost,
+        SUM(CASE WHEN deduction_source = 'balance' THEN cost ELSE 0 END) as total_cost,
         SUM(tokens_in + tokens_out) as total_tokens
       FROM usage_logs
-      WHERE user_id = ? AND DATE(created_at) = ?
-    `).get(userId, yesterday) as Record<string, number | null>;
+      WHERE user_id = ? AND DATE(created_at, ?) = ?
+    `).get(userId, `${tzOffset} minutes`, yesterday) as Record<string, number | null>;
 
     // Last month's stats (for comparison)
     const lastMonthStart = new Date();
@@ -63,33 +64,33 @@ export async function GET(request: NextRequest) {
     lastMonthEnd.setDate(1);
     lastMonthEnd.setHours(0, 0, 0, 0);
     const lastMonthStats = db.prepare(`
-      SELECT COUNT(*) as total_calls, SUM(cost) as total_cost, SUM(tokens_in + tokens_out) as total_tokens
+      SELECT COUNT(*) as total_calls, SUM(CASE WHEN deduction_source = 'balance' THEN cost ELSE 0 END) as total_cost, SUM(tokens_in + tokens_out) as total_tokens
       FROM usage_logs
       WHERE user_id = ? AND created_at >= ? AND created_at < ?
     `).get(userId, lastMonthStart.toISOString(), lastMonthEnd.toISOString()) as Record<string, number | null>;
 
-    // Recent 7 days usage for chart
+    // Recent 7 days usage for chart (timezone-adjusted)
     const dailyUsage = db.prepare(`
       SELECT
-        DATE(created_at) as date,
+        DATE(created_at, ?) as date,
         COUNT(*) as calls,
-        SUM(cost) as cost,
+        SUM(CASE WHEN deduction_source = 'balance' THEN cost ELSE 0 END) as cost,
         SUM(tokens_in + tokens_out) as tokens
       FROM usage_logs
-      WHERE user_id = ? AND created_at >= DATE('now', '-7 days')
-      GROUP BY DATE(created_at)
+      WHERE user_id = ? AND created_at >= DATE('now', '-7 days', ?)
+      GROUP BY DATE(created_at, ?)
       ORDER BY date ASC
-    `).all(userId) as Array<{ date: string; calls: number; cost: number; tokens: number }>;
+    `).all(`${tzOffset} minutes`, userId, `${tzOffset} minutes`, `${tzOffset} minutes`) as Array<{ date: string; calls: number; cost: number; tokens: number }>;
 
-    // Top models
+    // Top models (timezone-adjusted)
     const topModels = db.prepare(`
-      SELECT model, COUNT(*) as calls, SUM(cost) as cost
+      SELECT model, COUNT(*) as calls, SUM(CASE WHEN deduction_source = 'balance' THEN cost ELSE 0 END) as cost
       FROM usage_logs
-      WHERE user_id = ? AND created_at >= DATE('now', '-30 days')
+      WHERE user_id = ? AND created_at >= DATE('now', '-30 days', ?)
       GROUP BY model
       ORDER BY calls DESC
       LIMIT 5
-    `).all(userId) as Array<{ model: string; calls: number; cost: number }>;
+    `).all(userId, `${tzOffset} minutes`) as Array<{ model: string; calls: number; cost: number }>;
 
     // Cache savings (Feature 15)
     const cacheData = db.prepare(`

@@ -29,10 +29,11 @@ export async function GET(request: NextRequest) {
     const offset = Math.max(0, parseInt(searchParams.get('offset') || '0'));
     const model = searchParams.get('model');
     const status = searchParams.get('status'); // 'success' or 'failed'
-    const from = searchParams.get('from'); // ISO date string
-    const to = searchParams.get('to'); // ISO date string
+    const from = searchParams.get('from'); // ISO date string (local date)
+    const to = searchParams.get('to'); // ISO date string (local date)
     const format = searchParams.get('format'); // 'csv' or default JSON
     const keyId = searchParams.get('key_id'); // API key ID filter
+    const tzOffset = parseInt(searchParams.get('tz') || '0'); // timezone offset in minutes (e.g., -480 for UTC+8)
 
     const conditions: string[] = ['u.user_id = ?'];
     const params: unknown[] = [userId];
@@ -47,13 +48,14 @@ export async function GET(request: NextRequest) {
       conditions.push('success = 0');
     }
     if (from) {
-      conditions.push('u.created_at >= ?');
-      params.push(from);
+      // Convert local date to UTC using timezone offset
+      conditions.push('u.created_at >= datetime(?, ?)');
+      params.push(from, `${tzOffset} minutes`);
     }
     if (to) {
-      // Add one day to include all records on the 'to' date
-      conditions.push("u.created_at < date(?, '+1 day')");
-      params.push(to);
+      // Convert local date+1day to UTC using timezone offset
+      conditions.push("u.created_at < datetime(date(?, '+1 day'), ?)");
+      params.push(to, `${tzOffset} minutes`);
     }
     if (keyId) {
       conditions.push('u.api_key_id = ?');
