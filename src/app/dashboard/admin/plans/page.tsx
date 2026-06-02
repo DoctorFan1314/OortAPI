@@ -456,7 +456,7 @@ function AdminPlansContent() {
 
       {/* Create Plan Dialog */}
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>{lang === "zh" ? "创建套餐" : "Create Plan"}</DialogTitle>
             <DialogDescription>{lang === "zh" ? "填写新套餐信息" : "Enter new plan details"}</DialogDescription>
@@ -524,7 +524,7 @@ function AdminPlansContent() {
 
       {/* Edit Dialog — Tabbed */}
       <Dialog open={!!editPlan} onOpenChange={() => setEditPlan(null)}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{lang === "zh" ? "编辑套餐" : "Edit Plan"}</DialogTitle>
             <DialogDescription>{editPlan?.display_name}</DialogDescription>
@@ -681,7 +681,7 @@ function AdminPlansContent() {
 
       {/* Models Dialog — with autocomplete */}
       <Dialog open={!!modelDialogPlan} onOpenChange={() => setModelDialogPlan(null)}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>
               {lang === "zh" ? "管理模型" : "Manage Models"}

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useI18n } from "@/contexts/i18n-context";
 import { Zap, Code, Key, Activity, Server, DollarSign, AlertTriangle, Gauge, Book, Layout, ArrowRight, Search, Sparkles, HelpCircle, Layers, Cpu, ExternalLink, Shield } from "lucide-react";
+import { JsonLd, generateBreadcrumbJsonLd, generateWebSiteJsonLd } from "@/components/shared/json-ld";
 
 interface DocCard {
   href: string;
@@ -61,6 +62,11 @@ export default function DocsLandingPage() {
 
   return (
     <div className="min-h-screen space-y-12">
+      <JsonLd data={generateWebSiteJsonLd()} />
+      <JsonLd data={generateBreadcrumbJsonLd([
+        { name: lang === "zh" ? "首页" : "Home", url: "/" },
+        { name: lang === "zh" ? "文档" : "Docs" },
+      ])} />
       {/* Hero */}
       <div className="relative overflow-hidden rounded-2xl glass-card p-8 lg:p-12">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-purple-500/10 pointer-events-none" />

@@ -498,7 +498,7 @@ function ChannelFormFields({
 
       {/* Fetch Models Dialog */}
       <Dialog open={showFetchDialog} onOpenChange={setShowFetchDialog}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>{t.fetchModelsTitle}</DialogTitle>
           </DialogHeader>

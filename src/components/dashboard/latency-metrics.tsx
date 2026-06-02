@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useI18n } from "@/contexts/i18n-context";
 import { dashboardSWRConfig } from "@/lib/swr-fetcher";
 import { Gauge, Zap, Clock, Info } from "lucide-react";
+import { ChartErrorBoundary } from "@/components/shared/chart-error-boundary";
 
 const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false });
 
@@ -166,7 +167,9 @@ export function LatencyMetrics({ lang }: { lang: "zh" | "en" }) {
             color="bg-emerald-500/10"
           />
         </div>
-        <ReactECharts option={option} style={{ height: 200 }} opts={{ renderer: "canvas" }} notMerge />
+        <ChartErrorBoundary title={lang === "zh" ? "流式延迟" : "Streaming Latency"}>
+          <ReactECharts option={option} style={{ width: "100%" }} className="min-h-[160px] md:min-h-[200px]" opts={{ renderer: "canvas" }} notMerge />
+        </ChartErrorBoundary>
         <div className="flex items-center gap-3 text-[10px] text-muted-foreground/50 border-t border-border/30 pt-2">
           <span className="flex items-center gap-1">
             <Info className="h-3 w-3" />

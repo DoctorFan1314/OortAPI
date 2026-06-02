@@ -4,6 +4,9 @@ import { FaqContent } from "./client";
 export const metadata: Metadata = {
   title: "FAQ — OortAPI Docs",
   description: "Frequently asked questions about OortAPI: API keys, billing, models, rate limits, streaming, and integration.",
+  alternates: {
+    canonical: "/docs/faq",
+  },
 };
 
 export default function FaqPage() {

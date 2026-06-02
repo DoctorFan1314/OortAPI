@@ -7,6 +7,7 @@ import { BarChart3 } from "lucide-react";
 import { useMemo } from "react";
 import dynamic from "next/dynamic";
 import { DailyTrend } from "./usage-types";
+import { ChartErrorBoundary } from "@/components/shared/chart-error-boundary";
 
 const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false });
 
@@ -77,7 +78,9 @@ export function TrendChart({ trendData, metric, onMetricChange, isCreditsUser }:
         </div>
       </CardHeader>
       <CardContent className="pt-0">
-        <ReactECharts option={chartOption} style={{ height: 220 }} opts={{ renderer: "svg" }} />
+        <ChartErrorBoundary title={L.trend}>
+          <ReactECharts option={chartOption} style={{ width: "100%" }} className="min-h-[180px] md:min-h-[220px]" opts={{ renderer: "svg" }} />
+        </ChartErrorBoundary>
       </CardContent>
     </Card>
   );

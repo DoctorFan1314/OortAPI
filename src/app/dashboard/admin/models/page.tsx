@@ -155,6 +155,8 @@ export default function AdminModelsPage() {
   async function handleToggle(modelId: string, currentEnabled: boolean) {
     setTogglingId(modelId);
     const nextEnabled = !currentEnabled;
+    // Optimistic: update UI immediately
+    setEnabledMap((prev) => ({ ...prev, [modelId]: nextEnabled }));
     try {
       const res = await fetch("/api/dashboard/admin/models", {
         method: "POST",
@@ -164,9 +166,10 @@ export default function AdminModelsPage() {
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
+        // Rollback on error
+        setEnabledMap((prev) => ({ ...prev, [modelId]: currentEnabled }));
         showToast(data.error || (lang === "zh" ? "操作失败" : "Operation failed"), "error");
       } else {
-        setEnabledMap((prev) => ({ ...prev, [modelId]: nextEnabled }));
         showToast(
           lang === "zh"
             ? `${modelId} 已${nextEnabled ? "启用" : "禁用"}`
@@ -175,6 +178,8 @@ export default function AdminModelsPage() {
         );
       }
     } catch {
+      // Rollback on error
+      setEnabledMap((prev) => ({ ...prev, [modelId]: currentEnabled }));
       showToast(lang === "zh" ? "网络错误" : "Network error", "error");
     }
     setTogglingId(null);

@@ -120,19 +120,33 @@ export default function RedeemPage() {
   }
 
   async function handleToggle(id: number, enabled: number) {
+    const nextEnabled = !enabled;
+    const redeemKey = `/api/dashboard/redeem?page=${page}&limit=50`;
+    const optimisticData = rawData ? {
+      ...rawData,
+      codes: rawData.codes.map(c => c.id === id ? { ...c, enabled: nextEnabled ? 1 : 0 } : c),
+    } : undefined;
     try {
-      const res = await fetch("/api/dashboard/redeem", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ id, enabled: !enabled }),
-      });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        showToast(data.error || "Operation failed", "error");
-      }
-    } catch { showToast(L.networkError, "error"); }
-    mutate();
+      await mutate(
+        async () => {
+          const res = await fetch("/api/dashboard/redeem", {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ id, enabled: nextEnabled }),
+          });
+          if (!res.ok) {
+            const data = await res.json().catch(() => ({}));
+            throw new Error(data.error || "Operation failed");
+          }
+          const refetch = await fetch(redeemKey, { credentials: "include" });
+          return refetch.json();
+        },
+        { optimisticData, rollbackOnError: true, revalidate: false },
+      );
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : L.networkError, "error");
+    }
   }
 
   async function handleDelete() {
@@ -194,7 +208,7 @@ export default function RedeemPage() {
           const data = await res.json().catch(() => ({}));
           showToast(data.error || "Batch delete failed", "error");
         } else {
-          showToast(`${ids.length} codes deleted`, "success");
+          showToast(L.batchCodesDeleted.replace("{count}", String(ids.length)), "success");
         }
       } else {
         const res = await fetch("/api/dashboard/redeem", {
@@ -207,7 +221,7 @@ export default function RedeemPage() {
           const data = await res.json().catch(() => ({}));
           showToast(data.error || "Batch update failed", "error");
         } else {
-          showToast(`${ids.length} codes ${action === "enable" ? "enabled" : "disabled"}`, "success");
+          showToast((action === "enable" ? L.batchCodesEnabled : L.batchCodesDisabled).replace("{count}", String(ids.length)), "success");
         }
       }
     } catch { showToast(L.networkError, "error"); }
@@ -279,16 +293,16 @@ export default function RedeemPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border/50">
-                    <th className="text-left py-3 px-2 w-10">
+                    <th scope="col" className="text-left py-3 px-2 w-10">
                       <input type="checkbox" checked={filteredCodes.length > 0 && selectedIds.size === filteredCodes.length} onChange={toggleSelectAll} className="rounded border-input" />
                     </th>
-                    <th className="text-left py-3 px-4 text-muted-foreground font-medium">{L.code}</th>
-                    <th className="text-center py-3 px-4 text-muted-foreground font-medium">{L.codeType}</th>
-                    <th className="text-right py-3 px-4 text-muted-foreground font-medium">{L.amount}</th>
-                    <th className="text-center py-3 px-4 text-muted-foreground font-medium">{L.uses}</th>
-                    <th className="text-center py-3 px-4 text-muted-foreground font-medium">{L.status}</th>
-                    <th className="text-right py-3 px-4 text-muted-foreground font-medium">{L.expires}</th>
-                    <th className="text-right py-3 px-4 text-muted-foreground font-medium">{L.actions}</th>
+                    <th scope="col" className="text-left py-3 px-4 text-muted-foreground font-medium">{L.code}</th>
+                    <th scope="col" className="text-center py-3 px-4 text-muted-foreground font-medium">{L.codeType}</th>
+                    <th scope="col" className="text-right py-3 px-4 text-muted-foreground font-medium">{L.amount}</th>
+                    <th scope="col" className="text-center py-3 px-4 text-muted-foreground font-medium">{L.uses}</th>
+                    <th scope="col" className="text-center py-3 px-4 text-muted-foreground font-medium">{L.status}</th>
+                    <th scope="col" className="text-right py-3 px-4 text-muted-foreground font-medium">{L.expires}</th>
+                    <th scope="col" className="text-right py-3 px-4 text-muted-foreground font-medium">{L.actions}</th>
                   </tr>
                 </thead>
                 <tbody>

@@ -14,6 +14,7 @@ import { useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { useTheme } from "@/contexts/theme-context";
 import { cn } from "@/lib/utils";
+import { ChartErrorBoundary } from "@/components/shared/chart-error-boundary";
 
 const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false });
 
@@ -334,7 +335,9 @@ export default function ChannelsPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-0 flex items-center justify-center">
-                <ReactECharts option={pieOption} style={{ height: 300, width: "100%" }} opts={{ renderer: "svg" }} />
+                <ChartErrorBoundary title={t.pieTitle}>
+                  <ReactECharts option={pieOption} style={{ width: "100%" }} className="min-h-[250px] md:min-h-[300px]" opts={{ renderer: "svg" }} />
+                </ChartErrorBoundary>
               </CardContent>
             </Card>
           </div>

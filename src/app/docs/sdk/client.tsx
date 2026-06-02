@@ -5,7 +5,7 @@ import { useI18n } from "@/contexts/i18n-context";
 import { CodeBlock } from "@/components/docs/code-block";
 import { BaseUrlDisplay } from "@/components/docs/base-url-display";
 import { CrossLinks } from "@/components/docs/cross-links";
-import { Code2, FlaskConical, Zap, AlertTriangle } from "lucide-react";
+import { Code2, FlaskConical, Zap, AlertTriangle, Terminal } from "lucide-react";
 
 export function SdkContent() {
   const [origin, setOrigin] = useState("");
@@ -126,6 +126,72 @@ const { text } = await generateText({
   prompt: "Hello!",
 });
 console.log(text);`;
+
+  const goExample = `package main
+
+import (
+\t"bytes"
+\t"encoding/json"
+\t"fmt"
+\t"io"
+\t"net/http"
+)
+
+func main() {
+\tbody, _ := json.Marshal(map[string]interface{}{
+\t\t"model": "gpt-4o",
+\t\t"messages": []map[string]string{
+\t\t\t{"role": "user", "content": "Hello!"},
+\t\t},
+\t})
+
+\treq, _ := http.NewRequest("POST", "${OAI_BASE}/chat/completions", bytes.NewBuffer(body))
+\treq.Header.Set("Content-Type", "application/json")
+\treq.Header.Set("Authorization", "Bearer sk-oort-your-key")
+
+\tresp, _ := http.DefaultClient.Do(req)
+\tdefer resp.Body.Close()
+\tdata, _ := io.ReadAll(resp.Body)
+\tfmt.Println(string(data))
+}`;
+
+  const javaExample = `import java.net.URI;
+import java.net.http.*;
+import java.nio.charset.StandardCharsets;
+
+public class OortAPIExample {
+\tpublic static void main(String[] args) throws Exception {
+\t\tString json = "{\\"model\\":\\"gpt-4o\\",\\"messages\\":[{\\"role\\":\\"user\\",\\"content\\":\\"Hello!\\"}]}";
+
+\t\tHttpRequest request = HttpRequest.newBuilder()
+\t\t\t.uri(URI.create("${OAI_BASE}/chat/completions"))
+\t\t\t.header("Content-Type", "application/json")
+\t\t\t.header("Authorization", "Bearer sk-oort-your-key")
+\t\t\t.POST(HttpRequest.BodyPublishers.ofString(json, StandardCharsets.UTF_8))
+\t\t\t.build();
+
+\t\tHttpResponse<String> response = HttpClient.newHttpClient()
+\t\t\t.send(request, HttpResponse.BodyHandlers.ofString());
+\t\tSystem.out.println(response.body());
+\t}
+}`;
+
+  const phpExample = `<?php
+$ch = curl_init('${OAI_BASE}/chat/completions');
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_POST, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+\t'Content-Type: application/json',
+\t'Authorization: Bearer sk-oort-your-key',
+]);
+curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+\t'model' => 'gpt-4o',
+\t'messages' => [['role' => 'user', 'content' => 'Hello!']],
+]));
+
+$response = curl_exec($ch);
+curl_close($ch);
+echo $response;`;
 
   const streamingPython = `import openai
 
@@ -266,6 +332,48 @@ except openai.APIError as e:
             <span className="text-sm font-medium">LlamaIndex</span>
             <code className="text-xs font-mono text-muted-foreground">{OAI_BASE}</code>
             <span className="text-xs text-muted-foreground">OpenAI LLM</span>
+          </div>
+        </div>
+      </section>
+
+      {/* More Languages: Go / Java / PHP */}
+      <section className="space-y-4">
+        <h2 className="text-lg font-semibold flex items-center gap-2">
+          <Terminal className="h-5 w-5 text-teal-400" />
+          {lang === "zh" ? "更多语言示例" : "More Language Examples"}
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          {lang === "zh"
+            ? "使用原生 HTTP 客户端直接调用 OortAPI，无需额外依赖。"
+            : "Call OortAPI directly with native HTTP clients — no extra dependencies needed."}
+        </p>
+        <div className="space-y-4">
+          <div>
+            <h3 className="text-sm font-medium text-muted-foreground mb-2">Go (net/http)</h3>
+            <p className="text-xs text-muted-foreground mb-2">
+              {lang === "zh"
+                ? "使用 Go 标准库 net/http 发起请求。"
+                : "Make requests using Go's standard library net/http."}
+            </p>
+            <CodeBlock code={goExample} language="go" />
+          </div>
+          <div>
+            <h3 className="text-sm font-medium text-muted-foreground mb-2">Java (java.net.http)</h3>
+            <p className="text-xs text-muted-foreground mb-2">
+              {lang === "zh"
+                ? "使用 Java 11+ 内置 HttpClient 发起请求。"
+                : "Make requests using Java 11+'s built-in HttpClient."}
+            </p>
+            <CodeBlock code={javaExample} language="java" />
+          </div>
+          <div>
+            <h3 className="text-sm font-medium text-muted-foreground mb-2">PHP (cURL)</h3>
+            <p className="text-xs text-muted-foreground mb-2">
+              {lang === "zh"
+                ? "使用 PHP cURL 扩展发起请求。"
+                : "Make requests using PHP's cURL extension."}
+            </p>
+            <CodeBlock code={phpExample} language="php" />
           </div>
         </div>
       </section>

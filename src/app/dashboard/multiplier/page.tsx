@@ -78,15 +78,30 @@ export default function MultiplierPage() {
       .catch(() => { showToast(lang === "zh" ? "删除失败" : "Failed to delete rule", "error"); setDeleteTarget(null); });
   };
 
-  const handleToggleRule = (rule: MultiplierRule) => {
-    fetch('/api/dashboard/multiplier', {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model_name: rule.model_name, multiplier: rule.multiplier, enabled: !rule.enabled, description: rule.description }),
-    }).then(res => { if (!res.ok) throw new Error(); return res.json(); })
-      .then(() => mutate())
-      .catch(() => showToast(lang === "zh" ? "更新失败" : "Failed to update rule", "error"));
+  const handleToggleRule = async (rule: MultiplierRule) => {
+    const nextEnabled = !rule.enabled;
+    const optimisticData = rawData ? {
+      ...rawData,
+      rules: rawData.rules.map(r => r.id === rule.id ? { ...r, enabled: nextEnabled ? 1 : 0 } : r),
+    } : undefined;
+    try {
+      await mutate(
+        async () => {
+          const res = await fetch('/api/dashboard/multiplier', {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ model_name: rule.model_name, multiplier: rule.multiplier, enabled: nextEnabled, description: rule.description }),
+          });
+          if (!res.ok) throw new Error();
+          const refetch = await fetch('/api/dashboard/multiplier', { credentials: 'include' });
+          return refetch.json();
+        },
+        { optimisticData, rollbackOnError: true, revalidate: false },
+      );
+    } catch {
+      showToast(lang === "zh" ? "更新失败" : "Failed to update rule", "error");
+    }
   };
 
   const handleSaveTimeSettings = () => {
@@ -311,20 +326,20 @@ export default function MultiplierPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border/50">
-                    <th className="text-left py-2 px-2 w-8">
+                    <th scope="col" className="text-left py-2 px-2 w-8">
                       <input type="checkbox" checked={selectedRules.size === rules.length && rules.length > 0}
                         onChange={() => {
                           if (selectedRules.size === rules.length) setSelectedRules(new Set());
                           else setSelectedRules(new Set(rules.map(r => r.model_name)));
                         }} className="rounded" />
                     </th>
-                    <th className="text-left py-2 px-3 text-muted-foreground font-medium">{L.model}</th>
-                    <th className="text-right py-2 px-3 text-muted-foreground font-medium">{L.multiplier}</th>
-                    <th className="text-right py-2 px-3 text-muted-foreground font-medium">{L.effectiveInput}</th>
-                    <th className="text-right py-2 px-3 text-muted-foreground font-medium">{L.effectiveOutput}</th>
-                    <th className="text-left py-2 px-3 text-muted-foreground font-medium hidden md:table-cell">{L.description}</th>
-                    <th className="text-center py-2 px-3 text-muted-foreground font-medium">{L.enabled}</th>
-                    <th className="text-center py-2 px-3 text-muted-foreground font-medium">{L.actions}</th>
+                    <th scope="col" className="text-left py-2 px-3 text-muted-foreground font-medium">{L.model}</th>
+                    <th scope="col" className="text-right py-2 px-3 text-muted-foreground font-medium">{L.multiplier}</th>
+                    <th scope="col" className="text-right py-2 px-3 text-muted-foreground font-medium">{L.effectiveInput}</th>
+                    <th scope="col" className="text-right py-2 px-3 text-muted-foreground font-medium">{L.effectiveOutput}</th>
+                    <th scope="col" className="text-left py-2 px-3 text-muted-foreground font-medium hidden md:table-cell">{L.description}</th>
+                    <th scope="col" className="text-center py-2 px-3 text-muted-foreground font-medium">{L.enabled}</th>
+                    <th scope="col" className="text-center py-2 px-3 text-muted-foreground font-medium">{L.actions}</th>
                   </tr>
                 </thead>
                 <tbody>

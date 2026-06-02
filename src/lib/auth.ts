@@ -26,6 +26,7 @@ export interface JWTPayload {
   email: string;
   role: 'user' | 'admin';
   exp: number;
+  tv?: number; // token version — incremented on password change
 }
 
 export function signToken(payload: Omit<JWTPayload, 'exp'>): string {
@@ -35,6 +36,12 @@ export function signToken(payload: Omit<JWTPayload, 'exp'>): string {
   const body = base64url(JSON.stringify({ ...payload, exp: now + JWT_EXPIRY }));
   const signature = createHmac('sha256', JWT_SECRET).update(`${header}.${body}`).digest('base64url');
   return `${header}.${body}.${signature}`;
+}
+
+export function isTokenVersionValid(payload: JWTPayload, currentVersion: number): boolean {
+  // If token has no version field (old tokens), allow it (backwards compatible)
+  if (payload.tv === undefined) return true;
+  return payload.tv >= currentVersion;
 }
 
 export function verifyToken(token: string): JWTPayload | null {

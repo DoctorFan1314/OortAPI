@@ -23,6 +23,12 @@ function getDb(): Database.Database {
   _db.exec(schema);
 
   // Run migrations AFTER schema so tables exist for ALTER TABLE
+  _db.exec(`CREATE TABLE IF NOT EXISTS schema_version (
+    version INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
+    applied_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`);
+
   const migrations = [
     'ALTER TABLE usage_logs ADD COLUMN tokens_in_cache INTEGER DEFAULT 0',
     'ALTER TABLE usage_logs ADD COLUMN tokens_cache_creation INTEGER DEFAULT 0',
@@ -81,15 +87,36 @@ function getDb(): Database.Database {
     // TTFT and ITL columns (Feature 7)
     'ALTER TABLE usage_logs ADD COLUMN ttft_ms INTEGER DEFAULT 0',
     'ALTER TABLE usage_logs ADD COLUMN itl_ms REAL DEFAULT 0',
+    // model_rates updated_at
+    'ALTER TABLE model_rates ADD COLUMN updated_at DATETIME DEFAULT CURRENT_TIMESTAMP',
+    // audit_log indexes
+    'CREATE INDEX IF NOT EXISTS idx_audit_log_action ON audit_log(action)',
+    'CREATE INDEX IF NOT EXISTS idx_audit_log_target ON audit_log(target_type)',
+    // token version for JWT invalidation on password change
+    'ALTER TABLE users ADD COLUMN token_version INTEGER DEFAULT 0',
+    // Note: usage_logs.channel_id FK not added via ALTER because SQLite doesn't support
+    // adding FK constraints to existing tables. The constraint exists in schema.sql for new DBs.
   ];
-  for (const sql of migrations) {
+  // Check which migrations have already been applied
+  const applied = new Set<number>();
+  try {
+    const rows = _db.prepare('SELECT version FROM schema_version').all() as { version: number }[];
+    for (const row of rows) applied.add(row.version);
+  } catch { /* table just created */ }
+
+  for (let i = 0; i < migrations.length; i++) {
+    if (applied.has(i + 1)) continue; // already applied
     try {
-      _db.exec(sql);
+      _db.exec(migrations[i]);
+      _db.prepare('INSERT OR IGNORE INTO schema_version (version, name) VALUES (?, ?)').run(i + 1, migrations[i].slice(0, 80));
     } catch (e: unknown) {
       // Only ignore "duplicate column" errors; re-throw anything else
       const msg = e instanceof Error ? e.message : String(e);
       if (!msg.includes('duplicate column') && !msg.includes('already exists')) {
-        console.error(`Migration failed: ${sql}`, e);
+        console.error(`Migration ${i + 1} failed: ${migrations[i]}`, e);
+      } else {
+        // Column/table already exists — mark as applied
+        _db.prepare('INSERT OR IGNORE INTO schema_version (version, name) VALUES (?, ?)').run(i + 1, migrations[i].slice(0, 80));
       }
     }
   }
@@ -160,6 +187,10 @@ function getDb(): Database.Database {
     console.error('Plan seed error:', e);
   }
 
+  // Start background auto-renewal cron (every hour)
+  // Dynamic import to avoid circular dependency with billing-engine
+  import('./billing-engine').then(m => m.startAutoRenewalCron()).catch(() => {});
+
   return _db;
 }
 
@@ -190,6 +221,7 @@ export interface DBUser {
   bio: string | null;
   preferences: string;
   enabled: number;
+  token_version: number;
   created_at: string;
   updated_at: string;
 }

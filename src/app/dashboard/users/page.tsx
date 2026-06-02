@@ -302,22 +302,37 @@ export default function UsersPage() {
         });
         const data = await res.json();
         if (res.ok) {
-          showToast(`${data.updated || ids.length} users granted $${amt}`, "success");
+          showToast(L.batchGrantSuccess.replace("{count}", String(data.updated || ids.length)).replace("{amount}", String(amt)), "success");
         } else {
           showToast(data.error || L.operationFailed, "error");
         }
       } else {
-        const res = await fetch("/api/dashboard/users", {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ ids, enabled: action === "enable" }),
-        });
-        if (res.ok) {
-          showToast(`${ids.length} users ${action === "enable" ? "enabled" : "disabled"}`, "success");
-        } else {
-          const data = await res.json().catch(() => ({}));
-          showToast(data.error || L.operationFailed, "error");
+        const nextEnabled = action === "enable";
+        const optimisticData = usersData ? {
+          ...usersData,
+          users: usersData.users.map(u => ids.includes(u.id) ? { ...u, enabled: nextEnabled ? 1 : 0 } : u),
+        } : undefined;
+        try {
+          await mutate(
+            async () => {
+              const res = await fetch("/api/dashboard/users", {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ ids, enabled: nextEnabled }),
+              });
+              if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                throw new Error(data.error || L.operationFailed);
+              }
+              const refetch = await fetch(usersKey, { credentials: "include" });
+              return refetch.json();
+            },
+            { optimisticData, rollbackOnError: true, revalidate: false },
+          );
+          showToast((nextEnabled ? L.batchUsersEnabled : L.batchUsersDisabled).replace("{count}", String(ids.length)), "success");
+        } catch (e) {
+          showToast(e instanceof Error ? e.message : L.operationFailed, "error");
         }
       }
     } catch { showToast(L.networkError, "error"); }
@@ -416,17 +431,17 @@ export default function UsersPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border/50">
-                    <th className="text-left py-3 px-2 w-10">
+                    <th scope="col" className="text-left py-3 px-2 w-10">
                       <input type="checkbox" checked={users.length > 0 && selectedIds.size === users.filter(u => u.id !== currentUser?.id).length} onChange={toggleSelectAll} className="rounded border-input" />
                     </th>
-                    <th className="text-left py-3 px-4 text-muted-foreground font-medium">{L.email}</th>
-                    <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden md:table-cell">{L.username}</th>
-                    <th className="text-center py-3 px-4 text-muted-foreground font-medium">{L.role}</th>
-                    <th className="text-center py-3 px-4 text-muted-foreground font-medium hidden lg:table-cell">{lang === "zh" ? "订阅" : "Plan"}</th>
-                    <th className="text-right py-3 px-4 text-muted-foreground font-medium">{L.balance}</th>
-                    <th className="text-center py-3 px-4 text-muted-foreground font-medium">{L.status}</th>
-                    <th className="text-right py-3 px-4 text-muted-foreground font-medium hidden lg:table-cell">{L.registered}</th>
-                    <th className="text-right py-3 px-4 text-muted-foreground font-medium">{L.actions}</th>
+                    <th scope="col" className="text-left py-3 px-4 text-muted-foreground font-medium">{L.email}</th>
+                    <th scope="col" className="text-left py-3 px-4 text-muted-foreground font-medium hidden md:table-cell">{L.username}</th>
+                    <th scope="col" className="text-center py-3 px-4 text-muted-foreground font-medium">{L.role}</th>
+                    <th scope="col" className="text-center py-3 px-4 text-muted-foreground font-medium hidden lg:table-cell">{lang === "zh" ? "订阅" : "Plan"}</th>
+                    <th scope="col" className="text-right py-3 px-4 text-muted-foreground font-medium">{L.balance}</th>
+                    <th scope="col" className="text-center py-3 px-4 text-muted-foreground font-medium">{L.status}</th>
+                    <th scope="col" className="text-right py-3 px-4 text-muted-foreground font-medium hidden lg:table-cell">{L.registered}</th>
+                    <th scope="col" className="text-right py-3 px-4 text-muted-foreground font-medium">{L.actions}</th>
                   </tr>
                 </thead>
                 <tbody>

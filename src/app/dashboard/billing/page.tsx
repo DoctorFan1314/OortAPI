@@ -16,6 +16,7 @@ import useSWR from "swr";
 import dynamic from "next/dynamic";
 import { useTheme } from "@/contexts/theme-context";
 import { DeltaBadge } from "@/components/shared/delta-badge";
+import { ChartErrorBoundary } from "@/components/shared/chart-error-boundary";
 import { dashboardSWRConfig } from "@/lib/swr-fetcher";
 
 const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false });
@@ -269,7 +270,9 @@ export default function BillingPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
-            <ReactECharts option={trendChartOption} style={{ height: 220 }} opts={{ renderer: "svg" }} />
+            <ChartErrorBoundary title={lang === "zh" ? "消费趋势" : "Spending Trend"}>
+              <ReactECharts option={trendChartOption} style={{ width: "100%" }} className="min-h-[180px] md:min-h-[220px]" opts={{ renderer: "svg" }} />
+            </ChartErrorBoundary>
           </CardContent>
         </Card>
       )}

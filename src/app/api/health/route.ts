@@ -22,7 +22,7 @@ export async function GET() {
     return NextResponse.json({
       status: 'healthy',
       timestamp: new Date().toISOString(),
-      version: process.env.npm_package_version || '3.3.3',
+      version: process.env.npm_package_version || '3.3.5',
       checks: {
         database: { status: 'ok', latency_ms: dbLatency },
         channels: { status: channels.count > 0 ? 'ok' : 'degraded', count: channels.count },

@@ -1028,6 +1028,12 @@ export const en: Dictionary = {
     batchGrant: "Batch Grant Balance",
     grantAmount: "Grant Amount ($)",
     grantConfirm: "Grant balance to selected users?",
+    batchGrantSuccess: "{count} users granted ${amount}",
+    batchUsersEnabled: "{count} users enabled",
+    batchUsersDisabled: "{count} users disabled",
+    batchCodesDeleted: "{count} codes deleted",
+    batchCodesEnabled: "{count} codes enabled",
+    batchCodesDisabled: "{count} codes disabled",
     // Redeem page
     generate: "Generate Codes",
     count: "Count",

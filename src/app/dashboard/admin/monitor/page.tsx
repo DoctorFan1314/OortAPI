@@ -21,6 +21,7 @@ import useSWR from "swr";
 import { dashboardSWRConfig } from "@/lib/swr-fetcher";
 import dynamic from "next/dynamic";
 import { useMemo, useState, useEffect } from "react";
+import { ChartErrorBoundary } from "@/components/shared/chart-error-boundary";
 
 const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false });
 
@@ -369,7 +370,9 @@ export default function MonitorPage() {
             </div>
           </CardHeader>
           <CardContent className="pt-0">
-            <ReactECharts option={chartOption} style={{ height: 200 }} opts={{ renderer: "svg" }} />
+            <ChartErrorBoundary title={t.trend}>
+              <ReactECharts option={chartOption} style={{ width: "100%" }} className="min-h-[160px] md:min-h-[200px]" opts={{ renderer: "svg" }} />
+            </ChartErrorBoundary>
           </CardContent>
         </Card>
       )}

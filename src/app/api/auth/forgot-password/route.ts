@@ -2,11 +2,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import { randomBytes } from 'crypto';
 import db from '@/lib/db';
 import type { DBUser } from '@/lib/db';
+import { checkIpRateLimit } from '@/lib/rate-limiter';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   try {
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || '127.0.0.1';
+    const rateLimitResult = checkIpRateLimit(`forgot-password:${ip}`, 3, 60_000);
+    if (!rateLimitResult.allowed) {
+      return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 });
+    }
+
     const { email } = await request.json();
 
     if (!email || typeof email !== 'string') {

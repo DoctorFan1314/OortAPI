@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
     }
 
-    const token = signToken({ userId: user.id, email: user.email, role: user.role });
+    const token = signToken({ userId: user.id, email: user.email, role: user.role, tv: user.token_version || 0 });
     const cookie = setTokenCookie(token);
 
     // Track session

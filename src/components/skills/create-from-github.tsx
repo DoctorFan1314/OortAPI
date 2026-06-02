@@ -135,7 +135,7 @@ export function CreateFromGithub({ open, onClose, onCreated }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent showCloseButton closeLabel={t.common.close} className="max-w-lg">
+      <DialogContent showCloseButton closeLabel={t.common.close} className="sm:max-w-lg">
         {/* Header */}
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">

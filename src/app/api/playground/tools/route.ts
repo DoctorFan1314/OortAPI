@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { validateUserFromCookie } from '@/lib/api-gateway';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = validateUserFromCookie(request.headers.get('cookie'));
+    if (!auth.valid || !auth.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { tool, args, config } = body as {
       tool: string;

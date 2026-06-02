@@ -9,6 +9,7 @@ import { useCurrency } from "@/contexts/currency-context";
 import { useTheme } from "@/contexts/theme-context";
 import { BarChart3, TrendingUp, PieChart as PieIcon } from "lucide-react";
 import { dashboardSWRConfig } from "@/lib/swr-fetcher";
+import { ChartErrorBoundary } from "@/components/shared/chart-error-boundary";
 
 const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false });
 
@@ -479,7 +480,9 @@ export function ModelAnalytics() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ReactECharts option={stackedAreaOption} style={{ height: 'auto' }} opts={{ renderer: "canvas" }} notMerge className="min-h-[250px] md:min-h-[350px] w-full" />
+            <ChartErrorBoundary title={lbl.modelConsumption}>
+              <ReactECharts option={stackedAreaOption} style={{ height: 'auto' }} opts={{ renderer: "canvas" }} notMerge className="min-h-[250px] md:min-h-[350px] w-full" />
+            </ChartErrorBoundary>
           </CardContent>
         </Card>
         <Card className="glass-card">
@@ -490,7 +493,9 @@ export function ModelAnalytics() {
           </CardHeader>
           <CardContent>
             {data?.model_distribution?.length ? (
-              <ReactECharts option={pieOption} style={{ height: 400 }} opts={{ renderer: "canvas" }} notMerge />
+              <ChartErrorBoundary title={lbl.callDistribution}>
+                <ReactECharts option={pieOption} style={{ width: "100%" }} className="min-h-[300px] md:min-h-[400px]" opts={{ renderer: "canvas" }} notMerge />
+              </ChartErrorBoundary>
             ) : (
               <div className="h-64 flex items-center justify-center text-muted-foreground text-sm">{lbl.noData}</div>
             )}
@@ -506,7 +511,9 @@ export function ModelAnalytics() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <ReactECharts option={trendOption} style={{ height: 300 }} opts={{ renderer: "canvas" }} notMerge />
+          <ChartErrorBoundary title={lbl.callTrend}>
+            <ReactECharts option={trendOption} style={{ width: "100%" }} className="min-h-[250px] md:min-h-[300px]" opts={{ renderer: "canvas" }} notMerge />
+          </ChartErrorBoundary>
         </CardContent>
       </Card>
 
@@ -519,7 +526,9 @@ export function ModelAnalytics() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ReactECharts option={costOption} style={{ height: 300 }} opts={{ renderer: "canvas" }} notMerge />
+            <ChartErrorBoundary title={t.dashboard.costTrend}>
+              <ReactECharts option={costOption} style={{ width: "100%" }} className="min-h-[250px] md:min-h-[300px]" opts={{ renderer: "canvas" }} notMerge />
+            </ChartErrorBoundary>
           </CardContent>
         </Card>
         <Card className="glass-card">

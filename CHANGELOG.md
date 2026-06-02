@@ -8,6 +8,50 @@ All notable changes to this project will be documented in this file.
 
 ## [v3.3.5.0] — 2026-06-02
 
+### Full-Site Audit Phase 3 (30 Improvements)
+
+#### Security & Architecture (10)
+- **C3: Timing-safe password comparison** — `delete-account` now uses `verifyPassword` instead of `!==`
+- **C8: Forgot-password rate limiting** — Added IP rate limit (3 req/min) to prevent abuse
+- **C6: Playground tools authentication** — `/api/playground/tools` now requires login (SSRF fix)
+- **C7: Request body size limit** — `/v1/chat/completions` rejects bodies >10MB
+- **C2: JWT invalidation on password change** — Added `token_version` to users; old tokens rejected after password change
+- **C5: Content-Security-Policy** — Added CSP header to `next.config.ts`
+- **D5: Health endpoint version** — Fixed hardcoded `'3.3.3'` fallback to `'3.3.5'`
+- **D6: Models endpoint caching** — `/v1/models` now returns `Cache-Control: s-maxage=60`
+- **D1: model_rates updated_at** — Added `updated_at` column via migration
+- **D3: Audit log indexes** — Added indexes on `action` and `target_type` columns
+
+#### Feature Enhancements (5)
+- **B4: Chart ErrorBoundary** — Created `ChartErrorBoundary` component wrapping 13 ECharts instances across 9 files
+- **F2: Batch toast i18n** — Hardcoded English batch operation toasts replaced with dictionary keys
+- **F4: Sidebar auto-close** — Mobile sidebar now closes when a nav link is clicked
+- **F5: Table th scope** — Added `scope="col"` to all `<th>` elements in users/redeem/multiplier tables
+- **B5: Optimistic updates** — Toggle operations in users/redeem/multiplier/models now update UI instantly with SWR rollback
+
+#### Architecture & UX (5)
+- **D2: usage_logs FK** — Added `channel_id` foreign key constraint in schema.sql
+- **D4: Migration version tracking** — Added `schema_version` table to track applied migrations
+- **F1: Mobile dialog fullscreen** — 8 dialog components now use `sm:` prefix for proper mobile sizing
+- **F3: Responsive chart heights** — 12 ECharts instances switched from fixed px to responsive `min-h-[Xpx] md:min-h-[Npx]`
+
+#### Architecture & Docs (5)
+- **B7: Auto-renewal cron** — Subscription auto-renewal now runs hourly via background interval
+- **B8: Webhook retry** — Webhook delivery now retries 3 times with exponential backoff (2s/4s/8s)
+- **E4: JSON-LD structured data** — Added WebSite + BreadcrumbList JSON-LD to docs landing page
+- **E5: Per-page canonical URLs** — All 17 docs pages now have `alternates.canonical` in metadata
+
+#### Documentation (3)
+- **E2: Playground docs** — New `/docs/playground` page explaining the interactive API testing tool
+- **E3: Webhook docs** — New `/docs/webhooks` page covering events, payloads, signature verification, retry policy
+- **E1: SDK examples** — Added Go, Java, PHP examples to SDK docs page
+
+#### API Surface (2)
+- **B10: OpenAPI spec** — Added 23 endpoints + 6 schemas, version updated to 3.3.5
+- **B5: Optimistic updates** — Toggle operations use SWR `optimisticData` with `rollbackOnError`
+
+---
+
 ### Full-Site Audit Phase 2 (30 Improvements)
 
 #### P0 — Bug & Security Fixes

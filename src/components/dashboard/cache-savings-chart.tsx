@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Coins } from "lucide-react";
+import { ChartErrorBoundary } from "@/components/shared/chart-error-boundary";
 
 const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false });
 
@@ -77,7 +78,9 @@ export function CacheSavingsChart(props: CacheSavingsProps) {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <ReactECharts option={donutOption} style={{ height: 180 }} opts={{ renderer: "canvas" }} notMerge />
+        <ChartErrorBoundary title={lang === "zh" ? "缓存 ROI" : "Cache ROI"}>
+          <ReactECharts option={donutOption} style={{ width: "100%" }} className="min-h-[150px] md:min-h-[180px]" opts={{ renderer: "canvas" }} notMerge />
+        </ChartErrorBoundary>
         <div className="mt-2 space-y-2 text-xs">
           <div className="flex items-center justify-between bg-emerald-500/5 rounded-lg px-3 py-2">
             <span className="text-muted-foreground">{lang === "zh" ? "节省 Tokens" : "Tokens Saved"}</span>

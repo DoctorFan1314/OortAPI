@@ -1028,6 +1028,12 @@ export const zh: Dictionary = {
     batchGrant: "批量发放余额",
     grantAmount: "发放金额 ($)",
     grantConfirm: "确认为选中用户发放余额？",
+    batchGrantSuccess: "已为 {count} 位用户发放 ${amount}",
+    batchUsersEnabled: "已启用 {count} 位用户",
+    batchUsersDisabled: "已禁用 {count} 位用户",
+    batchCodesDeleted: "已删除 {count} 个兑换码",
+    batchCodesEnabled: "已启用 {count} 个兑换码",
+    batchCodesDisabled: "已禁用 {count} 个兑换码",
     // Redeem page
     generate: "生成兑换码",
     count: "数量",

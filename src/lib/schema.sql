@@ -64,7 +64,8 @@ CREATE TABLE IF NOT EXISTS model_rates (
   cache_creation_rate REAL DEFAULT 0,
   credit_rate REAL NOT NULL DEFAULT 1.0,
   enabled INTEGER DEFAULT 1,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Usage logs table
@@ -86,7 +87,8 @@ CREATE TABLE IF NOT EXISTS usage_logs (
   error_message TEXT,
   cached INTEGER DEFAULT 0,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (channel_id) REFERENCES channels(id) ON DELETE SET NULL
 );
 
 -- Billing records table

@@ -118,6 +118,10 @@ export function DashboardSidebar() {
   const isActive = (href: string) =>
     pathname === href || (href !== "/dashboard" && pathname.startsWith(href + "/"));
 
+  const closeMobileNav = () => {
+    if (window.innerWidth < 1024) setCollapsed(true);
+  };
+
   // Only show admin group items the user has access to
   const isAdmin = user?.role === "admin";
 
@@ -159,6 +163,7 @@ export function DashboardSidebar() {
                   <Link
                     key={item.href}
                     href={item.href}
+                    onClick={closeMobileNav}
                     aria-current={isActive(item.href) ? "page" : undefined}
                     className={cn(
                       "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors border-l-2",
@@ -188,6 +193,7 @@ export function DashboardSidebar() {
         <div className="border-t border-border pt-3 mt-3">
           <Link
             href={SETTINGS_ITEM.href}
+            onClick={closeMobileNav}
             aria-current={isActive(SETTINGS_ITEM.href) ? "page" : undefined}
             className={cn(
               "flex items-center gap-3 px-3 py-2 rounded-md text-base font-medium transition-colors border-l-2",

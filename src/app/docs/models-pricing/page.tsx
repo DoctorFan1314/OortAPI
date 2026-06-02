@@ -4,6 +4,9 @@ import { ModelsPricingContent } from "./client";
 export const metadata: Metadata = {
   title: "Models & Pricing — OortAPI Docs",
   description: "Browse available AI models and pricing. Token-based billing with cache-aware rates across OpenAI, Anthropic, Google, and more.",
+  alternates: {
+    canonical: "/docs/models-pricing",
+  },
 };
 
 export default function ModelsPricingPage() {

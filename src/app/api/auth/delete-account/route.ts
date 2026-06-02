@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
-import { hashPassword } from '@/lib/auth';
+import { verifyPassword } from '@/lib/auth';
 import { validateUserFromCookie } from '@/lib/api-gateway';
 
 export const dynamic = 'force-dynamic';
@@ -23,8 +23,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    const passwordHash = hashPassword(password, user.salt);
-    if (passwordHash !== user.password_hash) {
+    if (!verifyPassword(password, user.password_hash, user.salt)) {
       return NextResponse.json({ error: '密码错误' }, { status: 403 });
     }
 

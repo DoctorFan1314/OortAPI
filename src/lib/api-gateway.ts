@@ -1,7 +1,7 @@
 import db from './db';
 import type { DBApiKey, DBUser } from './db';
 import { createHmac } from 'crypto';
-import { verifyToken, getTokenFromCookie, decrypt, hashApiKey } from './auth';
+import { verifyToken, isTokenVersionValid, getTokenFromCookie, decrypt, hashApiKey } from './auth';
 import { checkRateLimit, type RateLimitResult } from './rate-limiter';
 import { deductBalance, deductCreditsOrBalance, calculateCost, logUsage, getEffectiveMultiplier, getActiveSubscription, dispatchWebhook } from './billing-engine';
 import { selectChannel, reportChannelFailure, reportChannelSuccess } from './channel-manager';
@@ -113,6 +113,11 @@ export function validateUserFromCookie(cookieHeader: string | null): { valid: bo
 
   const user = db.prepare('SELECT * FROM users WHERE id = ? AND enabled = 1').get(payload.userId) as DBUser | undefined;
   if (!user) return { valid: false, error: 'User not found or account disabled' };
+
+  // Check token version — if password was changed after this token was issued, reject it
+  if (!isTokenVersionValid(payload, user.token_version || 0)) {
+    return { valid: false, error: 'Token invalidated — please log in again' };
+  }
 
   return { valid: true, user };
 }

@@ -38,7 +38,7 @@ export function ReportModal({ open, onClose, onSubmit }: ReportModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent showCloseButton closeLabel={t.common.close} className="max-w-md">
+      <DialogContent showCloseButton closeLabel={t.common.close} className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{t.common.report}</DialogTitle>
         </DialogHeader>

@@ -1,7 +1,49 @@
 {
   "permissions": {
     "allow": [
-      "mcp__fetch__fetch"
+      "mcp__fetch__fetch",
+      "Bash(npm run *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(git commit *)",
+      "Bash(mkdir -p \"src/app/resources/mcp/[id]\")",
+      "Bash(netstat -ano)",
+      "Bash(PORT=3001 npm run dev)",
+      "Bash(net stop *)",
+      "Bash(net start *)",
+      "Bash(node -e \"const crypto = require\\('crypto'\\); const k = 'sk-oort-5b6cfe0b1a449f5cb272a8a474e06ad8cf73b30cf9b69d3814940511ca269347'; console.log\\(crypto.createHmac\\('sha256', 'oortapi-default-encryption-key-32b!'\\).update\\(k\\).digest\\('hex'\\).length + ' chars hash: ' + crypto.createHmac\\('sha256', 'oortapi-default-encryption-key-32b!'\\).update\\(k\\).digest\\('hex'\\)\\);\")",
+      "Bash(node -e ' *)",
+      "Bash(node -e \"const db = require\\('better-sqlite3'\\)\\('data/oortapi.db'\\); db.prepare\\('DELETE FROM api_keys WHERE id = 28'\\).run\\(\\); const r = db.prepare\\('SELECT id, key_value FROM api_keys ORDER BY id DESC LIMIT 5'\\).all\\(\\); r.forEach\\(x => console.log\\('id:', x.id, '|', \\(x.key_value||''\\).slice\\(0,20\\)\\)\\);\")",
+      "Bash(node -e \"const crypto = require\\('crypto'\\); for\\(let i=0;i<5;i++\\){ const k='sk-oort-'+crypto.randomBytes\\(24\\).toString\\('hex'\\); console.log\\(k.length, k\\); }\")",
+      "Bash(curl -s http://localhost:3000/api/v1/chat/completions -H \"Authorization: Bearer sk-oort-50cc6a7081287d4ee3d22cb6ea47ce4331bfb4cfaf1ccf1c\" -H \"Content-Type: application/json\" -d '{\"model\":\"qwen3.5-9b-mtp\",\"messages\":[{\"role\":\"user\",\"content\":\"hi\"}]}')",
+      "Bash(curl -s http://localhost:3000/api/v1/models -H \"Authorization: Bearer sk-oort-50cc6a7081287d4ee3d22cb6ea47ce4331bfb4cfaf1ccf1c\")",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('Models count:', len\\(d.get\\('data',[]\\)\\)\\); print\\('First model:', d.get\\('data',[{}]\\)[0].get\\('id','N/A'\\)\\)\")",
+      "Bash(curl -s http://localhost:3000/api/v1/chat/completions -H \"Authorization: Bearer sk-oort-dc2172d47ce0e253d3dc76a6460632df70a982b9fd0aae9b\" -H \"Content-Type: application/json\" -d '{\"model\":\"qwen3.5-9b-mtp\",\"messages\":[{\"role\":\"user\",\"content\":\"hi\"}]}')",
+      "Bash(curl -s http://localhost:3000/api/v1/chat/completions -H \"Authorization: Bearer sk-oort-dc2172d47ce0e253d3dc76a6460632df70a982b9fd0aae9b\" -H \"Content-Type: application/json\" -d '{\"model\":\"qwen3.5-9b-awq-int8-int4\",\"messages\":[{\"role\":\"user\",\"content\":\"hi\"}]}')",
+      "Bash(curl -s --connect-timeout 3 http://192.168.31.125:5677/v1/models)",
+      "Bash(curl -s --connect-timeout 3 http://192.168.31.125:5677/v1/chat/completions -H \"Content-Type: application/json\" -d '{\"model\":\"qwen3.5-9b-mtp\",\"messages\":[{\"role\":\"user\",\"content\":\"hi\"}],\"stream\":false}')",
+      "Bash(node -e \"const db = require\\('better-sqlite3'\\)\\('data/oortapi.db'\\); const r = db.prepare\\('DELETE FROM api_keys'\\).run\\(\\); console.log\\('Deleted', r.changes, 'keys'\\);\")",
+      "Bash(grep -v \"//\")",
+      "WebSearch",
+      "Bash(git remote *)",
+      "Bash(git reset *)",
+      "Bash(awk -F: '{print $2}')",
+      "Bash(awk '/^  dashboard:/{found=1} found{print NR\": \"$0} /^  };/{if\\(found\\) found=0}' src/lib/i18n/en.ts)",
+      "Bash(awk '/^  dashboard:/{found=1} found && /^  \\\\};/{found=0} found{print}' src/lib/i18n/en.ts)",
+      "Bash(awk '/^  dashboard:/{found=1} found && /^  \\\\};/{found=0} found' src/lib/i18n/en.ts)",
+      "Bash(awk '/^  dashboard:/{found=1} found && /^  \\\\};/{found=0} found{print NR\": \"$0}' src/lib/i18n/en.ts)",
+      "Bash(awk 'BEGIN{count=0} /^  dashboard:/{found=1; count++} found && /^  \\\\};/{found=0} found && count>0{print NR\": \"$0}' src/lib/i18n/en.ts)",
+      "Bash(grep -n '    __TRACKED_VAR__:' src/lib/i18n/en.ts)",
+      "Bash(awk '/^  dashboard:/{found=1} found && /^  \\\\};/{found=0} found && /timezone:/' src/lib/i18n/en.ts)",
+      "Bash(awk '/^  dashboard:/{found=1} found && /^  \\\\};/{found=0} found' src/lib/i18n/types.ts)",
+      "Bash(grep -n '    __TRACKED_VAR__:' src/lib/i18n/types.ts)",
+      "Bash(awk 'NR>=837 && /^  \\\\};/{print NR; exit}' src/lib/i18n/zh.ts)",
+      "Bash(npx next *)"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\zhang\\Desktop\\test\\oortapi\\src\\app\\resources\\mcp",
+      "C:\\Users\\zhang\\.claude\\plans"
     ]
   }
 }

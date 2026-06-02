@@ -8,6 +8,50 @@
 
 ## [v3.3.5.0] — 2026-06-02
 
+### 全站审计第三批（30 项改进）
+
+#### 安全与架构（10）
+- **C3: 恒定时间密码比较** — `delete-account` 改用 `verifyPassword` 替代 `!==`
+- **C8: 忘记密码速率限制** — 添加 IP 限速（3 次/分钟）防止滥用
+- **C6: Playground 工具认证** — `/api/playground/tools` 现在需要登录（SSRF 修复）
+- **C7: 请求体大小限制** — `/v1/chat/completions` 拒绝 >10MB 的请求体
+- **C2: 密码变更后 JWT 失效** — 用户表添加 `token_version`，密码变更后旧 token 被拒绝
+- **C5: Content-Security-Policy** — `next.config.ts` 添加 CSP 头
+- **D5: 健康端点版本** — 修复硬编码 `'3.3.3'` 回退值为 `'3.3.5'`
+- **D6: Models 端点缓存** — `/v1/models` 返回 `Cache-Control: s-maxage=60`
+- **D1: model_rates updated_at** — 迁移添加 `updated_at` 列
+- **D3: 审计日志索引** — `action` 和 `target_type` 列添加索引
+
+#### 功能提升（5）
+- **B4: 图表 ErrorBoundary** — 创建 `ChartErrorBoundary` 组件，包裹 9 个文件中 13 个 ECharts 实例
+- **F2: 批量操作 Toast i18n** — 硬编码英文批量操作 toast 替换为字典 key
+- **F4: 侧边栏自动关闭** — 移动端侧边栏点击导航链接后自动关闭
+- **F5: 表格 th scope** — users/redeem/multiplier 表格所有 `<th>` 添加 `scope="col"`
+- **B5: 乐观更新** — users/redeem/multiplier/models 的 toggle 操作即时更新 UI，SWR 自动回滚
+
+#### 架构与 UX（5）
+- **D2: usage_logs 外键** — schema.sql 添加 `channel_id` 外键约束
+- **D4: 迁移版本追踪** — 添加 `schema_version` 表追踪已执行的迁移
+- **F1: 移动端 Dialog 全屏** — 8 个 dialog 组件添加 `sm:` 前缀适配小屏幕
+- **F3: 响应式图表高度** — 12 个 ECharts 实例从固定 px 改为响应式 `min-h-[Xpx] md:min-h-[Npx]`
+
+#### 架构与文档（5）
+- **B7: 自动续费 cron** — 订阅自动续费现在每小时通过后台定时器运行
+- **B8: Webhook 重试** — Webhook 投递现在重试 3 次，指数退避（2s/4s/8s）
+- **E4: JSON-LD 结构化数据** — 文档首页添加 WebSite + BreadcrumbList JSON-LD
+- **E5: 每页 canonical URL** — 17 个文档页面 metadata 添加 `alternates.canonical`
+
+#### 文档（3）
+- **E2: Playground 文档** — 新增 `/docs/playground` 页面，介绍交互式 API 测试工具
+- **E3: Webhook 文档** — 新增 `/docs/webhooks` 页面，涵盖事件、载荷、签名验证、重试策略
+- **E1: SDK 示例** — SDK 文档页面添加 Go、Java、PHP 示例
+
+#### API 接口（2）
+- **B10: OpenAPI 规范** — 添加 23 个端点 + 6 个 Schema，版本更新为 3.3.5
+- **B5: 乐观更新** — Toggle 操作使用 SWR `optimisticData` + `rollbackOnError`
+
+---
+
 ### 全站审计第二批（30 项改进）
 
 #### P0 — Bug 与安全修复

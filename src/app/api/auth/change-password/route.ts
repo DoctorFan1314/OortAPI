@@ -31,7 +31,8 @@ export async function POST(request: NextRequest) {
 
     const salt = generateSalt();
     const passwordHash = hashPassword(newPassword, salt);
-    db.prepare('UPDATE users SET password_hash = ?, salt = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(passwordHash, salt, user.id);
+    // Increment token_version to invalidate all existing JWTs
+    db.prepare('UPDATE users SET password_hash = ?, salt = ?, token_version = COALESCE(token_version, 0) + 1, updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(passwordHash, salt, user.id);
 
     return NextResponse.json({ success: true });
   } catch (error) {

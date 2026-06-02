@@ -554,6 +554,12 @@ export interface Dictionary {
     batchGrant: string;
     grantAmount: string;
     grantConfirm: string;
+    batchGrantSuccess: string;
+    batchUsersEnabled: string;
+    batchUsersDisabled: string;
+    batchCodesDeleted: string;
+    batchCodesEnabled: string;
+    batchCodesDisabled: string;
     // Redeem page
     generate: string;
     count: string;

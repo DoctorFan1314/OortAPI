@@ -4,6 +4,9 @@ import { ChangelogContent } from "./client";
 export const metadata: Metadata = {
   title: "Changelog — OortAPI Docs",
   description: "All notable changes to the OortAPI API, including new features, bug fixes, and improvements.",
+  alternates: {
+    canonical: "/docs/changelog",
+  },
 };
 
 export default function ChangelogPage() {

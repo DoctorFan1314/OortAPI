@@ -8,6 +8,14 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   try {
+    const contentLength = request.headers.get('content-length');
+    if (contentLength && parseInt(contentLength, 10) > 10 * 1024 * 1024) {
+      return NextResponse.json(
+        { error: { message: 'Request body too large (max 10MB)', type: 'invalid_request_error' } },
+        { status: 413 }
+      );
+    }
+
     const authHeader = request.headers.get('authorization');
     const body = await request.json();
 

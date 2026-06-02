@@ -13,6 +13,7 @@ import { useParams } from "next/navigation";
 import { Activity, Coins, DollarSign, Key, Shield, TrendingUp, User, Clock, ArrowLeft, Pencil } from "lucide-react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
+import { ChartErrorBoundary } from "@/components/shared/chart-error-boundary";
 
 const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false });
 
@@ -293,7 +294,9 @@ export default function UserDetailPage() {
           </CardHeader>
           <CardContent>
             {trendChartOption ? (
-              <ReactECharts option={trendChartOption} style={{ height: 200 }} opts={{ renderer: "svg" }} />
+              <ChartErrorBoundary title={t.trend7d}>
+                <ReactECharts option={trendChartOption} style={{ width: "100%" }} className="min-h-[160px] md:min-h-[200px]" opts={{ renderer: "svg" }} />
+              </ChartErrorBoundary>
             ) : (
               <p className="text-sm text-muted-foreground">-</p>
             )}

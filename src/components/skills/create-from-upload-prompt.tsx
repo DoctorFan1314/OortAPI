@@ -108,7 +108,7 @@ export function CreateFromUploadPrompt({ open, onClose, onCreated }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent showCloseButton closeLabel={t.common.close} className="max-w-2xl max-h-[85vh] flex flex-col">
+      <DialogContent showCloseButton closeLabel={t.common.close} className="sm:max-w-2xl max-h-[85vh] flex flex-col">
         {/* Header */}
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">

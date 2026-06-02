@@ -388,12 +388,12 @@ export function dispatchWebhook(event: string, payload: Record<string, unknown>)
     ).all(`%${event}%`) as { id: number; url: string; secret: string }[];
 
     for (const hook of hooks) {
-      // Fire-and-forget — don't await
       const body = JSON.stringify({ event, timestamp: new Date().toISOString(), payload });
       const { createHmac } = require('crypto');
       const signature = createHmac('sha256', hook.secret).update(body).digest('hex');
 
-      fetch(hook.url, {
+      // Retry with exponential backoff (3 attempts)
+      deliverWithRetry(hook.id, hook.url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -402,9 +402,31 @@ export function dispatchWebhook(event: string, payload: Record<string, unknown>)
         },
         body,
         signal: AbortSignal.timeout(10_000),
-      }).catch(() => { /* silently ignore delivery failures */ });
+      }, 3);
     }
   } catch { /* ignore */ }
+}
+
+async function deliverWithRetry(webhookId: number, url: string, init: RequestInit, maxRetries: number, attempt = 1): Promise<void> {
+  try {
+    const res = await fetch(url, init);
+    // Update last_triggered_at and last_status_code
+    try {
+      db.prepare('UPDATE webhooks SET last_triggered_at = CURRENT_TIMESTAMP, last_status_code = ? WHERE id = ?').run(res.status, webhookId);
+    } catch { /* ignore */ }
+    if (!res.ok && attempt < maxRetries) {
+      const delay = Math.pow(2, attempt) * 1000; // 2s, 4s, 8s
+      setTimeout(() => deliverWithRetry(webhookId, url, init, maxRetries, attempt + 1), delay);
+    }
+  } catch {
+    try {
+      db.prepare('UPDATE webhooks SET last_triggered_at = CURRENT_TIMESTAMP, last_status_code = 0 WHERE id = ?').run(webhookId);
+    } catch { /* ignore */ }
+    if (attempt < maxRetries) {
+      const delay = Math.pow(2, attempt) * 1000;
+      setTimeout(() => deliverWithRetry(webhookId, url, init, maxRetries, attempt + 1), delay);
+    }
+  }
 }
 
 // --- Subscription Expiry Check ---
@@ -433,4 +455,23 @@ export function checkExpiringSubscriptions() {
 
     return expiring.length;
   } catch { return 0; }
+}
+
+// --- Background Auto-Renewal ---
+// Runs every hour to process expired subscriptions with auto_renew=1
+let _autoRenewInterval: ReturnType<typeof setInterval> | null = null;
+
+export function startAutoRenewalCron() {
+  if (_autoRenewInterval) return;
+  _autoRenewInterval = setInterval(() => {
+    try {
+      const result = processAutoRenewals();
+      if (result.renewed > 0 || result.failed > 0) {
+        console.log(`[AutoRenew] Renewed: ${result.renewed}, Failed: ${result.failed}`);
+      }
+    } catch (e) {
+      console.error('[AutoRenew] Error:', e);
+    }
+  }, 60 * 60 * 1000); // every hour
+  _autoRenewInterval.unref(); // don't keep process alive
 }
