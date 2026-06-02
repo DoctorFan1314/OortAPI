@@ -182,21 +182,21 @@ export default function ModelDetailPage() {
         <Card className="glass-card">
           <CardContent className="p-3">
             <p className="text-[10px] text-muted-foreground">{t.inputRate}</p>
-            <p className="text-lg font-bold font-mono">{symbol}{(model.input_rate * exchangeRate).toFixed(4)}</p>
+            <p className="text-lg font-bold font-mono">{symbol}{(symbol === "¥" ? model.input_rate * exchangeRate : model.input_rate).toFixed(4)}</p>
             <p className="text-[10px] text-muted-foreground">{t.perMillion}</p>
           </CardContent>
         </Card>
         <Card className="glass-card">
           <CardContent className="p-3">
             <p className="text-[10px] text-muted-foreground">{t.outputRate}</p>
-            <p className="text-lg font-bold font-mono">{symbol}{(model.output_rate * exchangeRate).toFixed(4)}</p>
+            <p className="text-lg font-bold font-mono">{symbol}{(symbol === "¥" ? model.output_rate * exchangeRate : model.output_rate).toFixed(4)}</p>
             <p className="text-[10px] text-muted-foreground">{t.perMillion}</p>
           </CardContent>
         </Card>
         <Card className="glass-card">
           <CardContent className="p-3">
             <p className="text-[10px] text-muted-foreground">{t.cacheRead}</p>
-            <p className="text-lg font-bold font-mono">{symbol}{(model.cache_rate * exchangeRate).toFixed(4)}</p>
+            <p className="text-lg font-bold font-mono">{symbol}{(symbol === "¥" ? model.cache_rate * exchangeRate : model.cache_rate).toFixed(4)}</p>
             <p className="text-[10px] text-muted-foreground">{t.perMillion}</p>
           </CardContent>
         </Card>

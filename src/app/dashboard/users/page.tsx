@@ -526,7 +526,7 @@ export default function UsersPage() {
                 <div className="h-1.5 bg-muted rounded-full overflow-hidden mb-1">
                   <div className="h-full bg-amber-500 rounded-full" style={{ width: `${editUser.subscription.credits_total > 0 ? ((editUser.subscription.credits_total - editUser.subscription.credits_remaining) / editUser.subscription.credits_total) * 100 : 0}%` }} />
                 </div>
-                <p className="text-[10px] text-muted-foreground mb-2">{lang === "zh" ? "有效期至" : "Valid until"} {new Date(editUser.subscription.current_period_end).toLocaleDateString()}</p>
+                <p className="text-[10px] text-muted-foreground mb-2">{lang === "zh" ? "有效期至" : "Valid until"} {new Date(editUser.subscription.current_period_end + "Z").toLocaleDateString()}</p>
                 <div className="flex items-center gap-2">
                   <Input type="number" min="0" placeholder={lang === "zh" ? "添加额度" : "Add credits"} value={giftCredits} onChange={e => setGiftCredits(e.target.value)} className="h-8 text-xs bg-secondary border-border" />
                   <Button variant="outline" size="sm" className="h-8 text-xs shrink-0" onClick={handleAddCredits} disabled={subActionLoading || !giftCredits}>

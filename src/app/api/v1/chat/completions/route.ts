@@ -68,6 +68,7 @@ export async function POST(request: NextRequest) {
         userId: number;
         apiKeyId: number;
         model: string;
+        actualModel?: string;
         startTime: number;
       };
 
@@ -105,8 +106,9 @@ export async function POST(request: NextRequest) {
         const latencyMs = Date.now() - streamData.startTime;
         const ttftMs = firstChunkTime > 0 ? firstChunkTime - streamData.startTime : 0;
         const itlMs = chunkCount > 1 ? (Date.now() - firstChunkTime) / (chunkCount - 1) : 0;
-        const { multiplier } = getEffectiveMultiplier(streamData.model);
-        const baseCost = calculateCost(streamData.model, tokensIn, tokensOut, tokensInCache);
+        const billingModel = streamData.actualModel || streamData.model;
+        const { multiplier } = getEffectiveMultiplier(billingModel);
+        const baseCost = calculateCost(billingModel, tokensIn, tokensOut, tokensInCache);
         const cost = baseCost * multiplier;
 
         let deductResult: { success: boolean; source: string; creditsUsed?: number } | undefined;

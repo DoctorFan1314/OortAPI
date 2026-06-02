@@ -156,7 +156,7 @@ export function ModelAnalytics() {
 
   // Stable color map per model (resolve CSS vars client-side)
   const [chartColors, setChartColors] = useState(() => getChartColors());
-  useEffect(() => { setChartColors(getChartColors()); }, []);
+  useEffect(() => { setChartColors(getChartColors()); }, [resolvedTheme]);
   const colorMap = useMemo(() => {
     const map: Record<string, string> = {};
     models.forEach((m, i) => { map[m] = chartColors[i % chartColors.length]; });
@@ -300,7 +300,7 @@ export function ModelAnalytics() {
   const costOption = useMemo(() => {
     if (!data?.daily_trend?.length) return {};
     const dates = data.daily_trend.map(d => d.date);
-    const costData = data.daily_trend.map(d => +(d.cost * exchangeRate).toFixed(4));
+    const costData = data.daily_trend.map(d => +(symbol === "¥" ? d.cost * exchangeRate : d.cost).toFixed(4));
     const callsData = data.daily_trend.map(d => d.calls);
     return {
       backgroundColor: "transparent",

@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
     delete preferences.reset_token;
     delete preferences.reset_token_expires;
 
-    db.prepare('UPDATE users SET password_hash = ?, salt = ?, preferences = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
+    db.prepare('UPDATE users SET password_hash = ?, salt = ?, preferences = ?, token_version = COALESCE(token_version, 0) + 1, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
       .run(passwordHash, salt, JSON.stringify(preferences), user.id);
 
     return NextResponse.json({ success: true });

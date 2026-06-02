@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { validateUserFromCookie } from '@/lib/api-gateway';
-import { dispatchWebhook } from '@/lib/billing-engine';
+import { deductBalance, dispatchWebhook } from '@/lib/billing-engine';
 import type { DBUserSubscription, DBSubscriptionPlan } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
@@ -125,10 +125,65 @@ export async function PATCH(request: NextRequest) {
       const newPlan = db.prepare('SELECT * FROM subscription_plans WHERE id = ?').get(plan_id) as DBSubscriptionPlan | undefined;
       if (!newPlan) return NextResponse.json({ error: 'Plan not found' }, { status: 404 });
 
-      // Calculate prorated credits from remaining days
+      // Get exchange rate for CNY plan conversion
+      const exchangeRateSetting = db.prepare("SELECT value FROM system_settings WHERE key = 'exchange_rate'").get() as { value: string } | undefined;
+      const exchangeRate = parseFloat(exchangeRateSetting?.value || '7.3');
+
+      // Calculate prorated price difference
       const now = new Date();
       const periodEnd = new Date(sub.current_period_end);
       const periodStart = new Date(sub.current_period_start);
+      const totalMs = periodEnd.getTime() - periodStart.getTime();
+      const remainingMs = Math.max(0, periodEnd.getTime() - now.getTime());
+      const remainingRatio = totalMs > 0 ? remainingMs / totalMs : 0;
+
+      const currentPlan = db.prepare('SELECT * FROM subscription_plans WHERE id = ?').get(sub.plan_id) as DBSubscriptionPlan | undefined;
+      const currentPrice = sub.billing_cycle === 'yearly' ? (currentPlan?.yearly_price || 0) : (currentPlan?.monthly_price || 0);
+      const remainingValue = currentPrice * remainingRatio;
+
+      const newBasePrice = sub.billing_cycle === 'yearly' ? newPlan.yearly_price : newPlan.monthly_price;
+      const newValue = newBasePrice * remainingRatio;
+
+      const diff = newValue - remainingValue;
+      const diffInUSD = newPlan.currency === 'CNY' ? diff / exchangeRate : diff;
+
+      // For downgrades, check consumed credits
+      if (diffInUSD < 0) {
+        const consumedCredits = sub.credits_total - sub.credits_remaining;
+        if (consumedCredits > newPlan.monthly_credits) {
+          return NextResponse.json({
+            error: `Cannot downgrade: you have used ${consumedCredits.toLocaleString()} credits, which exceeds the ${newPlan.display_name} plan limit of ${newPlan.monthly_credits.toLocaleString()} credits.`,
+            consumed: consumedCredits,
+            limit: newPlan.monthly_credits,
+          }, { status: 409 });
+        }
+      }
+
+      // For upgrades, check balance and deduct
+      if (diffInUSD > 0) {
+        const userRow = db.prepare('SELECT balance FROM users WHERE id = ?').get(auth.user.id) as { balance: number };
+        if (userRow.balance < diffInUSD) {
+          return NextResponse.json({
+            error: 'Insufficient balance for upgrade',
+            required: Math.round(diffInUSD * 100) / 100,
+            available: userRow.balance,
+          }, { status: 402 });
+        }
+        const deductResult = deductBalance(auth.user.id, diffInUSD, `Subscription upgrade: ${newPlan.display_name}`);
+        if (!deductResult.success) {
+          return NextResponse.json({ error: deductResult.error || 'Payment failed' }, { status: 402 });
+        }
+      } else if (diffInUSD < 0) {
+        // Downgrade refund
+        const refundAmount = Math.abs(diffInUSD);
+        db.prepare('UPDATE users SET balance = balance + ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(refundAmount, auth.user.id);
+        const updatedUser = db.prepare('SELECT balance FROM users WHERE id = ?').get(auth.user.id) as { balance: number };
+        db.prepare('INSERT INTO billing_records (user_id, amount, type, description, balance_after) VALUES (?, ?, ?, ?, ?)').run(
+          auth.user.id, refundAmount, 'refund', `Subscription downgrade refund → ${newPlan.display_name}`, updatedUser.balance
+        );
+      }
+
+      // Calculate prorated credits from remaining days
       const totalDays = Math.max(1, (periodEnd.getTime() - periodStart.getTime()) / (1000 * 60 * 60 * 24));
       const remainingDays = Math.max(0, (periodEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
       const proratedCredits = Math.round((sub.credits_remaining / totalDays) * remainingDays);
@@ -145,9 +200,19 @@ export async function PATCH(request: NextRequest) {
         "INSERT INTO user_subscriptions (user_id, plan_id, billing_cycle, status, credits_remaining, credits_total, current_period_start, current_period_end, is_first_purchase, auto_renew) VALUES (?, ?, 'monthly', 'active', ?, ?, datetime('now'), ?, 0, ?)"
       ).run(auth.user.id, plan_id, newCredits, newPlan.monthly_credits, newPeriodEnd.toISOString(), sub.auto_renew);
 
+      dispatchWebhook('subscription.changed', {
+        user_id: auth.user.id,
+        plan_id,
+        action,
+        charged: diffInUSD > 0 ? Math.round(diffInUSD * 100) / 100 : 0,
+        refunded: diffInUSD < 0 ? Math.round(Math.abs(diffInUSD) * 100) / 100 : 0,
+      });
+
       return NextResponse.json({
         success: true,
         message: `Plan ${action === 'upgrade' ? 'upgraded' : 'downgraded'} successfully`,
+        charged: diffInUSD > 0 ? Math.round(diffInUSD * 100) / 100 : 0,
+        refunded: diffInUSD < 0 ? Math.round(Math.abs(diffInUSD) * 100) / 100 : 0,
         prorated_credits: proratedCredits,
         new_plan: newPlan.display_name,
       });

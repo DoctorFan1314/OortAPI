@@ -68,12 +68,12 @@ export function validateApiKey(authHeader: string | null): { valid: boolean; api
 
   // Try hash-based lookup (new: SHA-256, deterministic)
   const newHash = hashApiKey(keyValue);
-  let apiKey = db.prepare('SELECT * FROM api_keys WHERE key_hash = ? AND enabled = 1').get(newHash) as DBApiKey | undefined;
+  let apiKey = db.prepare("SELECT * FROM api_keys WHERE key_hash = ? AND enabled = 1 AND (expires_at IS NULL OR expires_at > datetime('now'))").get(newHash) as DBApiKey | undefined;
 
   // Fallback: old HMAC-SHA256 hash (for keys created before the hash algorithm change)
   if (!apiKey) {
     const oldHash = createHmac('sha256', 'oortapi-default-encryption-key-32b!').update(keyValue).digest('hex');
-    apiKey = db.prepare('SELECT * FROM api_keys WHERE key_hash = ? AND enabled = 1').get(oldHash) as DBApiKey | undefined;
+    apiKey = db.prepare("SELECT * FROM api_keys WHERE key_hash = ? AND enabled = 1 AND (expires_at IS NULL OR expires_at > datetime('now'))").get(oldHash) as DBApiKey | undefined;
     if (apiKey) {
       try { db.prepare('UPDATE api_keys SET key_hash = ? WHERE id = ?').run(newHash, apiKey.id); } catch {}
     }
@@ -264,7 +264,7 @@ async function executeChannelRequest(
         data: {
           stream: true, response: upstreamRes,
           channelId: channel.id, userId, apiKeyId,
-          model: req.model, startTime,
+          model: req.model, actualModel, startTime,
         },
       };
     }

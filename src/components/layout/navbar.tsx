@@ -214,7 +214,7 @@ export function Navbar() {
                     <div className="px-4 py-3 border-b border-border">
                       <p className="text-sm font-medium text-foreground truncate">{user.username}</p>
                       <p className="text-xs text-muted-foreground truncate">{user.email}</p>
-                      <p className="text-xs text-yellow-500 font-mono mt-1">{t.common.balance}: {symbol}{formatPrice(user.balance ?? 0)}</p>
+                      <p className="text-xs text-yellow-500 font-mono mt-1">{t.common.balance}: {formatPrice(user.balance ?? 0)}</p>
                     </div>
                     <div className="py-1">
                       <Link href="/dashboard" role="menuitem" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors focus:bg-secondary focus:text-foreground focus-visible:outline-none">

@@ -655,8 +655,8 @@ export function ChannelCard({ lang = "zh" }: { lang?: "zh" | "en" }) {
       base_url: ch.base_url || "",
       weight: ch.weight,
       priority: ch.priority,
-      models: JSON.parse(ch.models || "[]").join(", "),
-      model_mapping: JSON.parse(ch.model_mapping || "{}"),
+      models: (() => { try { return JSON.parse(ch.models || "[]").join(", "); } catch { return ""; } })(),
+      model_mapping: (() => { try { return JSON.parse(ch.model_mapping || "{}"); } catch { return {}; } })(),
     });
   };
 
@@ -823,8 +823,9 @@ export function ChannelCard({ lang = "zh" }: { lang?: "zh" | "en" }) {
   const executeBatch = async () => {
     if (!batchAction) return;
     const ids = Array.from(selectedIds);
+    let results;
     if (batchAction === "delete") {
-      await Promise.all(ids.map(id =>
+      results = await Promise.all(ids.map(id =>
         fetch("/api/dashboard/channels", {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
@@ -834,7 +835,7 @@ export function ChannelCard({ lang = "zh" }: { lang?: "zh" | "en" }) {
       ));
     } else {
       const enabled = batchAction === "enable";
-      await Promise.all(ids.map(id =>
+      results = await Promise.all(ids.map(id =>
         fetch("/api/dashboard/channels", {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -843,10 +844,15 @@ export function ChannelCard({ lang = "zh" }: { lang?: "zh" | "en" }) {
         })
       ));
     }
+    const failed = results.filter(r => !r.ok).length;
     setSelectedIds(new Set());
     setBatchAction(null);
     fetchChannels();
-    showToast(t.batchSuccess, "success");
+    if (failed > 0) {
+      showToast(`${failed} / ${ids.length} ${lang === "zh" ? "操作失败" : "operations failed"}`, "error");
+    } else {
+      showToast(t.batchSuccess, "success");
+    }
   };
 
   const uniqueTypes = [...new Set(channels.map(c => c.type))];

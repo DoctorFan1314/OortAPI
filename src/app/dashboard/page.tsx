@@ -2,6 +2,7 @@
 
 import { useI18n } from "@/contexts/i18n-context";
 import { useAuth } from "@/contexts/auth-context";
+import { useCurrency } from "@/contexts/currency-context";
 import { StatsCards } from "@/components/dashboard/stats-cards";
 import { ModelAnalytics } from "@/components/dashboard/model-analytics";
 import { ActivityFeed } from "@/components/dashboard/activity-feed";
@@ -55,6 +56,7 @@ const LABELS = {
 export default function DashboardPage() {
   const { lang, t: dict } = useI18n();
   const { user } = useAuth();
+  const { formatPrice } = useCurrency();
   const t = LABELS[lang];
   const { data: keysData, error: keysError, mutate: mutateKeys } = useSWR<{ keys: { id: number }[] }>("/api/dashboard/keys", dashboardSWRConfig);
   const { data: subData, error: subError, mutate: mutateSub } = useSWR<{ subscriptions: { id: number; status: string; current_period_end: string; plan_display_name: string; auto_renew: number }[] }>("/api/dashboard/subscription", dashboardSWRConfig);
@@ -96,7 +98,7 @@ export default function DashboardPage() {
   // Check for expiring subscription (within 3 days, not auto-renew)
   const expiringSub = subData?.subscriptions?.find(s => {
     if (s.status !== 'active' || s.auto_renew) return false;
-    const endDate = new Date(s.current_period_end);
+    const endDate = new Date(s.current_period_end + "Z");
     const now = new Date();
     const daysLeft = (endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
     return daysLeft > 0 && daysLeft <= 3;
@@ -254,7 +256,7 @@ export default function DashboardPage() {
                 cacheHitTokens={statsData.cache_savings.cache_hit_tokens}
                 nonCachedTokens={statsData.cache_savings.non_cached_tokens}
                 cacheHitPct={statsData.cache_savings.cache_hit_pct}
-                formatPrice={(n: number) => n.toFixed(2)}
+                formatPrice={formatPrice}
                 lang={lang}
               />
             )}

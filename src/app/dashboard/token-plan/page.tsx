@@ -166,7 +166,7 @@ function TokenPlanContent() {
   }
 
   function formatDate(dateStr: string): string {
-    return new Date(dateStr).toLocaleDateString(lang === "zh" ? "zh-CN" : "en-US", { year: "numeric", month: "2-digit", day: "2-digit" });
+    return new Date(dateStr + "Z").toLocaleDateString(lang === "zh" ? "zh-CN" : "en-US", { year: "numeric", month: "2-digit", day: "2-digit" });
   }
 
   const activeSub = subscriptions.find((s) => s.status === "active");
