@@ -13,6 +13,7 @@ interface SparklineProps {
 
 /** Tiny inline SVG area sparkline — like Grafana sparklines */
 export function Sparkline({ data, width = 80, height = 24, color = "#0891b2", className }: SparklineProps) {
+  const gid = useId();
   const path = useMemo(() => {
     if (!data || data.length < 2) return null;
     const max = Math.max(...data, 1);
@@ -27,7 +28,6 @@ export function Sparkline({ data, width = 80, height = 24, color = "#0891b2", cl
   }, [data, width, height]);
 
   if (!path) return null;
-  const gid = useId();
 
   return (
     <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} className={cn("shrink-0", className)} aria-hidden="true">

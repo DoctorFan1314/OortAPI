@@ -134,7 +134,7 @@ export async function PATCH(request: NextRequest) {
         // Update credits_total for active subscriptions to match new plan credits
         // credits_remaining gets the difference added
         db.prepare(
-          `UPDATE user_subscriptions SET credits_remaining = credits_remaining + (? - credits_total), credits_total = ?, updated_at = CURRENT_TIMESTAMP WHERE plan_id = ? AND status = 'active'`
+          `UPDATE user_subscriptions SET credits_remaining = MAX(0, credits_remaining + (? - credits_total)), credits_total = ?, updated_at = CURRENT_TIMESTAMP WHERE plan_id = ? AND status = 'active'`
         ).run(newCredits, newCredits, id);
       }
     }
@@ -163,6 +163,11 @@ export async function DELETE(request: NextRequest) {
 
     if (!id) {
       return NextResponse.json({ error: 'Plan id is required' }, { status: 400 });
+    }
+
+    const activeCount = db.prepare("SELECT COUNT(*) as count FROM user_subscriptions WHERE plan_id = ? AND status = 'active'").get(id) as { count: number };
+    if (activeCount.count > 0) {
+      return NextResponse.json({ error: 'Cannot delete plan with active subscriptions' }, { status: 400 });
     }
 
     const result = db.prepare('DELETE FROM subscription_plans WHERE id = ?').run(id);

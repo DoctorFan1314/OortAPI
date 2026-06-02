@@ -200,7 +200,7 @@ export default function AuditPage() {
             filterTarget ? `target_type=${encodeURIComponent(filterTarget)}` : "",
             filterFrom ? `from=${filterFrom}` : "",
             filterTo ? `to=${filterTo}` : "",
-            searchQuery ? `search=${encodeURIComponent(searchQuery)}` : "",
+            debouncedSearch ? `search=${encodeURIComponent(debouncedSearch)}` : "",
           ].filter(Boolean).join('&');
           window.open(`/api/dashboard/audit?${params}`, '_blank');
         }}

@@ -68,11 +68,10 @@ export function checkRateLimit(keyId: number, limit: number): RateLimitResult {
     cache.set(key, entry);
   }
 
-  if (entry.count >= limit) {
+  entry.count++;
+  if (entry.count > limit) {
     return { allowed: false, remaining: 0, limit, resetAt };
   }
-
-  entry.count++;
 
   // Persist to DB every 5 increments or on first increment
   if (entry.count === 1 || entry.count % 5 === 0) {
@@ -95,11 +94,10 @@ export function checkIpRateLimit(ip: string, limit: number, windowMs: number = 6
     cache.set(key, entry);
   }
 
-  if (entry.count >= limit) {
+  entry.count++;
+  if (entry.count > limit) {
     return { allowed: false, remaining: 0, limit, resetAt };
   }
-
-  entry.count++;
 
   if (entry.count === 1 || entry.count % 5 === 0) {
     saveToDb(key, entry.count, windowStart);

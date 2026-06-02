@@ -192,7 +192,7 @@ export async function processGatewayRequest(
 
     lastError = result;
 
-    if (result.statusCode && result.statusCode < 500) return result;
+    if (result.statusCode && result.statusCode < 500 && result.statusCode !== 429) return result;
   }
 
   return lastError || {
@@ -289,7 +289,7 @@ async function executeChannelRequest(
 
     const deductResult = deductCreditsOrBalance(userId, req.model, cost, `API call: ${req.model}`, tokensIn, tokensOut, tokensInCache);
     if (!deductResult.success) {
-      console.error('Failed to deduct:', deductResult.error);
+      return { success: false, error: 'Insufficient balance', statusCode: 402 };
     }
 
     logUsage({

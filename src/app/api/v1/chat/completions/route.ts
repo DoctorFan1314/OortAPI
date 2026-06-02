@@ -109,9 +109,12 @@ export async function POST(request: NextRequest) {
         const baseCost = calculateCost(streamData.model, tokensIn, tokensOut, tokensInCache);
         const cost = baseCost * multiplier;
 
-        let deductResult: { source: string } | undefined;
+        let deductResult: { success: boolean; source: string; creditsUsed?: number } | undefined;
         if (cost > 0) {
           deductResult = deductCreditsOrBalance(streamData.userId, streamData.model, cost, `API call: ${streamData.model}`, tokensIn, tokensOut, tokensInCache);
+          if (!deductResult?.success) {
+            return NextResponse.json({ error: { message: 'Insufficient balance', type: 'insufficient_balance' } }, { status: 402 });
+          }
         }
 
         logUsage({
@@ -123,7 +126,7 @@ export async function POST(request: NextRequest) {
           tokensOut,
           tokensInCache,
           cost: deductResult?.source === 'credits' ? 0 : cost,
-          creditsUsed: deductResult?.source === 'credits' ? (tokensIn + tokensOut) : 0,
+          creditsUsed: deductResult?.creditsUsed || 0,
           deductionSource: deductResult?.source || 'balance',
           latencyMs,
           ttftMs,

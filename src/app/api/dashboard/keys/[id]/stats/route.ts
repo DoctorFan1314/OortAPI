@@ -22,8 +22,11 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     if (!key) return NextResponse.json({ error: 'Key not found' }, { status: 404 });
 
     const searchParams = request.nextUrl.searchParams;
-    const from = searchParams.get('from') || `datetime('now', '-7 days')`;
-    const to = searchParams.get('to') || `datetime('now')`;
+    const now = new Date();
+    const defaultFrom = new Date(now.getTime() - 7 * 86400000).toISOString();
+    const defaultTo = now.toISOString();
+    const from = searchParams.get('from') || defaultFrom;
+    const to = searchParams.get('to') || defaultTo;
 
     const stats = db.prepare(
       `SELECT

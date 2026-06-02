@@ -203,7 +203,8 @@ export async function PATCH(request: NextRequest) {
     }
 
     // Prevent admin from disabling/demoting themselves
-    if (id === auth.user.id) {
+    const numId = typeof id === 'string' ? parseInt(id, 10) : id;
+    if (numId === auth.user.id) {
       if (enabled === 0) {
         return NextResponse.json({ error: 'Cannot disable yourself' }, { status: 400 });
       }
@@ -330,7 +331,8 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'User id is required' }, { status: 400 });
     }
 
-    if (id === auth.user.id) {
+    const numId = typeof id === 'string' ? parseInt(id, 10) : id;
+    if (numId === auth.user.id) {
       return NextResponse.json({ error: 'Cannot delete yourself' }, { status: 400 });
     }
 

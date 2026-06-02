@@ -63,6 +63,7 @@ export const DEFAULT_TOOL_CONFIG: ToolConfig = {
 };
 
 export function loadToolConfig(): ToolConfig {
+  if (typeof window === 'undefined') return { ...DEFAULT_TOOL_CONFIG };
   try {
     const saved = localStorage.getItem("oortapi-tool-config");
     if (saved) return { ...DEFAULT_TOOL_CONFIG, ...JSON.parse(saved) };
@@ -71,6 +72,7 @@ export function loadToolConfig(): ToolConfig {
 }
 
 export function saveToolConfig(config: ToolConfig): void {
+  if (typeof window === 'undefined') return;
   try {
     localStorage.setItem("oortapi-tool-config", JSON.stringify(config));
   } catch { /* ignore */ }
@@ -85,6 +87,7 @@ export function getEnabledToolDefinitions(config: ToolConfig): ToolDefinition[] 
 const CAPS_STORAGE_KEY = "oortapi-model-caps";
 
 export function loadModelCaps(): ModelCapabilities {
+  if (typeof window === 'undefined') return {};
   try {
     const saved = localStorage.getItem(CAPS_STORAGE_KEY);
     if (saved) return JSON.parse(saved);
@@ -93,6 +96,7 @@ export function loadModelCaps(): ModelCapabilities {
 }
 
 export function saveModelCaps(caps: ModelCapabilities): void {
+  if (typeof window === 'undefined') return;
   try {
     localStorage.setItem(CAPS_STORAGE_KEY, JSON.stringify(caps));
   } catch { /* ignore */ }

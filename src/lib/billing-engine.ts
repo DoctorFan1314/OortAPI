@@ -98,7 +98,7 @@ export function calculateCost(
   const rate = db.prepare('SELECT input_rate, output_rate, cache_rate FROM model_rates WHERE model_name = ? AND enabled = 1').get(model) as { input_rate: number; output_rate: number; cache_rate: number } | undefined;
 
   if (!rate) {
-    return (tokensIn * 1.0 + tokensOut * 2.0) / 1000000;
+    return (Math.max(0, tokensIn - tokensInCache) * 1.0 + tokensInCache * 0.5 + tokensOut * 2.0) / 1000000;
   }
 
   // Input(non-cached): charged at input_rate
@@ -211,7 +211,7 @@ export function deductCreditsOrBalance(
       if (result.changes === 0) {
         // Credits were consumed between check and update — fall through to balance
         const freshSub = db.prepare('SELECT credits_remaining FROM user_subscriptions WHERE id = ?').get(subscription.id) as { credits_remaining: number };
-        return deductCreditsOrBalance_fallback(userId, plan, subscription, freshSub.credits_remaining, cost, description, creditsCost);
+        return deductCreditsOrBalance_fallback(userId, plan, subscription, freshSub.credits_remaining, cost, description, creditsCost, model);
       }
 
       // Log subscription usage
@@ -264,6 +264,7 @@ function deductCreditsOrBalance_fallback(
   cost: number,
   description: string,
   creditsCost: number,
+  model: string,
 ): DeductCreditsResult {
   if (creditsRemaining >= creditsCost) {
     // Another request freed up credits — retry with atomic check
@@ -271,7 +272,7 @@ function deductCreditsOrBalance_fallback(
       'UPDATE user_subscriptions SET credits_remaining = credits_remaining - ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND credits_remaining >= ?'
     ).run(creditsCost, subscription.id, creditsCost);
     if (result.changes > 0) {
-      db.prepare('INSERT INTO subscription_usage_logs (subscription_id, user_id, model, credits_used, source) VALUES (?, ?, ?, ?, ?)').run(subscription.id, userId, description.replace('API call: ', ''), creditsCost, 'credits');
+      db.prepare('INSERT INTO subscription_usage_logs (subscription_id, user_id, model, credits_used, source) VALUES (?, ?, ?, ?, ?)').run(subscription.id, userId, model, creditsCost, 'credits');
       const updatedSub = db.prepare('SELECT credits_remaining FROM user_subscriptions WHERE id = ?').get(subscription.id) as { credits_remaining: number };
       return { success: true, source: 'credits', creditsRemaining: updatedSub.credits_remaining, creditsUsed: creditsCost };
     }
@@ -288,7 +289,7 @@ function deductCreditsOrBalance_fallback(
   if (!deductResult.success) {
     return { success: false, source: 'blocked', error: deductResult.error, overageMultiplier };
   }
-  db.prepare('INSERT INTO subscription_usage_logs (subscription_id, user_id, model, credits_used, source) VALUES (?, ?, ?, ?, ?)').run(subscription.id, userId, description.replace('API call: ', ''), 0, 'balance');
+  db.prepare('INSERT INTO subscription_usage_logs (subscription_id, user_id, model, credits_used, source) VALUES (?, ?, ?, ?, ?)').run(subscription.id, userId, model, 0, 'balance');
   return { success: true, source: 'balance', newBalance: deductResult.newBalance, overageMultiplier };
 }
 

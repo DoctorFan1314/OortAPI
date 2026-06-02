@@ -61,11 +61,11 @@ export default function SettingsPage() {
   }>("/api/dashboard/settings", dashboardSWRConfig);
 
   // SWR: fetch current month spending
+  const now = new Date();
   const billingUrl = useMemo(() => {
-    const now = new Date();
     const from = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
     return `/api/v1/billing/usage?limit=1&from=${from}`;
-  }, []);
+  }, [now.getMonth(), now.getFullYear()]);
   const { data: billingData } = useSWR<{ total_cost?: number }>(billingUrl, dashboardSWRConfig);
 
   // Derive local state from SWR data
@@ -114,7 +114,7 @@ export default function SettingsPage() {
       handleSaveBudget();
     }, 2000);
     return () => clearTimeout(budgetTimerRef.current);
-  }, [monthlyBudget]);
+  }, [monthlyBudget, savedBudget]);
 
   // Notification prefs: debounced save with 2s delay
   const notifPrefsRef = useRef(notifPrefs);

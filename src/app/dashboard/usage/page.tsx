@@ -171,7 +171,7 @@ export default function UsagePage() {
         setLogs([]);
         setLoading(false);
       });
-  }, [page, filterModel, filterStatus, filterFrom, filterTo, filterKeyId]);
+  }, [page, filterModel, filterStatus, filterFrom, filterTo, filterKeyId, lang]);
 
   // Detect credit user from summary credits_used
   useEffect(() => {

@@ -32,6 +32,7 @@ export function getDifficultyLabel(difficulty: string, t: { prompts: { difficult
 }
 
 export function canPerformAction(action: string, cooldownMs: number = 3000): boolean {
+  if (typeof window === 'undefined') return true;
   const key = `ai-skills-hub-rate-${action}`;
   const last = localStorage.getItem(key);
   if (last && Date.now() - parseInt(last) < cooldownMs) return false;

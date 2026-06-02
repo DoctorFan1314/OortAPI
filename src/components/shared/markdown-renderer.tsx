@@ -72,7 +72,7 @@ function isTableSeparator(line: string): boolean {
   return /^\|[\s\-:|]+\|$/.test(line.trim());
 }
 
-const sanitize = (html: string) => html.replace(/<[^>]*>/g, "");
+const sanitize = (html: string) => html.replace(/<\/?(?:script|iframe|object|embed|form|input|style|link|meta)[^>]*>/gi, "");
 
 export const MarkdownRenderer = memo(function MarkdownRenderer({ content }: { content: string }) {
   const sanitizedContent = sanitize(content);
