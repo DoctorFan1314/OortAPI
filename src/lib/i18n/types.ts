@@ -3,6 +3,7 @@ export interface Dictionary {
     home: string; prompts: string; skills: string; categories: string; trending: string; tags: string;
     guide: string; submit: string; login: string; register: string; logout: string;
     profile: string; search: string; back: string; loading: string; noData: string;
+    errorTitle: string; errorDescription: string; retry: string; skipToContent: string;
     save: string; cancel: string; delete: string; edit: string; confirm: string;
     copy: string; copied: string; share: string; like: string; bookmark: string;
     more: string; all: string; viewAll: string;
@@ -259,6 +260,7 @@ export interface Dictionary {
     copyright: string; platforms: string;
     emailRequired: string; emailInvalid: string; alreadySubscribed: string; subscribeSuccess: string;
     comingSoon: string;
+    faq: string; systemStatus: string;
     product: string; features: string; modelMarket: string; apiDocs: string; dashboard: string;
     pricing: string; unifiedApi: string; smartRouting: string; usageBilling: string;
     multiProtocol: string; agentSkills: string; promptTemplates: string; categories: string;
@@ -358,7 +360,7 @@ export interface Dictionary {
     preferences: string;
   };
   notificationFilters: {
-    all: string; comments: string; skills: string; submissions: string; system: string; emptyCategory: string;
+    all: string; comments: string; skills: string; submissions: string; system: string; likes: string; replies: string; emptyCategory: string;
   };
   collections: {
     createFirst: string;
@@ -396,6 +398,8 @@ export interface Dictionary {
     refresh: string;
     lastUpdated: string;
     loadFailed: string;
+    networkError: string;
+    operationFailed: string;
     checkConnection: string;
     retry: string;
     progress: string;
@@ -732,6 +736,25 @@ export interface Dictionary {
     search: string;
     actions: string;
     user: string;
+    // Activity feed
+    recentCalls: string;
+    noCallsYet: string;
+    inputNonCachedLabel: string;
+    inputCachedLabel: string;
+    outputLabel: string;
+    cacheHitLabel: string;
+    // Billing history
+    failedToLoad: string;
+    // Model analytics
+    costTrend: string;
+    cacheRate: string;
+    cacheHitRate: string;
+    hit: string;
+    miss: string;
+    noConsumption: string;
+    callsUnit: string;
+    modelLatency: string;
+    errorRate: string;
   };
   apiDocs: {
     title: string;
@@ -850,6 +873,12 @@ export interface Dictionary {
     browseModels: string;
     onlineDebug: string;
     openapiSpec: string;
+    backToDocs: string;
+    featuresDesc: string;
+    modelsPricingDesc: string;
+    securityDesc: string;
+    faqDesc: string;
+    changelogDesc: string;
     swaggerDesc: string;
     jsonDesc: string;
     // Page labels

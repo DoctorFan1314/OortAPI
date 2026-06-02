@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowUpRight, ArrowDownLeft, RefreshCw, Gift, Search, X, AlertTriangle, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCurrency } from "@/contexts/currency-context";
+import { useI18n } from "@/contexts/i18n-context";
 import { dashboardSWRConfig } from "@/lib/swr-fetcher";
 import { Input } from "@/components/ui/input";
 
@@ -41,7 +42,8 @@ export function BillingHistory({ lang = "zh" }: { lang?: "zh" | "en" }) {
     dashboardSWRConfig,
   );
   const { formatPrice } = useCurrency();
-  const t = LABELS[lang];
+  const { t } = useI18n();
+  const lbl = LABELS[lang];
 
   const filtered = useMemo(() => {
     let list = data?.records || [];
@@ -63,12 +65,12 @@ export function BillingHistory({ lang = "zh" }: { lang?: "zh" | "en" }) {
     <Card className="glass-card">
       <CardHeader>
         <div className="flex items-center justify-between flex-wrap gap-2">
-          <CardTitle className="text-lg">{t.title}</CardTitle>
+          <CardTitle className="text-lg">{lbl.title}</CardTitle>
           <div className="flex items-center gap-2">
             <div className="relative w-44">
               <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground pointer-events-none" />
               <Input
-                placeholder={t.search}
+                placeholder={lbl.search}
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 className="h-8 pl-7 pr-7 text-xs bg-secondary border-border"
@@ -83,9 +85,9 @@ export function BillingHistory({ lang = "zh" }: { lang?: "zh" | "en" }) {
               value={typeFilter}
               onChange={e => setTypeFilter(e.target.value)}
               className="h-8 px-2 rounded-md border border-border bg-secondary text-xs text-foreground appearance-none cursor-pointer"
-              aria-label={t.type}
+              aria-label={lbl.type}
             >
-              <option value="all">{t.allTypes}</option>
+              <option value="all">{lbl.allTypes}</option>
               {TYPE_OPTIONS.filter(o => o !== "all").map(type => (
                 <option key={type} value={type}>{TYPE_CONFIG[type]?.[lang] || type}</option>
               ))}
@@ -97,13 +99,13 @@ export function BillingHistory({ lang = "zh" }: { lang?: "zh" | "en" }) {
         {fetchError && !data ? (
           <div className="text-center py-12">
             <AlertTriangle className="h-8 w-8 text-destructive/40 mx-auto mb-2" />
-            <p className="text-sm text-muted-foreground mb-2">{lang === "zh" ? "加载失败" : "Failed to load"}</p>
-            <Button variant="outline" size="sm" onClick={() => refetch()}>{lang === "zh" ? "重试" : "Retry"}</Button>
+            <p className="text-sm text-muted-foreground mb-2">{t.dashboard.failedToLoad}</p>
+            <Button variant="outline" size="sm" onClick={() => refetch()}>{t.dashboard.retry}</Button>
           </div>
         ) : filtered.length === 0 ? (
           <div className="text-center py-12">
             <Wallet className="h-8 w-8 text-muted-foreground/40 mx-auto mb-2" />
-            <p className="text-sm text-muted-foreground">{t.noRecords}</p>
+            <p className="text-sm text-muted-foreground">{lbl.noRecords}</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -122,7 +124,7 @@ export function BillingHistory({ lang = "zh" }: { lang?: "zh" | "en" }) {
                       {r.amount > 0 ? "+" : ""}{formatPrice(Math.abs(r.amount))}
                     </div>
                     {r.balance_after !== null && (
-                      <div className="text-xs text-muted-foreground">{t.balance}: {formatPrice(r.balance_after)}</div>
+                      <div className="text-xs text-muted-foreground">{lbl.balance}: {formatPrice(r.balance_after)}</div>
                     )}
                   </div>
                 </div>
@@ -134,17 +136,17 @@ export function BillingHistory({ lang = "zh" }: { lang?: "zh" | "en" }) {
         {(page > 1 || hasMore) && (
           <div className="flex items-center justify-between pt-3 border-t border-border/20">
             <span className="text-xs text-muted-foreground">
-              {t.showing} {filtered.length} / {data?.total || 0}
+              {lbl.showing} {filtered.length} / {data?.total || 0}
             </span>
             <div className="flex gap-2">
               {page > 1 && (
                 <button onClick={() => setPage(p => p - 1)} className="px-3 py-1 text-xs rounded-md bg-muted hover:bg-muted/80">
-                  {t.prev}
+                  {lbl.prev}
                 </button>
               )}
               {hasMore && (
                 <button onClick={() => setPage(p => p + 1)} className="px-3 py-1 text-xs rounded-md bg-muted hover:bg-muted/80">
-                  {t.next}
+                  {lbl.next}
                 </button>
               )}
             </div>

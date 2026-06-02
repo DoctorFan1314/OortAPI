@@ -601,7 +601,7 @@ export function ChannelCard({ lang = "zh" }: { lang?: "zh" | "en" }) {
         setChannels(d.channels || []);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch((e) => { console.warn("Failed to load channels:", e); setLoading(false); });
   };
 
   useEffect(() => {

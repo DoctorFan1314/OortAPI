@@ -6,7 +6,9 @@ import { useTheme } from "@/contexts/theme-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState, useMemo } from "react";
+import { useMemo } from "react";
+import useSWR from "swr";
+import { dashboardSWRConfig } from "@/lib/swr-fetcher";
 import { useParams } from "next/navigation";
 import { Activity, Coins, DollarSign, Key, Shield, TrendingUp, User, Clock, ArrowLeft, Pencil } from "lucide-react";
 import Link from "next/link";
@@ -97,6 +99,7 @@ const LABELS = {
     registered: "注册时间",
     recentActivity: "近期活动",
     noActivity: "暂无调用记录",
+    userNotFound: "用户不存在",
   },
   en: {
     title: "User Details",
@@ -125,6 +128,7 @@ const LABELS = {
     registered: "Registered",
     recentActivity: "Recent Activity",
     noActivity: "No calls yet",
+    userNotFound: "User not found",
   },
 };
 
@@ -137,32 +141,24 @@ export default function UserDetailPage() {
   const userId = params.id as string;
   const isDark = resolvedTheme === "dark";
 
-  const [user, setUser] = useState<UserDetail | null>(null);
-  const [stats, setStats] = useState<Stats | null>(null);
-  const [topModels, setTopModels] = useState<TopModel[]>([]);
-  const [trend, setTrend] = useState<TrendDay[]>([]);
-  const [keys, setKeys] = useState<KeyItem[]>([]);
-  const [subscription, setSubscription] = useState<Subscription | null>(null);
-  const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data, isLoading } = useSWR<{
+    user: UserDetail;
+    stats: Stats;
+    topModels: TopModel[];
+    trend: TrendDay[];
+    keys: KeyItem[];
+    subscription: Subscription | null;
+    recentActivity: RecentActivity[];
+  }>(`/api/dashboard/users?action=detail&id=${userId}`, dashboardSWRConfig);
+  const user = data?.user ?? null;
+  const stats = data?.stats ?? null;
+  const topModels = data?.topModels || [];
+  const trend = data?.trend || [];
+  const keys = data?.keys || [];
+  const subscription = data?.subscription ?? null;
+  const recentActivity = data?.recentActivity || [];
 
-  useEffect(() => {
-    fetch(`/api/dashboard/users?action=detail&id=${userId}`, { credentials: "include" })
-      .then(r => r.json())
-      .then(d => {
-        setUser(d.user);
-        setStats(d.stats);
-        setTopModels(d.topModels || []);
-        setTrend(d.trend || []);
-        setKeys(d.keys || []);
-        setSubscription(d.subscription);
-        setRecentActivity(d.recentActivity || []);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, [userId]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="space-y-6">
         <div className="h-8 w-48 animate-pulse bg-muted rounded" />
@@ -176,7 +172,7 @@ export default function UserDetailPage() {
   }
 
   if (!user) {
-    return <div className="text-center py-12 text-muted-foreground">User not found</div>;
+    return <div className="text-center py-12 text-muted-foreground">{t.userNotFound}</div>;
   }
 
   const successRate = stats && stats.total_calls > 0

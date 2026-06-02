@@ -125,10 +125,10 @@ function cssVar(name: string, fallback = "#888") {
 }
 
 export function ModelAnalytics() {
-  const { lang } = useI18n();
+  const { lang, t } = useI18n();
   const { formatPrice, exchangeRate, symbol } = useCurrency();
   const { resolvedTheme } = useTheme();
-  const t = LABELS[lang];
+  const lbl = LABELS[lang];
   // Resolve CSS vars + force re-render on theme change via resolvedTheme dep
   const fg = cssVar("--foreground");
   const mg = cssVar("--muted-foreground");
@@ -250,12 +250,12 @@ export function ModelAnalytics() {
             html += `<div style="font-size:12px;font-weight:500;margin-top:3px;white-space:nowrap;color:var(--foreground)"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};margin-right:6px"></span> ${p.seriesName}: <span style="font-family:var(--font-geist-mono,monospace)">${fmt(val)}</span></div>`;
             const brk = byModelBreakdown[p.seriesName]?.[slot];
             if (brk) {
-              if (brk.inNoncached > 0) html += `<div style="font-size:11px;padding-left:20px;color:var(--muted-foreground);white-space:nowrap">↳ ${lang === "zh" ? "输入(未命中缓存)" : "Input(non-cached)"}: <span style="font-family:var(--font-geist-mono,monospace)">${fmt(brk.inNoncached)}</span></div>`;
-              if (brk.inCache > 0) html += `<div style="font-size:11px;padding-left:20px;color:var(--muted-foreground);white-space:nowrap">↳ ${lang === "zh" ? "输入(命中缓存)" : "Input(cache hit)"}: <span style="font-family:var(--font-geist-mono,monospace)">${fmt(brk.inCache)}</span></div>`;
-              if (brk.out > 0) html += `<div style="font-size:11px;padding-left:20px;color:var(--muted-foreground);white-space:nowrap">↳ ${lang === "zh" ? "输出" : "Output"}: <span style="font-family:var(--font-geist-mono,monospace)">${fmt(brk.out)}</span></div>`;
+              if (brk.inNoncached > 0) html += `<div style="font-size:11px;padding-left:20px;color:var(--muted-foreground);white-space:nowrap">↳ ${t.dashboard.inputNonCachedLabel}: <span style="font-family:var(--font-geist-mono,monospace)">${fmt(brk.inNoncached)}</span></div>`;
+              if (brk.inCache > 0) html += `<div style="font-size:11px;padding-left:20px;color:var(--muted-foreground);white-space:nowrap">↳ ${t.dashboard.inputCachedLabel}: <span style="font-family:var(--font-geist-mono,monospace)">${fmt(brk.inCache)}</span></div>`;
+              if (brk.out > 0) html += `<div style="font-size:11px;padding-left:20px;color:var(--muted-foreground);white-space:nowrap">↳ ${t.dashboard.outputLabel}: <span style="font-family:var(--font-geist-mono,monospace)">${fmt(brk.out)}</span></div>`;
             }
           }
-          if (count === 0) html += `<div style="font-size:11px;color:var(--muted-foreground);white-space:nowrap">${lang === "zh" ? "无消耗" : "No consumption"}</div>`;
+          if (count === 0) html += `<div style="font-size:11px;color:var(--muted-foreground);white-space:nowrap">${t.dashboard.noConsumption}</div>`;
           return html;
         },
         extraCssText: "max-width:800px;white-space:nowrap;overflow:visible;border:1px solid var(--border);border-radius:8px;background:var(--card);backdrop-filter:blur(12px)",
@@ -265,14 +265,14 @@ export function ModelAnalytics() {
       xAxis: { type: "category" as const, data: xLabels, axisLabel: { fontSize: 11, color: fg }, axisLine: { show: false }, axisTick: { show: false }, splitLine: { show: false } },
       yAxis: {
         type: "value" as const,
-        name: t.yAxisUnit || undefined,
+        name: lbl.yAxisUnit || undefined,
         nameTextStyle: { fontSize: 10, color: mg },
         axisLabel: { fontSize: 10, color: mg },
         splitLine: { lineStyle: { color: "rgba(128,128,128,0.06)", type: "dashed" as const } },
       },
       series,
     };
-  }, [timeSource, models, colorMap, xLabels, t.yAxisUnit, lang, fg, mg, resolvedTheme]);
+  }, [timeSource, models, colorMap, xLabels, lbl.yAxisUnit, lang, fg, mg, resolvedTheme]);
 
   // ======== Trend Line Chart (Calls, per-model, same colors as bar) ========
   const trendOption = useMemo(() => {
@@ -292,7 +292,7 @@ export function ModelAnalytics() {
       legend: { type: "scroll" as const, bottom: 0, textStyle: { fontSize: 11, color: fg }, pageTextStyle: { fontSize: 10, color: mg } },
       grid: { left: 60, right: 20, top: 20, bottom: 56 },
       xAxis: { type: "category" as const, data: xLabels, axisLabel: { fontSize: 11, color: fg }, axisLine: { show: false }, axisTick: { show: false } },
-      yAxis: { type: "value" as const, name: lang === "zh" ? "次" : "", nameTextStyle: { fontSize: 10, color: mg }, axisLabel: { fontSize: 10, color: mg }, splitLine: { lineStyle: { color: "rgba(128,128,128,0.06)", type: "dashed" as const } } },
+      yAxis: { type: "value" as const, name: t.dashboard.callsUnit, nameTextStyle: { fontSize: 10, color: mg }, axisLabel: { fontSize: 10, color: mg }, splitLine: { lineStyle: { color: "rgba(128,128,128,0.06)", type: "dashed" as const } } },
       series,
     };
   }, [timeSource, models, colorMap, xLabels, lang, fg, mg, resolvedTheme]);
@@ -304,16 +304,16 @@ export function ModelAnalytics() {
     return {
       backgroundColor: "transparent",
       tooltip: { trigger: "axis" as const, extraCssText: "border:1px solid var(--border);border-radius:8px;background:var(--card);backdrop-filter:blur(12px)" },
-      legend: { data: [lang === "zh" ? "费用" : "Cost", lang === "zh" ? "调用" : "Calls"], bottom: 0, textStyle: { fontSize: 11, color: fg } },
+      legend: { data: [lbl.cost, lbl.calls], bottom: 0, textStyle: { fontSize: 11, color: fg } },
       grid: { left: 60, right: 60, top: 10, bottom: 40 },
       xAxis: { type: "category" as const, data: dates, axisLabel: { fontSize: 11, color: fg }, axisLine: { show: false }, axisTick: { show: false } },
       yAxis: [
         { type: "value" as const, name: symbol, axisLabel: { fontSize: 10, color: mg }, splitLine: { lineStyle: { color: "rgba(128,128,128,0.06)", type: "dashed" as const } } },
-        { type: "value" as const, name: lang === "zh" ? "次数" : "Calls", axisLabel: { fontSize: 10, color: mg }, splitLine: { show: false } },
+        { type: "value" as const, name: t.dashboard.callsUnit, axisLabel: { fontSize: 10, color: mg }, splitLine: { show: false } },
       ],
       series: [
-        { name: lang === "zh" ? "费用" : "Cost", type: "bar", data: costData, itemStyle: { color: "#8b5cf6", borderRadius: [4, 4, 0, 0] }, barMaxWidth: 20 },
-        { name: lang === "zh" ? "调用" : "Calls", type: "line", yAxisIndex: 1, data: callsData, smooth: true, lineStyle: { color: "#22c55e", width: 2 }, itemStyle: { color: "#22c55e" } },
+        { name: lbl.cost, type: "bar", data: costData, itemStyle: { color: "#8b5cf6", borderRadius: [4, 4, 0, 0] }, barMaxWidth: 20 },
+        { name: lbl.calls, type: "line", yAxisIndex: 1, data: callsData, smooth: true, lineStyle: { color: "#22c55e", width: 2 }, itemStyle: { color: "#22c55e" } },
       ],
     };
   }, [data, exchangeRate, symbol, lang, fg, mg, resolvedTheme]);
@@ -385,7 +385,7 @@ export function ModelAnalytics() {
     <div className="space-y-4">
       {/* Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <h2 className="text-lg font-semibold">{t.modelConsumption}</h2>
+        <h2 className="text-lg font-semibold">{lbl.modelConsumption}</h2>
         <div className="flex gap-2">
           {/* Range selector — only visible in day mode */}
           {timeMode === "day" && (
@@ -410,7 +410,7 @@ export function ModelAnalytics() {
                   ? "bg-primary text-primary-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
               }`}>
-              {t.byDay}
+              {lbl.byDay}
             </button>
             <button onClick={() => setTimeMode("hour")}
               className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
@@ -418,7 +418,7 @@ export function ModelAnalytics() {
                   ? "bg-primary text-primary-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
               }`}>
-              {t.byHour}
+              {lbl.byHour}
             </button>
           </div>
         </div>
@@ -431,7 +431,7 @@ export function ModelAnalytics() {
             <CardContent className="p-3 flex items-center gap-2">
               <BarChart3 className="h-4 w-4 text-blue-500" />
               <div>
-                <p className="text-xs text-muted-foreground">{lang === "zh" ? "总调用" : "Total Calls"}</p>
+                <p className="text-xs text-muted-foreground">{t.dashboard.totalCalls}</p>
                 <p className="text-lg font-bold font-mono">{data.total.calls.toLocaleString()}</p>
               </div>
             </CardContent>
@@ -440,18 +440,18 @@ export function ModelAnalytics() {
             <CardContent className="p-3">
               <div className="flex items-center gap-2 mb-2">
                 <TrendingUp className="h-4 w-4 text-green-500" />
-                <p className="text-xs text-muted-foreground">{lang === "zh" ? "总 Tokens" : "Total Tokens"}</p>
+                <p className="text-xs text-muted-foreground">{t.dashboard.totalTokens}</p>
               </div>
               <p className="text-lg font-bold font-mono mb-1">{data.total.tokens.toLocaleString()}</p>
               <div className="text-[10px] space-y-0.5 text-muted-foreground border-t border-border/20 pt-1.5">
                 {data.total.tokens_in_noncached > 0 && (
-                  <div className="flex justify-between"><span><span className="text-blue-400">■</span> {lang === "zh" ? "输入(未命中缓存)" : "Input(non-cached)"}</span><span className="font-mono">{data.total.tokens_in_noncached.toLocaleString()}</span></div>
+                  <div className="flex justify-between"><span><span className="text-blue-400">■</span> {t.dashboard.inputNonCached}</span><span className="font-mono">{data.total.tokens_in_noncached.toLocaleString()}</span></div>
                 )}
                 {data.total.tokens_in_cache > 0 && (
-                  <div className="flex justify-between"><span><span className="text-emerald-400">■</span> {lang === "zh" ? "输入(命中缓存)" : "Input(cache hit)"}</span><span className="font-mono">{data.total.tokens_in_cache.toLocaleString()}</span></div>
+                  <div className="flex justify-between"><span><span className="text-emerald-400">■</span> {t.dashboard.inputCached}</span><span className="font-mono">{data.total.tokens_in_cache.toLocaleString()}</span></div>
                 )}
                 {data.total.tokens_out > 0 && (
-                  <div className="flex justify-between"><span><span className="text-orange-400">■</span> {lang === "zh" ? "输出" : "Output"}</span><span className="font-mono">{data.total.tokens_out.toLocaleString()}</span></div>
+                  <div className="flex justify-between"><span><span className="text-orange-400">■</span> {t.dashboard.outputTokens}</span><span className="font-mono">{data.total.tokens_out.toLocaleString()}</span></div>
                 )}
               </div>
             </CardContent>
@@ -460,7 +460,7 @@ export function ModelAnalytics() {
             <CardContent className="p-3 flex items-center gap-2">
               <PieIcon className="h-4 w-4 text-red-500" />
               <div>
-                <p className="text-xs text-muted-foreground">{t.cost}</p>
+                <p className="text-xs text-muted-foreground">{lbl.cost}</p>
                 <p className="text-lg font-bold font-mono">
                   {formatPrice(data.total.cost)}
                 </p>
@@ -475,7 +475,7 @@ export function ModelAnalytics() {
         <Card className="glass-card">
           <CardHeader className="pb-2">
             <CardTitle className="text-base flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />{t.modelConsumption}
+              <BarChart3 className="h-4 w-4" />{lbl.modelConsumption}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -485,14 +485,14 @@ export function ModelAnalytics() {
         <Card className="glass-card">
           <CardHeader className="pb-2">
             <CardTitle className="text-base flex items-center gap-2">
-              <PieIcon className="h-4 w-4" />{t.callDistribution}
+              <PieIcon className="h-4 w-4" />{lbl.callDistribution}
             </CardTitle>
           </CardHeader>
           <CardContent>
             {data?.model_distribution?.length ? (
               <ReactECharts option={pieOption} style={{ height: 400 }} opts={{ renderer: "canvas" }} notMerge />
             ) : (
-              <div className="h-64 flex items-center justify-center text-muted-foreground text-sm">{t.noData}</div>
+              <div className="h-64 flex items-center justify-center text-muted-foreground text-sm">{lbl.noData}</div>
             )}
           </CardContent>
         </Card>
@@ -502,7 +502,7 @@ export function ModelAnalytics() {
       <Card className="glass-card">
         <CardHeader className="pb-2">
           <CardTitle className="text-base flex items-center gap-2">
-            <TrendingUp className="h-4 w-4" />{t.callTrend}
+            <TrendingUp className="h-4 w-4" />{lbl.callTrend}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -515,7 +515,7 @@ export function ModelAnalytics() {
         <Card className="glass-card lg:col-span-2">
           <CardHeader className="pb-2">
             <CardTitle className="text-base flex items-center gap-2">
-              <TrendingUp className="h-4 w-4" />{lang === "zh" ? "消费趋势" : "Cost Trend"}
+              <TrendingUp className="h-4 w-4" />{t.dashboard.costTrend}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -525,21 +525,21 @@ export function ModelAnalytics() {
         <Card className="glass-card">
           <CardHeader className="pb-2">
             <CardTitle className="text-base flex items-center gap-2">
-              <PieIcon className="h-4 w-4" />{lang === "zh" ? "缓存命中率" : "Cache Rate"}
+              <PieIcon className="h-4 w-4" />{t.dashboard.cacheRate}
             </CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col items-center justify-center h-[300px]">
             {data?.cache ? (
               <div className="text-center">
                 <div className="text-5xl font-bold font-mono text-emerald-400">{data.cache.cache_hit_rate}%</div>
-                <p className="text-xs text-muted-foreground mt-2">{lang === "zh" ? "周期内缓存命中率" : "Period cache hit rate"}</p>
+                <p className="text-xs text-muted-foreground mt-2">{t.dashboard.cacheHitRate}</p>
                 <div className="flex gap-4 mt-3 text-xs text-muted-foreground">
-                  <span>{lang === "zh" ? "命中" : "Hit"}: <span className="font-mono text-foreground">{data.cache.total_cache_hits.toLocaleString()}</span></span>
-                  <span>{lang === "zh" ? "未命中" : "Miss"}: <span className="font-mono text-foreground">{data.cache.total_non_cached.toLocaleString()}</span></span>
+                  <span>{t.dashboard.hit}: <span className="font-mono text-foreground">{data.cache.total_cache_hits.toLocaleString()}</span></span>
+                  <span>{t.dashboard.miss}: <span className="font-mono text-foreground">{data.cache.total_non_cached.toLocaleString()}</span></span>
                 </div>
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground">{lang === "zh" ? "暂无数据" : "No data"}</p>
+              <p className="text-sm text-muted-foreground">{t.common.noData}</p>
             )}
           </CardContent>
         </Card>
@@ -551,7 +551,7 @@ export function ModelAnalytics() {
           <Card className="glass-card">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm flex items-center gap-2">
-                <BarChart3 className="h-4 w-4 text-blue-500" />{lang === "zh" ? "模型延迟对比" : "Model Latency"}
+                <BarChart3 className="h-4 w-4 text-blue-500" />{t.dashboard.modelLatency}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -571,7 +571,7 @@ export function ModelAnalytics() {
           <Card className="glass-card">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm flex items-center gap-2">
-                <BarChart3 className="h-4 w-4 text-red-500" />{lang === "zh" ? "模型错误率" : "Error Rate"}
+                <BarChart3 className="h-4 w-4 text-red-500" />{t.dashboard.errorRate}
               </CardTitle>
             </CardHeader>
             <CardContent>

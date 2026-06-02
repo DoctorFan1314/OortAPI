@@ -264,12 +264,12 @@ export default function AuditPage() {
               </span>
               <div className="flex gap-2">
                 {page > 1 && (
-                  <button onClick={() => setPage(p => p - 1)} className="px-3 py-1 text-xs rounded-md bg-muted hover:bg-muted/80">
+                  <button onClick={() => setPage(p => p - 1)} className="px-3 py-1 text-xs rounded-md bg-muted hover:bg-muted/80" aria-label={t.prev}>
                     {t.prev}
                   </button>
                 )}
                 {(data?.total || 0) > page * 50 && (
-                  <button onClick={() => setPage(p => p + 1)} className="px-3 py-1 text-xs rounded-md bg-muted hover:bg-muted/80">
+                  <button onClick={() => setPage(p => p + 1)} className="px-3 py-1 text-xs rounded-md bg-muted hover:bg-muted/80" aria-label={t.next}>
                     {t.next}
                   </button>
                 )}

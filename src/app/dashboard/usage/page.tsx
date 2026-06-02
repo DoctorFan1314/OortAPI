@@ -63,11 +63,11 @@ export default function UsagePage() {
     fetch("/api/dashboard/keys", { credentials: "include" })
       .then(r => r.ok ? r.json() : null)
       .then(d => { if (d?.keys) setApiKeys(d.keys); })
-      .catch(() => {});
+      .catch((e) => console.warn("Failed to load keys:", e));
     fetch("/api/v1/models")
       .then(r => r.ok ? r.json() : null)
-      .then(d => { if (d?.data) setFilterModels(d.data.map((m: any) => m.id).sort()); })
-      .catch(() => {});
+      .then(d => { if (d?.data) setFilterModels(d.data.map((m: { id: string }) => m.id).sort()); })
+      .catch((e) => console.warn("Failed to load models:", e));
   }, []);
 
   const { toast: showToast } = useToast();
@@ -295,7 +295,7 @@ export default function UsagePage() {
                   color: warmColors,
                   legend: { type: "scroll", bottom: 0, textStyle: { fontSize: 10 }, pageTextStyle: { fontSize: 9 } },
                   tooltip: {
-                    trigger: "item", formatter: (p: any) => {
+                    trigger: "item", formatter: (p: { name: string; value: number }) => {
                       const val = isCreditsUser ? `${p.value.toLocaleString()} credits` : formatPrice(p.value);
                       return `${p.name}: ${val}`;
                     }
@@ -331,7 +331,7 @@ export default function UsagePage() {
                   color: coolColors,
                   legend: { type: "scroll", bottom: 0, textStyle: { fontSize: 10 }, pageTextStyle: { fontSize: 9 } },
                   tooltip: {
-                    trigger: "item", formatter: (p: any) => {
+                    trigger: "item", formatter: (p: { name: string; value: number; percent?: number }) => {
                       const d = detailMap[p.name];
                       if (d) {
                         return `${p.name}<br/>  ${p.value.toLocaleString()} tokens<br/>  ■ ${lang === "zh" ? "输入(未命中缓存)" : "Input(non-cached)"}: ${d.noncached.toLocaleString()}<br/>  ■ ${lang === "zh" ? "输入(命中缓存)" : "Input(cache hit)"}: ${d.cache_hit.toLocaleString()}<br/>  ■ ${lang === "zh" ? "输出" : "Output"}: ${d.output.toLocaleString()}`;

@@ -229,7 +229,7 @@ function AdminPlansContent() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -254,6 +254,7 @@ function AdminPlansContent() {
                 "px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer",
                 displayCurrency === "USD" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
               )}
+              aria-label={lang === "zh" ? "切换为美元显示" : "Switch to USD display"}
             >
               $ USD
             </button>
@@ -263,6 +264,7 @@ function AdminPlansContent() {
                 "px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer",
                 displayCurrency === "CNY" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
               )}
+              aria-label={lang === "zh" ? "切换为人民币显示" : "Switch to CNY display"}
             >
               {"¥"} CNY
             </button>
@@ -441,7 +443,7 @@ function AdminPlansContent() {
                     <Button variant="outline" size="sm" className="flex-1" onClick={() => { setEditPlan({ ...plan }); setEditTab("basic"); }}>
                       <Pencil className="h-3.5 w-3.5 mr-1" />{lang === "zh" ? "编辑" : "Edit"}
                     </Button>
-                    <Button variant="outline" size="sm" className="text-red-400 hover:text-red-300" onClick={() => setDeletePlan(plan)}>
+                    <Button variant="outline" size="sm" className="text-red-400 hover:text-red-300" onClick={() => setDeletePlan(plan)} aria-label={lang === "zh" ? `删除 ${plan.display_name}` : `Delete ${plan.display_name}`}>
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>
                   </div>
@@ -709,7 +711,7 @@ function AdminPlansContent() {
                     .map(m => <option key={m} value={m} />)}
                 </datalist>
               </div>
-              <Button onClick={handleAddModel} disabled={modelLoading || !newModel.trim()} className="h-10">
+              <Button onClick={handleAddModel} disabled={modelLoading || !newModel.trim()} className="h-10" aria-label={lang === "zh" ? "添加模型" : "Add model"}>
                 {modelLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
               </Button>
             </div>

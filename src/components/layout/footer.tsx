@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { useI18n } from "@/contexts/i18n-context";
+import { useTheme } from "@/contexts/theme-context";
 
 export function Footer() {
   const { t, lang } = useI18n();
+  const { resolvedTheme } = useTheme();
 
   const footerSections = [
     { id: "product", title: t.footer.product, links: [
@@ -12,7 +14,7 @@ export function Footer() {
       { label: t.footer.apiDocs, href: "/docs", disabled: false },
       { label: t.footer.dashboard, href: "/dashboard", disabled: false },
       { label: t.footer.pricing, href: "/token-plan", disabled: false },
-      { label: lang === "zh" ? "常见问题" : "FAQ", href: "/faq", disabled: false },
+      { label: t.footer.faq, href: "/faq", disabled: false },
     ]},
     { id: "features", title: t.footer.features, links: [
       { label: t.footer.unifiedApi, href: "/docs", disabled: false },
@@ -25,7 +27,7 @@ export function Footer() {
       { label: t.footer.promptTemplates, href: "/prompts", disabled: false },
       { label: t.footer.categories, href: "/categories", disabled: false },
       { label: t.common.changelog, href: "/changelog", disabled: false },
-      { label: lang === "zh" ? "系统状态" : "System Status", href: "/status", disabled: false },
+      { label: t.footer.systemStatus, href: "/status", disabled: false },
     ]},
     { id: "community", title: t.footer.community, links: [
       { label: t.footer.github, href: "https://github.com/DoctorFan1314/OortAPI", disabled: false },
@@ -40,10 +42,7 @@ export function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
           <div className="col-span-2 md:col-span-1">
             <div className="mb-4">
-              <picture>
-                <source srcSet="/logo-dark.svg" media="(prefers-color-scheme: dark)" />
-                <img src="/logo.svg" alt="OortAPI" className="h-14 w-auto" />
-              </picture>
+              <img src={resolvedTheme === "dark" ? "/logo-dark.svg" : "/logo.svg"} alt="OortAPI" className="h-14 w-auto" />
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed mb-6">
               {t.footer.description}

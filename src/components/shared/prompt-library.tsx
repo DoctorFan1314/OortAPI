@@ -57,11 +57,11 @@ export function PromptLibrary({ onSelect, open, onClose }: PromptLibraryProps) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" role="dialog" aria-modal="true" aria-label={lang === "zh" ? "提示词模板" : "Prompt Templates"} onClick={onClose}>
       <div className="bg-card border border-border/70 rounded-xl p-5 max-w-md w-full mx-auto shadow-2xl max-h-[80vh] flex flex-col animate-page-fade-in" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-semibold text-foreground flex items-center gap-2"><BookOpen className="h-4 w-4 text-primary" />{lang === "zh" ? "提示词模板" : "Prompt Templates"}</h2>
-          <button onClick={onClose} className="p-1 rounded-md hover:bg-muted transition-colors"><X className="h-4 w-4 text-muted-foreground" /></button>
+          <button onClick={onClose} className="p-1 rounded-md hover:bg-muted transition-colors" aria-label={lang === "zh" ? "关闭" : "Close"}><X className="h-4 w-4 text-muted-foreground" /></button>
         </div>
 
         {/* Template list */}

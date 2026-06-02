@@ -116,7 +116,7 @@ function TokenPlanContent() {
           showToast(lang === "zh" ? "订阅已取消" : "Subscription cancelled", "success");
         }
       }
-    } catch { showToast("Network error", "error"); } finally { setActionLoading(null); setCancelTarget(null); }
+    } catch { showToast(L.networkError, "error"); } finally { setActionLoading(null); setCancelTarget(null); }
   }
 
   async function handleToggleAutoRenew(subscriptionId: number) {
@@ -131,7 +131,7 @@ function TokenPlanContent() {
         const data = await res.json();
         setSubscriptions(prev => prev.map(s => s.id === subscriptionId ? { ...s, auto_renew: data.auto_renew ? 1 : 0 } : s));
       }
-    } catch { showToast("Network error", "error"); } finally { setActionLoading(null); }
+    } catch { showToast(L.networkError, "error"); } finally { setActionLoading(null); }
   }
 
   function handleCopy(text: string, key: string) {
@@ -162,7 +162,7 @@ function TokenPlanContent() {
       } else {
         showToast(data.error || "Plan change failed", "error");
       }
-    } catch { showToast("Network error", "error"); } finally { setUpgradeLoading(false); }
+    } catch { showToast(L.networkError, "error"); } finally { setUpgradeLoading(false); }
   }
 
   function formatDate(dateStr: string): string {
@@ -183,7 +183,7 @@ function TokenPlanContent() {
   };
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8">
+    <div className="space-y-6">
       <div className="mb-6"><h1 className="text-xl font-bold text-foreground">{L.title}</h1></div>
 
       {loading ? (

@@ -59,10 +59,10 @@ export default function BillingPage() {
         setRedeemCode("");
         refreshUser();
       } else {
-        setRedeemError(data.error || "Redeem failed");
+        setRedeemError(data.error || L.operationFailed);
       }
     } catch {
-      setRedeemError("Network error");
+      setRedeemError(L.networkError);
     }
     setRedeemLoading(false);
   }

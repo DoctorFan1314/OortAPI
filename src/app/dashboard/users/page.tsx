@@ -7,7 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
+import useSWR from "swr";
+import { dashboardSWRConfig } from "@/lib/swr-fetcher";
 import Link from "next/link";
 import { useToast } from "@/contexts/toast-context";
 import { useCurrency } from "@/contexts/currency-context";
@@ -49,16 +51,17 @@ export default function UsersPage() {
   const { toast: showToast } = useToast();
   const { formatPrice } = useCurrency();
 
-  const [users, setUsers] = useState<UserItem[]>([]);
-  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [roleFilter, setRoleFilter] = useState<"all" | "admin" | "user">("all");
   const [page, setPage] = useState(1);
-  const [total, setTotal] = useState(0);
-  const [hasMore, setHasMore] = useState(false);
-  const [fetchError, setFetchError] = useState(false);
+
+  const usersKey = `/api/dashboard/users?page=${page}&limit=20` + (debouncedSearch ? `&search=${encodeURIComponent(debouncedSearch)}` : "") + (roleFilter !== "all" ? `&role=${roleFilter}` : "");
+  const { data: usersData, isLoading, error: fetchError, mutate } = useSWR<{ users: UserItem[]; total: number; has_more: boolean }>(usersKey, dashboardSWRConfig);
+  const users = usersData?.users || [];
+  const total = usersData?.total || 0;
+  const hasMore = usersData?.has_more || false;
 
   // Edit dialog
   const [editUser, setEditUser] = useState<UserItem | null>(null);
@@ -77,7 +80,6 @@ export default function UsersPage() {
   const [copied, setCopied] = useState(false);
 
   // Subscription management
-  const [plans, setPlans] = useState<Plan[]>([]);
   const [giftPlanId, setGiftPlanId] = useState<number>(0);
   const [giftCredits, setGiftCredits] = useState("");
   const [subActionLoading, setSubActionLoading] = useState(false);
@@ -95,27 +97,8 @@ export default function UsersPage() {
     return () => { if (searchTimer.current) clearTimeout(searchTimer.current); };
   }, [search]);
 
-  const fetchUsers = useCallback(async () => {
-    setLoading(true);
-    setFetchError(false);
-    const params = new URLSearchParams({ page: String(page), limit: "20" });
-    if (debouncedSearch) params.set("search", debouncedSearch);
-    if (roleFilter !== "all") params.set("role", roleFilter);
-    try {
-      const res = await fetch(`/api/dashboard/users?${params}`, { credentials: "include" });
-      const data = await res.json();
-      setUsers(data.users || []);
-      setTotal(data.total || 0);
-      setHasMore(data.has_more || false);
-    } catch { setFetchError(true); }
-    setLoading(false);
-  }, [page, debouncedSearch, roleFilter]);
-
-  useEffect(() => { fetchUsers(); }, [fetchUsers]);
-
-  useEffect(() => {
-    fetch("/api/plans").then(r => r.json()).then(d => setPlans(d.plans || [])).catch(() => {});
-  }, []);
+  const { data: plansData } = useSWR<{ plans: Plan[] }>("/api/plans", dashboardSWRConfig);
+  const plans = plansData?.plans || [];
 
   function openEdit(u: UserItem) {
     setEditUser(u);
@@ -142,14 +125,14 @@ export default function UsersPage() {
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        showToast(data.error || "Operation failed", "error");
+        showToast(data.error || L.operationFailed, "error");
         setEditSaving(false);
         return;
       }
-    } catch { showToast("Network error", "error"); setEditSaving(false); return; }
+    } catch { showToast(L.networkError, "error"); setEditSaving(false); return; }
     setEditSaving(false);
     setEditUser(null);
-    fetchUsers();
+    mutate();
   }
 
   async function handleDelete() {
@@ -168,10 +151,10 @@ export default function UsersPage() {
         setDeleteLoading(false);
         return;
       }
-    } catch { showToast("Network error", "error"); setDeleteLoading(false); return; }
+    } catch { showToast(L.networkError, "error"); setDeleteLoading(false); return; }
     setDeleteLoading(false);
     setDeleteUser(null);
-    fetchUsers();
+    mutate();
   }
 
   async function handleResetPassword() {
@@ -190,7 +173,7 @@ export default function UsersPage() {
       } else {
         showToast(data.error || "Password reset failed", "error");
       }
-    } catch { showToast("Network error", "error"); }
+    } catch { showToast(L.networkError, "error"); }
     setResetLoading(false);
   }
 
@@ -227,11 +210,11 @@ export default function UsersPage() {
         body: JSON.stringify({ id: editUser.id, giftSubscription: { planId: giftPlanId, credits: giftCredits ? parseInt(giftCredits) : undefined } }),
       });
       const data = await res.json();
-      if (!res.ok) { showToast(data.error || "Operation failed", "error"); }
-    } catch { showToast("Network error", "error"); }
+      if (!res.ok) { showToast(data.error || L.operationFailed, "error"); }
+    } catch { showToast(L.networkError, "error"); }
     setSubActionLoading(false);
     setEditUser(null);
-    fetchUsers();
+    mutate();
   }
 
   async function handleCancelSubscription() {
@@ -251,11 +234,11 @@ export default function UsersPage() {
         body: JSON.stringify({ id: editUser.id, cancelSubscription: true }),
       });
       const data = await res.json();
-      if (!res.ok) { showToast(data.error || "Operation failed", "error"); }
-    } catch { showToast("Network error", "error"); }
+      if (!res.ok) { showToast(data.error || L.operationFailed, "error"); }
+    } catch { showToast(L.networkError, "error"); }
     setSubActionLoading(false);
     setEditUser(null);
-    fetchUsers();
+    mutate();
   }
 
   async function handleAddCredits() {
@@ -275,11 +258,11 @@ export default function UsersPage() {
         body: JSON.stringify({ id: editUser.id, addCredits: parseInt(giftCredits) }),
       });
       const data = await res.json();
-      if (!res.ok) { showToast(data.error || "Operation failed", "error"); }
-    } catch { showToast("Network error", "error"); }
+      if (!res.ok) { showToast(data.error || L.operationFailed, "error"); }
+    } catch { showToast(L.networkError, "error"); }
     setSubActionLoading(false);
     setEditUser(null);
-    fetchUsers();
+    mutate();
   }
 
   function toggleSelect(id: number) {
@@ -321,7 +304,7 @@ export default function UsersPage() {
         if (res.ok) {
           showToast(`${data.updated || ids.length} users granted $${amt}`, "success");
         } else {
-          showToast(data.error || "Operation failed", "error");
+          showToast(data.error || L.operationFailed, "error");
         }
       } else {
         const res = await fetch("/api/dashboard/users", {
@@ -334,15 +317,15 @@ export default function UsersPage() {
           showToast(`${ids.length} users ${action === "enable" ? "enabled" : "disabled"}`, "success");
         } else {
           const data = await res.json().catch(() => ({}));
-          showToast(data.error || "Operation failed", "error");
+          showToast(data.error || L.operationFailed, "error");
         }
       }
-    } catch { showToast("Network error", "error"); }
+    } catch { showToast(L.networkError, "error"); }
     setSelectedIds(new Set());
     setBatchLoading(false);
     setBatchGrantOpen(false);
     setBatchGrantAmount("");
-    fetchUsers();
+    mutate();
   }
 
   const roleFilters = [
@@ -415,13 +398,13 @@ export default function UsersPage() {
               </div>
             </div>
           )}
-          {loading ? (
+          {isLoading ? (
             <div className="h-48 animate-pulse bg-muted rounded-lg m-6" />
           ) : fetchError ? (
             <div className="text-center py-12">
               <AlertTriangle className="h-8 w-8 text-destructive/40 mx-auto mb-2" />
               <p className="text-sm text-muted-foreground mb-2">{lang === "zh" ? "加载失败" : "Failed to load"}</p>
-              <Button variant="outline" size="sm" onClick={() => fetchUsers()}>{lang === "zh" ? "重试" : "Retry"}</Button>
+              <Button variant="outline" size="sm" onClick={() => mutate()}>{lang === "zh" ? "重试" : "Retry"}</Button>
             </div>
           ) : users.length === 0 ? (
             <div className="text-center py-12">

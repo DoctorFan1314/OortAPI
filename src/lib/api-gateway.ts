@@ -319,7 +319,7 @@ async function executeChannelRequest(
     });
 
     if (error instanceof Error && error.name === 'AbortError') {
-      return { success: false, error: 'Upstream request timed out (180s)', statusCode: 504 };
+      return { success: false, error: 'Upstream request timed out (600s)', statusCode: 504 };
     }
     return { success: false, error: 'Gateway error: upstream request failed', statusCode: 502 };
   }

@@ -6,7 +6,46 @@
 
 ---
 
-## [v3.3.5.0] — 2026-05-28
+## [v3.3.5.0] — 2026-06-02
+
+### 全站审计第二批（30 项改进）
+
+#### P0 — Bug 与安全修复
+- **健康检查状态不匹配** — `api/health` 返回 `status: 'healthy'` 但 `StatusIndicator` 检查 `'ok'`；统一为 `'healthy'`
+- **API 网关超时错误信息** — 错误信息显示 "180s" 但实际超时 600s；已修正
+- **Logo 主题冲突** — `<picture media="(prefers-color-scheme)">` 与 JS 驱动的 ThemeProvider 冲突；改用 `resolvedTheme` 条件切换
+- **docs/api-reference i18n** — 整页纯中文；添加 `useI18n` 和英文翻译
+- **缺失 i18n key** — 添加 `featuresDesc`、`modelsPricingDesc`、`securityDesc`、`faqDesc`、`changelogDesc` 到字典
+
+#### P1 — 高优先
+- **硬编码错误消息** — billing、token-plan、redeem、users、webhooks、playground 等页面的 `"Network error"` / `"Operation failed"` 替换为 `L.networkError` / `L.operationFailed`
+- **静默错误吞噬** — playground、usage、redeem、users、channel-card 的 9+ 个 `.catch(() => {})` 添加 `console.warn`
+- **response-schema 主题** — 硬编码 `bg-[#0d1117]` / `text-zinc-200` 替换为 CSS 变量 `var(--code-bg)` / `var(--code-foreground)`
+- **response-schema i18n** — 所有字符串（Parameters、Required、Optional、Request、Response、Copy）使用 i18n
+- **table-of-contents i18n** — "On this page" 使用 `lang` 条件
+- **NotificationBell 筛选标签** — 内联三元替换为 `t.notificationFilters[tab.labelKey]`；添加 `likes`/`replies` key
+- **ErrorBoundary i18n** — 添加 `labels` prop；dashboard layout 传入 `t.common.*`
+- **ConfirmDialog i18n** — Cancel/Confirm 默认值使用 `t.common.cancel` / `t.common.confirm`
+
+#### P2 — 可访问性与美化
+- **仪表盘 aria-label** — 5 个页面的切换、分页、刷新、货币、操作按钮添加 aria-label
+- **移动端导航 aria-current** — 活跃链接添加 `aria-current="page"`
+- **模态框 dialog 语义** — PromptLibrary 和 KeyboardShortcutsHelp 添加 `role="dialog"`、`aria-modal="true"`
+- **CSS 重复规则** — 删除重复的 `.dark .playground-scrollbar` 规则
+- **CSS 变量渐变** — `.gradient-spark/flare/pulse/nova` 使用 `var(--plan-*-from/to)` 替代硬编码十六进制值
+- **TypeScript any 类型** — usage 页面 `(m: any)` 替换为具体类型
+- **文档页面间距** — 所有页面统一为 `space-y-8`
+- **仪表盘页面间距** — token-plan 和 admin/plans 移除 `max-w-4xl/6xl` 约束
+- **ParamTable 语义 HTML** — div 网格转换为 `<table>` 元素
+- **部署文档 URL** — 占位符 `your-org/oortapi.git` 替换为真实地址 `DoctorFan1314/OortAPI.git`
+- **Swagger 错误处理** — API Reference 页面添加错误状态和重试按钮
+- **移动端底部导航 i18n** — `lang === "zh"` 三元替换为 `t.common.*` / `t.dashboard.*`
+- **StatusIndicator i18n** — 状态文本使用 `lang` 条件
+- **Footer i18n** — FAQ 和系统状态链接使用 `t.footer.faq` / `t.footer.systemStatus`
+- **页面独立 metadata** — 17 个文档页面通过 server component wrapper 添加唯一 title/description
+- **CrossLinks 组件** — 添加到 15 个文档页面（之前只有 quickstart）
+- **SWR 迁移** — multiplier、redeem、users、users/[id] 从 raw fetch 迁移到 `useSWR`
+- **仪表盘组件 i18n** — activity-feed、billing-history、model-analytics 内联三元迁移到字典 key
 
 ### 全站审计（10 大改进 + 50 小改进）
 

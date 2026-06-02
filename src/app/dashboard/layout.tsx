@@ -20,7 +20,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div className="flex flex-col lg:flex-row gap-6">
           <DashboardSidebar />
           <main id="main-content" className="flex-1 min-w-0">
-            <ErrorBoundary>
+            <ErrorBoundary labels={{ title: t.common.errorTitle, description: t.common.errorDescription, retry: t.common.retry }}>
               {children}
             </ErrorBoundary>
           </main>

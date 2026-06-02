@@ -6,7 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { useEffect, useState, useCallback } from "react";
+import { useState } from "react";
+import useSWR from "swr";
+import { dashboardSWRConfig } from "@/lib/swr-fetcher";
 import { useToast } from "@/contexts/toast-context";
 import { Gift, Loader2, Plus, Trash2, Copy, Check, Power, PowerOff, AlertTriangle } from "lucide-react";
 
@@ -39,12 +41,15 @@ export default function RedeemPage() {
   const L = t.dashboard;
   const { toast: showToast } = useToast();
 
-  const [codes, setCodes] = useState<RedeemCode[]>([]);
-  const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [fetchError, setFetchError] = useState(false);
+
+  const { data: rawData, isLoading, error: fetchError, mutate } = useSWR<{ codes: RedeemCode[]; has_more: boolean }>(`/api/dashboard/redeem?page=${page}&limit=50`, dashboardSWRConfig);
+  const codes = rawData?.codes || [];
+  const hasMore = rawData?.has_more || false;
+
+  const { data: plansData } = useSWR<{ plans: Plan[] }>("/api/plans", dashboardSWRConfig);
+  const plans = plansData?.plans || [];
 
   const filteredCodes = searchQuery
     ? codes.filter(c => c.code.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -62,7 +67,6 @@ export default function RedeemPage() {
   const [genLoading, setGenLoading] = useState(false);
   const [genResult, setGenResult] = useState<string[]>([]);
   const [copied, setCopied] = useState(false);
-  const [plans, setPlans] = useState<Plan[]>([]);
 
   // Delete dialog
   const [deleteId, setDeleteId] = useState<number | null>(null);
@@ -72,21 +76,6 @@ export default function RedeemPage() {
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [batchLoading, setBatchLoading] = useState(false);
   const [batchDeleteOpen, setBatchDeleteOpen] = useState(false);
-
-  const fetchCodes = useCallback(async () => {
-    setLoading(true);
-    setFetchError(false);
-    try {
-      const res = await fetch(`/api/dashboard/redeem?page=${page}&limit=50`, { credentials: "include" });
-      const data = await res.json();
-      setCodes(data.codes || []);
-      setHasMore(data.has_more || false);
-    } catch { setFetchError(true); showToast("Failed to load redeem codes", "error"); }
-    setLoading(false);
-  }, [page]);
-
-  useEffect(() => { fetchCodes(); }, [fetchCodes]);
-  useEffect(() => { fetch("/api/plans").then(r => r.json()).then(d => setPlans(d.plans || [])).catch(() => {}); }, []);
 
   async function handleGenerate() {
     if (genCodeType === "balance" && (!genAmount || parseFloat(genAmount) <= 0)) {
@@ -122,11 +111,11 @@ export default function RedeemPage() {
       const data = await res.json();
       if (res.ok && data.codes) {
         setGenResult(data.codes);
-        fetchCodes();
+        mutate();
       } else {
         showToast(data.error || "Generation failed", "error");
       }
-    } catch { showToast("Network error", "error"); }
+    } catch { showToast(L.networkError, "error"); }
     setGenLoading(false);
   }
 
@@ -142,8 +131,8 @@ export default function RedeemPage() {
         const data = await res.json().catch(() => ({}));
         showToast(data.error || "Operation failed", "error");
       }
-    } catch { showToast("Network error", "error"); }
-    fetchCodes();
+    } catch { showToast(L.networkError, "error"); }
+    mutate();
   }
 
   async function handleDelete() {
@@ -160,10 +149,10 @@ export default function RedeemPage() {
         const data = await res.json().catch(() => ({}));
         showToast(data.error || "Delete failed", "error");
       }
-    } catch { showToast("Network error", "error"); }
+    } catch { showToast(L.networkError, "error"); }
     setDeleteLoading(false);
     setDeleteId(null);
-    fetchCodes();
+    mutate();
   }
 
   function copyAll() {
@@ -221,11 +210,11 @@ export default function RedeemPage() {
           showToast(`${ids.length} codes ${action === "enable" ? "enabled" : "disabled"}`, "success");
         }
       }
-    } catch { showToast("Network error", "error"); }
+    } catch { showToast(L.networkError, "error"); }
     setSelectedIds(new Set());
     setBatchLoading(false);
     setBatchDeleteOpen(false);
-    fetchCodes();
+    mutate();
   }
 
   function getStatus(code: RedeemCode) {
@@ -238,7 +227,7 @@ export default function RedeemPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold flex items-center gap-2"><Gift className="h-6 w-6" />{L.title}{!loading && <Badge variant="secondary" className="ml-1 text-xs">{codes.length}</Badge>}</h1>
+        <h1 className="text-2xl font-bold flex items-center gap-2"><Gift className="h-6 w-6" />{L.title}{!isLoading && <Badge variant="secondary" className="ml-1 text-xs">{codes.length}</Badge>}</h1>
         <Button onClick={() => { setGenOpen(true); setGenResult([]); }} size="sm">
           <Plus className="h-4 w-4 mr-1.5" />{L.generate}
         </Button>
@@ -272,13 +261,13 @@ export default function RedeemPage() {
               />
             </div>
           )}
-          {loading ? (
+          {isLoading ? (
             <div className="h-48 animate-pulse bg-muted rounded-lg m-6" />
           ) : fetchError ? (
             <div className="text-center py-12">
               <AlertTriangle className="h-8 w-8 text-destructive/40 mx-auto mb-2" />
               <p className="text-sm text-muted-foreground mb-2">{lang === "zh" ? "加载失败" : "Failed to load"}</p>
-              <Button variant="outline" size="sm" onClick={() => fetchCodes()}>{lang === "zh" ? "重试" : "Retry"}</Button>
+              <Button variant="outline" size="sm" onClick={() => mutate()}>{lang === "zh" ? "重试" : "Retry"}</Button>
             </div>
           ) : codes.length === 0 ? (
             <div className="text-center py-12">

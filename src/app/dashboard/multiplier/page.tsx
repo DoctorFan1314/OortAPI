@@ -5,6 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useEffect, useState } from "react";
+import useSWR from "swr";
+import { dashboardSWRConfig } from "@/lib/swr-fetcher";
 import { Clock, Layers, Plus, Trash2, Save, AlertTriangle, BarChart3 } from "lucide-react";
 import { useToast } from "@/contexts/toast-context";
 
@@ -31,11 +33,11 @@ export default function MultiplierPage() {
   const { lang, t } = useI18n();
   const L = t.dashboard;
   const { toast: showToast } = useToast();
-  const [rules, setRules] = useState<MultiplierRule[]>([]);
+  const { data: rawData, isLoading, error: fetchError, mutate } = useSWR<{ rules: MultiplierRule[]; time_settings?: TimeSettings }>("/api/dashboard/multiplier", dashboardSWRConfig);
+  const rules = rawData?.rules || [];
   const [timeSettings, setTimeSettings] = useState<TimeSettings>({
     day_start: '08:00', day_end: '22:00', day_rate: 1.0, night_rate: 0.5, timezone: 'Asia/Shanghai', enabled: 0,
   });
-  const [loading, setLoading] = useState(true);
   const [newModel, setNewModel] = useState('');
   const [newMultiplier, setNewMultiplier] = useState('1.0');
   const [newDesc, setNewDesc] = useState('');
@@ -43,21 +45,10 @@ export default function MultiplierPage() {
   const [selectedRules, setSelectedRules] = useState<Set<string>>(new Set());
   const [batchMultValue, setBatchMultValue] = useState('1.0');
   const [showBatchDialog, setShowBatchDialog] = useState(false);
-  const [fetchError, setFetchError] = useState(false);
 
-  const fetchData = () => {
-    setFetchError(false);
-    fetch('/api/dashboard/multiplier', { credentials: 'include' })
-      .then(res => { if (!res.ok) throw new Error(); return res.json(); })
-      .then(d => {
-        setRules(d.rules || []);
-        if (d.time_settings) setTimeSettings(d.time_settings);
-        setLoading(false);
-      })
-      .catch(() => { setLoading(false); setFetchError(true); });
-  };
-
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => {
+    if (rawData?.time_settings) setTimeSettings(rawData.time_settings);
+  }, [rawData]);
 
   const handleAddRule = () => {
     if (!newModel.trim()) return;
@@ -67,7 +58,7 @@ export default function MultiplierPage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ model_name: newModel.trim(), multiplier: parseFloat(newMultiplier) || 1.0, enabled: true, description: newDesc || null }),
     }).then(res => { if (!res.ok) throw new Error(); return res.json(); })
-      .then(() => { setNewModel(''); setNewMultiplier('1.0'); setNewDesc(''); fetchData(); })
+      .then(() => { setNewModel(''); setNewMultiplier('1.0'); setNewDesc(''); mutate(); })
       .catch(() => showToast(lang === "zh" ? "添加失败" : "Failed to add rule", "error"));
   };
 
@@ -83,7 +74,7 @@ export default function MultiplierPage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ model_name: deleteTarget }),
     }).then(res => { if (!res.ok) throw new Error(); return res.json(); })
-      .then(() => { setDeleteTarget(null); fetchData(); })
+      .then(() => { setDeleteTarget(null); mutate(); })
       .catch(() => { showToast(lang === "zh" ? "删除失败" : "Failed to delete rule", "error"); setDeleteTarget(null); });
   };
 
@@ -94,7 +85,7 @@ export default function MultiplierPage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ model_name: rule.model_name, multiplier: rule.multiplier, enabled: !rule.enabled, description: rule.description }),
     }).then(res => { if (!res.ok) throw new Error(); return res.json(); })
-      .then(() => fetchData())
+      .then(() => mutate())
       .catch(() => showToast(lang === "zh" ? "更新失败" : "Failed to update rule", "error"));
   };
 
@@ -132,11 +123,11 @@ export default function MultiplierPage() {
     await Promise.all(promises);
     setShowBatchDialog(false);
     setSelectedRules(new Set());
-    fetchData();
+    mutate();
     showToast(lang === "zh" ? "批量更新成功" : "Batch update successful", "success");
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="space-y-6">
         <h1 className="text-xl md:text-2xl font-bold">{L.title}</h1>
@@ -152,7 +143,7 @@ export default function MultiplierPage() {
         <div className="text-center py-12">
           <AlertTriangle className="h-8 w-8 text-destructive/40 mx-auto mb-2" />
           <p className="text-sm text-muted-foreground mb-2">{L.loadFailed}</p>
-          <Button variant="outline" size="sm" onClick={fetchData}>{L.retry}</Button>
+          <Button variant="outline" size="sm" onClick={() => mutate()}>{L.retry}</Button>
         </div>
       </div>
     );
@@ -243,6 +234,7 @@ export default function MultiplierPage() {
           <button
             onClick={handleSaveTimeSettings}
             className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
+            aria-label={L.save}
           >
             <Save className="h-4 w-4" />
             {L.save}
@@ -294,6 +286,7 @@ export default function MultiplierPage() {
             <button
               onClick={handleAddRule}
               className="flex items-center gap-1.5 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
+              aria-label={L.add}
             >
               <Plus className="h-4 w-4" />
               {L.add}

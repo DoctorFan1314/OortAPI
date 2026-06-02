@@ -434,6 +434,15 @@ export default function AdminModelsPage() {
                                   ? "启用"
                                   : "Enable"
                             }
+                            aria-label={
+                              enabled
+                                ? lang === "zh"
+                                  ? "禁用"
+                                  : "Disable"
+                                : lang === "zh"
+                                  ? "启用"
+                                  : "Enable"
+                            }
                           >
                             {togglingId === m.id ? (
                               <Loader2 className="h-3.5 w-3.5 animate-spin" />

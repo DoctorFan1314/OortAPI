@@ -4,6 +4,7 @@ import useSWR from "swr";
 import { dashboardSWRConfig } from "@/lib/swr-fetcher";
 import Link from "next/link";
 import { Activity, Cpu, ArrowRight } from "lucide-react";
+import { useI18n } from "@/contexts/i18n-context";
 
 interface UsageEntry {
   id: number;
@@ -35,6 +36,7 @@ function getProviderColor(model: string): { dot: string; icon: string } {
 }
 
 export function ActivityFeed({ lang = "zh" }: { lang?: "zh" | "en" }) {
+  const { t } = useI18n();
   const { data } = useSWR<UsageResponse>(
     "/api/v1/billing/usage?limit=10",
     dashboardSWRConfig,
@@ -47,10 +49,10 @@ export function ActivityFeed({ lang = "zh" }: { lang?: "zh" | "en" }) {
       <div className="glass-card p-5">
         <div className="flex items-center gap-2 mb-4">
           <Activity className="h-4 w-4 text-primary" />
-          <h3 className="text-sm font-semibold">{lang === "zh" ? "最近调用" : "Recent Calls"}</h3>
+          <h3 className="text-sm font-semibold">{t.dashboard.recentCalls}</h3>
         </div>
         <p className="text-xs text-muted-foreground text-center py-8">
-          {lang === "zh" ? "暂无调用记录" : "No calls yet"}
+          {t.dashboard.noCallsYet}
         </p>
       </div>
     );
@@ -61,7 +63,7 @@ export function ActivityFeed({ lang = "zh" }: { lang?: "zh" | "en" }) {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Cpu className="h-4 w-4 text-primary" />
-          <h3 className="text-sm font-semibold">{lang === "zh" ? "最近调用" : "Recent Calls"}</h3>
+          <h3 className="text-sm font-semibold">{t.dashboard.recentCalls}</h3>
         </div>
         <span className="text-[10px] font-mono text-muted-foreground">{logs.length}</span>
       </div>
@@ -105,14 +107,14 @@ export function ActivityFeed({ lang = "zh" }: { lang?: "zh" | "en" }) {
                 {/* Line 2: input non-cached */}
                 <div className="text-[11px] text-muted-foreground font-mono flex items-center gap-1">
                   <span className="inline-block w-1.5 h-1.5 rounded bg-blue-400 shrink-0" />
-                  {lang === "zh" ? "输入(未缓存)" : "Input(nc)"}: {fmt(nonCached)}
+                  {t.dashboard.inputNonCachedLabel}: {fmt(nonCached)}
                 </div>
 
                 {/* Line 3: input cache + badge right */}
                 <div className="flex items-center justify-between text-[11px] text-muted-foreground font-mono">
                   <span className="flex items-center gap-1">
                     <span className="inline-block w-1.5 h-1.5 rounded bg-emerald-400 shrink-0" />
-                    {lang === "zh" ? "输入(缓存)" : "Input(cache)"}: {fmt(entry.tokens_in_cache)}
+                    {t.dashboard.inputCachedLabel}: {fmt(entry.tokens_in_cache)}
                   </span>
                   {cacheRate !== null ? (
                     <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${
@@ -122,7 +124,7 @@ export function ActivityFeed({ lang = "zh" }: { lang?: "zh" | "en" }) {
                           ? "text-yellow-500 bg-yellow-500/10"
                           : "text-muted-foreground bg-muted"
                     }`}>
-                      {lang === "zh" ? "缓存命中率" : "cache hit"} {cacheRate}%
+                      {t.dashboard.cacheHitLabel} {cacheRate}%
                     </span>
                   ) : <span />}
                 </div>
@@ -131,7 +133,7 @@ export function ActivityFeed({ lang = "zh" }: { lang?: "zh" | "en" }) {
                 <div className="flex items-center justify-between text-[11px] text-muted-foreground font-mono">
                   <span className="flex items-center gap-1">
                     <span className="inline-block w-1.5 h-1.5 rounded bg-orange-400 shrink-0" />
-                    {lang === "zh" ? "输出" : "Out"}: {fmt(entry.tokens_out)}
+                    {t.dashboard.outputLabel}: {fmt(entry.tokens_out)}
                   </span>
                   <span className="text-muted-foreground/60">{time}</span>
                 </div>
@@ -142,7 +144,7 @@ export function ActivityFeed({ lang = "zh" }: { lang?: "zh" | "en" }) {
       </div>
 
       <Link href="/dashboard/usage" className="flex items-center justify-center gap-1 mt-3 pt-3 border-t border-border/30 text-[11px] text-muted-foreground hover:text-foreground transition-colors font-medium">
-        {lang === "zh" ? "查看全部" : "View All"}
+        {t.common.viewAll}
         <ArrowRight className="h-3 w-3" />
       </Link>
     </div>

@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
+import { useI18n } from "@/contexts/i18n-context";
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -18,6 +19,7 @@ interface ConfirmDialogProps {
   message: string;
   onConfirm: () => void;
   confirmLabel?: string;
+  cancelLabel?: string;
   variant?: "danger" | "default";
   loading?: boolean;
 }
@@ -28,10 +30,15 @@ export function ConfirmDialog({
   title,
   message,
   onConfirm,
-  confirmLabel = "Confirm",
+  confirmLabel,
+  cancelLabel,
   variant = "default",
   loading = false,
 }: ConfirmDialogProps) {
+  const { t } = useI18n();
+  const confirm = confirmLabel || t.common.confirm;
+  const cancel = cancelLabel || t.common.cancel;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -41,14 +48,14 @@ export function ConfirmDialog({
         </DialogHeader>
         <DialogFooter showCloseButton={false}>
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
-            Cancel
+            {cancel}
           </Button>
           <Button
             variant={variant === "danger" ? "destructive" : "default"}
             onClick={onConfirm}
             disabled={loading}
           >
-            {loading ? <><Loader2 className="h-4 w-4 animate-spin mr-1.5" />{confirmLabel}</> : confirmLabel}
+            {loading ? <><Loader2 className="h-4 w-4 animate-spin mr-1.5" />{confirm}</> : confirm}
           </Button>
         </DialogFooter>
       </DialogContent>

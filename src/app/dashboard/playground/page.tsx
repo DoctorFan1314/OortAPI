@@ -136,7 +136,7 @@ function PlaygroundContent() {
     fetch("/api/v1/models")
       .then((r) => { if (!r.ok) throw new Error(`Models: HTTP ${r.status}`); return r.json(); })
       .then((d) => { if (d?.data) { setModels(d.data); setSessions((prev) => prev.map((s) => ({ ...s, selectedModel: s.selectedModel || d.data[0]?.id || "" }))); } })
-      .catch(() => {});
+      .catch((e) => console.warn("Failed to load models:", e));
   }, []);
   useEffect(() => {
     fetch("/api/dashboard/keys", { credentials: "include" })
@@ -154,7 +154,7 @@ function PlaygroundContent() {
           }
         }
       })
-      .catch(() => {});
+      .catch((e) => console.warn("Failed to load keys:", e));
   }, []);
 
   // ── Persistence ──
@@ -466,7 +466,7 @@ function PlaygroundContent() {
         setIsSending(false); return;
       } catch (err: unknown) {
         if (err instanceof DOMException && err.name === "AbortError") { setIsSending(false); return; }
-        setError(err instanceof Error ? err.message : "Network error");
+        setError(err instanceof Error ? err.message : L.networkError);
         setIsSending(false); return;
       }
     }

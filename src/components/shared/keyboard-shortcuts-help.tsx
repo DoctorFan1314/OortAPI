@@ -34,7 +34,7 @@ export function KeyboardShortcutsHelp() {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={() => setOpen(false)}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label={locale === "zh" ? "键盘快捷键" : "Keyboard Shortcuts"} onClick={() => setOpen(false)}>
       <div className="bg-card border border-border/70 rounded-xl p-6 max-w-sm w-full mx-4 shadow-2xl animate-page-fade-in" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-semibold text-foreground">{locale === "zh" ? "键盘快捷键" : "Keyboard Shortcuts"}</h2>

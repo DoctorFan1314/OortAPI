@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import { ChevronDown, Copy, Check, FileJson, Table } from "lucide-react";
 import { cn } from "@/lib/utils";
 import LazySyntaxHighlighter from "@/components/shared/lazy-syntax-highlighter";
+import { useI18n } from "@/contexts/i18n-context";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -37,31 +38,23 @@ interface ResponseSchemaProps {
 
 type TabKey = "request" | "response";
 
-function ParameterTable({ parameters }: { parameters: Parameter[] }) {
+function ParameterTable({ parameters, labels }: { parameters: Parameter[]; labels: { parameters: string; required: string; optional: string; name: string; type: string; description: string } }) {
   if (!parameters || parameters.length === 0) return null;
 
   return (
-    <div className="border-t border-zinc-800">
-      <div className="flex items-center gap-2 px-4 py-2.5 bg-[#0d1117]">
-        <Table className="h-3.5 w-3.5 text-zinc-500" />
-        <span className="text-xs font-medium text-zinc-400">Parameters</span>
+    <div className="border-t border-[var(--code-border)]">
+      <div className="flex items-center gap-2 px-4 py-2.5 bg-[var(--code-bg)]">
+        <Table className="h-3.5 w-3.5 text-muted-foreground" />
+        <span className="text-xs font-medium text-muted-foreground">{labels.parameters}</span>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-zinc-800 bg-[#0d1117]/60">
-              <th className="text-left px-4 py-2 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
-                Name
-              </th>
-              <th className="text-left px-4 py-2 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
-                Type
-              </th>
-              <th className="text-left px-4 py-2 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
-                Required
-              </th>
-              <th className="text-left px-4 py-2 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
-                Description
-              </th>
+            <tr className="border-b border-[var(--code-border)] bg-[var(--code-bg)]/60">
+              <th className="text-left px-4 py-2 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">{labels.name}</th>
+              <th className="text-left px-4 py-2 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">{labels.type}</th>
+              <th className="text-left px-4 py-2 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">{labels.required}</th>
+              <th className="text-left px-4 py-2 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">{labels.description}</th>
             </tr>
           </thead>
           <tbody>
@@ -69,34 +62,28 @@ function ParameterTable({ parameters }: { parameters: Parameter[] }) {
               <tr
                 key={param.name}
                 className={cn(
-                  "border-b border-zinc-800/50 hover:bg-zinc-800/20 transition-colors",
+                  "border-b border-[var(--code-border)]/50 hover:bg-[var(--code-bg)]/40 transition-colors",
                   i === parameters.length - 1 && "border-b-0"
                 )}
               >
                 <td className="px-4 py-2.5">
-                  <code className="text-xs font-mono text-emerald-400">
-                    {param.name}
-                  </code>
+                  <code className="text-xs font-mono text-emerald-500 dark:text-emerald-400">{param.name}</code>
                 </td>
                 <td className="px-4 py-2.5">
-                  <code className="text-xs font-mono text-sky-400">
-                    {param.type}
-                  </code>
+                  <code className="text-xs font-mono text-sky-600 dark:text-sky-400">{param.type}</code>
                 </td>
                 <td className="px-4 py-2.5">
                   {param.required ? (
-                    <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                      Required
+                    <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                      {labels.required}
                     </span>
                   ) : (
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-500 border border-zinc-700/50">
-                      Optional
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground border border-border">
+                      {labels.optional}
                     </span>
                   )}
                 </td>
-                <td className="px-4 py-2.5 text-xs text-zinc-400 max-w-xs">
-                  {param.description}
-                </td>
+                <td className="px-4 py-2.5 text-xs text-muted-foreground max-w-xs">{param.description}</td>
               </tr>
             ))}
           </tbody>
@@ -118,6 +105,7 @@ export function ResponseSchema({
   defaultOpen = false,
   className,
 }: ResponseSchemaProps) {
+  const { lang } = useI18n();
   const [open, setOpen] = useState(defaultOpen);
   const [activeTab, setActiveTab] = useState<TabKey>("request");
   const [copied, setCopied] = useState(false);
@@ -131,31 +119,30 @@ export function ResponseSchema({
     }).catch(() => {});
   }, [activeCode]);
 
+  const labels = lang === "zh"
+    ? { parameters: "参数", required: "必填", optional: "可选", name: "名称", type: "类型", description: "描述", request: "请求", response: "响应", copied: "已复制!", copy: "复制" }
+    : { parameters: "Parameters", required: "Required", optional: "Optional", name: "Name", type: "Type", description: "Description", request: "Request", response: "Response", copied: "Copied!", copy: "Copy" };
+
   const tabConfig: { key: TabKey; label: string }[] = [
-    { key: "request", label: "Request" },
-    { key: "response", label: "Response" },
+    { key: "request", label: labels.request },
+    { key: "response", label: labels.response },
   ];
 
   return (
-    <div
-      className={cn(
-        "rounded-lg border border-zinc-800 overflow-hidden",
-        className
-      )}
-    >
+    <div className={cn("rounded-lg border border-[var(--code-border)] overflow-hidden", className)}>
       {/* Header — always visible, toggles collapse */}
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center justify-between px-4 py-3 bg-[#0d1117] hover:bg-[#0d1117]/80 transition-colors text-left"
+        className="w-full flex items-center justify-between px-4 py-3 bg-[var(--code-bg)] hover:bg-[var(--code-bg)]/80 transition-colors text-left"
       >
         <div className="flex items-center gap-2.5">
           <FileJson className="h-4 w-4 text-emerald-500" />
-          <span className="text-sm font-semibold text-zinc-200">{title}</span>
+          <span className="text-sm font-semibold text-[var(--code-foreground)]">{title}</span>
         </div>
         <ChevronDown
           className={cn(
-            "h-4 w-4 text-zinc-500 transition-transform duration-200 shrink-0",
+            "h-4 w-4 text-muted-foreground transition-transform duration-200 shrink-0",
             open && "rotate-180"
           )}
         />
@@ -165,7 +152,7 @@ export function ResponseSchema({
       {open && (
         <div>
           {/* Tab bar */}
-          <div className="flex items-center justify-between px-3 py-1.5 border-t border-zinc-800 bg-[#161b20]">
+          <div className="flex items-center justify-between px-3 py-1.5 border-t border-[var(--code-border)] bg-[var(--code-bg)]">
             <div className="flex gap-0.5">
               {tabConfig.map((tab) => (
                 <button
@@ -177,8 +164,8 @@ export function ResponseSchema({
                   className={cn(
                     "px-2.5 py-1 text-[11px] font-mono rounded transition-colors",
                     tab.key === activeTab
-                      ? "bg-zinc-800 text-zinc-200 border border-zinc-700 shadow-sm"
-                      : "text-zinc-500 hover:text-zinc-300"
+                      ? "bg-background text-foreground border border-border shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
                   )}
                 >
                   {tab.label}
@@ -187,15 +174,15 @@ export function ResponseSchema({
             </div>
             <button
               onClick={handleCopy}
-              className="flex items-center gap-1 text-[11px] text-zinc-400 hover:text-zinc-200 transition-colors"
-              aria-label="Copy code"
+              className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+              aria-label={labels.copy}
             >
               {copied ? (
-                <Check className="h-3 w-3 text-emerald-400" />
+                <Check className="h-3 w-3 text-emerald-500" />
               ) : (
                 <Copy className="h-3 w-3" />
               )}
-              <span>{copied ? "Copied!" : "Copy"}</span>
+              <span>{copied ? labels.copied : labels.copy}</span>
             </button>
           </div>
 
@@ -205,7 +192,7 @@ export function ResponseSchema({
           </div>
 
           {/* Parameter table */}
-          <ParameterTable parameters={parameters ?? []} />
+          <ParameterTable parameters={parameters ?? []} labels={labels} />
         </div>
       )}
     </div>

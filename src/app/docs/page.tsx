@@ -150,7 +150,7 @@ export default function DocsLandingPage() {
       </section>
 
       {/* Data-driven card groups */}
-      <div className="space-y-10">
+      <div className="space-y-8">
         {GROUPS.map(group => {
           const groupCards = cards.filter(c => c.group === group.key);
           const GroupIcon = group.icon;

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/contexts/i18n-context";
 
 interface TocItem {
   id: string;
@@ -11,6 +12,7 @@ interface TocItem {
 }
 
 export function TableOfContents() {
+  const { lang } = useI18n();
   const pathname = usePathname();
   const [items, setItems] = useState<TocItem[]>([]);
   const [activeId, setActiveId] = useState<string>("");
@@ -59,7 +61,7 @@ export function TableOfContents() {
     <nav className="hidden xl:block w-56 shrink-0" aria-label="Table of contents">
       <div className="sticky top-24 space-y-1">
         <p className="text-xs font-medium text-muted-foreground mb-3 uppercase tracking-wider">
-          On this page
+          {lang === "zh" ? "本页目录" : "On this page"}
         </p>
         {items.map((item, i) => (
           <button

@@ -6,7 +6,46 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [v3.3.5.0] — 2026-05-28
+## [v3.3.5.0] — 2026-06-02
+
+### Full-Site Audit Phase 2 (30 Improvements)
+
+#### P0 — Bug & Security Fixes
+- **Health check status mismatch** — `api/health` returned `status: 'healthy'` but `StatusIndicator` checked for `'ok'`; unified to `'healthy'`
+- **API gateway timeout message** — Error said "180s" but actual timeout is 600s; corrected
+- **Logo theme conflict** — `<picture media="(prefers-color-scheme)">` conflicted with JS-driven ThemeProvider; switched to `resolvedTheme` conditional `src`
+- **docs/api-reference i18n** — Entire page was Chinese-only; added `useI18n` and English translations
+- **Missing i18n keys** — Added `featuresDesc`, `modelsPricingDesc`, `securityDesc`, `faqDesc`, `changelogDesc` to dictionary
+
+#### P1 — High Priority
+- **Hardcoded error messages** — Replaced `"Network error"` / `"Operation failed"` with `L.networkError` / `L.operationFailed` across billing, token-plan, redeem, users, webhooks, playground pages
+- **Silent error swallowing** — Added `console.warn` to 9+ `.catch(() => {})` blocks in playground, usage, redeem, users, channel-card
+- **response-schema theme** — Replaced hardcoded `bg-[#0d1117]` / `text-zinc-200` with CSS variables `var(--code-bg)` / `var(--code-foreground)`
+- **response-schema i18n** — All strings (Parameters, Required, Optional, Request, Response, Copy) now use i18n
+- **table-of-contents i18n** — "On this page" now uses `lang` conditional
+- **NotificationBell filter tabs** — Replaced inline ternaries with `t.notificationFilters[tab.labelKey]`; added `likes`/`replies` keys
+- **ErrorBoundary i18n** — Added `labels` prop for title/description/retry; dashboard layout passes `t.common.*`
+- **ConfirmDialog i18n** — Cancel/Confirm defaults now use `t.common.cancel` / `t.common.confirm`
+
+#### P2 — Accessibility & Polish
+- **Dashboard aria-labels** — Added to toggle, pagination, refresh, currency, action buttons across 5 pages
+- **Mobile nav aria-current** — Active links now have `aria-current="page"`
+- **Modal dialog semantics** — PromptLibrary and KeyboardShortcutsHelp now have `role="dialog"`, `aria-modal="true"`
+- **CSS duplicate rules** — Removed duplicate `.dark .playground-scrollbar` rules (0.2 vs 0.12 opacity conflict)
+- **CSS variables for gradients** — `.gradient-spark/flare/pulse/nova` now use `var(--plan-*-from/to)` instead of hardcoded hex
+- **TypeScript any types** — Replaced `(m: any)` with `(m: { id: string })` and ECharts formatter types in usage page
+- **Docs page spacing** — Standardized all pages to `space-y-8` (was mix of 6/8/10)
+- **Dashboard page spacing** — Removed `max-w-4xl/6xl` constraints from token-plan and admin/plans
+- **ParamTable semantic HTML** — Converted div-based grid to `<table>` with `<thead>`/`<tbody>`/`<th>`/`<td>`
+- **Deployment docs URL** — Replaced placeholder `your-org/oortapi.git` with actual `DoctorFan1314/OortAPI.git`
+- **Swagger error handling** — Added error state with retry button to API Reference page
+- **Mobile bottom nav i18n** — Replaced `lang === "zh"` ternaries with `t.common.*` / `t.dashboard.*` keys
+- **StatusIndicator i18n** — "All Systems Operational" / "Service Disruption" now use `lang` conditional
+- **Footer i18n** — FAQ and System Status links now use `t.footer.faq` / `t.footer.systemStatus`
+- **Per-page metadata** — All 17 docs pages now have unique `title` and `description` via server component wrappers
+- **CrossLinks component** — Added to 15 docs pages (was only on quickstart)
+- **SWR migration** — Migrated multiplier, redeem, users, users/[id] from raw fetch to `useSWR` + `dashboardSWRConfig`
+- **Dashboard component i18n** — activity-feed, billing-history, model-analytics inline ternaries migrated to dictionary keys
 
 ### Full-Site Audit (10 Major + 50 Minor)
 

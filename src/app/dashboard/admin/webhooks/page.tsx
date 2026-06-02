@@ -66,6 +66,11 @@ const LABELS = {
     deliveryLogs: "投递日志",
     copySecret: "复制 Secret",
     secretCopied: "Secret 已复制",
+    networkError: "网络错误",
+    operationFailed: "操作失败",
+    updateFailed: "更新失败",
+    createFailed: "创建失败",
+    toggleFailed: "切换失败",
   },
   en: {
     title: "Webhook Management",
@@ -97,6 +102,11 @@ const LABELS = {
     deliveryLogs: "Delivery Logs",
     copySecret: "Copy Secret",
     secretCopied: "Secret copied",
+    networkError: "Network error",
+    operationFailed: "Operation failed",
+    updateFailed: "Update failed",
+    createFailed: "Create failed",
+    toggleFailed: "Toggle failed",
   },
 };
 
@@ -150,7 +160,7 @@ export default function WebhooksPage() {
           credentials: "include",
           body: JSON.stringify({ id: editingId, url, events: selectedEvents }),
         });
-        if (!res.ok) { const d = await res.json(); showToast(d.error || "Update failed", "error"); return; }
+        if (!res.ok) { const d = await res.json(); showToast(d.error || t.updateFailed, "error"); return; }
         showToast(t.updated, "success");
       } else {
         const res = await fetch("/api/dashboard/webhooks", {
@@ -159,12 +169,12 @@ export default function WebhooksPage() {
           credentials: "include",
           body: JSON.stringify({ url, events: selectedEvents }),
         });
-        if (!res.ok) { const d = await res.json(); showToast(d.error || "Create failed", "error"); return; }
+        if (!res.ok) { const d = await res.json(); showToast(d.error || t.createFailed, "error"); return; }
         showToast(t.created, "success");
       }
       setDialogOpen(false);
       mutate();
-    } catch { showToast("Network error", "error"); }
+    } catch { showToast(t.networkError, "error"); }
   };
 
   const toggleEnabled = async (id: number, enabled: boolean) => {
@@ -175,9 +185,9 @@ export default function WebhooksPage() {
         credentials: "include",
         body: JSON.stringify({ id, enabled }),
       });
-      if (!res.ok) { const d = await res.json(); showToast(d.error || "Toggle failed", "error"); return; }
+      if (!res.ok) { const d = await res.json(); showToast(d.error || t.toggleFailed, "error"); return; }
       mutate();
-    } catch { showToast("Network error", "error"); }
+    } catch { showToast(t.networkError, "error"); }
   };
 
   const confirmDelete = async () => {
@@ -200,9 +210,9 @@ export default function WebhooksPage() {
         method: "POST",
         credentials: "include",
       });
-      showToast(res.ok ? t.testSent : (lang === "zh" ? "测试请求失败" : "Test failed"), res.ok ? "success" : "error");
+      showToast(res.ok ? t.testSent : t.operationFailed, res.ok ? "success" : "error");
     } catch {
-      showToast(lang === "zh" ? "网络错误" : "Network error", "error");
+      showToast(t.networkError, "error");
     } finally {
       setTesting(null);
     }

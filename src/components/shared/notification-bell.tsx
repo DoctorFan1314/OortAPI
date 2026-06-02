@@ -230,10 +230,7 @@ export function NotificationBell() {
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                {tab.key === "all" ? (lang === "zh" ? "全部" : "All") : null}
-                {tab.key === "system" ? (lang === "zh" ? "系统" : "System") : null}
-                {tab.key === "like" ? (lang === "zh" ? "点赞" : "Likes") : null}
-                {tab.key === "comment_reply" ? (lang === "zh" ? "回复" : "Replies") : null}
+                {t.notificationFilters[tab.labelKey as keyof typeof t.notificationFilters]}
               </button>
             ))}
           </div>
