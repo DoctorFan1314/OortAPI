@@ -64,6 +64,21 @@ export async function POST(request: NextRequest) {
   }
 }
 
+// ── SSRF Protection ─────────────────────────────────────
+
+function isInternalUrl(urlStr: string): boolean {
+  try {
+    const url = new URL(urlStr);
+    const host = url.hostname;
+    if (host === 'localhost' || host === '[::1]' || host === '0.0.0.0') return true;
+    if (host.startsWith('127.') || host.startsWith('10.')) return true;
+    if (host.startsWith('172.')) { const o = parseInt(host.split('.')[1], 10); if (o >= 16 && o <= 31) return true; }
+    if (host.startsWith('192.168.')) return true;
+    if (host.startsWith('169.254.')) return true;
+    return false;
+  } catch { return true; }
+}
+
 // ── Built-in Tools ──────────────────────────────────────
 
 async function handleWebSearch(
@@ -108,6 +123,9 @@ async function handleFetchUrl(args: Record<string, unknown>) {
   const url = String(args.url || '');
   if (!url.startsWith('http://') && !url.startsWith('https://')) {
     return NextResponse.json({ error: 'Invalid URL' }, { status: 400 });
+  }
+  if (isInternalUrl(url)) {
+    return NextResponse.json({ error: 'URL targets an internal network' }, { status: 400 });
   }
 
   const res = await fetch(url, {
@@ -211,6 +229,9 @@ async function handleFetchContent(args: Record<string, unknown>) {
 
   if (!url.startsWith('http://') && !url.startsWith('https://')) {
     return NextResponse.json({ result: 'Invalid URL', demo: false }, { status: 400 });
+  }
+  if (isInternalUrl(url)) {
+    return NextResponse.json({ result: 'URL targets an internal network', demo: false }, { status: 400 });
   }
 
   try {

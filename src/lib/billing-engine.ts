@@ -407,9 +407,16 @@ export function processAutoRenewals(): { renewed: number; failed: number } {
 
 export function dispatchWebhook(event: string, payload: Record<string, unknown>) {
   try {
-    const hooks = db.prepare(
-      "SELECT * FROM webhooks WHERE enabled = 1 AND events LIKE ?"
-    ).all(`%${event}%`) as { id: number; url: string; secret: string }[];
+    const allHooks = db.prepare(
+      "SELECT * FROM webhooks WHERE enabled = 1"
+    ).all() as { id: number; url: string; secret: string; events: string }[];
+
+    const hooks = allHooks.filter(hook => {
+      try {
+        const events = JSON.parse(hook.events);
+        return Array.isArray(events) && events.includes(event);
+      } catch { return false; }
+    });
 
     for (const hook of hooks) {
       const body = JSON.stringify({ event, timestamp: new Date().toISOString(), payload });

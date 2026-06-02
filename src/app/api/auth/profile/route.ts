@@ -20,6 +20,10 @@ export async function PATCH(request: NextRequest) {
       if (typeof data.username !== 'string' || data.username.trim().length < 2 || data.username.trim().length > 32) {
         return NextResponse.json({ error: 'Username must be 2-32 characters' }, { status: 400 });
       }
+      const existing = db.prepare('SELECT id FROM users WHERE username = ? AND id != ?').get(data.username.trim(), auth.user.id);
+      if (existing) {
+        return NextResponse.json({ error: 'Username already taken' }, { status: 409 });
+      }
       updates.push('username = ?'); values.push(data.username.trim());
     }
     if (data.avatar !== undefined) {
@@ -44,6 +48,15 @@ export async function PATCH(request: NextRequest) {
 
     const user = db.prepare('SELECT * FROM users WHERE id = ?').get(auth.user.id) as DBUser;
     const { password_hash, salt, ...safeUser } = user;
+    // Strip sensitive reset token fields from preferences
+    if (safeUser.preferences) {
+      try {
+        const prefs = JSON.parse(safeUser.preferences as string);
+        delete prefs.reset_token;
+        delete prefs.reset_token_expires;
+        safeUser.preferences = JSON.stringify(prefs);
+      } catch { /* ignore parse errors */ }
+    }
     return NextResponse.json({ user: safeUser });
   } catch (error) {
     console.error('Profile update error:', error);

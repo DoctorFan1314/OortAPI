@@ -29,23 +29,20 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // If any channel supports all models, also include enabled model_rates
-    if (hasWildcard) {
-      const rates = db.prepare(
-        'SELECT model_name, display_name, provider, input_rate, output_rate, cache_rate, created_at, tags FROM model_rates WHERE enabled = 1'
-      ).all() as DBModelRate[];
-      for (const r of rates) {
-        channelModels.add(r.model_name);
-      }
-    }
-
-    // Build response with pricing info where available
+    // Single query for all enabled model_rates — used for both wildcard inclusion and pricing
     const rateMap = new Map<string, DBModelRate>();
     const allRates = db.prepare(
       'SELECT model_name, display_name, provider, input_rate, output_rate, cache_rate, created_at, tags FROM model_rates WHERE enabled = 1'
     ).all() as DBModelRate[];
     for (const r of allRates) {
       rateMap.set(r.model_name, r);
+    }
+
+    // If any channel supports all models, also include enabled model_rates
+    if (hasWildcard) {
+      for (const r of allRates) {
+        channelModels.add(r.model_name);
+      }
     }
 
     const data = [...channelModels].map(modelName => {

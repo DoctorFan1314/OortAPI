@@ -15,23 +15,29 @@ export async function GET(request: NextRequest) {
     const action = request.nextUrl.searchParams.get('action');
 
     if (action === 'stats') {
-      // Per-plan statistics
-      const plans = db.prepare('SELECT id, name, display_name, monthly_price, yearly_price, monthly_credits FROM subscription_plans ORDER BY tier ASC').all() as { id: number; name: string; display_name: string; monthly_price: number; yearly_price: number; monthly_credits: number }[];
+      // Single JOIN query for per-plan statistics (avoids N+1)
+      const statsRows = db.prepare(`
+        SELECT
+          p.id, p.display_name, p.monthly_price, p.monthly_credits,
+          COUNT(s.id) as active_subs,
+          SUM(s.credits_total - s.credits_remaining) as credits_used
+        FROM subscription_plans p
+        LEFT JOIN user_subscriptions s ON s.plan_id = p.id AND s.status = 'active'
+        GROUP BY p.id
+        ORDER BY p.tier ASC
+      `).all() as { id: number; display_name: string; monthly_price: number; monthly_credits: number; active_subs: number; credits_used: number | null }[];
 
-      const stats = plans.map(plan => {
-        const subs = db.prepare(
-          "SELECT COUNT(*) as count, SUM(credits_total - credits_remaining) as credits_used FROM user_subscriptions WHERE plan_id = ? AND status = 'active'"
-        ).get(plan.id) as { count: number; credits_used: number | null };
-        const monthlyRevenue = subs.count * plan.monthly_price;
-        const creditsUsageRate = plan.monthly_credits > 0 && subs.credits_used
-          ? (subs.credits_used / (subs.count * plan.monthly_credits)) * 100
+      const stats = statsRows.map(row => {
+        const monthlyRevenue = row.active_subs * row.monthly_price;
+        const creditsUsageRate = row.monthly_credits > 0 && row.credits_used
+          ? (row.credits_used / (row.active_subs * row.monthly_credits)) * 100
           : 0;
         return {
-          plan_id: plan.id,
-          plan_name: plan.display_name,
-          active_subs: subs.count,
+          plan_id: row.id,
+          plan_name: row.display_name,
+          active_subs: row.active_subs,
           monthly_revenue: monthlyRevenue,
-          credits_used: subs.credits_used || 0,
+          credits_used: row.credits_used || 0,
           credits_usage_rate: Math.min(100, Math.round(creditsUsageRate)),
         };
       });

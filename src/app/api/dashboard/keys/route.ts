@@ -33,6 +33,14 @@ export async function POST(request: NextRequest) {
 
     const { name, rate_limit, permissions, expires_at } = await request.json();
 
+    // Validate expires_at format
+    if (expires_at !== undefined && expires_at !== null) {
+      const d = new Date(expires_at);
+      if (isNaN(d.getTime())) {
+        return NextResponse.json({ error: 'expires_at must be a valid ISO date string or null' }, { status: 400 });
+      }
+    }
+
     const keyValue = generateApiKey();
     const keyHash = hashApiKey(keyValue);
     const maskedValue = keyValue.slice(0, 10) + '****';
@@ -73,6 +81,14 @@ export async function PATCH(request: NextRequest) {
       const maskedValue = newKey.slice(0, 10) + '****';
       db.prepare('UPDATE api_keys SET key_value = ?, key_hash = ?, enabled = 1 WHERE id = ?').run(maskedValue, keyHash, id);
       return NextResponse.json({ key: { id, full_key: newKey, key_value: maskedValue } });
+    }
+
+    // Validate expires_at format
+    if (expires_at !== undefined && expires_at !== null) {
+      const d = new Date(expires_at);
+      if (isNaN(d.getTime())) {
+        return NextResponse.json({ error: 'expires_at must be a valid ISO date string or null' }, { status: 400 });
+      }
     }
 
     const updates: string[] = [];

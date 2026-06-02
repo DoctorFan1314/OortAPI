@@ -45,7 +45,10 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({ settings, preferences: auth.user.preferences ? JSON.parse(auth.user.preferences) : {} });
+    const preferences = auth.user.preferences ? JSON.parse(auth.user.preferences) : {};
+    delete preferences.reset_token;
+    delete preferences.reset_token_expires;
+    return NextResponse.json({ settings, preferences });
   } catch (error) {
     console.error('Settings get error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

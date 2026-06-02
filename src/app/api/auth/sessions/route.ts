@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
-import { verifyToken, getTokenFromCookie } from '@/lib/auth';
+import { verifyToken, getTokenFromCookie, isTokenVersionValid } from '@/lib/auth';
+import type { DBUser } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,6 +12,11 @@ export async function GET(request: NextRequest) {
 
     const payload = verifyToken(token);
     if (!payload) return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+
+    const user = db.prepare('SELECT token_version FROM users WHERE id = ?').get(payload.userId) as Pick<DBUser, 'token_version'> | undefined;
+    if (!user || !isTokenVersionValid(payload, user.token_version || 0)) {
+      return NextResponse.json({ error: 'Token invalidated — please log in again' }, { status: 401 });
+    }
 
     const sessions = db.prepare(
       'SELECT id, ip_address, user_agent, created_at, last_active_at FROM sessions WHERE user_id = ? ORDER BY last_active_at DESC'
@@ -29,6 +35,11 @@ export async function DELETE(request: NextRequest) {
 
     const payload = verifyToken(token);
     if (!payload) return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+
+    const user = db.prepare('SELECT token_version FROM users WHERE id = ?').get(payload.userId) as Pick<DBUser, 'token_version'> | undefined;
+    if (!user || !isTokenVersionValid(payload, user.token_version || 0)) {
+      return NextResponse.json({ error: 'Token invalidated — please log in again' }, { status: 401 });
+    }
 
     const { sessionId } = await request.json().catch(() => ({}));
     if (!sessionId) return NextResponse.json({ error: 'sessionId required' }, { status: 400 });

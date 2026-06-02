@@ -191,23 +191,25 @@ export default function AdminModelsPage() {
     if (ids.length === 0) return;
     setBatchLoading(true);
     const nextEnabled = action === "enable";
-    let successCount = 0;
-    for (const modelId of ids) {
-      try {
+    const results = await Promise.allSettled(
+      ids.map(async (modelId) => {
         const res = await fetch("/api/dashboard/admin/models", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
           body: JSON.stringify({ modelId, enabled: nextEnabled }),
         });
-        if (res.ok) {
-          setEnabledMap((prev) => ({ ...prev, [modelId]: nextEnabled }));
-          successCount++;
-        }
-      } catch {
-        /* continue */
-      }
+        if (!res.ok) throw new Error("failed");
+        return modelId;
+      }),
+    );
+    const succeeded = results
+      .filter((r) => r.status === "fulfilled")
+      .map((r) => (r as PromiseFulfilledResult<string>).value);
+    for (const modelId of succeeded) {
+      setEnabledMap((prev) => ({ ...prev, [modelId]: nextEnabled }));
     }
+    const successCount = succeeded.length;
     showToast(
       lang === "zh"
         ? `${successCount} 个模型已${nextEnabled ? "启用" : "禁用"}`

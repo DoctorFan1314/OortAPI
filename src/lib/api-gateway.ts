@@ -6,6 +6,28 @@ import { checkRateLimit, type RateLimitResult } from './rate-limiter';
 import { deductBalance, deductCreditsOrBalance, calculateCost, logUsage, getEffectiveMultiplier, getActiveSubscription, dispatchWebhook } from './billing-engine';
 import { selectChannel, reportChannelFailure, reportChannelSuccess } from './channel-manager';
 
+// Batched API key updates — flush every 10s to avoid per-request UPDATE
+const _keyUpdateBatch = new Map<number, { lastUsed: number; calls: number }>();
+let _keyFlushTimer: ReturnType<typeof setInterval> | null = null;
+
+function batchKeyUpdate(keyId: number) {
+  const existing = _keyUpdateBatch.get(keyId);
+  _keyUpdateBatch.set(keyId, { lastUsed: Date.now(), calls: (existing?.calls || 0) + 1 });
+  if (!_keyFlushTimer) {
+    _keyFlushTimer = setInterval(flushKeyUpdates, 10000);
+    _keyFlushTimer.unref();
+  }
+}
+
+function flushKeyUpdates() {
+  if (_keyUpdateBatch.size === 0) return;
+  const updates = new Map(_keyUpdateBatch);
+  _keyUpdateBatch.clear();
+  for (const [keyId, data] of updates) {
+    db.prepare('UPDATE api_keys SET last_used_at = CURRENT_TIMESTAMP, total_calls = total_calls + ? WHERE id = ?').run(data.calls, keyId);
+  }
+}
+
 export interface GatewayRequest {
   model: string;
   messages?: Array<{ role: string; content: string | Array<{ type: string; text?: string }> }>;
@@ -88,8 +110,8 @@ export function validateApiKey(authHeader: string | null): { valid: boolean; api
     return { valid: false, error: 'User not found' };
   }
 
-  // Update last used timestamp
-  db.prepare('UPDATE api_keys SET last_used_at = CURRENT_TIMESTAMP, total_calls = total_calls + 1 WHERE id = ?').run(apiKey.id);
+  // Batch update last_used_at / total_calls (flushes every 10s)
+  batchKeyUpdate(apiKey.id);
 
   return { valid: true, apiKey, user };
 }

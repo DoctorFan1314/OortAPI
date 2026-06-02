@@ -6,7 +6,7 @@ export interface Dictionary {
     errorTitle: string; errorDescription: string; retry: string; skipToContent: string;
     save: string; cancel: string; delete: string; edit: string; confirm: string;
     copy: string; copied: string; share: string; like: string; bookmark: string;
-    more: string; all: string; viewAll: string;
+    more: string; all: string; viewAll: string; viewAllNotifications: string;
     or: string; closeSearch: string; toggleTheme: string; switchLanguage: string;
     openNavigation: string; navigationMenu: string; close: string; backToTop: string;
     navigation: string;
@@ -246,6 +246,15 @@ export interface Dictionary {
     title: string; description: string; retry: string;
     backToHome: string;
     somethingWentWrong: string; tryAgain: string; skillNotFound: string; promptNotFound: string;
+    sessionExpired: string; rateLimited: string; serverError: string;
+    serviceUnavailable: string; networkError: string;
+    authError: string;
+  };
+  docs: {
+    feedbackHelpful: string; feedbackThanks: string;
+    feedbackYes: string; feedbackNo: string;
+    feedbackPlaceholder: string; feedbackSubmit: string;
+    onThisPage: string; editOnGithub: string; seeAlso: string;
   };
   commandPalette: {
     searchPlaceholder: string; noResults: string;
