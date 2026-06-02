@@ -138,7 +138,7 @@ export function StatsCards({ lang = "zh" }: { lang?: "zh" | "en" }) {
   // For credit/subscription users, show credits consumed instead of dollar cost
   const isCreditsUser = (stats.month?.credits || 0) > 0 && (stats.month?.cost || 0) === 0;
   const monthlyDisplay = isCreditsUser
-    ? `${(stats.month?.credits || 0).toLocaleString()} credits`
+    ? (stats.month?.credits || 0).toLocaleString()
     : formatPrice(stats.month?.cost || 0);
   const monthlyLabel = isCreditsUser
     ? (lang === "zh" ? "本月 Credits" : "Monthly Credits")

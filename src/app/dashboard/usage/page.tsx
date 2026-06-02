@@ -229,7 +229,7 @@ export default function UsagePage() {
             </div>
           </CardContent>
         </Card>
-        {isCreditsUser && summary.total_credits_used ? (
+        {isCreditsUser ? (
           <Card className="glass-card">
             <CardContent className="p-4 flex items-center gap-3">
               <div className="p-2 rounded-md bg-amber-500/10">
