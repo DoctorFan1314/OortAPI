@@ -26,7 +26,7 @@ export default function UsagePage() {
   const [summary, setSummary] = useState<UsageSummary>({ total_calls: 0, total_tokens: 0, total_cost: 0, total_tokens_in_noncached: 0, total_tokens_in_cache: 0, total_tokens_out: 0 });
   const [dailyTrend, setDailyTrend] = useState<DailyTrend[]>([]);
   const [modelStats, setModelStats] = useState<Array<{ model: string; cost: number; credits_used: number; tokens_in: number; tokens_out: number; tokens_in_cache: number }>>([]);
-  const [isCreditsUser, setIsCreditsUser] = useState(false);
+  const [isCreditsUser, setIsCreditsUser] = useState(true); // assume credit user until proven otherwise
   const [chartMetric, setChartMetric] = useState<"cost" | "tokens" | "calls">("cost");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -173,16 +173,15 @@ export default function UsagePage() {
       });
   }, [page, filterModel, filterStatus, filterFrom, filterTo, filterKeyId]);
 
-  // Detect credit user from usage data (more reliable than subscription check)
+  // Detect credit user from summary credits_used
   useEffect(() => {
-    if (logs.length > 0) {
-      const hasCredits = logs.some((l: UsageLog & { deduction_source?: string }) => l.deduction_source === "credits");
-      if (hasCredits) {
-        setIsCreditsUser(true);
-        setChartMetric("tokens");
-      }
+    if (summary.total_credits_used && summary.total_credits_used > 0) {
+      setIsCreditsUser(true);
+      setChartMetric("tokens");
+    } else if (summary.total_calls > 0 && (!summary.total_credits_used || summary.total_credits_used === 0)) {
+      setIsCreditsUser(false);
     }
-  }, [logs]);
+  }, [summary]);
 
   const formatTokens = (n: number) => n.toLocaleString();
 

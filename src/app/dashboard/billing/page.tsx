@@ -102,13 +102,14 @@ export default function BillingPage() {
     dashboardSWRConfig,
   );
 
-  // Aggregate individual log entries into daily cost totals
+  // Aggregate individual log entries into daily cost totals (local timezone)
   const dailyCostTrend = useMemo(() => {
     const logs = dailyUsageData?.data;
     if (!logs || logs.length === 0) return null;
     const dayMap: Record<string, number> = {};
     logs.forEach((log) => {
-      const day = log.created_at.slice(0, 10);
+      const localDate = new Date(log.created_at + "Z");
+      const day = localDate.toLocaleDateString("sv-SE"); // YYYY-MM-DD
       dayMap[day] = (dayMap[day] || 0) + (log.cost || 0);
     });
     const entries = Object.entries(dayMap)

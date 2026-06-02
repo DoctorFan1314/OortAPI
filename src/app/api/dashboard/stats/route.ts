@@ -25,15 +25,20 @@ export async function GET(request: NextRequest) {
         AVG(latency_ms) as avg_latency
       FROM usage_logs
       WHERE user_id = ? AND DATE(created_at, ?) = ?
-    `).get(userId, `${tzOffset} minutes`, today) as Record<string, number | null>;
+    `).get(userId, `${-tzOffset} minutes`, today) as Record<string, number | null>;
 
     // Active API keys count
     const activeKeys = db.prepare('SELECT COUNT(*) as count FROM api_keys WHERE user_id = ? AND enabled = 1').get(userId) as { count: number };
 
+    // If user has ANY credit-based usage, cost is always 0 (subscription user)
+    const isCreditUser = db.prepare(
+      "SELECT 1 FROM usage_logs WHERE user_id = ? AND deduction_source = 'credits' LIMIT 1"
+    ).get(userId);
+
     const monthStats = db.prepare(`
       SELECT
         COUNT(*) as total_calls,
-        SUM(CASE WHEN deduction_source = 'balance' THEN cost ELSE 0 END) as total_cost,
+        ${isCreditUser ? '0' : "SUM(CASE WHEN deduction_source = 'balance' THEN cost ELSE 0 END)"} as total_cost,
         SUM(CASE WHEN deduction_source = 'credits' THEN credits_used ELSE 0 END) as total_credits,
         SUM(tokens_in + tokens_out) as total_tokens,
         SUM(tokens_in - tokens_in_cache - tokens_cache_creation) as tokens_in_noncached,
@@ -42,7 +47,7 @@ export async function GET(request: NextRequest) {
         SUM(tokens_out) as tokens_out
       FROM usage_logs
       WHERE user_id = ? AND DATE(created_at, ?) >= DATE('now', 'start of month', ?)
-    `).get(userId, `${tzOffset} minutes`, `${tzOffset} minutes`) as Record<string, number | null>;
+    `).get(userId, `${-tzOffset} minutes`, `${-tzOffset} minutes`) as Record<string, number | null>;
 
     // Yesterday's stats (for comparison, timezone-adjusted)
     const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
@@ -53,7 +58,7 @@ export async function GET(request: NextRequest) {
         SUM(tokens_in + tokens_out) as total_tokens
       FROM usage_logs
       WHERE user_id = ? AND DATE(created_at, ?) = ?
-    `).get(userId, `${tzOffset} minutes`, yesterday) as Record<string, number | null>;
+    `).get(userId, `${-tzOffset} minutes`, yesterday) as Record<string, number | null>;
 
     // Last month's stats (for comparison)
     const lastMonthStart = new Date();
@@ -80,7 +85,7 @@ export async function GET(request: NextRequest) {
       WHERE user_id = ? AND created_at >= DATE('now', '-7 days', ?)
       GROUP BY DATE(created_at, ?)
       ORDER BY date ASC
-    `).all(`${tzOffset} minutes`, userId, `${tzOffset} minutes`, `${tzOffset} minutes`) as Array<{ date: string; calls: number; cost: number; tokens: number }>;
+    `).all(`${-tzOffset} minutes`, userId, `${-tzOffset} minutes`, `${-tzOffset} minutes`) as Array<{ date: string; calls: number; cost: number; tokens: number }>;
 
     // Top models (timezone-adjusted)
     const topModels = db.prepare(`
@@ -90,7 +95,7 @@ export async function GET(request: NextRequest) {
       GROUP BY model
       ORDER BY calls DESC
       LIMIT 5
-    `).all(userId, `${tzOffset} minutes`) as Array<{ model: string; calls: number; cost: number }>;
+    `).all(userId, `${-tzOffset} minutes`) as Array<{ model: string; calls: number; cost: number }>;
 
     // Cache savings (Feature 15)
     const cacheData = db.prepare(`

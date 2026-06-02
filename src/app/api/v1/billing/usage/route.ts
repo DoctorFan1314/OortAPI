@@ -48,14 +48,14 @@ export async function GET(request: NextRequest) {
       conditions.push('success = 0');
     }
     if (from) {
-      // Convert local date to UTC using timezone offset
+      // Convert local date to UTC: subtract timezone offset
       conditions.push('u.created_at >= datetime(?, ?)');
-      params.push(from, `${tzOffset} minutes`);
+      params.push(from, `${-tzOffset} minutes`);
     }
     if (to) {
-      // Convert local date+1day to UTC using timezone offset
+      // Convert local date+1day to UTC: subtract timezone offset
       conditions.push("u.created_at < datetime(date(?, '+1 day'), ?)");
-      params.push(to, `${tzOffset} minutes`);
+      params.push(to, `${-tzOffset} minutes`);
     }
     if (keyId) {
       conditions.push('u.api_key_id = ?');
@@ -118,7 +118,7 @@ export async function GET(request: NextRequest) {
     let dailyTrend: TrendRow[] = [];
     if (format !== 'csv') {
       dailyTrend = db.prepare(
-        `SELECT DATE(u.created_at) as date,
+        `SELECT DATE(u.created_at, ?) as date,
                 COUNT(*) as calls,
                 COALESCE(SUM(CASE WHEN u.deduction_source = 'balance' THEN u.cost ELSE 0 END), 0) as cost,
                 COALESCE(SUM(u.tokens_in + u.tokens_out + u.tokens_in_cache), 0) as tokens,
@@ -126,8 +126,8 @@ export async function GET(request: NextRequest) {
                 COALESCE(SUM(u.tokens_in_cache), 0) as tokens_in_cache,
                 COALESCE(SUM(u.tokens_out), 0) as tokens_out
          FROM usage_logs u WHERE ${whereClause}
-         GROUP BY DATE(created_at) ORDER BY date DESC LIMIT 60`
-      ).all(...params) as TrendRow[];
+         GROUP BY DATE(u.created_at, ?) ORDER BY date DESC LIMIT 60`
+      ).all(`${-tzOffset} minutes`, ...params, `${-tzOffset} minutes`) as TrendRow[];
     }
 
     // CSV export
