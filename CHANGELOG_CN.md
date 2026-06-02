@@ -8,6 +8,45 @@
 
 ## [v3.3.5.0] — 2026-06-02
 
+### Bug 审计：修复 32 个功能性 Bug
+
+#### CRITICAL（5）
+- **#1: API Key 前缀认证绕过** — 移除 10 字符 `LIKE` 匹配，攻击者只需猜 2 个十六进制字符即可冒充用户
+- **#2: 注册存储明文 Key** — 改为存储掩码 Key + Hash，与控制台 Key 创建一致
+- **#3: 今日/昨日 UTC 日期不匹配** — Stats API 改用用户本地时区计算今日/昨日
+- **#4: 月度边界在 UTC+ 偏移** — `start of month` 在时区转换后应用，而非之前
+- **#5: 上月统计用服务器时区** — 通过 `tzOffset` 参数在用户时区计算
+
+#### HIGH（7）
+- **#6: total_tokens 双重计算缓存命中** — `tokens_in` 已包含 `tokens_in_cache`，移除重复加法
+- **#7: 升级/降级超收 7.3 倍** — CNY 差价转换为 USD 后再扣余额
+- **#8: 自动续费可导致负余额** — 事务内添加 `AND balance >= ?` 保护
+- **#9: 渠道恢复因时区失效** — `new Date()` 将 UTC 字符串解析为本地时间，UTC+ 渠道立即恢复
+- **#10: 网关用错误模型计费** — 使用 `actualModel`（channel 映射后）而非 `req.model`
+- **#11: 注册 Token 缺少 tv** — 新用户改密码后旧 session 可失效
+- **#12: creditsUsed 记录不正确** — 使用 `deductResult` 的实际扣减值，而非原始 token 数
+
+#### MEDIUM（14）
+- **#13: 套餐用户今日/昨日 cost** — 有 credit 记录时强制为 0
+- **#14: tokens_in_noncached 不一致** — 两个端点统一使用 `tokens_in - tokens_in_cache - tokens_cache_creation`
+- **#15: 套餐页汇率加载失败** — `settings.find()` → `settings.exchange_rate`
+- **#16: 删除兑换码失败时关闭对话框** — 错误 toast 后添加 `return`
+- **#17: Webhook 事件解析错误** — `split(",")` → `JSON.parse()` 带回退
+- **#18: 套餐 tier 超过 1-4** — 限制为 `Math.min(4, ...)`
+- **#19: 全选包含当前用户** — 选择时排除当前用户
+- **#20: savedBudget 未初始化** — 从 API 数据加载时设置
+- **#21: 通知偏好页面加载时自动保存** — 用 `loadedRef` 跳过首次 effect
+- **#22: 订阅缺少 period_end 检查** — 添加 `current_period_end > datetime('now')`
+- **#23: 降级退款用陈旧余额** — UPDATE 后查询 DB 获取最新余额
+- **#24: 密码重置无限速** — 添加 IP 限速 + `timingSafeEqual` 比较
+- **#25: 删除账户未清理订阅** — 事务中添加 `DELETE FROM user_subscriptions`
+- **#26: SQL 字符串拼接** — 渠道健康查询改用参数化 `?`
+
+#### LOW（6）
+- **#27-32**: Models enabled 基准、全选 toggle、日趋势时区、账单图表日期、credit 检测、子查询性能
+
+---
+
 ### 全站审计第三批（30 项改进）
 
 #### 安全与架构（10）

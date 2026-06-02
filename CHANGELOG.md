@@ -8,6 +8,45 @@ All notable changes to this project will be documented in this file.
 
 ## [v3.3.5.0] — 2026-06-02
 
+### Bug Audit: 32 Functional Bugs Fixed
+
+#### CRITICAL (5)
+- **#1: API Key prefix auth bypass** — Removed 10-char `LIKE` fallback that allowed guessing 2 hex chars to impersonate any user
+- **#2: Registration stores plaintext key** — Now stores masked key + hash, matching dashboard key creation pattern
+- **#3: Today/yesterday UTC date mismatch** — Stats API now computes today/yesterday in user's local timezone
+- **#4: Month boundary shifted for UTC+** — `start of month` now applied after timezone conversion, not before
+- **#5: Last month stats use server timezone** — Computed in user timezone via `tzOffset` parameter
+
+#### HIGH (7)
+- **#6: total_tokens double-counts cache hits** — `tokens_in` already includes `tokens_in_cache`; removed redundant addition
+- **#7: Upgrade/downgrade 7.3x overcharge** — CNY price differences now converted to USD before balance deduction
+- **#8: Auto-renewal can drive balance negative** — Added `AND balance >= ?` guard inside transaction
+- **#9: Channel recovery broken by timezone** — `new Date()` parses UTC string as local time; channels recover instantly in UTC+
+- **#10: Gateway bills wrong model** — Uses `actualModel` (after channel mapping) instead of `req.model`
+- **#11: Registration token missing tv** — New users' sessions can now be invalidated on password change
+- **#12: creditsUsed logged incorrectly** — Uses actual deducted credits from `deductResult`, not raw token count
+
+#### MEDIUM (14)
+- **#13: Credit user today/yesterday cost** — Forced to 0 when user has any credit-based usage
+- **#14: tokens_in_noncached inconsistent** — Both endpoints now use `tokens_in - tokens_in_cache - tokens_cache_creation`
+- **#15: Plans page exchange rate** — Fixed `settings.find()` on object → `settings.exchange_rate`
+- **#16: Delete redeem code closes on failure** — Added `return` after error toast
+- **#17: Webhook events parsed wrong** — `split(",")` → `JSON.parse()` with fallback
+- **#18: Plan tier exceeds 1-4** — Capped at `Math.min(4, ...)`
+- **#19: Select-all includes current user** — Filters out current user from selection
+- **#20: savedBudget never initialized** — Set from API data on load
+- **#21: Notification prefs auto-save on load** — Skips first effect firing with `loadedRef`
+- **#22: Subscribe missing period_end check** — Added `current_period_end > datetime('now')`
+- **#23: Downgrade refund stale balance** — Queries DB for fresh balance after UPDATE
+- **#24: reset-password no rate limit** — Added IP rate limiting + `timingSafeEqual` for token comparison
+- **#25: delete-account orphaned subscriptions** — Added `DELETE FROM user_subscriptions` to transaction
+- **#26: SQL string interpolation** — Channel health query uses parameterized `?` placeholder
+
+#### LOW (6)
+- **#27-32**: Models enabled state, select-all toggle, daily trend timezone, billing chart dates, credit detection, subquery performance
+
+---
+
 ### Full-Site Audit Phase 3 (30 Improvements)
 
 #### Security & Architecture (10)
