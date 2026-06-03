@@ -810,6 +810,21 @@ export interface Dictionary {
     callsUnit: string;
     modelLatency: string;
     errorRate: string;
+    mostPopular: string;
+    monthlyCredits: string;
+    creditsLabel: string;
+    pricePerYear: string;
+    pricePerMonth: string;
+    concurrentRequests: string;
+    dedicatedSupport: string;
+    prioritySupport: string;
+    emailSupport: string;
+    communitySupport: string;
+    offPeakPricing: string;
+    compatibleTools: string;
+    perMillionTokens: string;
+    saveAmount: string;
+    yearlyPriceInfo: string;
   };
   apiDocs: {
     title: string;

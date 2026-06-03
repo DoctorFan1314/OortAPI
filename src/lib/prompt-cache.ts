@@ -5,6 +5,15 @@ import { createHash } from 'crypto';
 const promptCache = new Map<string, { tokensIn: number; timestamp: number }>();
 const PROMPT_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
+// Periodic cleanup every 5 minutes instead of probabilistic
+const CLEANUP_INTERVAL = 5 * 60 * 1000;
+setInterval(() => {
+  const now = Date.now();
+  for (const [k, v] of promptCache) {
+    if (now - v.timestamp > PROMPT_CACHE_TTL) promptCache.delete(k);
+  }
+}, CLEANUP_INTERVAL);
+
 function getPromptCacheKey(userId: number, model: string, messages: unknown): string {
   const hash = createHash('md5').update(JSON.stringify(messages)).digest('hex');
   return `${userId}:${model}:${hash}`;
@@ -13,12 +22,6 @@ function getPromptCacheKey(userId: number, model: string, messages: unknown): st
 export function checkPromptCache(userId: number, model: string, messages: unknown, tokensIn: number): { cacheHit: number; cacheCreate: number } {
   const key = getPromptCacheKey(userId, model, messages);
   const now = Date.now();
-  // Clean expired entries (every 100 checks)
-  if (Math.random() < 0.01) {
-    for (const [k, v] of promptCache) {
-      if (now - v.timestamp > PROMPT_CACHE_TTL) promptCache.delete(k);
-    }
-  }
   const cached = promptCache.get(key);
   if (cached && now - cached.timestamp < PROMPT_CACHE_TTL) {
     // Cache hit: treat as cache read (report as cache hit tokens)

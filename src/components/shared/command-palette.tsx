@@ -19,8 +19,14 @@ export function CommandPalette() {
   const handleClose = useCallback(() => {
     setOpen(false);
     setQuery("");
-    previousFocusRef.current?.focus();
   }, []);
+
+  // Restore focus to the element that was focused before the palette opened
+  useEffect(() => {
+    if (!open && previousFocusRef.current) {
+      previousFocusRef.current.focus();
+    }
+  }, [open]);
 
   const handleOpen = useCallback(() => {
     previousFocusRef.current = document.activeElement as HTMLElement;

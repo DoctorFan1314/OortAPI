@@ -178,6 +178,7 @@ export function NotificationBell() {
           ref={menuRef}
           role="menu"
           aria-label={t.common.notifications}
+          aria-activedescendant={activeIdx >= 0 ? `notification-item-${activeIdx}` : undefined}
           onKeyDown={handleKeyDown}
           className="absolute top-full right-0 mt-2 w-80 bg-card border border-border rounded-xl shadow-2xl overflow-hidden z-50 animate-fadeIn"
         >
@@ -252,6 +253,7 @@ export function NotificationBell() {
               return filtered.map((notification, idx) => (
                 <button
                   key={notification.id}
+                  id={`notification-item-${idx}`}
                   role="menuitem"
                   tabIndex={idx === activeIdx ? 0 : -1}
                   onClick={() => handleNotificationClick(notification)}

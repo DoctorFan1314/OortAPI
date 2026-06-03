@@ -78,13 +78,17 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ history });
     }
 
-    const channels = db.prepare('SELECT * FROM channels ORDER BY priority DESC, created_at DESC').all();
+    const limit = Math.max(1, Math.min(100, parseInt(request.nextUrl.searchParams.get('limit') || '20', 10)));
+    const offset = Math.max(0, parseInt(request.nextUrl.searchParams.get('offset') || '0', 10));
+
+    const total = (db.prepare('SELECT COUNT(*) as count FROM channels').get() as { count: number }).count;
+    const channels = db.prepare('SELECT * FROM channels ORDER BY priority DESC, created_at DESC LIMIT ? OFFSET ?').all(limit, offset);
     // Return masked API keys for security
     const masked = (channels as DBChannel[]).map(ch => ({
       ...ch,
       api_key_encrypted: ch.api_key_encrypted ? '••••••••' + decrypt(ch.api_key_encrypted).slice(-4) : '',
     }));
-    return NextResponse.json({ channels: masked });
+    return NextResponse.json({ channels: masked, total, limit, offset });
   } catch (error) {
     console.error('Channels list error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

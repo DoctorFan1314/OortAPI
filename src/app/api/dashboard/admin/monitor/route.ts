@@ -47,32 +47,23 @@ export async function GET(request: NextRequest) {
     }
     const qps = totalCalls / timeRangeSeconds;
 
-    // Percentile latency using subquery with ORDER BY + LIMIT
-    // p50 = median
-    const p50Row = db.prepare(`
-      SELECT latency_ms FROM usage_logs
-      WHERE created_at >= datetime('now', '-24 hours') AND latency_ms IS NOT NULL
-      ORDER BY latency_ms ASC
-      LIMIT 1 OFFSET (
-        SELECT CAST(COUNT(*) / 2 AS INTEGER) FROM usage_logs
+    // Approximate percentile latency using ROW_NUMBER() window function
+    const percentiles = db.prepare(`
+      WITH ranked AS (
+        SELECT latency_ms,
+               ROW_NUMBER() OVER (ORDER BY latency_ms ASC) as rn,
+               COUNT(*) OVER () as total
+        FROM usage_logs
         WHERE created_at >= datetime('now', '-24 hours') AND latency_ms IS NOT NULL
       )
-    `).get() as { latency_ms: number } | undefined;
+      SELECT
+        MAX(CASE WHEN rn = CAST(total * 0.5 AS INTEGER) THEN latency_ms END) as p50,
+        MAX(CASE WHEN rn = CAST(total * 0.95 AS INTEGER) THEN latency_ms END) as p95
+      FROM ranked
+    `).get() as { p50: number | null; p95: number | null } | undefined;
 
-    const p50Latency = p50Row?.latency_ms ?? 0;
-
-    // p95 latency
-    const p95Row = db.prepare(`
-      SELECT latency_ms FROM usage_logs
-      WHERE created_at >= datetime('now', '-24 hours') AND latency_ms IS NOT NULL
-      ORDER BY latency_ms ASC
-      LIMIT 1 OFFSET (
-        SELECT CAST(COUNT(*) * 0.95 AS INTEGER) FROM usage_logs
-        WHERE created_at >= datetime('now', '-24 hours') AND latency_ms IS NOT NULL
-      )
-    `).get() as { latency_ms: number } | undefined;
-
-    const p95Latency = p95Row?.latency_ms ?? 0;
+    const p50Latency = percentiles?.p50 ?? 0;
+    const p95Latency = percentiles?.p95 ?? 0;
 
     // Per-provider stats by joining usage_logs with channels
     const providers = db.prepare(`

@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Diamond, Sparkles, Zap, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCountUp } from "@/hooks/use-count-up";
+import { useI18n } from "@/contexts/i18n-context";
 
 interface PlanData {
   id: number;
@@ -60,11 +61,11 @@ const THEMES: Record<string, { gradientClass: string; shadowColor: string; accen
   },
 };
 
-const TIER_LABELS: Record<string, { zh: string; en: string }> = {
-  spark: { zh: "基础模型", en: "Basic Models" },
-  flare: { zh: "高级模型", en: "Advanced Models" },
-  pulse: { zh: "旗舰模型", en: "Flagship Models" },
-  nova: { zh: "全部模型", en: "All Models" },
+const TIER_KEY: Record<string, string> = {
+  spark: "basicModels",
+  flare: "advancedModels",
+  pulse: "flagshipModels",
+  nova: "allModels",
 };
 
 export function SubscriptionCard({
@@ -78,6 +79,8 @@ export function SubscriptionCard({
   onSelect,
   children,
 }: SubscriptionCardProps) {
+  const { t } = useI18n();
+  const getTierLabel = (name: string) => (t.dashboard as Record<string, string>)[TIER_KEY[name]] || name;
   const theme = THEMES[plan.name] || THEMES.spark;
   const Icon = theme.icon;
   const isPopular = plan.popular === 1;
@@ -98,8 +101,8 @@ export function SubscriptionCard({
   const sym = targetCurrency === "CNY" ? "¥" : "$";
   const displayPrice = billingCycle === "yearly" ? convert(plan.yearly_price) : convert(plan.monthly_price);
   const priceLabel = billingCycle === "yearly"
-    ? (lang === "zh" ? "/年" : "/yr")
-    : (lang === "zh" ? "/月" : "/mo");
+    ? t.dashboard.pricePerYear
+    : t.dashboard.pricePerMonth;
 
   const yearlySavings = Math.round((1 - plan.yearly_price / (plan.monthly_price * 12)) * 100);
   const priceInt = Math.round(displayPrice);
@@ -128,7 +131,7 @@ export function SubscriptionCard({
               </div>
               <div>
                 <h3 className="text-xl font-bold text-white">{plan.display_name}</h3>
-                <p className="text-sm text-white/70">{plan.tagline || TIER_LABELS[plan.name]?.[lang]}</p>
+                <p className="text-sm text-white/70">{plan.tagline || getTierLabel(plan.name)}</p>
               </div>
             </div>
             <div className="text-right">
@@ -179,7 +182,7 @@ export function SubscriptionCard({
         <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20">
           <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0 px-4 py-1 text-[11px] font-bold shadow-lg shadow-orange-500/25">
             <Star className="h-3 w-3 mr-1 fill-current" />
-            {lang === "zh" ? "最受欢迎" : "Most Popular"}
+            {t.dashboard.mostPopular}
           </Badge>
         </div>
       )}
@@ -203,7 +206,7 @@ export function SubscriptionCard({
           </div>
           <div>
             <h3 className="text-lg font-bold text-white">{plan.display_name}</h3>
-            <p className="text-xs text-white/80">{plan.tagline || TIER_LABELS[plan.name]?.[lang] || plan.name}</p>
+            <p className="text-xs text-white/80">{plan.tagline || getTierLabel(plan.name)}</p>
           </div>
         </div>
 
@@ -218,20 +221,20 @@ export function SubscriptionCard({
             const perMillion = (convert(plan.monthly_price) / plan.monthly_credits) * 1000000;
             return (
               <p className="text-[10px] text-white/40 mt-0.5">
-                ≈ {sym}{perMillion < 0.01 ? perMillion.toFixed(4) : perMillion.toFixed(2)} / 百万 Tokens
+                ≈ {sym}{perMillion < 0.01 ? perMillion.toFixed(4) : perMillion.toFixed(2)} {t.dashboard.perMillionTokens}
               </p>
             );
           })()}
           {billingCycle === "yearly" ? (
             <div className="flex items-center gap-2 mt-1">
               <span className="text-[11px] text-white/40 line-through">{sym}{convert(plan.monthly_price * 12).toFixed(2)}</span>
-              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold text-white bg-white/15">{lang === "zh" ? `省 ${sym}${(convert(plan.monthly_price * 12) - convert(plan.yearly_price)).toFixed(2)}` : `Save ${sym}${(convert(plan.monthly_price * 12) - convert(plan.yearly_price)).toFixed(2)}`}</span>
+              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold text-white bg-white/15">{t.dashboard.saveAmount.replace("{amount}", `${sym}${(convert(plan.monthly_price * 12) - convert(plan.yearly_price)).toFixed(2)}`)}</span>
             </div>
           ) : (
             <p className="text-[11px] text-white/50 mt-1">
-              {lang === "zh"
-                ? `年付 ${sym}${convert(plan.yearly_price).toFixed(2)}/年 · 省 ${sym}${(convert(plan.monthly_price * 12) - convert(plan.yearly_price)).toFixed(2)}`
-                : `Yearly ${sym}${convert(plan.yearly_price).toFixed(2)}/yr · Save ${sym}${(convert(plan.monthly_price * 12) - convert(plan.yearly_price)).toFixed(2)}`}
+              {t.dashboard.yearlyPriceInfo
+                .replace("{price}", `${sym}${convert(plan.yearly_price).toFixed(2)}`)
+                .replace("{amount}", `${sym}${(convert(plan.monthly_price * 12) - convert(plan.yearly_price)).toFixed(2)}`)}
             </p>
           )}
         </div>
@@ -249,10 +252,10 @@ export function SubscriptionCard({
       <div className="px-5 pt-3 pb-5 bg-card rounded-b-xl">
         {/* Credits */}
         <div className="flex items-baseline justify-between mb-2 pb-1.5 border-b border-border/20">
-          <span className="text-sm text-muted-foreground">{lang === "zh" ? "每月额度" : "Monthly Credits"}</span>
+          <span className="text-sm text-muted-foreground">{t.dashboard.monthlyCredits}</span>
           <div className="text-right">
             <span className={`text-base font-bold ${theme.accent}`}>{plan.monthly_credits.toLocaleString()}</span>
-            <div className="text-[10px] text-muted-foreground leading-tight text-right">credits</div>
+            <div className="text-[10px] text-muted-foreground leading-tight text-right">{t.dashboard.creditsLabel}</div>
           </div>
         </div>
 
@@ -260,25 +263,25 @@ export function SubscriptionCard({
         <div className="space-y-2.5">
           <div className="flex items-center gap-2 text-sm">
             <CheckCircle className={`h-4 w-4 ${theme.accent} shrink-0`} />
-            <span className="text-foreground">{TIER_LABELS[plan.name]?.[lang] || plan.name}</span>
+            <span className="text-foreground">{getTierLabel(plan.name)}</span>
           </div>
           <div className="flex items-center gap-2 text-sm">
             <CheckCircle className={`h-4 w-4 ${theme.accent} shrink-0`} />
-            <span className="text-foreground">{plan.max_concurrency || 10} {lang === "zh" ? "并发请求" : "concurrent requests"}</span>
+            <span className="text-foreground">{plan.max_concurrency || 10} {t.dashboard.concurrentRequests}</span>
           </div>
           <div className="flex items-center gap-2 text-sm">
             <CheckCircle className={`h-4 w-4 ${theme.accent} shrink-0`} />
             <span className="text-foreground">
-              {plan.support_level === "dedicated" ? (lang === "zh" ? "专属客服支持" : "Dedicated Support") : plan.support_level === "priority" ? (lang === "zh" ? "优先技术支持" : "Priority Support") : plan.support_level === "email" ? (lang === "zh" ? "邮件技术支持" : "Email Support") : (lang === "zh" ? "社区支持" : "Community Support")}
+              {plan.support_level === "dedicated" ? t.dashboard.dedicatedSupport : plan.support_level === "priority" ? t.dashboard.prioritySupport : plan.support_level === "email" ? t.dashboard.emailSupport : t.dashboard.communitySupport}
             </span>
           </div>
           <div className="flex items-center gap-2 text-sm">
             <CheckCircle className={`h-4 w-4 ${theme.accent} shrink-0`} />
-            <span className="text-foreground">{lang === "zh" ? "非高峰时段优惠计费" : "Off-peak discount pricing"}</span>
+            <span className="text-foreground">{t.dashboard.offPeakPricing}</span>
           </div>
           <div className="flex items-center gap-2 text-sm">
             <CheckCircle className={`h-4 w-4 ${theme.accent} shrink-0`} />
-            <span className="text-foreground">{lang === "zh" ? "兼容主流编程工具" : "Compatible with coding tools"}</span>
+            <span className="text-foreground">{t.dashboard.compatibleTools}</span>
           </div>
         </div>
 

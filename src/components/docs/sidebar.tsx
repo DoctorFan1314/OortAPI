@@ -123,6 +123,7 @@ export function DocsSidebar() {
           value={searchQuery}
           onChange={e => setSearchQuery(e.target.value)}
           placeholder={Lr.navDocsSearchPlaceholder || "Search docs..."}
+          aria-label={Lr.navDocsSearchPlaceholder || "Search docs..."}
           className="w-full pl-8 pr-3 py-1.5 bg-background rounded-lg text-sm border border-border/50 focus:border-primary focus:outline-none"
         />
       </div>
