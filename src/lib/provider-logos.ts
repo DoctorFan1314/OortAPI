@@ -25,7 +25,6 @@ export const PROVIDER_GROUPS = {
       { id: "mistral", name: "Mistral", nameZh: "Mistral" },
       { id: "cohere", name: "Cohere", nameZh: "Cohere" },
       { id: "groq", name: "Groq", nameZh: "Groq" },
-      { id: "xai", name: "xAI", nameZh: "xAI" },
       { id: "zhipu", name: "ZhiPu", nameZh: "智谱" },
       { id: "minimax", name: "MiniMax", nameZh: "MiniMax" },
       { id: "moonshot", name: "Moonshot", nameZh: "月之暗面" },
@@ -68,7 +67,6 @@ export const PROVIDER_GROUPS = {
       { id: "siliconcloud", name: "SiliconCloud", nameZh: "硅基流动" },
       { id: "openrouter", name: "OpenRouter", nameZh: "OpenRouter" },
       { id: "anyscale", name: "Anyscale", nameZh: "Anyscale" },
-      { id: "groq", name: "Groq", nameZh: "Groq" },
     ],
   },
 } as const;
