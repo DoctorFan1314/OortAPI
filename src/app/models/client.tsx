@@ -568,14 +568,19 @@ export default function ModelsPage() {
                           </span>
                         </div>
 
-                        {/* Model name */}
-                        <div className="px-5 pb-3">
-                          <h3 className="font-semibold text-sm leading-tight truncate" title={m.model_name}>
-                            {m.display_name && m.display_name !== m.model_name ? m.display_name : m.model_name}
-                          </h3>
-                          {m.display_name && m.display_name !== m.model_name && (
-                            <p className="text-[11px] text-muted-foreground font-mono mt-0.5 truncate">{m.model_name}</p>
-                          )}
+                        {/* Model name with provider logo */}
+                        <div className="px-5 pb-3 flex items-start gap-3">
+                          <div className="w-10 h-10 rounded-lg bg-muted/50 flex items-center justify-center shrink-0 mt-0.5">
+                            <ProviderLogo provider={m.provider} size={28} />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <h3 className="font-semibold text-sm leading-tight truncate" title={m.model_name}>
+                              {m.display_name && m.display_name !== m.model_name ? m.display_name : m.model_name}
+                            </h3>
+                            {m.display_name && m.display_name !== m.model_name && (
+                              <p className="text-[11px] text-muted-foreground font-mono mt-0.5 truncate">{m.model_name}</p>
+                            )}
+                          </div>
                         </div>
 
                         {/* Price table */}
@@ -646,6 +651,7 @@ export default function ModelsPage() {
                     <tr key={`${m.model_name}-${m.channel_id}`} className={`border-b border-border hover:bg-muted/30 transition-colors ${!m.enabled ? "opacity-50" : ""}`}>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
+                          <ProviderLogo provider={m.provider} size={20} />
                           {m.tags?.length > 0 && (() => {
                             const t = m.tags[0];
                             const cfg = CAP_CONFIG[t];
