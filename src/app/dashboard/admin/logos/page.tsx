@@ -166,7 +166,7 @@ export default function LogoManagePage() {
         ))}
       </div>
 
-      {/* Icon Grid — grouped by provider */}
+      {/* Icon Grid — flat grid */}
       {loading ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
           {Array.from({ length: 18 }).map((_, i) => (
@@ -177,39 +177,29 @@ export default function LogoManagePage() {
           ))}
         </div>
       ) : (
-        <div className="space-y-6">
-          {[...groupedByProvider.entries()].map(([provider, icons]) => (
-            <div key={provider}>
-              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-1">{provider}</h3>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-                {icons.map((icon) => {
-                  const displaySuffix = icon.variants.includes("-color") ? "-color" : icon.variants[0];
-                  return (
-                    <button
-                      key={icon.id}
-                      onClick={() => { setSelectedIcon(icon); setSelectedVariant(displaySuffix); setCopied(false); }}
-                      className="group flex flex-col items-center gap-2 p-3 rounded-xl border border-border/50 bg-card hover:bg-muted/50 hover:border-primary/30 transition-all cursor-pointer"
-                    >
-                      <div className="w-12 h-12 flex items-center justify-center">
-                        <img
-                          src={getSrc(icon.id, displaySuffix)}
-                          alt={icon.id}
-                          className="w-12 h-12 object-contain"
-                          loading="lazy"
-                        />
-                      </div>
-                      <span className="text-xs text-foreground/80 group-hover:text-foreground transition-colors text-center leading-tight truncate w-full font-medium">
-                        {icon.id}
-                      </span>
-                      <span className="text-[10px] text-muted-foreground">
-                        {icon.variants.length} {lang === "zh" ? "个变体" : "variants"}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+          {filtered.map((icon) => {
+            const displaySuffix = icon.variants.includes("-color") ? "-color" : icon.variants[0];
+            return (
+              <button
+                key={icon.id}
+                onClick={() => { setSelectedIcon(icon); setSelectedVariant(displaySuffix); setCopied(false); }}
+                className="group flex flex-col items-center gap-2 p-3 rounded-xl border border-border/50 bg-card hover:bg-muted/50 hover:border-primary/30 transition-all cursor-pointer"
+              >
+                <div className="w-12 h-12 flex items-center justify-center">
+                  <img
+                    src={getSrc(icon.id, displaySuffix)}
+                    alt={icon.id}
+                    className="w-12 h-12 object-contain"
+                    loading="lazy"
+                  />
+                </div>
+                <span className="text-xs text-foreground/80 group-hover:text-foreground transition-colors text-center leading-tight truncate w-full font-medium">
+                  {icon.id}
+                </span>
+              </button>
+            );
+          })}
         </div>
       )}
 
