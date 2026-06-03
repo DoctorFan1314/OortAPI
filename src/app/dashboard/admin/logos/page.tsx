@@ -242,11 +242,11 @@ export default function LogoManagePage() {
               : `${allIcons.length} ${lang === "zh" ? "个图标" : "icons"} · ${filtered.length} ${lang === "zh" ? "个显示" : "shown"}`}
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
           <button
             onClick={() => setShowFavorites(!showFavorites)}
             className={cn(
-              "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border",
+              "flex items-center gap-1.5 px-3 h-9 rounded-lg text-xs font-medium transition-all border whitespace-nowrap",
               showFavorites
                 ? "bg-yellow-500/10 text-yellow-500 border-yellow-500/30"
                 : "bg-transparent text-muted-foreground border-border hover:text-foreground"
@@ -255,8 +255,8 @@ export default function LogoManagePage() {
             <Star className={cn("h-3.5 w-3.5", showFavorites && "fill-current")} />
             {lang === "zh" ? "收藏" : "Favorites"}
           </button>
-          <div className="relative max-w-xs w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <div className="relative w-56">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
             <Input
               placeholder={L.logoSearch}
               value={search}
@@ -406,6 +406,9 @@ export default function LogoManagePage() {
                 <p>File: <code className="font-mono bg-muted px-1.5 py-0.5 rounded text-xs">{selectedIcon.id}{selectedVariant}.svg</code></p>
                 <p>Path: <code className="font-mono bg-muted px-1.5 py-0.5 rounded text-xs">/providers/{selectedIcon.id}{selectedVariant}.svg</code></p>
                 <p>{lang === "zh" ? "变体" : "Variants"}: {selectedIcon.variants.map(v => <code key={v} className="font-mono bg-muted px-1.5 py-0.5 rounded text-xs ml-1">{v || "(mono)"}</code>)}</p>
+                <p className="text-[11px] text-muted-foreground/60">
+                  {lang === "zh" ? "下载/复制的是原始 SVG 文件。暗色预览仅是浏览器渲染效果。" : "Download/copy is the original SVG file. Dark preview is browser rendering only."}
+                </p>
               </div>
             </div>
 
