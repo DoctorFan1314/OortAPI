@@ -60,7 +60,7 @@ export default function DashboardPage() {
   const t = LABELS[lang];
   const { data: keysData, error: keysError, mutate: mutateKeys } = useSWR<{ keys: { id: number }[] }>("/api/dashboard/keys", dashboardSWRConfig);
   const { data: subData, error: subError, mutate: mutateSub } = useSWR<{ subscriptions: { id: number; status: string; current_period_end: string; plan_display_name: string; auto_renew: number }[] }>("/api/dashboard/subscription", dashboardSWRConfig);
-  const { data: statsData } = useSWR<{
+  const { data: statsData, error: statsError } = useSWR<{
     cache_savings?: {
       tokens_saved: number;
       cache_hit_pct: number;

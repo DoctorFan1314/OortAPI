@@ -31,7 +31,7 @@ interface NavGroup {
 
 const GROUPS: NavGroup[] = [
   {
-    headerKey: "core",
+    headerKey: "groupCore",
     items: [
       { href: "/dashboard", icon: LayoutDashboard, labelKey: "overview" },
       { href: "/dashboard/keys", icon: Key, labelKey: "apiKeys" },
@@ -39,7 +39,7 @@ const GROUPS: NavGroup[] = [
     ],
   },
   {
-    headerKey: "billing",
+    headerKey: "groupBilling",
     items: [
       { href: "/dashboard/token-plan", icon: Sparkles, labelKey: "tokenPlan" },
       { href: "/dashboard/usage", icon: BarChart3, labelKey: "usage" },
@@ -47,7 +47,7 @@ const GROUPS: NavGroup[] = [
     ],
   },
   {
-    headerKey: "admin",
+    headerKey: "groupAdmin",
     items: [
       { href: "/dashboard/channels", icon: Radio, labelKey: "channels", adminOnly: true },
       { href: "/dashboard/multiplier", icon: Percent, labelKey: "multiplier", adminOnly: true },
@@ -64,36 +64,11 @@ const GROUPS: NavGroup[] = [
 
 const SETTINGS_ITEM: NavItem = { href: "/dashboard/settings", icon: Settings, labelKey: "settings" };
 
-const GROUP_HEADERS: Record<string, { zh: string; en: string }> = {
-  core: { zh: "核心服务", en: "Core" },
-  billing: { zh: "额度与账单", en: "Billing & Usage" },
-  admin: { zh: "管理中心", en: "Administration" },
-};
-
-const LABELS: Record<string, { zh: string; en: string }> = {
-  overview: { zh: "概览", en: "Overview" },
-  tokenPlan: { zh: "我的订阅", en: "My Subscription" },
-  apiKeys: { zh: "API Keys", en: "API Keys" },
-  usage: { zh: "调用日志", en: "Call Logs" },
-  billing: { zh: "账单中心", en: "Billing" },
-  channels: { zh: "渠道管理", en: "Channels" },
-  multiplier: { zh: "倍率管理", en: "Multipliers" },
-  planManage: { zh: "套餐管理", en: "Plan Management" },
-  users: { zh: "用户管理", en: "Users" },
-  redeem: { zh: "兑换码", en: "Redeem Codes" },
-  audit: { zh: "审计日志", en: "Audit Logs" },
-  monitor: { zh: "系统监控", en: "System Monitor" },
-  webhooks: { zh: "Webhook", en: "Webhooks" },
-  modelManage: { zh: "模型管理", en: "Model Management" },
-  playground: { zh: "API 测试", en: "API Playground" },
-  settings: { zh: "设置", en: "Settings" },
-};
-
 // ─── Component ─────────────────────────────────────────────
 
 export function DashboardSidebar() {
   const pathname = usePathname();
-  const { lang } = useI18n();
+  const { lang, t } = useI18n();
   const { user } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
 
@@ -157,7 +132,7 @@ export function DashboardSidebar() {
             return (
               <div key={group.headerKey}>
                 <div className="text-sm font-semibold tracking-wider text-muted-foreground uppercase px-3 pt-6 pb-1.5">
-                  {GROUP_HEADERS[group.headerKey][lang]}
+                  {t.dashboard[group.headerKey as keyof typeof t.dashboard]}
                 </div>
                 {visibleItems.map((item) => (
                   <Link
@@ -173,7 +148,7 @@ export function DashboardSidebar() {
                     )}
                   >
                     <item.icon className="h-4 w-4 shrink-0" />
-                    <span className="flex-1">{LABELS[item.labelKey][lang]}</span>
+                    <span className="flex-1">{t.dashboard[item.labelKey as keyof typeof t.dashboard]}</span>
                     {(() => {
                       const badge = getBadge(item.href);
                       return badge ? (
@@ -203,7 +178,7 @@ export function DashboardSidebar() {
             )}
           >
             <SETTINGS_ITEM.icon className="h-5 w-5 shrink-0" />
-            <span className="flex-1">{LABELS[SETTINGS_ITEM.labelKey][lang]}</span>
+            <span className="flex-1">{t.dashboard[SETTINGS_ITEM.labelKey as keyof typeof t.dashboard]}</span>
           </Link>
         </div>
       </div>

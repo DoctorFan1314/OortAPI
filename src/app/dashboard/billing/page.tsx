@@ -210,7 +210,7 @@ export default function BillingPage() {
               <div className="relative" onMouseEnter={() => setShowRedeemTooltip(true)} onMouseLeave={() => setShowRedeemTooltip(false)}>
                 <Button className="gap-2" disabled>
                   <Plus className="h-4 w-4" />
-                  {L.recharge}
+                  {lang === "zh" ? "即将推出" : "Coming Soon"}
                 </Button>
                 {showRedeemTooltip && (
                   <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg bg-popover border border-border text-xs text-muted-foreground whitespace-nowrap shadow-lg z-10">

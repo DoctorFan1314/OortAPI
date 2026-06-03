@@ -3,6 +3,7 @@
 import useSWR from "swr";
 import { Card, CardContent } from "@/components/ui/card";
 import { useCurrency } from "@/contexts/currency-context";
+import { useI18n } from "@/contexts/i18n-context";
 import { Wallet, TrendingDown, Activity, Coins, Gauge, Cpu } from "lucide-react";
 import Link from "next/link";
 import { dashboardSWRConfig } from "@/lib/swr-fetcher";
@@ -42,44 +43,11 @@ interface StatsData {
   daily_usage: Array<{ date: string; calls: number; cost: number; tokens: number }>;
 }
 
-const LABELS = {
-  zh: {
-    balance: "当前余额",
-    totalCost: "历史消耗",
-    totalCalls: "请求次数",
-    totalTokens: "Token 总量",
-    rpm: "平均 RPM",
-    tpm: "平均 TPM",
-    monthlyCalls: "本月调用",
-    monthlyCost: "本月花费",
-    monthlyTokens: "本月 Tokens",
-    tokensInput: "输入 Token",
-    tokensInputNonCached: "输入(未命中缓存)",
-    tokensCacheHit: "输入(命中缓存)",
-    tokensOutput: "输出",
-  },
-  en: {
-    balance: "Balance",
-    totalCost: "Total Spent",
-    totalCalls: "Total Requests",
-    totalTokens: "Total Tokens",
-    rpm: "Avg RPM",
-    tpm: "Avg TPM",
-    monthlyCalls: "Monthly Calls",
-    monthlyCost: "Monthly Cost",
-    monthlyTokens: "Monthly Tokens",
-    tokensInput: "Input Tokens",
-    tokensInputNonCached: "Input(non-cached)",
-    tokensCacheHit: "Input(cache hit)",
-    tokensOutput: "Output",
-  },
-};
-
 export function StatsCards({ lang = "zh" }: { lang?: "zh" | "en" }) {
   const tzOffset = -new Date().getTimezoneOffset();
   const { data: stats, error } = useSWR<StatsData>(`/api/dashboard/stats?tz=${tzOffset}`, dashboardSWRConfig);
   const { currency, exchangeRate, symbol, formatPrice } = useCurrency();
-  const t = LABELS[lang];
+  const { t } = useI18n();
 
   const formatTokens = (n: number) => {
     return n.toLocaleString();
@@ -143,14 +111,14 @@ export function StatsCards({ lang = "zh" }: { lang?: "zh" | "en" }) {
     : formatPrice(stats.month?.cost || 0);
   const monthlyLabel = isCreditsUser
     ? (lang === "zh" ? "本月 Credits" : "Monthly Credits")
-    : t.monthlyCost;
+    : t.dashboard.monthlyCost;
 
   const cards = [
-    { icon: Wallet, label: t.balance, value: formatPrice(stats.balance), color: "text-yellow-500", bgColor: "bg-yellow-500/10", hex: "#eab308", href: "/dashboard/billing" },
+    { icon: Wallet, label: t.dashboard.balance, value: formatPrice(stats.balance), color: "text-yellow-500", bgColor: "bg-yellow-500/10", hex: "#eab308", href: "/dashboard/billing" },
     { icon: TrendingDown, label: monthlyLabel, value: monthlyDisplay, color: "text-red-500", bgColor: "bg-red-500/10", delta: isCreditsUser ? null : costDelta, hex: "#ef4444", sparkData: dailyCosts, href: "/dashboard/usage" },
-    { icon: Activity, label: t.monthlyCalls, value: (stats.month?.calls || 0).toLocaleString(), color: "text-blue-500", bgColor: "bg-blue-500/10", delta: callsDelta, hex: "#3b82f6", sparkData: dailyCalls, href: "/dashboard/usage" },
-    { icon: Gauge, label: t.rpm, value: avgRPM, color: "text-purple-500", bgColor: "bg-purple-500/10", hex: "#a855f7", sparkData: dailyCalls, href: "/dashboard/usage" },
-    { icon: Cpu, label: t.tpm, value: formatTokens(avgTPM), color: "text-cyan-500", bgColor: "bg-cyan-500/10", hex: "#06b6d4", sparkData: dailyTokens, href: "/dashboard/usage" },
+    { icon: Activity, label: t.dashboard.monthlyCalls, value: (stats.month?.calls || 0).toLocaleString(), color: "text-blue-500", bgColor: "bg-blue-500/10", delta: callsDelta, hex: "#3b82f6", sparkData: dailyCalls, href: "/dashboard/usage" },
+    { icon: Gauge, label: t.dashboard.rpm, value: avgRPM, color: "text-purple-500", bgColor: "bg-purple-500/10", hex: "#a855f7", sparkData: dailyCalls, href: "/dashboard/usage" },
+    { icon: Cpu, label: t.dashboard.tpm, value: formatTokens(avgTPM), color: "text-cyan-500", bgColor: "bg-cyan-500/10", hex: "#06b6d4", sparkData: dailyTokens, href: "/dashboard/usage" },
   ];
 
   return (
@@ -163,7 +131,7 @@ export function StatsCards({ lang = "zh" }: { lang?: "zh" | "en" }) {
                 <card.icon className={`h-3.5 w-3.5 ${card.color}`} />
               </div>
               <span className="text-xs text-muted-foreground">{card.label}</span>
-              {'delta' in card && card.delta && <DeltaBadge delta={card.delta} reverse={card.label === t.monthlyCost} />}
+              {'delta' in card && card.delta && <DeltaBadge delta={card.delta} reverse={card.label === t.dashboard.monthlyCost} />}
             </div>
             <div className="flex items-center justify-between">
               <div className="text-xl font-bold font-mono">{card.value}</div>
@@ -189,25 +157,25 @@ export function StatsCards({ lang = "zh" }: { lang?: "zh" | "en" }) {
             <div className="p-1.5 rounded-md bg-green-500/10">
               <Coins className="h-3.5 w-3.5 text-green-500" />
             </div>
-            <span className="text-xs text-muted-foreground">{t.monthlyTokens}</span>
+            <span className="text-xs text-muted-foreground">{t.dashboard.monthlyTokens}</span>
           </div>
           <div className="text-xl font-bold font-mono mb-2">{formatTokens(stats.month?.tokens || 0)}</div>
           <div className="space-y-1 text-xs border-t border-border/20 pt-2">
             {stats.month.tokens_in_noncached > 0 && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground"><span className="text-blue-400">■</span> {t.tokensInputNonCached}</span>
+                <span className="text-muted-foreground"><span className="text-blue-400">■</span> {t.dashboard.tokensInputNonCached}</span>
                 <span className="font-mono">{formatTokens(stats.month.tokens_in_noncached)}</span>
               </div>
             )}
             {stats.month.tokens_in_cache > 0 && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground"><span className="text-emerald-400">■</span> {t.tokensCacheHit}</span>
+                <span className="text-muted-foreground"><span className="text-emerald-400">■</span> {t.dashboard.tokensCacheHit}</span>
                 <span className="font-mono">{formatTokens(stats.month.tokens_in_cache)}</span>
               </div>
             )}
             {stats.month.tokens_out > 0 && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground"><span className="text-orange-400">■</span> {t.tokensOutput}</span>
+                <span className="text-muted-foreground"><span className="text-orange-400">■</span> {t.dashboard.tokensOutput}</span>
                 <span className="font-mono">{formatTokens(stats.month.tokens_out)}</span>
               </div>
             )}

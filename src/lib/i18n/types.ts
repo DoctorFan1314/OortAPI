@@ -397,6 +397,12 @@ export interface Dictionary {
     monthlyCalls: string;
     monthlyCost: string;
     monthlyTokens: string;
+    rpm: string;
+    tpm: string;
+    tokensInput: string;
+    tokensInputNonCached: string;
+    tokensCacheHit: string;
+    tokensOutput: string;
     dailyUsage: string;
     topModels: string;
     calls: string;
@@ -728,6 +734,8 @@ export interface Dictionary {
     monitor: string;
     webhooks: string;
     channelManage: string;
+    users: string;
+    playground: string;
     // Settings page
     apiEndpoint: string;
     copyEndpoint: string;
@@ -815,6 +823,8 @@ export interface Dictionary {
     navAiTools: string;
     navFeatures: string;
     navModelsPricing: string;
+    navPlayground: string;
+    navWebhooks: string;
     navFaq: string;
     navSecurity: string;
     navPrev: string;

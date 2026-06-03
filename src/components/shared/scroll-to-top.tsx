@@ -30,7 +30,7 @@ export function ScrollToTop() {
   return (
     <button
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-      className={`fixed bottom-6 right-6 z-50 h-10 w-10 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-opacity duration-300 flex items-center justify-center ${show ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+      className={`fixed bottom-20 lg:bottom-6 right-6 z-50 h-10 w-10 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-opacity duration-300 flex items-center justify-center ${show ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
       aria-label={t.common.backToTop}
       aria-hidden={!show}
       tabIndex={show ? 0 : -1}

@@ -275,12 +275,17 @@ export default function UsersPage() {
   }
 
   function toggleSelectAll() {
-    const selectableUsers = users.filter(u => u.id !== currentUser?.id);
-    if (selectedIds.size === selectableUsers.length) {
-      setSelectedIds(new Set());
-    } else {
-      setSelectedIds(new Set(selectableUsers.map(u => u.id)));
-    }
+    const selectableIds = users.filter(u => u.id !== currentUser?.id).map(u => u.id);
+    const allPageSelected = selectableIds.length > 0 && selectableIds.every((id) => selectedIds.has(id));
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (allPageSelected) {
+        for (const id of selectableIds) next.delete(id);
+      } else {
+        for (const id of selectableIds) next.add(id);
+      }
+      return next;
+    });
   }
 
   async function handleBatchAction(action: "enable" | "disable" | "grant") {
@@ -433,7 +438,7 @@ export default function UsersPage() {
                 <thead>
                   <tr className="border-b border-border/50">
                     <th scope="col" className="text-left py-3 px-2 w-10">
-                      <input type="checkbox" checked={users.length > 0 && selectedIds.size === users.filter(u => u.id !== currentUser?.id).length} onChange={toggleSelectAll} className="rounded border-input" />
+                      <input type="checkbox" checked={users.length > 0 && users.filter(u => u.id !== currentUser?.id).every(u => selectedIds.has(u.id))} onChange={toggleSelectAll} className="rounded border-input" />
                     </th>
                     <th scope="col" className="text-left py-3 px-4 text-muted-foreground font-medium">{L.email}</th>
                     <th scope="col" className="text-left py-3 px-4 text-muted-foreground font-medium hidden md:table-cell">{L.username}</th>

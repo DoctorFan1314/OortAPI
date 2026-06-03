@@ -104,8 +104,10 @@ export default function SettingsPage() {
 
   // Auto-save budget with 2s debounce
   const budgetTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const budgetLoadedRef = useRef(false);
   const notifPrefsTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   useEffect(() => {
+    if (!budgetLoadedRef.current) { budgetLoadedRef.current = true; setAutoSaveStatus("saved"); return; }
     if (!monthlyBudget || monthlyBudget === String(savedBudget)) { setAutoSaveStatus("saved"); return; }
     setAutoSaveStatus("unsaved");
     clearTimeout(budgetTimerRef.current);
@@ -326,7 +328,7 @@ export default function SettingsPage() {
                   <p className="text-sm text-foreground">{item.label}</p>
                   <p className="text-xs text-muted-foreground">{item.desc}</p>
                 </div>
-                <div className={`w-9 h-5 rounded-full transition-colors relative ${notifPrefs[item.key] ? "bg-primary" : "bg-muted/50 border border-border"}`}>
+                <div role="switch" aria-checked={notifPrefs[item.key]} className={`w-9 h-5 rounded-full transition-colors relative ${notifPrefs[item.key] ? "bg-primary" : "bg-muted/50 border border-border"}`}>
                   <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-all ${notifPrefs[item.key] ? "left-[18px]" : "left-[2px]"}`} />
                 </div>
                 <input type="checkbox" className="sr-only" checked={notifPrefs[item.key]} onChange={() => setNotifPrefs(prev => ({ ...prev, [item.key]: !prev[item.key] }))} />

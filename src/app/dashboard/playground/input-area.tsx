@@ -125,7 +125,7 @@ export function InputArea({
           )}
         </button>
 
-        <Textarea ref={textareaRef} placeholder={t.inputMessage} value={message} onChange={(e) => onSetMessage(e.target.value)} onKeyDown={handleKeyDown} rows={1} className="resize-none flex-1 min-h-[2.5rem] max-h-32 overflow-y-auto" disabled={isStreaming} />
+        <Textarea ref={textareaRef} placeholder={t.inputMessage} aria-label={t.inputMessage} value={message} onChange={(e) => onSetMessage(e.target.value)} onKeyDown={handleKeyDown} rows={1} className="resize-none flex-1 min-h-[2.5rem] max-h-32 overflow-y-auto" disabled={isStreaming} />
 
         <div className="flex flex-col gap-1.5 self-center">
           <div className="flex gap-1.5">

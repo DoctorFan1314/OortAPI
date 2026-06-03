@@ -12,7 +12,7 @@ export function EditThisPage() {
 
   // Map pathname to GitHub file path
   const filePath = pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
-  const githubUrl = `${GITHUB_BASE}${filePath}/page.tsx`;
+  const githubUrl = `${GITHUB_BASE}${filePath}/client.tsx`;
 
   return (
     <a

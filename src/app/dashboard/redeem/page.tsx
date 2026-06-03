@@ -187,11 +187,17 @@ export default function RedeemPage() {
   }
 
   function toggleSelectAll() {
-    if (selectedIds.size === filteredCodes.length) {
-      setSelectedIds(new Set());
-    } else {
-      setSelectedIds(new Set(filteredCodes.map(c => c.id)));
-    }
+    const pageIds = filteredCodes.map(c => c.id);
+    const allPageSelected = pageIds.length > 0 && pageIds.every((id) => selectedIds.has(id));
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (allPageSelected) {
+        for (const id of pageIds) next.delete(id);
+      } else {
+        for (const id of pageIds) next.add(id);
+      }
+      return next;
+    });
   }
 
   async function handleBatchAction(action: "enable" | "disable" | "delete") {
@@ -296,7 +302,7 @@ export default function RedeemPage() {
                 <thead>
                   <tr className="border-b border-border/50">
                     <th scope="col" className="text-left py-3 px-2 w-10">
-                      <input type="checkbox" checked={filteredCodes.length > 0 && selectedIds.size === filteredCodes.length} onChange={toggleSelectAll} className="rounded border-input" />
+                      <input type="checkbox" checked={filteredCodes.length > 0 && filteredCodes.every(c => selectedIds.has(c.id))} onChange={toggleSelectAll} className="rounded border-input" />
                     </th>
                     <th scope="col" className="text-left py-3 px-4 text-muted-foreground font-medium">{L.code}</th>
                     <th scope="col" className="text-center py-3 px-4 text-muted-foreground font-medium">{L.codeType}</th>

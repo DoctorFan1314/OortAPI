@@ -30,6 +30,7 @@ interface ModelItem {
   display_name: string;
   pricing: { input: number; output: number; cache: number } | null;
   tags: string[];
+  context_length?: number;
 }
 
 interface ModelsResponse {
@@ -144,11 +145,17 @@ export default function AdminModelsPage() {
   }
 
   function toggleSelectAll() {
-    if (selectedIds.size === paged.length) {
-      setSelectedIds(new Set());
-    } else {
-      setSelectedIds(new Set(paged.map((m) => m.id)));
-    }
+    const pageIds = paged.map((m) => m.id);
+    const allPageSelected = pageIds.length > 0 && pageIds.every((id) => selectedIds.has(id));
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (allPageSelected) {
+        for (const id of pageIds) next.delete(id);
+      } else {
+        for (const id of pageIds) next.add(id);
+      }
+      return next;
+    });
   }
 
   /* ---- Toggle single model ---- */
@@ -347,7 +354,7 @@ export default function AdminModelsPage() {
                     <th className="text-left py-3 px-2 w-10">
                       <input
                         type="checkbox"
-                        checked={paged.length > 0 && selectedIds.size === paged.length}
+                        checked={paged.length > 0 && paged.every((m) => selectedIds.has(m.id))}
                         onChange={toggleSelectAll}
                         className="rounded border-input"
                       />
@@ -402,7 +409,7 @@ export default function AdminModelsPage() {
                           </Badge>
                         </td>
                         <td className="py-3 px-4 text-center text-xs text-muted-foreground">
-                          {"—"}
+                          {m.context_length ? m.context_length.toLocaleString() : "—"}
                         </td>
                         <td className="py-3 px-4 text-center">
                           <span

@@ -301,11 +301,13 @@ function PlaygroundContent() {
     }
     if (attachedImages.length > 0) {
       const parts: ContentPart[] = [];
-      if (message.trim()) parts.push({ type: "text", text: message });
+      const textParts = [quoteMessage ? `[Quoting: ${flatContent(quoteMessage.content)}]\n\n` : "", message.trim()].filter(Boolean).join("");
+      if (textParts) parts.push({ type: "text", text: textParts });
       for (const img of attachedImages) parts.push({ type: "image_url", image_url: { url: img } });
       msgs.push({ role: "user", content: parts });
     } else {
-      msgs.push({ role: "user", content: message });
+      const fullContent = quoteMessage ? `[Quoting: ${flatContent(quoteMessage.content)}]\n\n${message}` : message;
+      msgs.push({ role: "user", content: fullContent });
     }
     return msgs;
   };
@@ -601,6 +603,7 @@ function PlaygroundContent() {
         setAttachedImages((prev) => [...prev, canvas.toDataURL("image/jpeg", 0.85)]);
         URL.revokeObjectURL(blobUrl);
       };
+      img.onerror = () => { URL.revokeObjectURL(blobUrl); };
       img.src = blobUrl;
       return;
     }
@@ -644,12 +647,11 @@ function PlaygroundContent() {
     const firstMsgs = buildMessages();
     setMessage("");
     await sendWithTools(firstMsgs);
-  }, [chatHistory, selectedModel, selectedKey?.key_value, isSending, endpoint]); // eslint-disable-line
+  }, [chatHistory, selectedModel, selectedKey?.key_value, isSending, endpoint, systemPrompt, params, attachedImages]); // eslint-disable-line
 
   const handleClear = () => {
     updateSession((s) => ({ ...s, messages: [] }));
     setResponse(""); setError(""); setUsage(null); setAttachedImages([]); setReasoningContent("");
-    try { localStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
   };
 
   const capEntries: { key: string; label: string; color: string }[] = [

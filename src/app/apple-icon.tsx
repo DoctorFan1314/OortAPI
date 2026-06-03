@@ -18,7 +18,7 @@ export default function AppleIcon() {
         fontWeight: "bold",
         borderRadius: 36,
       }}>
-        S
+        O
       </div>
     ),
     { ...size }
