@@ -27,6 +27,7 @@ interface ChannelModel {
   credit_rate: number;
   rate_id: number | null;
   display_name: string | null;
+  logo_id: string | null;
   tags: string[];
 }
 
@@ -163,7 +164,7 @@ export default function ModelsPage() {
   const [loading, setLoading] = useState(true);
   const { currency, setCurrency, exchangeRate, formatPrice } = useCurrency();
   const [editingModel, setEditingModel] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState({ input_rate: 0, output_rate: 0, cache_rate: 0, cache_creation_rate: 0, credit_rate: 1.0, display_name: "", tags: [] as string[] });
+  const [editForm, setEditForm] = useState({ input_rate: 0, output_rate: 0, cache_rate: 0, cache_creation_rate: 0, credit_rate: 1.0, display_name: "", logo_id: "", tags: [] as string[] });
   const [search, setSearch] = useState("");
   const [providerFilter, setProviderFilter] = useState("all");
   const [tagFilter, setTagFilter] = useState("all");
@@ -211,6 +212,7 @@ export default function ModelsPage() {
       cache_creation_rate: m.cache_creation_rate,
       credit_rate: m.credit_rate ?? 1.0,
       display_name: m.display_name || m.model_name,
+      logo_id: m.logo_id || "",
       tags: m.tags || [],
     });
   };
@@ -461,6 +463,22 @@ export default function ModelsPage() {
                             className="h-8 text-xs"
                          />
                         </div>
+                        <div>
+                          <label className="text-xs text-muted-foreground mb-1 block">{lang === "zh" ? "Logo ID (留空使用供应商默认)" : "Logo ID (empty for provider default)"}</label>
+                          <div className="flex gap-2">
+                            <Input
+                              value={editForm.logo_id}
+                              onChange={(e) => setEditForm((f) => ({ ...f, logo_id: e.target.value }))}
+                              placeholder={m.provider}
+                              className="h-8 text-xs flex-1"
+                            />
+                            {editForm.logo_id && (
+                              <div className="w-8 h-8 rounded bg-muted flex items-center justify-center">
+                                <ProviderLogo provider={m.provider} logoId={editForm.logo_id} size={20} />
+                              </div>
+                            )}
+                          </div>
+                        </div>
                         <div className="grid grid-cols-2 gap-2">
                           {[
                             { key: "input_rate" as const, label: t.inputPrice },
@@ -569,9 +587,9 @@ export default function ModelsPage() {
                         </div>
 
                         {/* Model name with provider logo */}
-                        <div className="px-5 pb-3 flex items-start gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-muted/50 flex items-center justify-center shrink-0 mt-0.5">
-                            <ProviderLogo provider={m.provider} size={28} />
+                        <div className="px-5 pb-3 flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-lg bg-muted/50 flex items-center justify-center shrink-0">
+                            <ProviderLogo provider={m.provider} logoId={m.logo_id} size={28} />
                           </div>
                           <div className="min-w-0 flex-1">
                             <h3 className="font-semibold text-sm leading-tight truncate" title={m.model_name}>

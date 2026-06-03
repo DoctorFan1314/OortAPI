@@ -96,6 +96,8 @@ function getDb(): Database.Database {
     'ALTER TABLE users ADD COLUMN token_version INTEGER DEFAULT 0',
     // Note: usage_logs.channel_id FK not added via ALTER because SQLite doesn't support
     // adding FK constraints to existing tables. The constraint exists in schema.sql for new DBs.
+    // logo_id for admin-configurable model logos
+    'ALTER TABLE model_rates ADD COLUMN logo_id TEXT',
   ];
   // Check which migrations have already been applied
   const applied = new Set<number>();
@@ -263,6 +265,7 @@ export interface DBModelRate {
   model_name: string;
   display_name: string;
   provider: string;
+  logo_id: string | null;
   input_rate: number;
   output_rate: number;
   cache_rate: number;

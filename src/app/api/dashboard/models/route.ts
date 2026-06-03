@@ -34,6 +34,7 @@ export async function GET(request: NextRequest) {
         credit_rate: number;
         rate_id: number | null;
         display_name: string | null;
+        logo_id: string | null;
         tags: string[];
       }>();
 
@@ -43,8 +44,8 @@ export async function GET(request: NextRequest) {
           if (modelName === '*') continue;
           if (!modelMap.has(modelName)) {
             const rate = db.prepare(
-              'SELECT id, display_name, input_rate, output_rate, cache_rate, cache_creation_rate, credit_rate, enabled, tags FROM model_rates WHERE model_name = ?'
-            ).get(modelName) as Pick<DBModelRate, 'id' | 'display_name' | 'input_rate' | 'output_rate' | 'cache_rate' | 'cache_creation_rate' | 'credit_rate' | 'enabled' | 'tags'> | undefined;
+              'SELECT id, display_name, logo_id, input_rate, output_rate, cache_rate, cache_creation_rate, credit_rate, enabled, tags FROM model_rates WHERE model_name = ?'
+            ).get(modelName) as Pick<DBModelRate, 'id' | 'display_name' | 'logo_id' | 'input_rate' | 'output_rate' | 'cache_rate' | 'cache_creation_rate' | 'credit_rate' | 'enabled' | 'tags'> | undefined;
 
             modelMap.set(modelName, {
               model_name: modelName,
@@ -59,6 +60,7 @@ export async function GET(request: NextRequest) {
               credit_rate: rate?.credit_rate ?? 1.0,
               rate_id: rate?.id ?? null,
               display_name: rate?.display_name ?? null,
+              logo_id: rate?.logo_id ?? null,
               tags: rate?.tags ? JSON.parse(rate.tags) : [],
             });
           }
@@ -105,7 +107,7 @@ export async function PATCH(request: NextRequest) {
       }
     }
 
-    const { id, display_name, input_rate, output_rate, cache_rate, cache_creation_rate, credit_rate, enabled, tags } = body;
+    const { id, display_name, input_rate, output_rate, cache_rate, cache_creation_rate, credit_rate, enabled, tags, logo_id } = body;
     if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 });
 
     const updates: string[] = [];
@@ -118,6 +120,7 @@ export async function PATCH(request: NextRequest) {
     if (credit_rate !== undefined) { updates.push('credit_rate = ?'); values.push(credit_rate); }
     if (enabled !== undefined) { updates.push('enabled = ?'); values.push(enabled ? 1 : 0); }
     if (tags !== undefined) { updates.push('tags = ?'); values.push(JSON.stringify(tags)); }
+    if (logo_id !== undefined) { updates.push('logo_id = ?'); values.push(logo_id); }
 
     if (updates.length > 0) {
       values.push(id);

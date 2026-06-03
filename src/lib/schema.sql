@@ -58,6 +58,7 @@ CREATE TABLE IF NOT EXISTS model_rates (
   model_name TEXT UNIQUE NOT NULL,
   display_name TEXT,
   provider TEXT,
+  logo_id TEXT,
   input_rate REAL NOT NULL DEFAULT 0,
   output_rate REAL NOT NULL DEFAULT 0,
   cache_rate REAL DEFAULT 0,

@@ -47,17 +47,20 @@ const PROVIDER_ID_MAP: Record<string, string> = {
 
 interface ProviderLogoProps {
   provider: string;
+  logoId?: string | null;
   size?: number;
   className?: string;
 }
 
-export function ProviderLogo({ provider, size = 16, className = "" }: ProviderLogoProps) {
+export function ProviderLogo({ provider, logoId, size = 16, className = "" }: ProviderLogoProps) {
   const [variant, setVariant] = useState<"color" | "mono">("color");
-  const providerId = PROVIDER_ID_MAP[provider.toLowerCase()] || provider.toLowerCase();
+
+  // Use logoId if provided, otherwise fall back to provider mapping
+  const resolvedId = logoId || PROVIDER_ID_MAP[provider.toLowerCase()] || provider.toLowerCase();
 
   const src = variant === "color"
-    ? `/providers/${providerId}-color.svg`
-    : `/providers/${providerId}.svg`;
+    ? `/providers/${resolvedId}-color.svg`
+    : `/providers/${resolvedId}.svg`;
 
   return (
     <img
