@@ -48,7 +48,16 @@
       "Bash(uniq -f1 -d)",
       "Bash(awk 'NR>=903 && /^  \\\\}/ {print NR; exit}' \"c:\\\\Users\\\\zhang\\\\Desktop\\\\test\\\\oortapi\\\\src\\\\lib\\\\i18n\\\\en.ts\")",
       "Bash(awk 'NR>=903 && NR<=1507 {print NR\": \"$0}' \"c:\\\\Users\\\\zhang\\\\Desktop\\\\test\\\\oortapi\\\\src\\\\lib\\\\i18n\\\\en.ts\")",
-      "Bash(awk 'NR>=1370 && NR<=1400' \"c:\\\\Users\\\\zhang\\\\Desktop\\\\test\\\\oortapi\\\\src\\\\lib\\\\i18n\\\\en.ts\")"
+      "Bash(awk 'NR>=1370 && NR<=1400' \"c:\\\\Users\\\\zhang\\\\Desktop\\\\test\\\\oortapi\\\\src\\\\lib\\\\i18n\\\\en.ts\")",
+      "Bash(npm install *)",
+      "Bash(npm uninstall *)",
+      "Bash(curl -sL \"https://unpkg.com/@lobehub/icons-static-svg@latest/icons/openai-color.svg\" -o public/providers/openai.svg)",
+      "Bash(curl -sL \"https://unpkg.com/@lobehub/icons-static-svg@latest/icons/anthropic-color.svg\" -o public/providers/anthropic.svg)",
+      "Bash(curl -sL \"https://unpkg.com/@lobehub/icons-static-svg@latest/icons/google-color.svg\" -o public/providers/google.svg)",
+      "Bash(curl -sL \"https://unpkg.com/@lobehub/icons-static-svg@latest/icons/deepseek-color.svg\" -o public/providers/deepseek.svg)",
+      "Bash(curl -sL \"https://unpkg.com/@lobehub/icons-static-svg@latest/icons/meta-color.svg\" -o public/providers/meta.svg)",
+      "Bash(curl -sL \"https://unpkg.com/@lobehub/icons-static-svg@latest/icons/openai.svg\" -o /tmp/openai.svg)",
+      "Read(//tmp/**)"
     ],
     "additionalDirectories": [
       "C:\\Users\\zhang\\Desktop\\test\\oortapi\\src\\app\\resources\\mcp",

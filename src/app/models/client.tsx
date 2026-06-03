@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { Pencil, Save, X, RefreshCw, Search, Cpu, Check, Zap, ArrowUpDown, ExternalLink, LayoutGrid, List } from "lucide-react";
 import Link from "next/link";
 import { CostSimulator } from "@/components/models/cost-simulator";
+import { ProviderLogo } from "@/components/models/provider-logo";
 
 interface ChannelModel {
   model_name: string;
@@ -343,12 +344,13 @@ export default function ModelsPage() {
                   <button
                     key={p}
                     onClick={() => { setProviderFilter(p); setVisibleCount(20); }}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
                       providerFilter === p
                         ? `${c.bg} ${c.text} ${c.border}`
                         : "bg-transparent text-muted-foreground border-border hover:text-foreground hover:border-foreground/20"
                     }`}
                   >
+                    <ProviderLogo provider={p} size={14} />
                     {p.toUpperCase()}
                   </button>
                 );
@@ -445,6 +447,8 @@ export default function ModelsPage() {
                   key={`${m.model_name}-${m.channel_id}`}
                   className={`glass-card overflow-hidden transition-all hover:shadow-lg hover:border-foreground/10 group ${!m.enabled ? "opacity-50" : ""}`}
                 >
+                  {/* Provider color accent bar */}
+                  <div className={`h-1 w-full ${c.text.replace('text-', 'bg-')}`} />
                   <CardContent className="p-0">
                     {isEditing ? (
                       /* Edit mode */
@@ -545,7 +549,7 @@ export default function ModelsPage() {
                         <div className="px-5 pt-4 pb-3 flex items-center justify-between">
                           <div className="flex items-center gap-1.5 flex-wrap">
                             <span className={`inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wider px-2 py-0.5 rounded font-semibold border ${c.bg} ${c.text} ${c.border}`}>
-                              <span className={`w-1.5 h-1.5 rounded-full ${c.text.replace('text-', 'bg-')}`} />
+                              <ProviderLogo provider={m.provider} size={12} />
                               {m.provider}
                             </span>
                             {m.tags && m.tags.length > 0 && m.tags.map((tag: string) => {
@@ -656,7 +660,10 @@ export default function ModelsPage() {
                         </div>
                       </td>
                       <td className="px-4 py-3">
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-medium ${c.bg} ${c.text} border ${c.border}`}>{m.provider?.toUpperCase()}</span>
+                        <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-medium ${c.bg} ${c.text} border ${c.border}`}>
+                          <ProviderLogo provider={m.provider} size={12} />
+                          {m.provider?.toUpperCase()}
+                        </span>
                       </td>
                       <td className="px-4 py-3 text-right font-mono text-xs">{m.rate_id ? fmtPrice(m.input_rate) : "-"}</td>
                       <td className="px-4 py-3 text-right font-mono text-xs">{m.rate_id ? fmtPrice(m.output_rate) : "-"}</td>

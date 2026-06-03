@@ -10,6 +10,7 @@ import { useParams, useRouter } from "next/navigation";
 import { Cpu, Activity, Clock, Coins, ArrowLeft, Server, Play, UserPlus } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import Link from "next/link";
+import { ProviderLogo } from "@/components/models/provider-logo";
 
 interface ModelInfo {
   name: string;
@@ -170,7 +171,8 @@ export default function ModelDetailPage() {
           {model.display_name}
         </h1>
         <div className="flex items-center gap-2 mt-1">
-          <Badge variant="secondary" className={PROVIDER_COLORS[model.provider] || PROVIDER_COLORS.unknown}>
+          <Badge variant="secondary" className={`inline-flex items-center gap-1.5 ${PROVIDER_COLORS[model.provider] || PROVIDER_COLORS.unknown}`}>
+            <ProviderLogo provider={model.provider} size={14} />
             {model.provider}
           </Badge>
           <code className="text-xs text-muted-foreground font-mono">{model.name}</code>
