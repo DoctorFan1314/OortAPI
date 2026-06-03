@@ -178,8 +178,11 @@ export default function LogoManagePage() {
     const isMono = displaySuffix === "";
 
     return (
-      <button
+      <div
+        role="button"
+        tabIndex={0}
         onClick={() => { setSelectedIcon(icon); setSelectedVariant(displaySuffix); setCopied(false); addToRecent(icon.id); }}
+        onKeyDown={(e) => { if (e.key === "Enter") { setSelectedIcon(icon); setSelectedVariant(displaySuffix); setCopied(false); addToRecent(icon.id); } }}
         className={cn(
           "group relative flex flex-col items-center gap-2 rounded-xl border transition-all cursor-pointer",
           size === "small" ? "p-2" : "p-3",
@@ -220,7 +223,7 @@ export default function LogoManagePage() {
             {icon.variants.length}
           </span>
         )}
-      </button>
+      </div>
     );
   };
 
