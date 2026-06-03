@@ -4,6 +4,7 @@ import { useI18n } from "@/contexts/i18n-context";
 import { ChannelCard } from "@/components/dashboard/channel-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Activity, CheckCircle, AlertTriangle, XCircle,
   GitBranch, Search, Server, RefreshCw, Layers, ArrowRight,
@@ -277,9 +278,9 @@ export default function ChannelsPage() {
           </h1>
           <p className="text-sm text-muted-foreground mt-1">{t.subtitle}</p>
         </div>
-        <button onClick={() => refreshHealth()} className="flex items-center gap-1.5 h-8 px-3 rounded-md border border-input bg-background text-xs hover:bg-muted transition-colors shrink-0" aria-label={t.refresh}>
+        <Button variant="outline" size="sm" onClick={() => refreshHealth()} className="gap-1.5 shrink-0" aria-label={t.refresh}>
           <RefreshCw className="h-3.5 w-3.5" /> {t.refresh}
-        </button>
+        </Button>
       </div>
 
       {/* Stats */}

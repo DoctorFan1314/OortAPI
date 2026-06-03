@@ -20,7 +20,7 @@ export function FeedbackPrompt() {
   const [comment, setComment] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
-  // Restore previous feedback from localStorage
+  // Restore previous feedback from localStorage, reset on navigation
   useEffect(() => {
     try {
       const stored = localStorage.getItem(storageKey(pathname));
@@ -29,6 +29,10 @@ export function FeedbackPrompt() {
         setVote(data.vote);
         setComment(data.comment ?? "");
         setSubmitted(true);
+      } else {
+        setVote(null);
+        setComment("");
+        setSubmitted(false);
       }
     } catch {
       // ignore parse errors

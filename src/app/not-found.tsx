@@ -4,30 +4,34 @@ import Link from "next/link";
 import { Search, Zap, FileText, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useI18n } from "@/contexts/i18n-context";
 
-const FALLBACK_SKILLS = [
-  { id: "find-skills", name: "Find Skills", description: "Discover & Install Agent Skills" },
-  { id: "frontend-design", name: "Frontend Design", description: "Create production-grade frontend interfaces" },
-  { id: "web-search", name: "Web Search", description: "Search and extract web content" },
-  { id: "agent-reach", name: "Agent Reach", description: "Interact with 13+ platforms" },
-];
+function getFallbackSkills(t: ReturnType<typeof useI18n>["t"]) {
+  return [
+    { id: "find-skills", name: t.notFound.skillFindSkills, description: t.notFound.skillFindSkillsDesc },
+    { id: "frontend-design", name: t.notFound.skillFrontendDesign, description: t.notFound.skillFrontendDesignDesc },
+    { id: "web-search", name: t.notFound.skillWebSearch, description: t.notFound.skillWebSearchDesc },
+    { id: "agent-reach", name: t.notFound.skillAgentReach, description: t.notFound.skillAgentReachDesc },
+  ];
+}
 
-const FALLBACK_PROMPTS = [
-  { id: "xiaohongshu-notes", title: "小红书笔记生成器", subtitle: "生成高质量小红书笔记" },
-  { id: "weekly-report", title: "周报生成器", subtitle: "自动生成结构化周报" },
-  { id: "code-review", title: "代码审查专家", subtitle: "专业代码审查报告" },
-  { id: "meeting-summary", title: "会议纪要生成器", subtitle: "自动生成会议纪要" },
-];
+function getFallbackPrompts(t: ReturnType<typeof useI18n>["t"]) {
+  return [
+    { id: "xiaohongshu-notes", title: t.notFound.promptXhsNotes, subtitle: t.notFound.promptXhsNotesDesc },
+    { id: "weekly-report", title: t.notFound.promptWeeklyReport, subtitle: t.notFound.promptWeeklyReportDesc },
+    { id: "code-review", title: t.notFound.promptCodeReview, subtitle: t.notFound.promptCodeReviewDesc },
+    { id: "meeting-summary", title: t.notFound.promptMeetingSummary, subtitle: t.notFound.promptMeetingSummaryDesc },
+  ];
+}
 
 export default function NotFound() {
   const { t } = useI18n();
   const router = useRouter();
   const [query, setQuery] = useState("");
-  const [skills] = useState(FALLBACK_SKILLS);
-  const [prompts] = useState(FALLBACK_PROMPTS);
+  const skills = getFallbackSkills(t);
+  const prompts = getFallbackPrompts(t);
 
   function handleSearch(e?: React.KeyboardEvent) {
     if (e && e.key !== "Enter") return;

@@ -27,15 +27,19 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
     const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '50', 10)));
+    const search = searchParams.get('search')?.trim() || '';
     const offset = (page - 1) * limit;
 
-    const total = (db.prepare('SELECT COUNT(*) as count FROM redeem_codes').get() as { count: number }).count;
+    const whereClause = search ? 'WHERE rc.code LIKE ?' : '';
+    const countParams = search ? [`%${search}%`] : [];
+    const total = (db.prepare(`SELECT COUNT(*) as count FROM redeem_codes rc ${whereClause}`).get(...countParams) as { count: number }).count;
     const codes = db.prepare(
       `SELECT rc.*, sp.display_name as plan_display_name, sp.monthly_credits as plan_monthly_credits
        FROM redeem_codes rc
        LEFT JOIN subscription_plans sp ON rc.plan_id = sp.id
+       ${whereClause}
        ORDER BY rc.created_at DESC LIMIT ? OFFSET ?`
-    ).all(limit, offset) as (DBRedeemCode & { plan_display_name?: string; plan_monthly_credits?: number })[];
+    ).all(...countParams, limit, offset) as (DBRedeemCode & { plan_display_name?: string; plan_monthly_credits?: number })[];
 
     return NextResponse.json({ codes, total, page, limit, has_more: offset + codes.length < total });
   } catch (error) {

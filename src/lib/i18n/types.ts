@@ -241,6 +241,14 @@ export interface Dictionary {
     title: string; description: string; backHome: string;
     searchPlaceholder: string; popularSkills: string; popularPrompts: string;
     browseSkills: string; browsePrompts: string;
+    skillFindSkills: string; skillFindSkillsDesc: string;
+    skillFrontendDesign: string; skillFrontendDesignDesc: string;
+    skillWebSearch: string; skillWebSearchDesc: string;
+    skillAgentReach: string; skillAgentReachDesc: string;
+    promptXhsNotes: string; promptXhsNotesDesc: string;
+    promptWeeklyReport: string; promptWeeklyReportDesc: string;
+    promptCodeReview: string; promptCodeReviewDesc: string;
+    promptMeetingSummary: string; promptMeetingSummaryDesc: string;
   };
   error: {
     title: string; description: string; retry: string;
@@ -249,6 +257,8 @@ export interface Dictionary {
     sessionExpired: string; rateLimited: string; serverError: string;
     serviceUnavailable: string; networkError: string;
     authError: string;
+    chartUnavailable: string;
+    refreshPage: string;
   };
   docs: {
     feedbackHelpful: string; feedbackThanks: string;
@@ -274,6 +284,28 @@ export interface Dictionary {
     pricing: string; unifiedApi: string; smartRouting: string; usageBilling: string;
     multiProtocol: string; agentSkills: string; promptTemplates: string; categories: string;
     guide: string;
+  };
+  shortcuts: {
+    title: string;
+    pressAgainToClose: string;
+    openCommandPalette: string;
+    keyboardShortcuts: string;
+    sendMessage: string;
+    newLine: string;
+    closeDialog: string;
+    focusSearch: string;
+  };
+  promptLib: {
+    title: string;
+    noTemplates: string;
+    templateName: string;
+    promptContent: string;
+    saveTemplate: string;
+    close: string;
+  };
+  status: {
+    allOperational: string;
+    serviceDisruption: string;
   };
   rateLimit: {
     tooFast: string;
@@ -990,6 +1022,16 @@ export interface Dictionary {
     aiToolInstallation: string;
     aiToolNotes: string;
     aiToolProtocol: string;
+    // Docs landing page
+    breadcrumbHome: string; breadcrumbDocs: string;
+    heroBadgeText: string;
+    badgeModels: string; badgeDualProtocol: string; badgeSdkDropin: string;
+    quickStartTitle: string;
+    step1GetKeyTitle: string; step1GetKeyDesc: string; step1GoDashboard: string;
+    step2BaseUrlTitle: string; step2BaseUrlDesc: string; step2ViewUrls: string;
+    step3StartTitle: string; step3StartDesc: string; step3SdkExamples: string;
+    needHelp: string; needHelpDesc: string;
+    faq: string;
   };
   resources: {
     title: string;

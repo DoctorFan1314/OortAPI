@@ -8,19 +8,19 @@ interface ErrorFallbackProps {
   reset?: () => void;
 }
 
-function getErrorMessage(err: Error | undefined): string {
+function getErrorMessage(err: Error | undefined, t: ReturnType<typeof useI18n>["t"]): string {
   const msg = err?.message || "";
-  if (msg.includes("401") || msg.includes("Unauthorized")) return "Your session has expired. Please log in again.";
-  if (msg.includes("429") || msg.includes("Too Many Requests")) return "Rate limited. Please wait and try again.";
-  if (msg.includes("500") || msg.includes("Internal Server")) return "Server error. Our team has been notified.";
-  if (msg.includes("502") || msg.includes("503")) return "Service temporarily unavailable. Please try again later.";
-  if (msg.includes("fetch") || msg.includes("NetworkError") || msg.includes("Failed to fetch")) return "Network error. Check your connection and retry.";
-  return msg || "Something went wrong";
+  if (msg.includes("401") || msg.includes("Unauthorized")) return t.error.sessionExpired;
+  if (msg.includes("429") || msg.includes("Too Many Requests")) return t.error.rateLimited;
+  if (msg.includes("500") || msg.includes("Internal Server")) return t.error.serverError;
+  if (msg.includes("502") || msg.includes("503")) return t.error.serviceUnavailable;
+  if (msg.includes("fetch") || msg.includes("NetworkError") || msg.includes("Failed to fetch")) return t.error.networkError;
+  return msg || t.error.somethingWentWrong;
 }
 
 export function ErrorFallback({ error, reset }: ErrorFallbackProps) {
   const { t } = useI18n();
-  const displayMsg = getErrorMessage(error);
+  const displayMsg = getErrorMessage(error, t);
 
   return (
     <div className="min-h-[50vh] flex items-center justify-center p-4">

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validateUserFromCookie } from '@/lib/api-gateway';
+import { logAdminAction } from '@/lib/billing-engine';
 import db from '@/lib/db';
 import { readFileSync, unlinkSync } from 'fs';
 import { join } from 'path';
@@ -26,6 +27,8 @@ export async function GET(request: NextRequest) {
       // Clean up the temp file
       unlinkSync(backupPath);
 
+      logAdminAction(auth.user.id, 'download_backup', 'backup', undefined, `size=${backupData.length}`, request.headers.get('x-forwarded-for')?.split(',')[0]?.trim());
+
       return new Response(backupData, {
         headers: {
           'Content-Type': 'application/x-sqlite3',
@@ -35,6 +38,9 @@ export async function GET(request: NextRequest) {
     } catch (dbError) {
       // Fallback: return raw db file
       const dbData = readFileSync(dbPath);
+
+      logAdminAction(auth.user.id, 'download_backup', 'backup', undefined, `fallback, size=${dbData.length}`, request.headers.get('x-forwarded-for')?.split(',')[0]?.trim());
+
       return new Response(dbData, {
         headers: {
           'Content-Type': 'application/x-sqlite3',

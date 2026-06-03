@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import useSWR from "swr";
 import { dashboardSWRConfig } from "@/lib/swr-fetcher";
 import { useToast } from "@/contexts/toast-context";
@@ -84,6 +84,25 @@ export default function AdminModelsPage() {
   // /api/v1/models only returns models visible to users.
   const [enabledMap, setEnabledMap] = useState<Record<string, boolean>>({});
   const [togglingId, setTogglingId] = useState<string | null>(null);
+
+  // Fetch actual enabled state from model_rates on mount
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/dashboard/models", { credentials: "include" });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (cancelled) return;
+        const map: Record<string, boolean> = {};
+        for (const m of data.models ?? []) {
+          map[m.model_name] = m.enabled === 1;
+        }
+        setEnabledMap(map);
+      } catch { /* ignore */ }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   // Search
   const [search, setSearch] = useState("");

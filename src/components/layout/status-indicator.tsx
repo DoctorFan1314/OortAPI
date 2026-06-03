@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useI18n } from "@/contexts/i18n-context";
 
 export function StatusIndicator() {
-  const { lang } = useI18n();
+  const { t } = useI18n();
   const [status, setStatus] = useState<"loading" | "online" | "offline">("loading");
 
   useEffect(() => {
@@ -23,9 +23,7 @@ export function StatusIndicator() {
 
   if (status === "loading") return null;
 
-  const label = status === "online"
-    ? (lang === "zh" ? "所有系统正常" : "All Systems Operational")
-    : (lang === "zh" ? "服务异常" : "Service Disruption");
+  const label = status === "online" ? t.status.allOperational : t.status.serviceDisruption;
 
   return (
     <div className="flex items-center gap-1.5 text-xs">

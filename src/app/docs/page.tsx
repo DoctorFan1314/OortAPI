@@ -54,7 +54,7 @@ function DocCard({ href, icon: Icon, label, desc }: { href: string; icon: typeof
 }
 
 export default function DocsLandingPage() {
-  const { lang, t } = useI18n();
+  const { t } = useI18n();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const L = t.apiDocs;
@@ -64,8 +64,8 @@ export default function DocsLandingPage() {
     <div className="min-h-screen space-y-12">
       <JsonLd data={generateWebSiteJsonLd()} />
       <JsonLd data={generateBreadcrumbJsonLd([
-        { name: lang === "zh" ? "首页" : "Home", url: "/" },
-        { name: lang === "zh" ? "文档" : "Docs" },
+        { name: Lr.breadcrumbHome, url: "/" },
+        { name: Lr.breadcrumbDocs },
       ])} />
       {/* Hero */}
       <div className="relative overflow-hidden rounded-2xl glass-card p-8 lg:p-12">
@@ -74,7 +74,7 @@ export default function DocsLandingPage() {
         <div className="relative z-10 text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium mb-6 hero-animate-1">
             <Sparkles className="h-3 w-3" />
-            {lang === "zh" ? "OpenAI + Anthropic 双协议兼容 · 一个 Key 聚合所有 AI 服务" : "OpenAI + Anthropic Dual Protocol · One Key for All AI Services"}
+            {Lr.heroBadgeText}
           </div>
           <h1 className="text-3xl lg:text-4xl font-bold tracking-tight mb-3 hero-animate-2">{L.title}</h1>
           <p className="text-base text-muted-foreground max-w-2xl mx-auto mb-6 hero-animate-3">{L.subtitle}</p>
@@ -82,9 +82,9 @@ export default function DocsLandingPage() {
           {/* Quick stat badges */}
           <div className="flex flex-wrap justify-center gap-3 mb-8">
             {[
-              { label: lang === "zh" ? "20+ 模型" : "20+ Models", icon: Cpu },
-              { label: lang === "zh" ? "双协议兼容" : "Dual Protocol", icon: Layers },
-              { label: lang === "zh" ? "SDK 一键接入" : "SDK Drop-in", icon: Zap },
+              { label: Lr.badgeModels, icon: Cpu },
+              { label: Lr.badgeDualProtocol, icon: Layers },
+              { label: Lr.badgeSdkDropin, icon: Zap },
             ].map((badge) => {
               const Icon = badge.icon;
               return (
@@ -115,30 +115,30 @@ export default function DocsLandingPage() {
       <section className="space-y-4">
         <h2 className="text-lg font-bold flex items-center gap-2">
           <Zap className="h-5 w-5 text-primary" />
-          {lang === "zh" ? "3 步开始使用" : "Get Started in 3 Steps"}
+          {Lr.quickStartTitle}
         </h2>
         <div className="grid sm:grid-cols-3 gap-4">
           {[
             {
               step: "1",
-              title: lang === "zh" ? "获取 API Key" : "Get API Key",
-              desc: lang === "zh" ? "注册后在控制台创建 Key" : "Create a key in Dashboard after registering",
+              title: Lr.step1GetKeyTitle,
+              desc: Lr.step1GetKeyDesc,
               href: "/dashboard/keys",
-              linkText: lang === "zh" ? "前往创建" : "Go to Dashboard",
+              linkText: Lr.step1GoDashboard,
             },
             {
               step: "2",
-              title: lang === "zh" ? "设置 Base URL" : "Set Base URL",
-              desc: lang === "zh" ? "选择 OpenAI 或 Anthropic 协议地址" : "Choose OpenAI or Anthropic protocol URL",
+              title: Lr.step2BaseUrlTitle,
+              desc: Lr.step2BaseUrlDesc,
               href: "/docs/quickstart",
-              linkText: lang === "zh" ? "查看地址" : "View URLs",
+              linkText: Lr.step2ViewUrls,
             },
             {
               step: "3",
-              title: lang === "zh" ? "开始调用" : "Start Calling",
-              desc: lang === "zh" ? "用 SDK 或 cURL 发送第一个请求" : "Send your first request with SDK or cURL",
+              title: Lr.step3StartTitle,
+              desc: Lr.step3StartDesc,
               href: "/docs/sdk",
-              linkText: lang === "zh" ? "SDK 示例" : "SDK Examples",
+              linkText: Lr.step3SdkExamples,
             },
           ].map((item) => (
             <div key={item.step} className="glass-card rounded-xl p-5 border border-border/50">
@@ -185,12 +185,10 @@ export default function DocsLandingPage() {
       {/* Need Help */}
       <section className="rounded-xl border border-border/50 glass-card p-6 text-center space-y-4">
         <h2 className="text-lg font-bold">
-          {lang === "zh" ? "需要帮助？" : "Need Help?"}
+          {Lr.needHelp}
         </h2>
         <p className="text-sm text-muted-foreground max-w-lg mx-auto">
-          {lang === "zh"
-            ? "如果文档没有解答你的问题，可以通过以下方式获取帮助："
-            : "If the docs didn't answer your question, get help through these channels:"}
+          {Lr.needHelpDesc}
         </p>
         <div className="flex flex-wrap justify-center gap-3">
           <Link
@@ -198,7 +196,7 @@ export default function DocsLandingPage() {
             className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity"
           >
             <HelpCircle className="h-3.5 w-3.5" />
-            {lang === "zh" ? "常见问题" : "FAQ"}
+            {Lr.faq}
           </Link>
           <a
             href="https://github.com/DoctorFan1314/OortAPI/issues"

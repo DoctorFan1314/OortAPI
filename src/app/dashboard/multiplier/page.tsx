@@ -3,11 +3,12 @@
 import { useI18n } from "@/contexts/i18n-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import useSWR from "swr";
 import { dashboardSWRConfig } from "@/lib/swr-fetcher";
-import { Clock, Layers, Plus, Trash2, Save, AlertTriangle, BarChart3 } from "lucide-react";
+import { Clock, Layers, Plus, Trash2, Save, AlertTriangle, BarChart3, Upload, Download } from "lucide-react";
 import { useToast } from "@/contexts/toast-context";
 
 interface MultiplierRule {
@@ -142,6 +143,64 @@ export default function MultiplierPage() {
     showToast(lang === "zh" ? "批量更新成功" : "Batch update successful", "success");
   };
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleExport = () => {
+    const exportData = rules.map(r => ({
+      model_name: r.model_name,
+      multiplier: r.multiplier,
+      enabled: !!r.enabled,
+      description: r.description,
+      input_rate: r.input_rate,
+      output_rate: r.output_rate,
+    }));
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "multiplier-rules.json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast(lang === "zh" ? "导出成功" : "Export successful", "success");
+  };
+
+  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = "";
+    try {
+      const text = await file.text();
+      const imported = JSON.parse(text) as { model_name: string; multiplier: number; enabled?: boolean; description?: string }[];
+      if (!Array.isArray(imported) || imported.length === 0) {
+        showToast(lang === "zh" ? "文件格式无效" : "Invalid file format", "error");
+        return;
+      }
+      const valid = imported.filter(r => r.model_name && typeof r.multiplier === "number");
+      if (valid.length === 0) {
+        showToast(lang === "zh" ? "未找到有效规则" : "No valid rules found", "error");
+        return;
+      }
+      const promises = valid.map(r =>
+        fetch('/api/dashboard/multiplier', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ model_name: r.model_name, multiplier: r.multiplier, enabled: r.enabled ?? true, description: r.description ?? null }),
+        })
+      );
+      await Promise.all(promises);
+      mutate();
+      showToast(
+        lang === "zh" ? `成功导入 ${valid.length} 条规则` : `Imported ${valid.length} rules`,
+        "success"
+      );
+    } catch {
+      showToast(lang === "zh" ? "导入失败：文件解析错误" : "Import failed: parse error", "error");
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-6">
@@ -192,42 +251,38 @@ export default function MultiplierPage() {
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             <div>
               <label className="text-xs text-muted-foreground block mb-1">{L.dayStart}</label>
-              <input
+              <Input
                 type="time"
                 value={timeSettings.day_start}
                 onChange={e => setTimeSettings(s => ({ ...s, day_start: e.target.value }))}
-                className="w-full px-3 py-2 bg-muted rounded-lg text-sm border border-border/50 focus:border-primary focus:outline-none"
               />
             </div>
             <div>
               <label className="text-xs text-muted-foreground block mb-1">{L.dayEnd}</label>
-              <input
+              <Input
                 type="time"
                 value={timeSettings.day_end}
                 onChange={e => setTimeSettings(s => ({ ...s, day_end: e.target.value }))}
-                className="w-full px-3 py-2 bg-muted rounded-lg text-sm border border-border/50 focus:border-primary focus:outline-none"
               />
             </div>
             <div>
               <label className="text-xs text-muted-foreground block mb-1">{L.dayRate}</label>
-              <input
+              <Input
                 type="number"
                 step="0.01"
                 min="0"
                 value={timeSettings.day_rate}
                 onChange={e => setTimeSettings(s => ({ ...s, day_rate: parseFloat(e.target.value) || 1.0 }))}
-                className="w-full px-3 py-2 bg-muted rounded-lg text-sm border border-border/50 focus:border-primary focus:outline-none"
               />
             </div>
             <div>
               <label className="text-xs text-muted-foreground block mb-1">{L.nightRate}</label>
-              <input
+              <Input
                 type="number"
                 step="0.01"
                 min="0"
                 value={timeSettings.night_rate}
                 onChange={e => setTimeSettings(s => ({ ...s, night_rate: parseFloat(e.target.value) || 0.5 }))}
-                className="w-full px-3 py-2 bg-muted rounded-lg text-sm border border-border/50 focus:border-primary focus:outline-none"
               />
             </div>
             <div>
@@ -246,66 +301,69 @@ export default function MultiplierPage() {
               </select>
             </div>
           </div>
-          <button
-            onClick={handleSaveTimeSettings}
-            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
-            aria-label={L.save}
-          >
+          <Button onClick={handleSaveTimeSettings} className="gap-2" aria-label={L.save}>
             <Save className="h-4 w-4" />
             {L.save}
-          </button>
+          </Button>
         </CardContent>
       </Card>
 
       {/* Regular multiplier rules */}
       <Card className="glass-card">
         <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Layers className="h-5 w-5" />
-            {L.regular}
-          </CardTitle>
-          <p className="text-sm text-muted-foreground">{L.regularDesc}</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Layers className="h-5 w-5" />
+                {L.regular}
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">{L.regularDesc}</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={handleExport} className="gap-1.5" disabled={rules.length === 0}>
+                <Download className="h-3.5 w-3.5" />
+                {lang === "zh" ? "导出" : "Export"}
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} className="gap-1.5">
+                <Upload className="h-3.5 w-3.5" />
+                {lang === "zh" ? "导入" : "Import"}
+              </Button>
+            </div>
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Add new rule form */}
           <div className="flex flex-wrap items-end gap-3 p-3 bg-muted/30 rounded-lg">
             <div className="flex-1 min-w-[150px]">
               <label className="text-xs text-muted-foreground block mb-1">{L.model}</label>
-              <input
+              <Input
                 value={newModel}
                 onChange={e => setNewModel(e.target.value)}
                 placeholder="gpt-4o"
-                className="w-full px-3 py-2 bg-background rounded-lg text-sm border border-border/50 focus:border-primary focus:outline-none"
               />
             </div>
             <div className="w-24">
               <label className="text-xs text-muted-foreground block mb-1">{L.multiplier}</label>
-              <input
+              <Input
                 value={newMultiplier}
                 onChange={e => setNewMultiplier(e.target.value)}
                 type="number"
                 step="0.01"
                 min="0"
-                className="w-full px-3 py-2 bg-background rounded-lg text-sm border border-border/50 focus:border-primary focus:outline-none"
               />
             </div>
             <div className="flex-1 min-w-[150px]">
               <label className="text-xs text-muted-foreground block mb-1">{L.description}</label>
-              <input
+              <Input
                 value={newDesc}
                 onChange={e => setNewDesc(e.target.value)}
                 placeholder={lang === "zh" ? "可选" : "Optional"}
-                className="w-full px-3 py-2 bg-background rounded-lg text-sm border border-border/50 focus:border-primary focus:outline-none"
               />
             </div>
-            <button
-              onClick={handleAddRule}
-              className="flex items-center gap-1.5 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
-              aria-label={L.add}
-            >
+            <Button onClick={handleAddRule} className="gap-1.5" aria-label={L.add}>
               <Plus className="h-4 w-4" />
               {L.add}
-            </button>
+            </Button>
           </div>
 
           {/* Rules table */}
@@ -411,9 +469,8 @@ export default function MultiplierPage() {
           <div className="space-y-3 py-2">
             <div>
               <label className="text-xs text-muted-foreground block mb-1">{L.newMultiplier}</label>
-              <input type="number" step="0.01" min="0.01" max="100" value={batchMultValue}
-                onChange={e => setBatchMultValue(e.target.value)}
-                className="w-full px-3 py-2 bg-background rounded-lg text-sm border border-border/50 focus:border-primary focus:outline-none" />
+              <Input type="number" step="0.01" min="0.01" max="100" value={batchMultValue}
+                onChange={e => setBatchMultValue(e.target.value)} />
             </div>
             <p className="text-xs text-muted-foreground">{L.selectedCount.replace("{count}", String(selectedRules.size))}</p>
           </div>
@@ -423,6 +480,9 @@ export default function MultiplierPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Hidden file input for import */}
+      <input ref={fileInputRef} type="file" accept=".json" className="hidden" onChange={handleImport} />
     </div>
   );
 }

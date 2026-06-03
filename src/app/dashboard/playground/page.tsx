@@ -751,6 +751,11 @@ function PlaygroundContent() {
             onOpenToolManager={() => setShowToolManager(true)}
             textareaRef={messageInputRef}
           />
+          {/* Keyboard shortcut hint */}
+          <div className="flex items-center justify-center gap-3 pb-2 text-[10px] text-muted-foreground/50 select-none">
+            <span><kbd className="px-1 py-0.5 rounded border border-border/40 bg-muted/30 font-mono">/</kbd> {lang === "zh" ? "聚焦输入" : "focus input"}</span>
+            <span><kbd className="px-1 py-0.5 rounded border border-border/40 bg-muted/30 font-mono">Esc</kbd> {lang === "zh" ? "聚焦输入" : "focus input"}</span>
+          </div>
         </div>
 
         {/* Column 3: Params */}

@@ -3,6 +3,7 @@
 import { useEffect, Component, type ReactNode, type ErrorInfo } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
+import { useI18n } from "@/contexts/i18n-context";
 
 class ErrorBoundary extends Component<{ children: ReactNode; fallback: ReactNode }, { hasError: boolean }> {
   state = { hasError: false };
@@ -14,6 +15,7 @@ class ErrorBoundary extends Component<{ children: ReactNode; fallback: ReactNode
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const { user, loaded } = useAuth();
   const router = useRouter();
+  const { t } = useI18n();
 
   useEffect(() => {
     if (loaded && !user) {
@@ -36,8 +38,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   return (
     <ErrorBoundary fallback={
       <div className="mx-auto max-w-5xl px-4 py-20 text-center">
-        <p className="text-muted-foreground">Something went wrong. Please try refreshing the page.</p>
-        <p className="text-muted-foreground text-sm mt-1">出了点问题，请刷新页面重试。</p>
+        <p className="text-muted-foreground">{t.error.somethingWentWrong} {t.error.refreshPage}</p>
       </div>
     }>
       {children}

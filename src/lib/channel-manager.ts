@@ -3,6 +3,10 @@ import type { DBChannel } from './db';
 
 const FAIL_THRESHOLD = 3;
 const RECOVERY_TIME_MS = 5 * 60 * 1000; // 5 minutes
+const LATENCY_CACHE_TTL = 30 * 1000; // 30 seconds
+
+interface LatencyStat { channel_id: number; avg_latency: number; request_count: number }
+let latencyCache: { stats: LatencyStat[]; expiresAt: number } | null = null;
 
 export interface ChannelSelection {
   channel: DBChannel;
@@ -39,17 +43,18 @@ export function selectChannel(requestedModel: string): ChannelSelection | null {
 
   if (available.length === 0) return null;
 
-  // Get recent latency stats for available channels (last 100 requests)
-  const channelIds = available.map(ch => ch.id);
-  const placeholders = channelIds.map(() => '?').join(',');
-  const latencyStats = db.prepare(
-    `SELECT channel_id, AVG(latency_ms) as avg_latency, COUNT(*) as request_count
-     FROM usage_logs
-     WHERE channel_id IN (${placeholders}) AND created_at > datetime('now', '-1 hour')
-     GROUP BY channel_id`
-  ).all(...channelIds) as { channel_id: number; avg_latency: number; request_count: number }[];
-
-  const statsMap = new Map(latencyStats.map(s => [s.channel_id, s]));
+  // Get recent latency stats (cached for 30s)
+  const now2 = Date.now();
+  if (!latencyCache || now2 >= latencyCache.expiresAt) {
+    const freshStats = db.prepare(
+      `SELECT channel_id, AVG(latency_ms) as avg_latency, COUNT(*) as request_count
+       FROM usage_logs
+       WHERE created_at > datetime('now', '-1 hour')
+       GROUP BY channel_id`
+    ).all() as LatencyStat[];
+    latencyCache = { stats: freshStats, expiresAt: now2 + LATENCY_CACHE_TTL };
+  }
+  const statsMap = new Map(latencyCache.stats.map(s => [s.channel_id, s]));
 
   // Weighted selection with latency boost
   const scored = available.map(ch => {

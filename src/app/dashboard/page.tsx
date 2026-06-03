@@ -69,6 +69,8 @@ export default function DashboardPage() {
       cache_hit_tokens: number;
       non_cached_tokens: number;
     };
+    today?: { calls: number };
+    month?: { calls: number };
   }>("/api/dashboard/stats", dashboardSWRConfig);
 
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
@@ -85,15 +87,17 @@ export default function DashboardPage() {
 
   const hasKeys = (keysData?.keys?.length || 0) > 0;
   const hasSub = (subData?.subscriptions?.length || 0) > 0;
+  const hasApiCalls = ((statsData?.month?.calls || 0) + (statsData?.today?.calls || 0)) > 0;
   const isNewUser = !hasKeys && !hasSub;
-  const isNewUserAny = !hasKeys || !hasSub;
+  const isNewUserAny = !hasKeys || !hasSub || !hasApiCalls;
 
   const onboardProgress = useMemo(() => {
     let done = 0;
     if (hasKeys) done++;
     if (hasSub) done++;
-    return Math.round((done / 2) * 100);
-  }, [hasKeys, hasSub]);
+    if (hasApiCalls) done++;
+    return Math.round((done / 3) * 100);
+  }, [hasKeys, hasSub, hasApiCalls]);
 
   // Check for expiring subscription (within 3 days, not auto-renew)
   const expiringSub = subData?.subscriptions?.find(s => {
@@ -199,33 +203,49 @@ export default function DashboardPage() {
               </div>
 
               {/* Step 2 */}
-              <div className="flex flex-col gap-2 p-4 rounded-lg glass-card glass-card-hover">
+              <div className={`flex flex-col gap-2 p-4 rounded-lg glass-card glass-card-hover ${hasSub ? "opacity-60" : ""}`}>
                 <div className="flex items-center gap-2">
-                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold">2</span>
-                  <CreditCard className="h-4 w-4 text-primary" />
-                  <span className="font-medium text-sm">{t.step2}</span>
+                  {hasSub ? (
+                    <span className="flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-bold"><Check className="h-3.5 w-3.5" /></span>
+                  ) : (
+                    <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold">2</span>
+                  )}
+                  <CreditCard className={`h-4 w-4 ${hasSub ? "text-emerald-400" : "text-primary"}`} />
+                  <span className={`font-medium text-sm ${hasSub ? "text-muted-foreground line-through" : "text-foreground"}`}>{t.step2}</span>
                 </div>
                 <p className="text-xs text-muted-foreground">{t.step2Desc}</p>
-                <Link href="/dashboard/token-plan" className="mt-auto">
-                  <Button size="sm" variant="outline" className="w-full gap-1">
-                    {t.browsePlans} <ArrowRight className="h-3 w-3" />
-                  </Button>
-                </Link>
+                {hasSub ? (
+                  <span className="text-xs text-emerald-400 font-medium mt-auto">{dict.dashboard.done}</span>
+                ) : (
+                  <Link href="/dashboard/token-plan" className="mt-auto">
+                    <Button size="sm" variant="outline" className="w-full gap-1">
+                      {t.browsePlans} <ArrowRight className="h-3 w-3" />
+                    </Button>
+                  </Link>
+                )}
               </div>
 
               {/* Step 3 */}
-              <div className="flex flex-col gap-2 p-4 rounded-lg glass-card glass-card-hover">
+              <div className={`flex flex-col gap-2 p-4 rounded-lg glass-card glass-card-hover ${hasApiCalls ? "opacity-60" : ""}`}>
                 <div className="flex items-center gap-2">
-                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold">3</span>
-                  <Code className="h-4 w-4 text-primary" />
-                  <span className="font-medium text-sm">{t.step3}</span>
+                  {hasApiCalls ? (
+                    <span className="flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-bold"><Check className="h-3.5 w-3.5" /></span>
+                  ) : (
+                    <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold">3</span>
+                  )}
+                  <Code className={`h-4 w-4 ${hasApiCalls ? "text-emerald-400" : "text-primary"}`} />
+                  <span className={`font-medium text-sm ${hasApiCalls ? "text-muted-foreground line-through" : "text-foreground"}`}>{t.step3}</span>
                 </div>
                 <p className="text-xs text-muted-foreground">{t.step3Desc}</p>
-                <Link href="/docs" className="mt-auto">
-                  <Button size="sm" variant="outline" className="w-full gap-1">
-                    {t.viewDocs} <ArrowRight className="h-3 w-3" />
-                  </Button>
-                </Link>
+                {hasApiCalls ? (
+                  <span className="text-xs text-emerald-400 font-medium mt-auto">{dict.dashboard.done}</span>
+                ) : (
+                  <Link href="/docs" className="mt-auto">
+                    <Button size="sm" variant="outline" className="w-full gap-1">
+                      {t.viewDocs} <ArrowRight className="h-3 w-3" />
+                    </Button>
+                  </Link>
+                )}
               </div>
             </div>
             {/* Progress bar */}

@@ -43,17 +43,25 @@ export default function RedeemPage() {
 
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [searchTimer, setSearchTimer] = useState<ReturnType<typeof setTimeout> | null>(null);
 
-  const { data: rawData, isLoading, error: fetchError, mutate } = useSWR<{ codes: RedeemCode[]; has_more: boolean }>(`/api/dashboard/redeem?page=${page}&limit=50`, dashboardSWRConfig);
+  function handleSearchChange(value: string) {
+    setSearchQuery(value);
+    if (searchTimer) clearTimeout(searchTimer);
+    setSearchTimer(setTimeout(() => {
+      setDebouncedSearch(value);
+      setPage(1);
+    }, 300));
+  }
+
+  const searchParam = debouncedSearch ? `&search=${encodeURIComponent(debouncedSearch)}` : '';
+  const { data: rawData, isLoading, error: fetchError, mutate } = useSWR<{ codes: RedeemCode[]; has_more: boolean }>(`/api/dashboard/redeem?page=${page}&limit=50${searchParam}`, dashboardSWRConfig);
   const codes = rawData?.codes || [];
   const hasMore = rawData?.has_more || false;
 
   const { data: plansData } = useSWR<{ plans: Plan[] }>("/api/plans", dashboardSWRConfig);
   const plans = plansData?.plans || [];
-
-  const filteredCodes = searchQuery
-    ? codes.filter(c => c.code.toLowerCase().includes(searchQuery.toLowerCase()))
-    : codes;
 
   // Generate dialog
   const [genOpen, setGenOpen] = useState(false);
@@ -121,7 +129,7 @@ export default function RedeemPage() {
 
   async function handleToggle(id: number, enabled: number) {
     const nextEnabled = !enabled;
-    const redeemKey = `/api/dashboard/redeem?page=${page}&limit=50`;
+    const redeemKey = `/api/dashboard/redeem?page=${page}&limit=50${searchParam}`;
     const optimisticData = rawData ? {
       ...rawData,
       codes: rawData.codes.map(c => c.id === id ? { ...c, enabled: nextEnabled ? 1 : 0 } : c),
@@ -187,7 +195,7 @@ export default function RedeemPage() {
   }
 
   function toggleSelectAll() {
-    const pageIds = filteredCodes.map(c => c.id);
+    const pageIds = codes.map(c => c.id);
     const allPageSelected = pageIds.length > 0 && pageIds.every((id) => selectedIds.has(id));
     setSelectedIds((prev) => {
       const next = new Set(prev);
@@ -278,7 +286,7 @@ export default function RedeemPage() {
               <Input
                 placeholder={L.searchCodes}
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => handleSearchChange(e.target.value)}
                 className="max-w-xs h-8 text-sm"
               />
             </div>
@@ -302,7 +310,7 @@ export default function RedeemPage() {
                 <thead>
                   <tr className="border-b border-border/50">
                     <th scope="col" className="text-left py-3 px-2 w-10">
-                      <input type="checkbox" checked={filteredCodes.length > 0 && filteredCodes.every(c => selectedIds.has(c.id))} onChange={toggleSelectAll} className="rounded border-input" />
+                      <input type="checkbox" checked={codes.length > 0 && codes.every(c => selectedIds.has(c.id))} onChange={toggleSelectAll} className="rounded border-input" />
                     </th>
                     <th scope="col" className="text-left py-3 px-4 text-muted-foreground font-medium">{L.code}</th>
                     <th scope="col" className="text-center py-3 px-4 text-muted-foreground font-medium">{L.codeType}</th>
@@ -314,7 +322,7 @@ export default function RedeemPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredCodes.map((c) => {
+                  {codes.map((c) => {
                     const st = getStatus(c);
                     return (
                       <tr key={c.id} className="border-b border-border/20 hover:bg-muted/30">
