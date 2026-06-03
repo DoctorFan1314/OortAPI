@@ -1,13 +1,49 @@
 "use client";
 
-const PROVIDER_LOGOS: Record<string, string> = {
-  openai: "/providers/openai.svg",
-  anthropic: "/providers/anthropic.svg",
-  google: "/providers/google.svg",
-  deepseek: "/providers/deepseek.svg",
-  meta: "/providers/meta.svg",
-  alibaba: "/providers/alibaba.svg",
-  qwen: "/providers/qwen.svg",
+import { useTheme } from "@/contexts/theme-context";
+
+// Map provider names to logo file IDs
+// The logo files follow lobehub naming: {id}.svg (mono) and {id}-color.svg (color)
+const PROVIDER_ID_MAP: Record<string, string> = {
+  openai: "openai",
+  anthropic: "anthropic",
+  google: "google",
+  deepseek: "deepseek",
+  meta: "meta",
+  alibaba: "alibaba",
+  qwen: "qwen",
+  baidu: "baidu",
+  bytedance: "bytedance",
+  mistral: "mistral",
+  cohere: "cohere",
+  groq: "groq",
+  xai: "xai",
+  zhipu: "zhipu",
+  minimax: "minimax",
+  moonshot: "moonshot",
+  stepfun: "stepfun",
+  baichuan: "baichuan",
+  yi: "zeroone",
+  siliconcloud: "siliconcloud",
+  togetherai: "togetherai",
+  fireworks: "fireworks",
+  perplexity: "perplexity",
+  azure: "azure",
+  aws: "aws",
+  bedrock: "bedrock",
+  vertexai: "vertexai",
+  vercel: "vercel",
+  ollama: "ollama",
+  lmstudio: "lmstudio",
+  vllm: "vllm",
+  nvidia: "nvidia",
+  intel: "intel",
+  huawei: "huawei",
+  tencent: "tencent",
+  baiducloud: "baiducloud",
+  alibabacloud: "alibabacloud",
+  googlecloud: "googlecloud",
+  cloudflare: "cloudflare",
 };
 
 interface ProviderLogoProps {
@@ -17,11 +53,11 @@ interface ProviderLogoProps {
 }
 
 export function ProviderLogo({ provider, size = 16, className = "" }: ProviderLogoProps) {
-  const src = PROVIDER_LOGOS[provider.toLowerCase()];
+  const { resolvedTheme } = useTheme();
+  const providerId = PROVIDER_ID_MAP[provider.toLowerCase()] || provider.toLowerCase();
 
-  if (!src) {
-    return null;
-  }
+  // Use color variant for both themes (color logos look good in both)
+  const src = `/providers/${providerId}-color.svg`;
 
   return (
     <img
@@ -31,6 +67,13 @@ export function ProviderLogo({ provider, size = 16, className = "" }: ProviderLo
       height={size}
       className={`inline-block shrink-0 ${className}`}
       loading="lazy"
+      onError={(e) => {
+        // Fallback to mono variant if color doesn't exist
+        const target = e.target as HTMLImageElement;
+        if (target.src.includes("-color")) {
+          target.src = `/providers/${providerId}.svg`;
+        }
+      }}
     />
   );
 }

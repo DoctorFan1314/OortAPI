@@ -9,7 +9,7 @@ import { useAuth } from "@/contexts/auth-context";
 import {
   LayoutDashboard, Key, BarChart3, Wallet, Radio,
   Settings, Users, Gift, Percent, Sparkles, ListChecks,
-  ChevronDown, FileText, Webhook, Activity, Play,
+  ChevronDown, FileText, Webhook, Activity, Play, Palette,
   Cpu,
 } from "lucide-react";
 import useSWR from "swr";
@@ -58,6 +58,7 @@ const GROUPS: NavGroup[] = [
       { href: "/dashboard/admin/monitor", icon: Activity, labelKey: "monitor", adminOnly: true },
       { href: "/dashboard/admin/webhooks", icon: Webhook, labelKey: "webhooks", adminOnly: true },
       { href: "/dashboard/admin/models", icon: Cpu, labelKey: "modelManage", adminOnly: true },
+      { href: "/dashboard/admin/logos", icon: Palette, labelKey: "logoManage", adminOnly: true },
     ],
   },
 ];

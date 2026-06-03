@@ -761,6 +761,18 @@ export interface Dictionary {
     tokenPlan: string;
     planManage: string;
     modelManage: string;
+    logoManage: string;
+    logoSearch: string;
+    logoAll: string;
+    logoAiModels: string;
+    logoCloud: string;
+    logoTools: string;
+    logoColor: string;
+    logoMono: string;
+    logoCopySvg: string;
+    logoDownload: string;
+    logoPreview: string;
+    logoCount: string;
     routing: string;
     audit: string;
     monitor: string;
