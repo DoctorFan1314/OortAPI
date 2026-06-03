@@ -4,8 +4,7 @@
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "ace"
+    ]
   },
   {
     "id": "adobe",
@@ -13,8 +12,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "adobe"
+    ]
   },
   {
     "id": "adobefirefly",
@@ -22,8 +20,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "adobefirefly"
+    ]
   },
   {
     "id": "agentvoice",
@@ -31,16 +28,14 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "agentvoice"
+    ]
   },
   {
     "id": "agui",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "agui"
+    ]
   },
   {
     "id": "ai2",
@@ -48,8 +43,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "ai2"
+    ]
   },
   {
     "id": "ai21",
@@ -58,8 +52,7 @@
       "-text",
       "-brand",
       "-brand-color"
-    ],
-    "provider": "ai21"
+    ]
   },
   {
     "id": "ai302",
@@ -67,8 +60,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "ai302"
+    ]
   },
   {
     "id": "ai360",
@@ -76,8 +68,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "ai360"
+    ]
   },
   {
     "id": "aihubmix",
@@ -85,8 +76,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "aihubmix"
+    ]
   },
   {
     "id": "aimass",
@@ -94,8 +84,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "aimass"
+    ]
   },
   {
     "id": "aionlabs",
@@ -103,8 +92,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "aionlabs"
+    ]
   },
   {
     "id": "airjelly",
@@ -112,16 +100,14 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "airjelly"
+    ]
   },
   {
     "id": "aistudio",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "aistudio"
+    ]
   },
   {
     "id": "akashchat",
@@ -129,16 +115,14 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "akashchat"
+    ]
   },
   {
     "id": "alephalpha",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "alephalpha"
+    ]
   },
   {
     "id": "alibaba",
@@ -149,8 +133,7 @@
       "-text-cn",
       "-brand",
       "-brand-color"
-    ],
-    "provider": "Alibaba"
+    ]
   },
   {
     "id": "alibabacloud",
@@ -159,8 +142,7 @@
       "-color",
       "-text",
       "-text-cn"
-    ],
-    "provider": "Alibaba"
+    ]
   },
   {
     "id": "amp",
@@ -168,8 +150,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "amp"
+    ]
   },
   {
     "id": "antgroup",
@@ -180,16 +161,14 @@
       "-text-cn",
       "-brand",
       "-brand-color"
-    ],
-    "provider": "antgroup"
+    ]
   },
   {
     "id": "anthropic",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "Anthropic"
+    ]
   },
   {
     "id": "antigravity",
@@ -197,8 +176,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "antigravity"
+    ]
   },
   {
     "id": "anyscale",
@@ -206,8 +184,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "anyscale"
+    ]
   },
   {
     "id": "apertis",
@@ -215,16 +192,14 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "apertis"
+    ]
   },
   {
     "id": "apple",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "apple"
+    ]
   },
   {
     "id": "arcee",
@@ -232,8 +207,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "arcee"
+    ]
   },
   {
     "id": "askverdict",
@@ -241,8 +215,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "askverdict"
+    ]
   },
   {
     "id": "assemblyai",
@@ -250,16 +223,14 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "assemblyai"
+    ]
   },
   {
     "id": "atlascloud",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "atlascloud"
+    ]
   },
   {
     "id": "automatic",
@@ -267,8 +238,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "automatic"
+    ]
   },
   {
     "id": "aws",
@@ -278,8 +248,7 @@
       "-text",
       "-brand",
       "-brand-color"
-    ],
-    "provider": "AWS"
+    ]
   },
   {
     "id": "aya",
@@ -287,8 +256,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "Cohere"
+    ]
   },
   {
     "id": "azure",
@@ -296,8 +264,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "Azure"
+    ]
   },
   {
     "id": "azureai",
@@ -305,16 +272,14 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "Azure"
+    ]
   },
   {
     "id": "baai",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "baai"
+    ]
   },
   {
     "id": "baichuan",
@@ -322,8 +287,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "Baichuan"
+    ]
   },
   {
     "id": "baidu",
@@ -334,8 +298,7 @@
       "-text-cn",
       "-brand",
       "-brand-color"
-    ],
-    "provider": "Baidu"
+    ]
   },
   {
     "id": "baiducloud",
@@ -343,8 +306,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "Baidu"
+    ]
   },
   {
     "id": "bailian",
@@ -352,16 +314,14 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "Alibaba"
+    ]
   },
   {
     "id": "baseten",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "baseten"
+    ]
   },
   {
     "id": "bedrock",
@@ -369,16 +329,14 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "AWS"
+    ]
   },
   {
     "id": "bfl",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "bfl"
+    ]
   },
   {
     "id": "bilibili",
@@ -386,16 +344,14 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "bilibili"
+    ]
   },
   {
     "id": "bilibiliindex",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "bilibiliindex"
+    ]
   },
   {
     "id": "bing",
@@ -403,8 +359,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "bing"
+    ]
   },
   {
     "id": "briaai",
@@ -412,8 +367,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "briaai"
+    ]
   },
   {
     "id": "burncloud",
@@ -421,8 +375,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "burncloud"
+    ]
   },
   {
     "id": "bytedance",
@@ -433,16 +386,14 @@
       "-text-cn",
       "-brand",
       "-brand-color"
-    ],
-    "provider": "ByteDance"
+    ]
   },
   {
     "id": "capcut",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "ByteDance"
+    ]
   },
   {
     "id": "centml",
@@ -452,8 +403,7 @@
       "-text",
       "-brand",
       "-brand-color"
-    ],
-    "provider": "centml"
+    ]
   },
   {
     "id": "cerebras",
@@ -463,8 +413,7 @@
       "-text",
       "-brand",
       "-brand-color"
-    ],
-    "provider": "cerebras"
+    ]
   },
   {
     "id": "chatglm",
@@ -472,8 +421,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "ZhiPu"
+    ]
   },
   {
     "id": "cherrystudio",
@@ -481,8 +429,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "cherrystudio"
+    ]
   },
   {
     "id": "civitai",
@@ -490,15 +437,13 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "civitai"
+    ]
   },
   {
     "id": "civitai-text",
     "variants": [
       "-color"
-    ],
-    "provider": "civitai-text"
+    ]
   },
   {
     "id": "claude",
@@ -506,8 +451,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "Anthropic"
+    ]
   },
   {
     "id": "claudecode",
@@ -515,24 +459,21 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "Anthropic"
+    ]
   },
   {
     "id": "cline",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "Cline"
+    ]
   },
   {
     "id": "clipdrop",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "clipdrop"
+    ]
   },
   {
     "id": "cloudflare",
@@ -540,8 +481,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "Cloudflare"
+    ]
   },
   {
     "id": "codebuddy",
@@ -549,8 +489,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "codebuddy"
+    ]
   },
   {
     "id": "codeflicker",
@@ -558,8 +497,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "codeflicker"
+    ]
   },
   {
     "id": "codegeex",
@@ -567,8 +505,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "codegeex"
+    ]
   },
   {
     "id": "codex",
@@ -576,8 +513,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "OpenAI"
+    ]
   },
   {
     "id": "cogvideo",
@@ -585,8 +521,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "ZhiPu"
+    ]
   },
   {
     "id": "cogview",
@@ -594,8 +529,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "ZhiPu"
+    ]
   },
   {
     "id": "cohere",
@@ -603,8 +537,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "Cohere"
+    ]
   },
   {
     "id": "colab",
@@ -612,8 +545,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "colab"
+    ]
   },
   {
     "id": "cometapi",
@@ -621,8 +553,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "cometapi"
+    ]
   },
   {
     "id": "comfyui",
@@ -630,8 +561,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "comfyui"
+    ]
   },
   {
     "id": "commanda",
@@ -639,8 +569,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "commanda"
+    ]
   },
   {
     "id": "copilot",
@@ -648,8 +577,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "Microsoft"
+    ]
   },
   {
     "id": "copilotkit",
@@ -657,8 +585,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "copilotkit"
+    ]
   },
   {
     "id": "coqui",
@@ -666,16 +593,14 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "coqui"
+    ]
   },
   {
     "id": "coze",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "ByteDance"
+    ]
   },
   {
     "id": "crewai",
@@ -685,8 +610,7 @@
       "-text",
       "-brand",
       "-brand-color"
-    ],
-    "provider": "crewai"
+    ]
   },
   {
     "id": "crusoe",
@@ -694,24 +618,21 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "crusoe"
+    ]
   },
   {
     "id": "cursor",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "Cursor"
+    ]
   },
   {
     "id": "cybercut",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "cybercut"
+    ]
   },
   {
     "id": "dalle",
@@ -719,8 +640,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "OpenAI"
+    ]
   },
   {
     "id": "dbrx",
@@ -730,16 +650,14 @@
       "-text",
       "-brand",
       "-brand-color"
-    ],
-    "provider": "dbrx"
+    ]
   },
   {
     "id": "deepai",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "deepai"
+    ]
   },
   {
     "id": "deepcogito",
@@ -747,8 +665,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "deepcogito"
+    ]
   },
   {
     "id": "deepinfra",
@@ -756,8 +673,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "deepinfra"
+    ]
   },
   {
     "id": "deepl",
@@ -765,8 +681,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "deepl"
+    ]
   },
   {
     "id": "deepmind",
@@ -774,8 +689,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "Google"
+    ]
   },
   {
     "id": "deepseek",
@@ -783,8 +697,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "DeepSeek"
+    ]
   },
   {
     "id": "devin",
@@ -792,8 +705,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "devin"
+    ]
   },
   {
     "id": "dify",
@@ -801,8 +713,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "dify"
+    ]
   },
   {
     "id": "doc2x",
@@ -810,8 +721,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "doc2x"
+    ]
   },
   {
     "id": "docsearch",
@@ -819,16 +729,14 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "docsearch"
+    ]
   },
   {
     "id": "dolphin",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "dolphin"
+    ]
   },
   {
     "id": "doubao",
@@ -836,32 +744,28 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "ByteDance"
+    ]
   },
   {
     "id": "dreammachine",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "dreammachine"
+    ]
   },
   {
     "id": "elevenlabs",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "elevenlabs"
+    ]
   },
   {
     "id": "elevenx",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "elevenx"
+    ]
   },
   {
     "id": "essentialai",
@@ -869,8 +773,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "essentialai"
+    ]
   },
   {
     "id": "exa",
@@ -878,8 +781,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "exa"
+    ]
   },
   {
     "id": "fal",
@@ -887,8 +789,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "fal"
+    ]
   },
   {
     "id": "fastgpt",
@@ -896,8 +797,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "fastgpt"
+    ]
   },
   {
     "id": "featherless",
@@ -905,8 +805,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "featherless"
+    ]
   },
   {
     "id": "figma",
@@ -914,8 +813,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "figma"
+    ]
   },
   {
     "id": "fireworks",
@@ -923,48 +821,42 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "Fireworks"
+    ]
   },
   {
     "id": "fishaudio",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "fishaudio"
+    ]
   },
   {
     "id": "flora",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "flora"
+    ]
   },
   {
     "id": "flowith",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "flowith"
+    ]
   },
   {
     "id": "flux",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "flux"
+    ]
   },
   {
     "id": "friendli",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "friendli"
+    ]
   },
   {
     "id": "gemini",
@@ -972,8 +864,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "Google"
+    ]
   },
   {
     "id": "geminicli",
@@ -981,8 +872,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "Google"
+    ]
   },
   {
     "id": "gemma",
@@ -990,48 +880,42 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "Google"
+    ]
   },
   {
     "id": "giteeai",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "giteeai"
+    ]
   },
   {
     "id": "github",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "GitHub"
+    ]
   },
   {
     "id": "githubcopilot",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "GitHub"
+    ]
   },
   {
     "id": "glama",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "glama"
+    ]
   },
   {
     "id": "glif",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "glif"
+    ]
   },
   {
     "id": "glmv",
@@ -1039,8 +923,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "ZhiPu"
+    ]
   },
   {
     "id": "google",
@@ -1049,8 +932,7 @@
       "-color",
       "-brand",
       "-brand-color"
-    ],
-    "provider": "Google"
+    ]
   },
   {
     "id": "googlecloud",
@@ -1059,16 +941,14 @@
       "-color",
       "-brand",
       "-brand-color"
-    ],
-    "provider": "Google"
+    ]
   },
   {
     "id": "goose",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "goose"
+    ]
   },
   {
     "id": "gradio",
@@ -1076,8 +956,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "gradio"
+    ]
   },
   {
     "id": "greptile",
@@ -1085,24 +964,21 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "greptile"
+    ]
   },
   {
     "id": "grok",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "xAI"
+    ]
   },
   {
     "id": "groq",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "Groq"
+    ]
   },
   {
     "id": "hailuo",
@@ -1110,32 +986,28 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "hailuo"
+    ]
   },
   {
     "id": "haiper",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "haiper"
+    ]
   },
   {
     "id": "hedra",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "hedra"
+    ]
   },
   {
     "id": "hermesagent",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "hermesagent"
+    ]
   },
   {
     "id": "higress",
@@ -1143,8 +1015,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "higress"
+    ]
   },
   {
     "id": "huawei",
@@ -1153,8 +1024,7 @@
       "-color",
       "-text",
       "-text-cn"
-    ],
-    "provider": "huawei"
+    ]
   },
   {
     "id": "huaweicloud",
@@ -1163,8 +1033,7 @@
       "-color",
       "-text",
       "-text-cn"
-    ],
-    "provider": "huaweicloud"
+    ]
   },
   {
     "id": "huggingface",
@@ -1172,8 +1041,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "HuggingFace"
+    ]
   },
   {
     "id": "hunyuan",
@@ -1181,8 +1049,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "hunyuan"
+    ]
   },
   {
     "id": "hyperbolic",
@@ -1190,24 +1057,21 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "hyperbolic"
+    ]
   },
   {
     "id": "ibm",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "ibm"
+    ]
   },
   {
     "id": "ideogram",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "ideogram"
+    ]
   },
   {
     "id": "iflytekcloud",
@@ -1215,24 +1079,21 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "iflytekcloud"
+    ]
   },
   {
     "id": "inception",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "inception"
+    ]
   },
   {
     "id": "inference",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "inference"
+    ]
   },
   {
     "id": "infermatic",
@@ -1240,8 +1101,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "infermatic"
+    ]
   },
   {
     "id": "infinigence",
@@ -1250,16 +1110,14 @@
       "-color",
       "-text",
       "-text-cn"
-    ],
-    "provider": "infinigence"
+    ]
   },
   {
     "id": "inflection",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "inflection"
+    ]
   },
   {
     "id": "internlm",
@@ -1267,8 +1125,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "internlm"
+    ]
   },
   {
     "id": "jimeng",
@@ -1276,16 +1133,14 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "ByteDance"
+    ]
   },
   {
     "id": "jina",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "jina"
+    ]
   },
   {
     "id": "junie",
@@ -1293,16 +1148,14 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "junie"
+    ]
   },
   {
     "id": "kilocode",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "kilocode"
+    ]
   },
   {
     "id": "kimi",
@@ -1310,8 +1163,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "Moonshot"
+    ]
   },
   {
     "id": "kiro",
@@ -1319,8 +1171,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "kiro"
+    ]
   },
   {
     "id": "kling",
@@ -1328,8 +1179,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "kling"
+    ]
   },
   {
     "id": "kluster",
@@ -1337,8 +1187,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "kluster"
+    ]
   },
   {
     "id": "kolors",
@@ -1346,31 +1195,27 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "kolors"
+    ]
   },
   {
     "id": "krea",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "krea"
-  },
-  {
-    "id": "kwaikat-text",
-    "variants": [
-      "-color"
-    ],
-    "provider": "kwaikat-text"
+    ]
   },
   {
     "id": "kwaikat",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "kwaikat"
+    ]
+  },
+  {
+    "id": "kwaikat-text",
+    "variants": [
+      "-color"
+    ]
   },
   {
     "id": "kwaipilot",
@@ -1378,16 +1223,14 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "kwaipilot"
+    ]
   },
   {
     "id": "lambda",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "lambda"
+    ]
   },
   {
     "id": "langchain",
@@ -1395,8 +1238,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "langchain"
+    ]
   },
   {
     "id": "langfuse",
@@ -1404,8 +1246,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "langfuse"
+    ]
   },
   {
     "id": "langgraph",
@@ -1413,8 +1254,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "langgraph"
+    ]
   },
   {
     "id": "langsmith",
@@ -1422,8 +1262,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "langsmith"
+    ]
   },
   {
     "id": "leptonai",
@@ -1431,8 +1270,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "leptonai"
+    ]
   },
   {
     "id": "lg",
@@ -1440,24 +1278,21 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "lg"
+    ]
   },
   {
     "id": "lightricks",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "lightricks"
+    ]
   },
   {
     "id": "liquid",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "liquid"
+    ]
   },
   {
     "id": "livekit",
@@ -1465,8 +1300,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "livekit"
+    ]
   },
   {
     "id": "llamaindex",
@@ -1474,8 +1308,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "llamaindex"
+    ]
   },
   {
     "id": "llava",
@@ -1483,8 +1316,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "llava"
+    ]
   },
   {
     "id": "llmapi",
@@ -1492,16 +1324,14 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "llmapi"
+    ]
   },
   {
     "id": "lmstudio",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "lmstudio"
+    ]
   },
   {
     "id": "lobehub",
@@ -1509,8 +1339,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "LobeHub"
+    ]
   },
   {
     "id": "longcat",
@@ -1518,8 +1347,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "longcat"
+    ]
   },
   {
     "id": "lovable",
@@ -1527,16 +1355,14 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "lovable"
+    ]
   },
   {
     "id": "lovart",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "lovart"
+    ]
   },
   {
     "id": "luma",
@@ -1544,16 +1370,14 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "luma"
+    ]
   },
   {
     "id": "magic",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "magic"
+    ]
   },
   {
     "id": "make",
@@ -1561,32 +1385,28 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "make"
+    ]
   },
   {
     "id": "manus",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "manus"
+    ]
   },
   {
     "id": "mastra",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "mastra"
+    ]
   },
   {
     "id": "mcp",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "mcp"
+    ]
   },
   {
     "id": "mcpso",
@@ -1594,8 +1414,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "mcpso"
+    ]
   },
   {
     "id": "menlo",
@@ -1603,8 +1422,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "menlo"
+    ]
   },
   {
     "id": "meshy",
@@ -1612,8 +1430,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "meshy"
+    ]
   },
   {
     "id": "meta",
@@ -1623,8 +1440,7 @@
       "-text",
       "-brand",
       "-brand-color"
-    ],
-    "provider": "Meta"
+    ]
   },
   {
     "id": "metaai",
@@ -1632,16 +1448,14 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "Meta"
+    ]
   },
   {
     "id": "metagpt",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "Meta"
+    ]
   },
   {
     "id": "microsoft",
@@ -1649,16 +1463,14 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "Microsoft"
+    ]
   },
   {
     "id": "midjourney",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "midjourney"
+    ]
   },
   {
     "id": "minimax",
@@ -1666,8 +1478,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "MiniMax"
+    ]
   },
   {
     "id": "mistral",
@@ -1675,8 +1486,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "Mistral"
+    ]
   },
   {
     "id": "modelscope",
@@ -1684,8 +1494,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "modelscope"
+    ]
   },
   {
     "id": "monica",
@@ -1693,16 +1502,14 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "monica"
+    ]
   },
   {
     "id": "moonshot",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "Moonshot"
+    ]
   },
   {
     "id": "morph",
@@ -1710,8 +1517,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "morph"
+    ]
   },
   {
     "id": "moxt",
@@ -1719,8 +1525,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "moxt"
+    ]
   },
   {
     "id": "myshell",
@@ -1728,8 +1533,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "myshell"
+    ]
   },
   {
     "id": "n8n",
@@ -1737,8 +1541,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "n8n"
+    ]
   },
   {
     "id": "nanobanana",
@@ -1746,16 +1549,14 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "nanobanana"
+    ]
   },
   {
     "id": "nebius",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "nebius"
+    ]
   },
   {
     "id": "newapi",
@@ -1763,32 +1564,28 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "newapi"
+    ]
   },
   {
     "id": "notebooklm",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "Google"
+    ]
   },
   {
     "id": "notion",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "notion"
+    ]
   },
   {
     "id": "nousresearch",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "nousresearch"
+    ]
   },
   {
     "id": "nova",
@@ -1796,16 +1593,14 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "nova"
+    ]
   },
   {
     "id": "novelai",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "novelai"
+    ]
   },
   {
     "id": "novita",
@@ -1813,8 +1608,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "novita"
+    ]
   },
   {
     "id": "nplcloud",
@@ -1822,8 +1616,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "nplcloud"
+    ]
   },
   {
     "id": "nvidia",
@@ -1831,8 +1624,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "NVIDIA"
+    ]
   },
   {
     "id": "obsidian",
@@ -1840,24 +1632,21 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "obsidian"
+    ]
   },
   {
     "id": "ollama",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "Ollama"
+    ]
   },
   {
     "id": "openai",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "OpenAI"
+    ]
   },
   {
     "id": "openchat",
@@ -1865,8 +1654,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "openchat"
+    ]
   },
   {
     "id": "openclaw",
@@ -1874,16 +1662,14 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "openclaw"
+    ]
   },
   {
     "id": "opencode",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "opencode"
+    ]
   },
   {
     "id": "openhands",
@@ -1891,32 +1677,28 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "openhands"
+    ]
   },
   {
     "id": "openhuman",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "openhuman"
+    ]
   },
   {
     "id": "openrouter",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "openrouter"
+    ]
   },
   {
     "id": "openwebui",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "openwebui"
+    ]
   },
   {
     "id": "palm",
@@ -1924,16 +1706,14 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "palm"
+    ]
   },
   {
     "id": "parasail",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "parasail"
+    ]
   },
   {
     "id": "perplexity",
@@ -1941,8 +1721,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "Perplexity"
+    ]
   },
   {
     "id": "phidata",
@@ -1950,24 +1729,21 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "phidata"
+    ]
   },
   {
     "id": "phind",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "phind"
+    ]
   },
   {
     "id": "pika",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "pika"
+    ]
   },
   {
     "id": "pixverse",
@@ -1975,8 +1751,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "pixverse"
+    ]
   },
   {
     "id": "player2",
@@ -1984,8 +1759,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "player2"
+    ]
   },
   {
     "id": "poe",
@@ -1993,16 +1767,14 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "poe"
+    ]
   },
   {
     "id": "pollinations",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "pollinations"
+    ]
   },
   {
     "id": "ppio",
@@ -2011,8 +1783,7 @@
       "-color",
       "-text",
       "-text-cn"
-    ],
-    "provider": "ppio"
+    ]
   },
   {
     "id": "prunaai",
@@ -2020,8 +1791,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "prunaai"
+    ]
   },
   {
     "id": "pydanticai",
@@ -2029,8 +1799,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "pydanticai"
+    ]
   },
   {
     "id": "qingyan",
@@ -2038,8 +1807,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "qingyan"
+    ]
   },
   {
     "id": "qiniu",
@@ -2047,8 +1815,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "qiniu"
+    ]
   },
   {
     "id": "qoder",
@@ -2056,8 +1823,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "qoder"
+    ]
   },
   {
     "id": "qwen",
@@ -2065,32 +1831,28 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "Alibaba"
+    ]
   },
   {
     "id": "railway",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "railway"
+    ]
   },
   {
     "id": "recraft",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "recraft"
+    ]
   },
   {
     "id": "relace",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "relace"
+    ]
   },
   {
     "id": "replicate",
@@ -2098,8 +1860,7 @@
       "",
       "-text",
       "-brand"
-    ],
-    "provider": "Replicate"
+    ]
   },
   {
     "id": "replit",
@@ -2107,24 +1868,21 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "replit"
+    ]
   },
   {
     "id": "reve",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "reve"
+    ]
   },
   {
     "id": "roocode",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "roocode"
+    ]
   },
   {
     "id": "rsshub",
@@ -2132,16 +1890,14 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "rsshub"
+    ]
   },
   {
     "id": "runway",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "runway"
+    ]
   },
   {
     "id": "rwkv",
@@ -2149,8 +1905,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "rwkv"
+    ]
   },
   {
     "id": "sambanova",
@@ -2158,8 +1913,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "sambanova"
+    ]
   },
   {
     "id": "search1api",
@@ -2167,16 +1921,14 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "search1api"
+    ]
   },
   {
     "id": "searchapi",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "searchapi"
+    ]
   },
   {
     "id": "sensenova",
@@ -2186,8 +1938,7 @@
       "-text",
       "-brand",
       "-brand-color"
-    ],
-    "provider": "sensenova"
+    ]
   },
   {
     "id": "siliconcloud",
@@ -2195,8 +1946,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "SiliconCloud"
+    ]
   },
   {
     "id": "sillytavern",
@@ -2204,8 +1954,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "sillytavern"
+    ]
   },
   {
     "id": "skywork",
@@ -2213,16 +1962,14 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "skywork"
+    ]
   },
   {
     "id": "slock",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "slock"
+    ]
   },
   {
     "id": "smithery",
@@ -2230,8 +1977,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "smithery"
+    ]
   },
   {
     "id": "snowflake",
@@ -2239,8 +1985,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "snowflake"
+    ]
   },
   {
     "id": "sophnet",
@@ -2248,8 +1993,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "sophnet"
+    ]
   },
   {
     "id": "sora",
@@ -2257,8 +2001,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "OpenAI"
+    ]
   },
   {
     "id": "spark",
@@ -2266,8 +2009,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "spark"
+    ]
   },
   {
     "id": "speedai",
@@ -2275,8 +2017,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "speedai"
+    ]
   },
   {
     "id": "stability",
@@ -2286,8 +2027,7 @@
       "-text",
       "-brand",
       "-brand-color"
-    ],
-    "provider": "Stability"
+    ]
   },
   {
     "id": "statecloud",
@@ -2295,8 +2035,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "statecloud"
+    ]
   },
   {
     "id": "stepfun",
@@ -2304,8 +2043,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "StepFun"
+    ]
   },
   {
     "id": "straico",
@@ -2313,8 +2051,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "straico"
+    ]
   },
   {
     "id": "streamlake",
@@ -2322,8 +2059,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "streamlake"
+    ]
   },
   {
     "id": "submodel",
@@ -2331,24 +2067,21 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "submodel"
+    ]
   },
   {
     "id": "suno",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "suno"
+    ]
   },
   {
     "id": "sync",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "sync"
+    ]
   },
   {
     "id": "targon",
@@ -2356,8 +2089,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "targon"
+    ]
   },
   {
     "id": "tavily",
@@ -2365,8 +2097,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "tavily"
+    ]
   },
   {
     "id": "tencent",
@@ -2377,8 +2108,7 @@
       "-text-cn",
       "-brand",
       "-brand-color"
-    ],
-    "provider": "tencent"
+    ]
   },
   {
     "id": "tencentcloud",
@@ -2386,8 +2116,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "tencentcloud"
+    ]
   },
   {
     "id": "tiangong",
@@ -2395,8 +2124,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "tiangong"
+    ]
   },
   {
     "id": "tii",
@@ -2404,8 +2132,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "tii"
+    ]
   },
   {
     "id": "together",
@@ -2415,16 +2142,14 @@
       "-text",
       "-brand",
       "-brand-color"
-    ],
-    "provider": "together"
+    ]
   },
   {
     "id": "topazlabs",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "topazlabs"
+    ]
   },
   {
     "id": "trae",
@@ -2432,8 +2157,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "trae"
+    ]
   },
   {
     "id": "tripo",
@@ -2441,16 +2165,14 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "tripo"
+    ]
   },
   {
     "id": "turix",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "turix"
+    ]
   },
   {
     "id": "udio",
@@ -2458,8 +2180,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "udio"
+    ]
   },
   {
     "id": "unstructured",
@@ -2467,8 +2188,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "unstructured"
+    ]
   },
   {
     "id": "upstage",
@@ -2476,23 +2196,20 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "upstage"
+    ]
   },
   {
     "id": "v0",
     "variants": [
       ""
-    ],
-    "provider": "v0"
+    ]
   },
   {
     "id": "vectorizerai",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "vectorizerai"
+    ]
   },
   {
     "id": "venice",
@@ -2500,16 +2217,14 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "venice"
+    ]
   },
   {
     "id": "vercel",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "Vercel"
+    ]
   },
   {
     "id": "vertexai",
@@ -2517,8 +2232,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "vertexai"
+    ]
   },
   {
     "id": "vidu",
@@ -2526,16 +2240,14 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "vidu"
+    ]
   },
   {
     "id": "viggle",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "viggle"
+    ]
   },
   {
     "id": "vllm",
@@ -2543,8 +2255,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "vllm"
+    ]
   },
   {
     "id": "volcengine",
@@ -2552,8 +2263,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "ByteDance"
+    ]
   },
   {
     "id": "voyage",
@@ -2561,8 +2271,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "voyage"
+    ]
   },
   {
     "id": "wenxin",
@@ -2570,16 +2279,14 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "Baidu"
+    ]
   },
   {
     "id": "windsurf",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "Windsurf"
+    ]
   },
   {
     "id": "workersai",
@@ -2587,32 +2294,28 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "workersai"
+    ]
   },
   {
     "id": "worldrouter",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "worldrouter"
+    ]
   },
   {
     "id": "xai",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "xAI"
+    ]
   },
   {
     "id": "xiaomimimo",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "xiaomimimo"
+    ]
   },
   {
     "id": "xinference",
@@ -2620,8 +2323,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "xinference"
+    ]
   },
   {
     "id": "xpay",
@@ -2629,8 +2331,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "xpay"
+    ]
   },
   {
     "id": "xuanyuan",
@@ -2638,16 +2339,14 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "xuanyuan"
+    ]
   },
   {
     "id": "yandex",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "yandex"
+    ]
   },
   {
     "id": "yi",
@@ -2655,16 +2354,14 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "01.AI"
+    ]
   },
   {
     "id": "youmind",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "youmind"
+    ]
   },
   {
     "id": "yuanbao",
@@ -2672,16 +2369,14 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "yuanbao"
+    ]
   },
   {
     "id": "zai",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "zai"
+    ]
   },
   {
     "id": "zapier",
@@ -2689,8 +2384,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "zapier"
+    ]
   },
   {
     "id": "zeabur",
@@ -2698,8 +2392,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "zeabur"
+    ]
   },
   {
     "id": "zencoder",
@@ -2707,16 +2400,14 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "zencoder"
+    ]
   },
   {
     "id": "zenmux",
     "variants": [
       "",
       "-text"
-    ],
-    "provider": "zenmux"
+    ]
   },
   {
     "id": "zeroone",
@@ -2724,8 +2415,7 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "01.AI"
+    ]
   },
   {
     "id": "zhipu",
@@ -2733,7 +2423,6 @@
       "",
       "-color",
       "-text"
-    ],
-    "provider": "ZhiPu"
+    ]
   }
 ]
