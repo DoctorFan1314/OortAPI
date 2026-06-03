@@ -1,0 +1,2739 @@
+[
+  {
+    "id": "ace",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "ace"
+  },
+  {
+    "id": "adobe",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "adobe"
+  },
+  {
+    "id": "adobefirefly",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "adobefirefly"
+  },
+  {
+    "id": "agentvoice",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "agentvoice"
+  },
+  {
+    "id": "agui",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "agui"
+  },
+  {
+    "id": "ai2",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "ai2"
+  },
+  {
+    "id": "ai21",
+    "variants": [
+      "",
+      "-text",
+      "-brand",
+      "-brand-color"
+    ],
+    "provider": "ai21"
+  },
+  {
+    "id": "ai302",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "ai302"
+  },
+  {
+    "id": "ai360",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "ai360"
+  },
+  {
+    "id": "aihubmix",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "aihubmix"
+  },
+  {
+    "id": "aimass",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "aimass"
+  },
+  {
+    "id": "aionlabs",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "aionlabs"
+  },
+  {
+    "id": "airjelly",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "airjelly"
+  },
+  {
+    "id": "aistudio",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "aistudio"
+  },
+  {
+    "id": "akashchat",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "akashchat"
+  },
+  {
+    "id": "alephalpha",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "alephalpha"
+  },
+  {
+    "id": "alibaba",
+    "variants": [
+      "",
+      "-color",
+      "-text",
+      "-text-cn",
+      "-brand",
+      "-brand-color"
+    ],
+    "provider": "Alibaba"
+  },
+  {
+    "id": "alibabacloud",
+    "variants": [
+      "",
+      "-color",
+      "-text",
+      "-text-cn"
+    ],
+    "provider": "Alibaba"
+  },
+  {
+    "id": "amp",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "amp"
+  },
+  {
+    "id": "antgroup",
+    "variants": [
+      "",
+      "-color",
+      "-text",
+      "-text-cn",
+      "-brand",
+      "-brand-color"
+    ],
+    "provider": "antgroup"
+  },
+  {
+    "id": "anthropic",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "Anthropic"
+  },
+  {
+    "id": "antigravity",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "antigravity"
+  },
+  {
+    "id": "anyscale",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "anyscale"
+  },
+  {
+    "id": "apertis",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "apertis"
+  },
+  {
+    "id": "apple",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "apple"
+  },
+  {
+    "id": "arcee",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "arcee"
+  },
+  {
+    "id": "askverdict",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "askverdict"
+  },
+  {
+    "id": "assemblyai",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "assemblyai"
+  },
+  {
+    "id": "atlascloud",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "atlascloud"
+  },
+  {
+    "id": "automatic",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "automatic"
+  },
+  {
+    "id": "aws",
+    "variants": [
+      "",
+      "-color",
+      "-text",
+      "-brand",
+      "-brand-color"
+    ],
+    "provider": "AWS"
+  },
+  {
+    "id": "aya",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "Cohere"
+  },
+  {
+    "id": "azure",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "Azure"
+  },
+  {
+    "id": "azureai",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "Azure"
+  },
+  {
+    "id": "baai",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "baai"
+  },
+  {
+    "id": "baichuan",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "Baichuan"
+  },
+  {
+    "id": "baidu",
+    "variants": [
+      "",
+      "-color",
+      "-text",
+      "-text-cn",
+      "-brand",
+      "-brand-color"
+    ],
+    "provider": "Baidu"
+  },
+  {
+    "id": "baiducloud",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "Baidu"
+  },
+  {
+    "id": "bailian",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "Alibaba"
+  },
+  {
+    "id": "baseten",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "baseten"
+  },
+  {
+    "id": "bedrock",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "AWS"
+  },
+  {
+    "id": "bfl",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "bfl"
+  },
+  {
+    "id": "bilibili",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "bilibili"
+  },
+  {
+    "id": "bilibiliindex",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "bilibiliindex"
+  },
+  {
+    "id": "bing",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "bing"
+  },
+  {
+    "id": "briaai",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "briaai"
+  },
+  {
+    "id": "burncloud",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "burncloud"
+  },
+  {
+    "id": "bytedance",
+    "variants": [
+      "",
+      "-color",
+      "-text",
+      "-text-cn",
+      "-brand",
+      "-brand-color"
+    ],
+    "provider": "ByteDance"
+  },
+  {
+    "id": "capcut",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "ByteDance"
+  },
+  {
+    "id": "centml",
+    "variants": [
+      "",
+      "-color",
+      "-text",
+      "-brand",
+      "-brand-color"
+    ],
+    "provider": "centml"
+  },
+  {
+    "id": "cerebras",
+    "variants": [
+      "",
+      "-color",
+      "-text",
+      "-brand",
+      "-brand-color"
+    ],
+    "provider": "cerebras"
+  },
+  {
+    "id": "chatglm",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "ZhiPu"
+  },
+  {
+    "id": "cherrystudio",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "cherrystudio"
+  },
+  {
+    "id": "civitai",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "civitai"
+  },
+  {
+    "id": "civitai-text",
+    "variants": [
+      "-color"
+    ],
+    "provider": "civitai-text"
+  },
+  {
+    "id": "claude",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "Anthropic"
+  },
+  {
+    "id": "claudecode",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "Anthropic"
+  },
+  {
+    "id": "cline",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "Cline"
+  },
+  {
+    "id": "clipdrop",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "clipdrop"
+  },
+  {
+    "id": "cloudflare",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "Cloudflare"
+  },
+  {
+    "id": "codebuddy",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "codebuddy"
+  },
+  {
+    "id": "codeflicker",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "codeflicker"
+  },
+  {
+    "id": "codegeex",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "codegeex"
+  },
+  {
+    "id": "codex",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "OpenAI"
+  },
+  {
+    "id": "cogvideo",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "ZhiPu"
+  },
+  {
+    "id": "cogview",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "ZhiPu"
+  },
+  {
+    "id": "cohere",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "Cohere"
+  },
+  {
+    "id": "colab",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "colab"
+  },
+  {
+    "id": "cometapi",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "cometapi"
+  },
+  {
+    "id": "comfyui",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "comfyui"
+  },
+  {
+    "id": "commanda",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "commanda"
+  },
+  {
+    "id": "copilot",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "Microsoft"
+  },
+  {
+    "id": "copilotkit",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "copilotkit"
+  },
+  {
+    "id": "coqui",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "coqui"
+  },
+  {
+    "id": "coze",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "ByteDance"
+  },
+  {
+    "id": "crewai",
+    "variants": [
+      "",
+      "-color",
+      "-text",
+      "-brand",
+      "-brand-color"
+    ],
+    "provider": "crewai"
+  },
+  {
+    "id": "crusoe",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "crusoe"
+  },
+  {
+    "id": "cursor",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "Cursor"
+  },
+  {
+    "id": "cybercut",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "cybercut"
+  },
+  {
+    "id": "dalle",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "OpenAI"
+  },
+  {
+    "id": "dbrx",
+    "variants": [
+      "",
+      "-color",
+      "-text",
+      "-brand",
+      "-brand-color"
+    ],
+    "provider": "dbrx"
+  },
+  {
+    "id": "deepai",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "deepai"
+  },
+  {
+    "id": "deepcogito",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "deepcogito"
+  },
+  {
+    "id": "deepinfra",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "deepinfra"
+  },
+  {
+    "id": "deepl",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "deepl"
+  },
+  {
+    "id": "deepmind",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "Google"
+  },
+  {
+    "id": "deepseek",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "DeepSeek"
+  },
+  {
+    "id": "devin",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "devin"
+  },
+  {
+    "id": "dify",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "dify"
+  },
+  {
+    "id": "doc2x",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "doc2x"
+  },
+  {
+    "id": "docsearch",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "docsearch"
+  },
+  {
+    "id": "dolphin",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "dolphin"
+  },
+  {
+    "id": "doubao",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "ByteDance"
+  },
+  {
+    "id": "dreammachine",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "dreammachine"
+  },
+  {
+    "id": "elevenlabs",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "elevenlabs"
+  },
+  {
+    "id": "elevenx",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "elevenx"
+  },
+  {
+    "id": "essentialai",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "essentialai"
+  },
+  {
+    "id": "exa",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "exa"
+  },
+  {
+    "id": "fal",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "fal"
+  },
+  {
+    "id": "fastgpt",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "fastgpt"
+  },
+  {
+    "id": "featherless",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "featherless"
+  },
+  {
+    "id": "figma",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "figma"
+  },
+  {
+    "id": "fireworks",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "Fireworks"
+  },
+  {
+    "id": "fishaudio",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "fishaudio"
+  },
+  {
+    "id": "flora",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "flora"
+  },
+  {
+    "id": "flowith",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "flowith"
+  },
+  {
+    "id": "flux",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "flux"
+  },
+  {
+    "id": "friendli",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "friendli"
+  },
+  {
+    "id": "gemini",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "Google"
+  },
+  {
+    "id": "geminicli",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "Google"
+  },
+  {
+    "id": "gemma",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "Google"
+  },
+  {
+    "id": "giteeai",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "giteeai"
+  },
+  {
+    "id": "github",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "GitHub"
+  },
+  {
+    "id": "githubcopilot",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "GitHub"
+  },
+  {
+    "id": "glama",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "glama"
+  },
+  {
+    "id": "glif",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "glif"
+  },
+  {
+    "id": "glmv",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "ZhiPu"
+  },
+  {
+    "id": "google",
+    "variants": [
+      "",
+      "-color",
+      "-brand",
+      "-brand-color"
+    ],
+    "provider": "Google"
+  },
+  {
+    "id": "googlecloud",
+    "variants": [
+      "",
+      "-color",
+      "-brand",
+      "-brand-color"
+    ],
+    "provider": "Google"
+  },
+  {
+    "id": "goose",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "goose"
+  },
+  {
+    "id": "gradio",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "gradio"
+  },
+  {
+    "id": "greptile",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "greptile"
+  },
+  {
+    "id": "grok",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "xAI"
+  },
+  {
+    "id": "groq",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "Groq"
+  },
+  {
+    "id": "hailuo",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "hailuo"
+  },
+  {
+    "id": "haiper",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "haiper"
+  },
+  {
+    "id": "hedra",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "hedra"
+  },
+  {
+    "id": "hermesagent",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "hermesagent"
+  },
+  {
+    "id": "higress",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "higress"
+  },
+  {
+    "id": "huawei",
+    "variants": [
+      "",
+      "-color",
+      "-text",
+      "-text-cn"
+    ],
+    "provider": "huawei"
+  },
+  {
+    "id": "huaweicloud",
+    "variants": [
+      "",
+      "-color",
+      "-text",
+      "-text-cn"
+    ],
+    "provider": "huaweicloud"
+  },
+  {
+    "id": "huggingface",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "HuggingFace"
+  },
+  {
+    "id": "hunyuan",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "hunyuan"
+  },
+  {
+    "id": "hyperbolic",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "hyperbolic"
+  },
+  {
+    "id": "ibm",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "ibm"
+  },
+  {
+    "id": "ideogram",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "ideogram"
+  },
+  {
+    "id": "iflytekcloud",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "iflytekcloud"
+  },
+  {
+    "id": "inception",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "inception"
+  },
+  {
+    "id": "inference",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "inference"
+  },
+  {
+    "id": "infermatic",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "infermatic"
+  },
+  {
+    "id": "infinigence",
+    "variants": [
+      "",
+      "-color",
+      "-text",
+      "-text-cn"
+    ],
+    "provider": "infinigence"
+  },
+  {
+    "id": "inflection",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "inflection"
+  },
+  {
+    "id": "internlm",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "internlm"
+  },
+  {
+    "id": "jimeng",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "ByteDance"
+  },
+  {
+    "id": "jina",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "jina"
+  },
+  {
+    "id": "junie",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "junie"
+  },
+  {
+    "id": "kilocode",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "kilocode"
+  },
+  {
+    "id": "kimi",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "Moonshot"
+  },
+  {
+    "id": "kiro",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "kiro"
+  },
+  {
+    "id": "kling",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "kling"
+  },
+  {
+    "id": "kluster",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "kluster"
+  },
+  {
+    "id": "kolors",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "kolors"
+  },
+  {
+    "id": "krea",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "krea"
+  },
+  {
+    "id": "kwaikat-text",
+    "variants": [
+      "-color"
+    ],
+    "provider": "kwaikat-text"
+  },
+  {
+    "id": "kwaikat",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "kwaikat"
+  },
+  {
+    "id": "kwaipilot",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "kwaipilot"
+  },
+  {
+    "id": "lambda",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "lambda"
+  },
+  {
+    "id": "langchain",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "langchain"
+  },
+  {
+    "id": "langfuse",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "langfuse"
+  },
+  {
+    "id": "langgraph",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "langgraph"
+  },
+  {
+    "id": "langsmith",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "langsmith"
+  },
+  {
+    "id": "leptonai",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "leptonai"
+  },
+  {
+    "id": "lg",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "lg"
+  },
+  {
+    "id": "lightricks",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "lightricks"
+  },
+  {
+    "id": "liquid",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "liquid"
+  },
+  {
+    "id": "livekit",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "livekit"
+  },
+  {
+    "id": "llamaindex",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "llamaindex"
+  },
+  {
+    "id": "llava",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "llava"
+  },
+  {
+    "id": "llmapi",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "llmapi"
+  },
+  {
+    "id": "lmstudio",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "lmstudio"
+  },
+  {
+    "id": "lobehub",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "LobeHub"
+  },
+  {
+    "id": "longcat",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "longcat"
+  },
+  {
+    "id": "lovable",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "lovable"
+  },
+  {
+    "id": "lovart",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "lovart"
+  },
+  {
+    "id": "luma",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "luma"
+  },
+  {
+    "id": "magic",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "magic"
+  },
+  {
+    "id": "make",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "make"
+  },
+  {
+    "id": "manus",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "manus"
+  },
+  {
+    "id": "mastra",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "mastra"
+  },
+  {
+    "id": "mcp",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "mcp"
+  },
+  {
+    "id": "mcpso",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "mcpso"
+  },
+  {
+    "id": "menlo",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "menlo"
+  },
+  {
+    "id": "meshy",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "meshy"
+  },
+  {
+    "id": "meta",
+    "variants": [
+      "",
+      "-color",
+      "-text",
+      "-brand",
+      "-brand-color"
+    ],
+    "provider": "Meta"
+  },
+  {
+    "id": "metaai",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "Meta"
+  },
+  {
+    "id": "metagpt",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "Meta"
+  },
+  {
+    "id": "microsoft",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "Microsoft"
+  },
+  {
+    "id": "midjourney",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "midjourney"
+  },
+  {
+    "id": "minimax",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "MiniMax"
+  },
+  {
+    "id": "mistral",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "Mistral"
+  },
+  {
+    "id": "modelscope",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "modelscope"
+  },
+  {
+    "id": "monica",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "monica"
+  },
+  {
+    "id": "moonshot",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "Moonshot"
+  },
+  {
+    "id": "morph",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "morph"
+  },
+  {
+    "id": "moxt",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "moxt"
+  },
+  {
+    "id": "myshell",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "myshell"
+  },
+  {
+    "id": "n8n",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "n8n"
+  },
+  {
+    "id": "nanobanana",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "nanobanana"
+  },
+  {
+    "id": "nebius",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "nebius"
+  },
+  {
+    "id": "newapi",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "newapi"
+  },
+  {
+    "id": "notebooklm",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "Google"
+  },
+  {
+    "id": "notion",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "notion"
+  },
+  {
+    "id": "nousresearch",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "nousresearch"
+  },
+  {
+    "id": "nova",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "nova"
+  },
+  {
+    "id": "novelai",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "novelai"
+  },
+  {
+    "id": "novita",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "novita"
+  },
+  {
+    "id": "nplcloud",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "nplcloud"
+  },
+  {
+    "id": "nvidia",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "NVIDIA"
+  },
+  {
+    "id": "obsidian",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "obsidian"
+  },
+  {
+    "id": "ollama",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "Ollama"
+  },
+  {
+    "id": "openai",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "OpenAI"
+  },
+  {
+    "id": "openchat",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "openchat"
+  },
+  {
+    "id": "openclaw",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "openclaw"
+  },
+  {
+    "id": "opencode",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "opencode"
+  },
+  {
+    "id": "openhands",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "openhands"
+  },
+  {
+    "id": "openhuman",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "openhuman"
+  },
+  {
+    "id": "openrouter",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "openrouter"
+  },
+  {
+    "id": "openwebui",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "openwebui"
+  },
+  {
+    "id": "palm",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "palm"
+  },
+  {
+    "id": "parasail",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "parasail"
+  },
+  {
+    "id": "perplexity",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "Perplexity"
+  },
+  {
+    "id": "phidata",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "phidata"
+  },
+  {
+    "id": "phind",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "phind"
+  },
+  {
+    "id": "pika",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "pika"
+  },
+  {
+    "id": "pixverse",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "pixverse"
+  },
+  {
+    "id": "player2",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "player2"
+  },
+  {
+    "id": "poe",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "poe"
+  },
+  {
+    "id": "pollinations",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "pollinations"
+  },
+  {
+    "id": "ppio",
+    "variants": [
+      "",
+      "-color",
+      "-text",
+      "-text-cn"
+    ],
+    "provider": "ppio"
+  },
+  {
+    "id": "prunaai",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "prunaai"
+  },
+  {
+    "id": "pydanticai",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "pydanticai"
+  },
+  {
+    "id": "qingyan",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "qingyan"
+  },
+  {
+    "id": "qiniu",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "qiniu"
+  },
+  {
+    "id": "qoder",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "qoder"
+  },
+  {
+    "id": "qwen",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "Alibaba"
+  },
+  {
+    "id": "railway",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "railway"
+  },
+  {
+    "id": "recraft",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "recraft"
+  },
+  {
+    "id": "relace",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "relace"
+  },
+  {
+    "id": "replicate",
+    "variants": [
+      "",
+      "-text",
+      "-brand"
+    ],
+    "provider": "Replicate"
+  },
+  {
+    "id": "replit",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "replit"
+  },
+  {
+    "id": "reve",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "reve"
+  },
+  {
+    "id": "roocode",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "roocode"
+  },
+  {
+    "id": "rsshub",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "rsshub"
+  },
+  {
+    "id": "runway",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "runway"
+  },
+  {
+    "id": "rwkv",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "rwkv"
+  },
+  {
+    "id": "sambanova",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "sambanova"
+  },
+  {
+    "id": "search1api",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "search1api"
+  },
+  {
+    "id": "searchapi",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "searchapi"
+  },
+  {
+    "id": "sensenova",
+    "variants": [
+      "",
+      "-color",
+      "-text",
+      "-brand",
+      "-brand-color"
+    ],
+    "provider": "sensenova"
+  },
+  {
+    "id": "siliconcloud",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "SiliconCloud"
+  },
+  {
+    "id": "sillytavern",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "sillytavern"
+  },
+  {
+    "id": "skywork",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "skywork"
+  },
+  {
+    "id": "slock",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "slock"
+  },
+  {
+    "id": "smithery",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "smithery"
+  },
+  {
+    "id": "snowflake",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "snowflake"
+  },
+  {
+    "id": "sophnet",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "sophnet"
+  },
+  {
+    "id": "sora",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "OpenAI"
+  },
+  {
+    "id": "spark",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "spark"
+  },
+  {
+    "id": "speedai",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "speedai"
+  },
+  {
+    "id": "stability",
+    "variants": [
+      "",
+      "-color",
+      "-text",
+      "-brand",
+      "-brand-color"
+    ],
+    "provider": "Stability"
+  },
+  {
+    "id": "statecloud",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "statecloud"
+  },
+  {
+    "id": "stepfun",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "StepFun"
+  },
+  {
+    "id": "straico",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "straico"
+  },
+  {
+    "id": "streamlake",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "streamlake"
+  },
+  {
+    "id": "submodel",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "submodel"
+  },
+  {
+    "id": "suno",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "suno"
+  },
+  {
+    "id": "sync",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "sync"
+  },
+  {
+    "id": "targon",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "targon"
+  },
+  {
+    "id": "tavily",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "tavily"
+  },
+  {
+    "id": "tencent",
+    "variants": [
+      "",
+      "-color",
+      "-text",
+      "-text-cn",
+      "-brand",
+      "-brand-color"
+    ],
+    "provider": "tencent"
+  },
+  {
+    "id": "tencentcloud",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "tencentcloud"
+  },
+  {
+    "id": "tiangong",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "tiangong"
+  },
+  {
+    "id": "tii",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "tii"
+  },
+  {
+    "id": "together",
+    "variants": [
+      "",
+      "-color",
+      "-text",
+      "-brand",
+      "-brand-color"
+    ],
+    "provider": "together"
+  },
+  {
+    "id": "topazlabs",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "topazlabs"
+  },
+  {
+    "id": "trae",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "trae"
+  },
+  {
+    "id": "tripo",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "tripo"
+  },
+  {
+    "id": "turix",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "turix"
+  },
+  {
+    "id": "udio",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "udio"
+  },
+  {
+    "id": "unstructured",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "unstructured"
+  },
+  {
+    "id": "upstage",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "upstage"
+  },
+  {
+    "id": "v0",
+    "variants": [
+      ""
+    ],
+    "provider": "v0"
+  },
+  {
+    "id": "vectorizerai",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "vectorizerai"
+  },
+  {
+    "id": "venice",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "venice"
+  },
+  {
+    "id": "vercel",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "Vercel"
+  },
+  {
+    "id": "vertexai",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "vertexai"
+  },
+  {
+    "id": "vidu",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "vidu"
+  },
+  {
+    "id": "viggle",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "viggle"
+  },
+  {
+    "id": "vllm",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "vllm"
+  },
+  {
+    "id": "volcengine",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "ByteDance"
+  },
+  {
+    "id": "voyage",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "voyage"
+  },
+  {
+    "id": "wenxin",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "Baidu"
+  },
+  {
+    "id": "windsurf",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "Windsurf"
+  },
+  {
+    "id": "workersai",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "workersai"
+  },
+  {
+    "id": "worldrouter",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "worldrouter"
+  },
+  {
+    "id": "xai",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "xAI"
+  },
+  {
+    "id": "xiaomimimo",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "xiaomimimo"
+  },
+  {
+    "id": "xinference",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "xinference"
+  },
+  {
+    "id": "xpay",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "xpay"
+  },
+  {
+    "id": "xuanyuan",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "xuanyuan"
+  },
+  {
+    "id": "yandex",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "yandex"
+  },
+  {
+    "id": "yi",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "01.AI"
+  },
+  {
+    "id": "youmind",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "youmind"
+  },
+  {
+    "id": "yuanbao",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "yuanbao"
+  },
+  {
+    "id": "zai",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "zai"
+  },
+  {
+    "id": "zapier",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "zapier"
+  },
+  {
+    "id": "zeabur",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "zeabur"
+  },
+  {
+    "id": "zencoder",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "zencoder"
+  },
+  {
+    "id": "zenmux",
+    "variants": [
+      "",
+      "-text"
+    ],
+    "provider": "zenmux"
+  },
+  {
+    "id": "zeroone",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "01.AI"
+  },
+  {
+    "id": "zhipu",
+    "variants": [
+      "",
+      "-color",
+      "-text"
+    ],
+    "provider": "ZhiPu"
+  }
+]
