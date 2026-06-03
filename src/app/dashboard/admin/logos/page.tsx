@@ -250,7 +250,7 @@ export default function LogoManagePage() {
           onClick={() => setSelectedIcon(null)}
           onKeyDown={(e) => e.key === "Escape" && setSelectedIcon(null)}
         >
-          <div className="bg-card border border-border rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-card border border-border rounded-2xl shadow-2xl max-w-3xl w-full overflow-hidden" onClick={(e) => e.stopPropagation()}>
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-border">
               <div className="flex items-center gap-3">
@@ -267,82 +267,70 @@ export default function LogoManagePage() {
               </button>
             </div>
 
-            {/* Variant selector */}
-            {selectedIcon.variants.length > 1 && (
-              <div className="flex gap-1.5 px-6 pt-4 flex-wrap">
+            {/* Body: variant tabs (left) + preview (right) */}
+            <div className="flex min-h-[320px]">
+              {/* Left: variant tabs */}
+              <div className="w-36 border-r border-border bg-muted/30 p-3 space-y-1 shrink-0">
                 {selectedIcon.variants.map((v) => (
                   <button
                     key={v}
                     onClick={() => { setSelectedVariant(v); setCopiedIdx(null); }}
                     className={cn(
-                      "px-3 py-1.5 rounded-lg text-xs font-medium transition-all border",
+                      "w-full text-left px-3 py-2 rounded-lg text-xs font-medium transition-all",
                       selectedVariant === v
-                        ? "bg-primary/10 text-primary border-primary/30"
-                        : "bg-transparent text-muted-foreground border-border hover:text-foreground"
+                        ? "bg-primary/10 text-primary"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted"
                     )}
                   >
                     {getVariantLabel(v)}
                   </button>
                 ))}
               </div>
-            )}
 
-            {/* Preview — light and dark */}
-            <div className="p-6">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col items-center gap-3 p-6 rounded-xl bg-white border border-border">
-                  <img src={getSrc(selectedIcon.id, selectedVariant)} alt={selectedIcon.id} className="w-24 h-24 object-contain" />
-                  <span className="text-xs text-gray-500 flex items-center gap-1.5"><Sun className="h-3.5 w-3.5" /> Light</span>
-                </div>
-                <div className="flex flex-col items-center gap-3 p-6 rounded-xl bg-gray-900 border border-gray-700">
-                  <img
-                    src={getSrc(selectedIcon.id, selectedVariant)}
-                    alt={selectedIcon.id}
-                    className="w-24 h-24 object-contain"
-                    style={needsInvert(selectedVariant) ? { filter: "invert(1)" } : undefined}
-                  />
-                  <span className="text-xs text-gray-400 flex items-center gap-1.5"><Moon className="h-3.5 w-3.5" /> Dark</span>
-                </div>
-              </div>
-
-              {/* Info */}
-              <div className="mt-4 text-sm text-muted-foreground space-y-1.5">
-                <p>File: <code className="font-mono bg-muted px-1.5 py-0.5 rounded text-xs">{selectedIcon.id}{selectedVariant}.svg</code></p>
-                <p>Path: <code className="font-mono bg-muted px-1.5 py-0.5 rounded text-xs">/providers/{selectedIcon.id}{selectedVariant}.svg</code></p>
-              </div>
-            </div>
-
-            {/* Per-variant download/copy table */}
-            <div className="px-6 pb-4">
-              <p className="text-xs font-medium text-muted-foreground mb-2">{lang === "zh" ? "下载/复制单个变体" : "Download / Copy individual variant"}</p>
-              <div className="border border-border rounded-lg overflow-hidden">
-                {selectedIcon.variants.map((v, idx) => (
-                  <div key={v} className={cn("flex items-center justify-between px-3 py-2 text-xs", idx > 0 && "border-t border-border/50")}>
-                    <div className="flex items-center gap-2">
-                      <img
-                        src={getSrc(selectedIcon.id, v)}
-                        alt={`${selectedIcon.id}${v}`}
-                        className="w-5 h-5 object-contain"
-                        style={resolvedTheme === "dark" && needsInvert(v) ? { filter: "invert(1)" } : undefined}
-                      />
-                      <span className="font-mono text-foreground/80">{selectedIcon.id}{v}.svg</span>
-                    </div>
-                    <div className="flex gap-1">
-                      <button
-                        onClick={() => handleCopy(selectedIcon.id, v, idx)}
-                        className="px-2 py-1 rounded text-[11px] text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                      >
-                        {copiedIdx === idx ? <Check className="h-3 w-3 text-emerald-500" /> : <Copy className="h-3 w-3" />}
-                      </button>
-                      <button
-                        onClick={() => handleDownload(selectedIcon.id, v)}
-                        className="px-2 py-1 rounded text-[11px] text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                      >
-                        <Download className="h-3 w-3" />
-                      </button>
-                    </div>
+              {/* Right: preview + actions */}
+              <div className="flex-1 p-6 flex flex-col">
+                {/* Light/Dark preview */}
+                <div className="grid grid-cols-2 gap-4 flex-1">
+                  <div className="flex flex-col items-center justify-center gap-3 p-4 rounded-xl bg-white border border-border">
+                    <img src={getSrc(selectedIcon.id, selectedVariant)} alt={selectedIcon.id} className="w-20 h-20 object-contain" />
+                    <span className="text-xs text-gray-500 flex items-center gap-1"><Sun className="h-3 w-3" /> Light</span>
                   </div>
-                ))}
+                  <div className="flex flex-col items-center justify-center gap-3 p-4 rounded-xl bg-gray-900 border border-gray-700">
+                    <img
+                      src={getSrc(selectedIcon.id, selectedVariant)}
+                      alt={selectedIcon.id}
+                      className="w-20 h-20 object-contain"
+                      style={needsInvert(selectedVariant) ? { filter: "invert(1)" } : undefined}
+                    />
+                    <span className="text-xs text-gray-400 flex items-center gap-1"><Moon className="h-3 w-3" /> Dark</span>
+                  </div>
+                </div>
+
+                {/* File info */}
+                <p className="mt-3 text-xs text-muted-foreground font-mono">
+                  {selectedIcon.id}{selectedVariant}.svg
+                </p>
+
+                {/* Actions: copy + download for current variant */}
+                <div className="flex gap-2 mt-3">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => handleCopy(selectedIcon.id, selectedVariant, 0)}
+                  >
+                    {copiedIdx === 0 ? <Check className="h-3.5 w-3.5 mr-1.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5 mr-1.5" />}
+                    {copiedIdx === 0 ? (lang === "zh" ? "已复制" : "Copied!") : L.logoCopySvg}
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => handleDownload(selectedIcon.id, selectedVariant)}
+                  >
+                    <Download className="h-3.5 w-3.5 mr-1.5" />
+                    {L.logoDownload}
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
