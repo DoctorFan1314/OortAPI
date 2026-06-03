@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import useSWR from "swr";
+import { dashboardSWRConfig } from "@/lib/swr-fetcher";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -69,6 +71,20 @@ function AdminPlansContent() {
   const { toast: showToast } = useToast();
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // SWR for plans, settings, stats, and models
+  const { data: plansData, mutate: mutatePlans } = useSWR<{ plans?: Plan[] }>(
+    "/api/dashboard/admin/plans", dashboardSWRConfig,
+  );
+  const { data: settingsData } = useSWR<{ settings?: { exchange_rate?: string } }>(
+    "/api/dashboard/settings", dashboardSWRConfig,
+  );
+  const { data: statsData } = useSWR<{ stats?: PlanStat[]; total_subs?: number; total_monthly_revenue?: number }>(
+    "/api/dashboard/admin/plans?action=stats", dashboardSWRConfig,
+  );
+  const { data: modelsData } = useSWR<{ data?: { id: string }[]; models?: { id: string }[] }>(
+    "/api/v1/models", dashboardSWRConfig,
+  );
   const [editPlan, setEditPlan] = useState<Plan | null>(null);
   const [editSaving, setEditSaving] = useState(false);
   const [editTab, setEditTab] = useState("basic");
@@ -93,38 +109,35 @@ function AdminPlansContent() {
   const [createSaving, setCreateSaving] = useState(false);
 
   const fetchPlans = useCallback(async () => {
-    try {
-      const [planRes, settingsRes, statsRes] = await Promise.all([
-        fetch("/api/dashboard/admin/plans", { credentials: "include" }),
-        fetch("/api/dashboard/settings", { credentials: "include" }),
-        fetch("/api/dashboard/admin/plans?action=stats", { credentials: "include" }),
-      ]);
-      if (planRes.ok) { const d = await planRes.json(); setPlans(d.plans || []); }
-      if (settingsRes.ok) {
-        const d = await settingsRes.json();
-        if (d.settings?.exchange_rate) setExchangeRate(parseFloat(d.settings.exchange_rate) || 7.3);
-      }
-      if (statsRes.ok) {
-        const d = await statsRes.json();
-        setPlanStats(d.stats || []);
-        setTotalSubs(d.total_subs || 0);
-        setTotalRevenue(d.total_monthly_revenue || 0);
-      }
-    } catch {} finally { setLoading(false); }
-  }, []);
+    await mutatePlans();
+  }, [mutatePlans]);
 
-  const fetchAvailableModels = useCallback(async () => {
-    try {
-      const res = await fetch("/api/v1/models", { credentials: "include" });
-      if (res.ok) {
-        const d = await res.json();
-        const models = (d.data || d.models || []).map((m: { id: string }) => m.id);
-        setAvailableModels(models);
-      }
-    } catch {}
-  }, []);
+  // Sync SWR data into local state
+  useEffect(() => {
+    if (plansData?.plans) setPlans(plansData.plans);
+    setLoading(!plansData);
+  }, [plansData]);
 
-  useEffect(() => { fetchPlans(); fetchAvailableModels(); }, [fetchPlans, fetchAvailableModels]);
+  useEffect(() => {
+    if (settingsData?.settings?.exchange_rate) {
+      setExchangeRate(parseFloat(settingsData.settings.exchange_rate) || 7.3);
+    }
+  }, [settingsData]);
+
+  useEffect(() => {
+    if (statsData) {
+      setPlanStats(statsData.stats || []);
+      setTotalSubs(statsData.total_subs || 0);
+      setTotalRevenue(statsData.total_monthly_revenue || 0);
+    }
+  }, [statsData]);
+
+  useEffect(() => {
+    if (modelsData) {
+      const models = (modelsData.data || modelsData.models || []).map((m) => m.id);
+      setAvailableModels(models);
+    }
+  }, [modelsData]);
 
   async function fetchPlanModels(planId: number) {
     try {

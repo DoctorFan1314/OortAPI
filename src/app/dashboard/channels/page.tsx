@@ -12,12 +12,10 @@ import {
 import useSWR from "swr";
 import { dashboardSWRConfig } from "@/lib/swr-fetcher";
 import { useMemo, useState } from "react";
-import dynamic from "next/dynamic";
 import { useTheme } from "@/contexts/theme-context";
 import { cn } from "@/lib/utils";
 import { ChartErrorBoundary } from "@/components/shared/chart-error-boundary";
-
-const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false });
+import ReactECharts from "@/components/shared/lazy-echarts";
 
 /* ---------- types ---------- */
 

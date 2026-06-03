@@ -6,14 +6,14 @@ import { useToast } from "@/contexts/toast-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import { Activity, Coins, DollarSign, BarChart3, AlertTriangle } from "lucide-react";
-import dynamic from "next/dynamic";
+import useSWR from "swr";
+import { dashboardSWRConfig } from "@/lib/swr-fetcher";
+import ReactECharts from "@/components/shared/lazy-echarts";
 import { UsageLog, DailyTrend, UsageSummary } from "./usage-types";
 import { FilterBar } from "./filter-bar";
 import { LogTable } from "./log-table";
 import { TrendChart } from "./trend-chart";
 import { ChartErrorBoundary } from "@/components/shared/chart-error-boundary";
-
-const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false });
 
 export default function UsagePage() {
   const { lang, t } = useI18n();
@@ -51,25 +51,19 @@ export default function UsagePage() {
   const [filterTo, setFilterTo] = useState(todayStr);
   const [filterKeyId, setFilterKeyId] = useState("");
 
-  // API keys & models for filter dropdowns
-  const [apiKeys, setApiKeys] = useState<{ id: number; name: string }[]>([]);
-  const [filterModels, setFilterModels] = useState<string[]>([]);
+  // API keys & models for filter dropdowns via SWR
+  const { data: keysData } = useSWR<{ keys?: { id: number; name: string }[] }>(
+    "/api/dashboard/keys", dashboardSWRConfig,
+  );
+  const { data: modelsData } = useSWR<{ data?: { id: string }[] }>(
+    "/api/v1/models", dashboardSWRConfig,
+  );
+  const apiKeys = keysData?.keys ?? [];
+  const filterModels = modelsData?.data?.map((m) => m.id).sort() ?? [];
 
   // Sort state
   const [sortKey, setSortKey] = useState<string>("created_at");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
-
-  // Fetch API keys and models
-  useEffect(() => {
-    fetch("/api/dashboard/keys", { credentials: "include" })
-      .then(r => r.ok ? r.json() : null)
-      .then(d => { if (d?.keys) setApiKeys(d.keys); })
-      .catch((e) => console.warn("Failed to load keys:", e));
-    fetch("/api/v1/models")
-      .then(r => r.ok ? r.json() : null)
-      .then(d => { if (d?.data) setFilterModels(d.data.map((m: { id: string }) => m.id).sort()); })
-      .catch((e) => console.warn("Failed to load models:", e));
-  }, []);
 
   const { toast: showToast } = useToast();
 

@@ -13,13 +13,11 @@ import { useToast } from "@/contexts/toast-context";
 import { Wallet, Plus, Gift, Loader2, RefreshCw, TrendingUp, Calendar, BarChart3 } from "lucide-react";
 import { useState, useMemo } from "react";
 import useSWR from "swr";
-import dynamic from "next/dynamic";
 import { useTheme } from "@/contexts/theme-context";
 import { DeltaBadge } from "@/components/shared/delta-badge";
 import { ChartErrorBoundary } from "@/components/shared/chart-error-boundary";
 import { dashboardSWRConfig } from "@/lib/swr-fetcher";
-
-const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false });
+import ReactECharts from "@/components/shared/lazy-echarts";
 
 interface UsageAggregate {
   total_cost: number;
