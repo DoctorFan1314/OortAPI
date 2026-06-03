@@ -6,6 +6,54 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [v3.3.5.1] — 2026-06-03
+
+### Logo Library & Model Cards
+
+#### Logo Library Page (New)
+- **Full icon library** — 871 SVG + 727 PNG Light + 727 PNG Dark = 2325 files, 311 unique icons from @lobehub/icons
+- **Format switching** — Preview dialog supports SVG / PNG Light / PNG Dark with left variant tabs
+- **Category filter** — All / LLM / Image & Video / Cloud / Agent & Tools / Infrastructure
+- **Search & favorites** — Search by icon ID, star favorites with localStorage persistence
+- **Manifest-based loading** — Auto-generated manifest.json for instant page load
+- **Dark mode** — Mono SVG icons auto-inverted in dark theme
+
+#### Model Cards (Improved)
+- **Provider logos** — 40px rounded container with 28px provider logo next to model name
+- **Admin-configurable logos** — Logo picker dialog with search, admins can set custom logo per model
+- **logo_id field** — New database column for per-model logo override
+- **Vertical centering** — Logo and model name properly aligned
+
+### Bug Fixes (32+)
+- **Security: API Key prefix auth bypass** — Removed 10-char LIKE fallback
+- **Security: Registration stores hashed key** — Now stores masked key + hash
+- **Security: SSRF protection** — Playground fetch blocks internal network addresses
+- **Security: Password reset invalidates sessions** — token_version incremented on reset
+- **Security: Webhook URL validation** — Rejects internal network URLs
+- **Billing: Stream path cost not zeroed** — Credit users now correctly show 0 cost
+- **Billing: Timezone sign inversion** — Fixed +480 → -480 for UTC+8
+- **Billing: Daily trend timezone** — GROUP BY now uses timezone offset
+- **Billing: Credit user detection** — From summary.total_credits_used instead of log entries
+- **UX: Navigation progress reaches 100%** — Now animates to 100% before hiding
+- **UX: Scroll-to-top above mobile nav** — Changed to bottom-20 on mobile
+- **UX: Feedback prompt state reset** — Resets on navigation between docs pages
+- **UX: Playground clear only current session** — No longer deletes all sessions
+- **UX: Playground quote message sent to LLM** — Now included in message array
+- **UX: Playground image error handling** — Added onerror handler
+
+### Performance
+- **Channel latency cache** — 30-second TTL cache for channel health stats
+- **Monitor percentile** — Single-pass window function instead of O(n) OFFSET
+- **Prompt cache cleanup** — Deterministic 5-minute timer instead of probabilistic
+
+### i18n
+- **500+ inline ternaries migrated** — Dashboard components now use centralized dictionary
+- **Error boundary i18n** — Labels prop for title/description/retry
+- **Confirm dialog i18n** — Defaults from dictionary
+- **Notification bell** — Uses dictionary keys for filter tabs
+
+---
+
 ## [v3.3.5.0] — 2026-06-02
 
 ### Bug Audit Round 3: 35 More Bugs Fixed
