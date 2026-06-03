@@ -1,16 +1,21 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useI18n } from "@/contexts/i18n-context";
 import { useTheme } from "@/contexts/theme-context";
 import { cn } from "@/lib/utils";
-import { Search, Download, Copy, Check, X, Palette, Sun, Moon } from "lucide-react";
-import { PROVIDER_GROUPS, getAllProviders, getProviderLogo, type ProviderGroupKey, type ProviderInfo } from "@/lib/provider-logos";
+import { Search, Download, Copy, Check, X, Palette, Sun, Moon, Image as ImageIcon } from "lucide-react";
 
-const GROUP_KEYS: ProviderGroupKey[] = ["ai", "cloud", "tool"];
+// All available variant suffixes in lobehub icons
+const VARIANT_SUFFIXES = ["-color", "-text", "-text-cn", "-brand", "-brand-color", ""];
+
+interface LogoEntry {
+  id: string;           // base ID, e.g. "openai"
+  variants: string[];   // available variant suffixes, e.g. ["", "-color", "-text"]
+}
 
 export default function LogoManagePage() {
   const { t, lang } = useI18n();
@@ -18,27 +23,112 @@ export default function LogoManagePage() {
   const L = t.dashboard;
 
   const [search, setSearch] = useState("");
-  const [groupFilter, setGroupFilter] = useState<"all" | ProviderGroupKey>("all");
-  const [selectedLogo, setSelectedLogo] = useState<ProviderInfo | null>(null);
-  const [previewVariant, setPreviewVariant] = useState<"color" | "mono">("color");
+  const [selectedLogo, setSelectedLogo] = useState<LogoEntry | null>(null);
+  const [selectedVariant, setSelectedVariant] = useState("");
   const [copied, setCopied] = useState(false);
+  const [allLogos, setAllLogos] = useState<LogoEntry[]>([]);
 
-  const allProviders = useMemo(() => getAllProviders(), []);
+  // Discover all logos from public/providers/
+  useEffect(() => {
+    fetch("/api/docs/openapi.json")
+      .catch(() => {});
+
+    // Scan the providers directory by trying known patterns
+    const discovered: Map<string, string[]> = new Map();
+
+    // We'll check the manifest file if it exists, otherwise use a known list
+    const knownProviders = [
+      "ace", "adobe", "adobefirefly", "agentvoice", "agui", "ai2", "ai21", "ai302", "ai360",
+      "aihubmix", "aimass", "aionlabs", "airjelly", "aistudio", "akashchat", "alephalpha",
+      "alibaba", "alibabacloud", "amp", "antgroup", "anthropic", "antigravity", "anyscale",
+      "apertis", "apple", "arcee", "askverdict", "assemblyai", "atlascloud", "automatic",
+      "aws", "aya", "azure", "azureai", "baai", "baichuan", "baidu", "baiducloud", "bailian",
+      "baseten", "bedrock", "bfl", "bilibili", "bilibiliindex", "bing", "briaai", "burncloud",
+      "bytedance", "capcut", "centml", "cerebras", "chatglm", "cherrystudio", "civitai",
+      "claude", "claudecode", "cline", "clipdrop", "cloudflare", "codebuddy", "codeflicker",
+      "codegeex", "codex", "cogvideo", "cogview", "cohere", "colab", "cometapi", "comfyui",
+      "commanda", "copilot", "copilotkit", "coqui", "coze", "crewai", "crusoe", "cursor",
+      "cybercut", "dalle", "dbrx", "deepai", "deepcogito", "deepinfra", "deepl", "deepmind",
+      "deepseek", "devin", "dify", "doc2x", "docsearch", "dolphin", "doubao", "dreammachine",
+      "elevenlabs", "elevenx", "essentialai", "exa", "fal", "fastgpt", "featherless", "figma",
+      "fireworks", "fishaudio", "flora", "flowith", "flux", "friendli", "gemini", "geminicli",
+      "gemma", "giteeai", "github", "githubcopilot", "glama", "glif", "glmv", "google",
+      "googlecloud", "goose", "gradio", "greptile", "grok", "groq", "hailuo", "haiper",
+      "hedra", "hermesagent", "higress", "huawei", "huaweicloud", "huggingface", "hunyuan",
+      "hyperbolic", "ibm", "ideogram", "iflytekcloud", "inception", "inference", "infermatic",
+      "infinigence", "inflection", "internlm", "jimeng", "jina", "junie", "kilocode", "kimi",
+      "kiro", "kling", "kluster", "kolors", "krea", "kwaikat", "kwaipilot", "lambda",
+      "langchain", "langfuse", "langgraph", "langsmith", "leptonai", "lg", "lightricks",
+      "liquid", "livekit", "llamaindex", "llava", "llmapi", "lmstudio", "lobehub", "longcat",
+      "lovable", "lovart", "luma", "magic", "make", "manus", "mastra", "mcp", "mcpso",
+      "menlo", "meshy", "meta", "metaai", "metagpt", "microsoft", "midjourney", "minimax",
+      "mistral", "modelscope", "monica", "moonshot", "morph", "moxt", "myshell", "n8n",
+      "nanobanana", "nebius", "newapi", "notebooklm", "notion", "nousresearch", "nova",
+      "novelai", "novita", "nplcloud", "nvidia", "obsidian", "ollama", "openchat", "openclaw",
+      "opencode", "openhands", "openhuman", "openrouter", "openwebui", "palm", "parasail",
+      "perplexity", "phidata", "phind", "pika", "pixverse", "player2", "poe", "pollinations",
+      "ppio", "prunaai", "pydanticai", "qingyan", "qiniu", "qoder", "qwen", "railway",
+      "recraft", "relace", "replicate", "replit", "reve", "roocode", "rsshub", "runway",
+      "rwkv", "sambanova", "search1api", "searchapi", "sensenova", "siliconcloud",
+      "sillytavern", "skywork", "slock", "smithery", "snowflake", "sophnet", "sora", "spark",
+      "speedai", "stability", "statecloud", "stepfun", "straico", "streamlake", "submodel",
+      "suno", "sync", "targon", "tavily", "tencent", "tencentcloud", "tiangong", "tii",
+      "togetherai", "topazlabs", "trae", "tripo", "turix", "udio", "unstructured", "upstage",
+      "v0", "vectorizerai", "venice", "vercel", "vertexai", "vidu", "viggle", "vllm",
+      "volcengine", "voyage", "wenxin", "windsurf", "workersai", "worldrouter", "xai",
+      "xiaomimimo", "xinference", "xpay", "xuanyuan", "yandex", "yi", "youmind", "yuanbao",
+      "zai", "zapier", "zeabur", "zencoder", "zenmux", "zeroone", "zhipu"
+    ];
+
+    // For each provider, discover which variants exist
+    const checkVariant = (id: string, suffix: string): Promise<boolean> => {
+      return new Promise((resolve) => {
+        const img = new window.Image();
+        img.onload = () => resolve(true);
+        img.onerror = () => resolve(false);
+        img.src = `/providers/${id}${suffix}.svg`;
+      });
+    };
+
+    const discoverAll = async () => {
+      const results: LogoEntry[] = [];
+      for (const id of knownProviders) {
+        const variants: string[] = [];
+        for (const suffix of VARIANT_SUFFIXES) {
+          const exists = await checkVariant(id, suffix);
+          if (exists) variants.push(suffix);
+        }
+        if (variants.length > 0) {
+          results.push({ id, variants });
+        }
+      }
+      setAllLogos(results);
+    };
+
+    discoverAll();
+  }, []);
 
   const filtered = useMemo(() => {
-    return allProviders.filter((p) => {
-      const matchesSearch = !search ||
-        p.name.toLowerCase().includes(search.toLowerCase()) ||
-        p.nameZh.includes(search) ||
-        p.id.toLowerCase().includes(search.toLowerCase());
-      const matchesGroup = groupFilter === "all" || p.group === groupFilter;
-      return matchesSearch && matchesGroup;
-    });
-  }, [allProviders, search, groupFilter]);
+    if (!search) return allLogos;
+    const q = search.toLowerCase();
+    return allLogos.filter((l) => l.id.toLowerCase().includes(q));
+  }, [allLogos, search]);
 
-  const handleCopySvg = async (id: string) => {
+  const getSrc = (id: string, suffix: string) => `/providers/${id}${suffix}.svg`;
+
+  const getVariantLabel = (suffix: string) => {
+    if (suffix === "") return lang === "zh" ? "标准" : "Standard";
+    if (suffix === "-color") return lang === "zh" ? "彩色" : "Color";
+    if (suffix === "-text") return lang === "zh" ? "文字" : "Text";
+    if (suffix === "-text-cn") return lang === "zh" ? "中文文字" : "Text (CN)";
+    if (suffix === "-brand") return lang === "zh" ? "品牌" : "Brand";
+    if (suffix === "-brand-color") return lang === "zh" ? "品牌彩色" : "Brand Color";
+    return suffix;
+  };
+
+  const handleCopySvg = async (id: string, suffix: string) => {
     try {
-      const res = await fetch(getProviderLogo(id, previewVariant));
+      const res = await fetch(getSrc(id, suffix));
       const svg = await res.text();
       await navigator.clipboard.writeText(svg);
       setCopied(true);
@@ -46,25 +136,18 @@ export default function LogoManagePage() {
     } catch { /* ignore */ }
   };
 
-  const handleDownload = async (id: string) => {
+  const handleDownload = async (id: string, suffix: string) => {
     try {
-      const res = await fetch(getProviderLogo(id, previewVariant));
+      const res = await fetch(getSrc(id, suffix));
       const svg = await res.text();
       const blob = new Blob([svg], { type: "image/svg+xml" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${id}-${previewVariant}.svg`;
+      a.download = `${id}${suffix}.svg`;
       a.click();
       URL.revokeObjectURL(url);
     } catch { /* ignore */ }
-  };
-
-  const groupLabels: Record<string, string> = {
-    all: L.logoAll,
-    ai: L.logoAiModels,
-    cloud: L.logoCloud,
-    tool: L.logoTools,
   };
 
   return (
@@ -77,7 +160,9 @@ export default function LogoManagePage() {
             {L.logoManage}
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            {L.logoCount.replace("{count}", String(filtered.length))}
+            {allLogos.length > 0
+              ? `${allLogos.length} ${lang === "zh" ? "个供应商" : "providers"} · ${allLogos.reduce((s, l) => s + l.variants.length, 0)} ${lang === "zh" ? "个图标" : "icons"}`
+              : lang === "zh" ? "加载中..." : "Loading..."}
           </p>
         </div>
         <div className="relative max-w-xs w-full">
@@ -91,53 +176,34 @@ export default function LogoManagePage() {
         </div>
       </div>
 
-      {/* Group filter */}
-      <div className="flex gap-1.5 flex-wrap">
-        {(["all", ...GROUP_KEYS] as const).map((key) => (
-          <button
-            key={key}
-            onClick={() => setGroupFilter(key)}
-            className={cn(
-              "px-3 py-1.5 rounded-lg text-xs font-medium transition-all border",
-              groupFilter === key
-                ? "bg-primary/10 text-primary border-primary/30"
-                : "bg-transparent text-muted-foreground border-border hover:text-foreground hover:border-foreground/20"
-            )}
-          >
-            {groupLabels[key]}
-          </button>
-        ))}
-      </div>
-
       {/* Logo Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3">
-        {filtered.map((p) => (
-          <button
-            key={p.id}
-            onClick={() => { setSelectedLogo(p); setPreviewVariant("color"); setCopied(false); }}
-            className="group flex flex-col items-center gap-2 p-3 rounded-xl border border-border/50 bg-card hover:bg-muted/50 hover:border-primary/30 transition-all cursor-pointer"
-          >
-            <div className="w-10 h-10 flex items-center justify-center">
-              <img
-                src={getProviderLogo(p.id, "color")}
-                alt={p.name}
-                className="w-10 h-10 object-contain"
-                loading="lazy"
-                onError={(e) => {
-                  // Fallback to mono
-                  const target = e.target as HTMLImageElement;
-                  target.src = getProviderLogo(p.id, "mono");
-                }}
-              />
-            </div>
-            <span className="text-[10px] text-muted-foreground group-hover:text-foreground transition-colors text-center leading-tight truncate w-full">
-              {lang === "zh" ? p.nameZh : p.name}
-            </span>
-          </button>
-        ))}
+        {filtered.map((logo) => {
+          // Prefer color variant, fallback to mono
+          const displaySuffix = logo.variants.includes("-color") ? "-color" : logo.variants[0];
+          return (
+            <button
+              key={logo.id}
+              onClick={() => { setSelectedLogo(logo); setSelectedVariant(displaySuffix); setCopied(false); }}
+              className="group flex flex-col items-center gap-2 p-3 rounded-xl border border-border/50 bg-card hover:bg-muted/50 hover:border-primary/30 transition-all cursor-pointer"
+            >
+              <div className="w-10 h-10 flex items-center justify-center">
+                <img
+                  src={getSrc(logo.id, displaySuffix)}
+                  alt={logo.id}
+                  className="w-10 h-10 object-contain"
+                  loading="lazy"
+                />
+              </div>
+              <span className="text-[10px] text-muted-foreground group-hover:text-foreground transition-colors text-center leading-tight truncate w-full">
+                {logo.id}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
-      {filtered.length === 0 && (
+      {allLogos.length > 0 && filtered.length === 0 && (
         <div className="text-center py-20 text-muted-foreground">
           <Palette className="h-12 w-12 mx-auto mb-4 opacity-30" />
           <p>{lang === "zh" ? "未找到匹配的 Logo" : "No matching logos found"}</p>
@@ -151,62 +217,59 @@ export default function LogoManagePage() {
           onClick={() => setSelectedLogo(null)}
         >
           <div
-            className="bg-card border border-border rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden"
+            className="bg-card border border-border rounded-2xl shadow-2xl max-w-lg w-full mx-4 overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-              <h3 className="font-semibold">{selectedLogo.name}</h3>
+              <h3 className="font-semibold font-mono">{selectedLogo.id}</h3>
               <button onClick={() => setSelectedLogo(null)} className="text-muted-foreground hover:text-foreground">
                 <X className="h-5 w-5" />
               </button>
             </div>
 
-            {/* Preview */}
-            <div className="p-6 space-y-4">
-              {/* Variant toggle */}
-              <div className="flex gap-1 bg-muted rounded-lg p-0.5 text-xs font-medium">
-                <button
-                  onClick={() => setPreviewVariant("color")}
-                  className={cn(
-                    "flex-1 px-3 py-1.5 rounded-md transition-all",
-                    previewVariant === "color" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
-                  )}
-                >
-                  {L.logoColor}
-                </button>
-                <button
-                  onClick={() => setPreviewVariant("mono")}
-                  className={cn(
-                    "flex-1 px-3 py-1.5 rounded-md transition-all",
-                    previewVariant === "mono" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
-                  )}
-                >
-                  {L.logoMono}
-                </button>
+            {/* Variant selector */}
+            {selectedLogo.variants.length > 1 && (
+              <div className="flex gap-1 px-5 pt-4 flex-wrap">
+                {selectedLogo.variants.map((v) => (
+                  <button
+                    key={v}
+                    onClick={() => { setSelectedVariant(v); setCopied(false); }}
+                    className={cn(
+                      "px-2.5 py-1 rounded-md text-xs font-medium transition-all border",
+                      selectedVariant === v
+                        ? "bg-primary/10 text-primary border-primary/30"
+                        : "bg-transparent text-muted-foreground border-border hover:text-foreground"
+                    )}
+                  >
+                    {getVariantLabel(v)}
+                  </button>
+                ))}
               </div>
+            )}
 
-              {/* Preview cards */}
+            {/* Preview */}
+            <div className="p-6">
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col items-center gap-2 p-4 rounded-xl bg-white border border-border">
-                  <img src={getProviderLogo(selectedLogo.id, previewVariant)} alt={selectedLogo.name} className="w-16 h-16 object-contain" />
+                  <img src={getSrc(selectedLogo.id, selectedVariant)} alt={selectedLogo.id} className="w-16 h-16 object-contain" />
                   <span className="text-[10px] text-gray-500 flex items-center gap-1"><Sun className="h-3 w-3" /> Light</span>
                 </div>
                 <div className="flex flex-col items-center gap-2 p-4 rounded-xl bg-gray-900 border border-gray-700">
                   <img
-                    src={getProviderLogo(selectedLogo.id, previewVariant)}
-                    alt={selectedLogo.name}
+                    src={getSrc(selectedLogo.id, selectedVariant)}
+                    alt={selectedLogo.id}
                     className="w-16 h-16 object-contain"
-                    style={previewVariant === "mono" ? { filter: "invert(1)" } : undefined}
+                    style={selectedVariant === "" ? { filter: "invert(1)" } : undefined}
                   />
                   <span className="text-[10px] text-gray-400 flex items-center gap-1"><Moon className="h-3 w-3" /> Dark</span>
                 </div>
               </div>
 
               {/* Info */}
-              <div className="text-xs text-muted-foreground space-y-1">
-                <p>ID: <code className="font-mono bg-muted px-1 rounded">{selectedLogo.id}</code></p>
-                <p>{lang === "zh" ? "路径" : "Path"}: <code className="font-mono bg-muted px-1 rounded">{getProviderLogo(selectedLogo.id, previewVariant)}</code></p>
+              <div className="mt-4 text-xs text-muted-foreground space-y-1">
+                <p>ID: <code className="font-mono bg-muted px-1 rounded">{selectedLogo.id}{selectedVariant}.svg</code></p>
+                <p>{lang === "zh" ? "变体" : "Variants"}: {selectedLogo.variants.length}</p>
               </div>
             </div>
 
@@ -216,7 +279,7 @@ export default function LogoManagePage() {
                 variant="outline"
                 size="sm"
                 className="flex-1"
-                onClick={() => handleCopySvg(selectedLogo.id)}
+                onClick={() => handleCopySvg(selectedLogo.id, selectedVariant)}
               >
                 {copied ? <Check className="h-3.5 w-3.5 mr-1.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5 mr-1.5" />}
                 {copied ? (lang === "zh" ? "已复制" : "Copied!") : L.logoCopySvg}
@@ -224,7 +287,7 @@ export default function LogoManagePage() {
               <Button
                 size="sm"
                 className="flex-1"
-                onClick={() => handleDownload(selectedLogo.id)}
+                onClick={() => handleDownload(selectedLogo.id, selectedVariant)}
               >
                 <Download className="h-3.5 w-3.5 mr-1.5" />
                 {L.logoDownload}

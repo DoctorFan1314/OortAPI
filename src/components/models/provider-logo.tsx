@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 
-// Map provider names to logo file IDs
+// Map provider names to best available logo file ID
 const PROVIDER_ID_MAP: Record<string, string> = {
   openai: "openai",
-  anthropic: "anthropic",
+  anthropic: "claude",
   google: "google",
   deepseek: "deepseek",
   meta: "meta",
@@ -42,14 +42,8 @@ const PROVIDER_ID_MAP: Record<string, string> = {
   alibabacloud: "alibabacloud",
   googlecloud: "googlecloud",
   cloudflare: "cloudflare",
+  gemini: "gemini",
 };
-
-// Providers that only have mono SVGs (no color variant)
-const MONO_ONLY = new Set([
-  "openai", "anthropic", "groq", "xai", "moonshot", "ollama",
-  "lmstudio", "vllm", "nvidia", "vercel", "huawei", "tencent",
-  "baiducloud", "alibabacloud", "googlecloud", "cloudflare",
-]);
 
 interface ProviderLogoProps {
   provider: string;
@@ -58,15 +52,12 @@ interface ProviderLogoProps {
 }
 
 export function ProviderLogo({ provider, size = 16, className = "" }: ProviderLogoProps) {
-  const [errored, setErrored] = useState(false);
+  const [variant, setVariant] = useState<"color" | "mono">("color");
   const providerId = PROVIDER_ID_MAP[provider.toLowerCase()] || provider.toLowerCase();
-  const useMono = MONO_ONLY.has(providerId) || errored;
-  const src = useMono ? `/providers/${providerId}.svg` : `/providers/${providerId}-color.svg`;
 
-  if (errored && !MONO_ONLY.has(providerId)) {
-    // Both color and mono failed, don't render
-    return null;
-  }
+  const src = variant === "color"
+    ? `/providers/${providerId}-color.svg`
+    : `/providers/${providerId}.svg`;
 
   return (
     <img
@@ -77,11 +68,8 @@ export function ProviderLogo({ provider, size = 16, className = "" }: ProviderLo
       className={`inline-block shrink-0 ${className}`}
       loading="lazy"
       onError={() => {
-        if (!useMono) {
-          setErrored(true);
-        }
+        if (variant === "color") setVariant("mono");
       }}
-      style={useMono ? { filter: "brightness(0) invert(0.5)" } : undefined}
     />
   );
 }
