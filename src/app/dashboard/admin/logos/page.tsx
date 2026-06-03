@@ -6,14 +6,13 @@ import { Input } from "@/components/ui/input";
 import { useI18n } from "@/contexts/i18n-context";
 import { useTheme } from "@/contexts/theme-context";
 import { cn } from "@/lib/utils";
-import { Search, Download, Copy, Check, X, Palette, Sun, Moon, Star, Clock, Filter } from "lucide-react";
+import { Search, Download, Copy, Check, X, Palette, Sun, Moon, Star } from "lucide-react";
 
 interface IconEntry {
   id: string;
   variants: string[];
 }
 
-// Category definitions
 const CATEGORIES = [
   { key: "all", zh: "全部", en: "All" },
   { key: "llm", zh: "大语言模型", en: "LLM", ids: ["openai","anthropic","claude","claudecode","google","gemini","geminicli","gemma","deepseek","meta","metaai","mistral","cohere","qwen","alibaba","baidu","bytedance","zhipu","minimax","moonshot","stepfun","baichuan","yi","zeroone","perplexity","groq","xai","grok","doubao","kimi","spark","hunyuan","internlm","chatglm","rwkv","sensenova","skywork","tii","alephalpha","inflection"] },
@@ -24,7 +23,6 @@ const CATEGORIES = [
 ];
 
 const STORAGE_KEY = "oortapi-logo-favorites";
-const RECENT_KEY = "oortapi-logo-recent";
 
 export default function LogoManagePage() {
   const { t, lang } = useI18n();
@@ -35,93 +33,46 @@ export default function LogoManagePage() {
   const [category, setCategory] = useState("all");
   const [selectedIcon, setSelectedIcon] = useState<IconEntry | null>(null);
   const [selectedVariant, setSelectedVariant] = useState("");
-  const [copied, setCopied] = useState(false);
-  const [copiedPath, setCopiedPath] = useState(false);
+  const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
   const [allIcons, setAllIcons] = useState<IconEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
-  const [recentIds, setRecentIds] = useState<string[]>([]);
   const [showFavorites, setShowFavorites] = useState(false);
 
-  // Load manifest + favorites + recent
   useEffect(() => {
-    // Load manifest
     fetch("/providers/manifest.json")
       .then((r) => r.json())
-      .then((data: IconEntry[]) => {
-        setAllIcons(data);
-        setLoading(false);
-      })
+      .then((data: IconEntry[]) => { setAllIcons(data); setLoading(false); })
       .catch(() => setLoading(false));
 
-    // Load favorites from localStorage
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) setFavorites(new Set(JSON.parse(saved)));
     } catch { /* ignore */ }
-
-    // Load recent from localStorage
-    try {
-      const saved = localStorage.getItem(RECENT_KEY);
-      if (saved) setRecentIds(JSON.parse(saved));
-    } catch { /* ignore */ }
   }, []);
 
-  // Save favorites
   const toggleFavorite = useCallback((id: string) => {
     setFavorites(prev => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
+      if (next.has(id)) next.delete(id); else next.add(id);
       localStorage.setItem(STORAGE_KEY, JSON.stringify([...next]));
       return next;
     });
   }, []);
 
-  // Add to recent
-  const addToRecent = useCallback((id: string) => {
-    setRecentIds(prev => {
-      const next = [id, ...prev.filter(r => r !== id)].slice(0, 10);
-      localStorage.setItem(RECENT_KEY, JSON.stringify(next));
-      return next;
-    });
-  }, []);
-
-  // Filter icons
   const filtered = useMemo(() => {
     let result = allIcons;
-
-    // Favorites filter
-    if (showFavorites) {
-      result = result.filter((icon) => favorites.has(icon.id));
-    }
-
-    // Category filter
+    if (showFavorites) result = result.filter(i => favorites.has(i.id));
     if (category !== "all") {
-      const cat = CATEGORIES.find(c => c.key === category);
-      const catIds = new Set(cat?.ids || []);
-      result = result.filter((icon) => catIds.has(icon.id));
+      const catIds = new Set(CATEGORIES.find(c => c.key === category)?.ids || []);
+      result = result.filter(i => catIds.has(i.id));
     }
-
-    // Search filter
     if (search) {
       const q = search.toLowerCase();
-      result = result.filter((icon) =>
-        icon.id.toLowerCase().includes(q) ||
-        icon.variants.some(v => v.includes(q))
-      );
+      result = result.filter(i => i.id.toLowerCase().includes(q) || i.variants.some(v => v.includes(q)));
     }
-
     return result;
   }, [allIcons, search, category, showFavorites, favorites]);
-
-  // Recent icons (shown at top when no search/filter)
-  const recentIcons = useMemo(() => {
-    if (search || category !== "all" || showFavorites) return [];
-    return recentIds
-      .map(id => allIcons.find(i => i.id === id))
-      .filter(Boolean) as IconEntry[];
-  }, [allIcons, recentIds, search, category, showFavorites]);
 
   const getSrc = (id: string, suffix: string) => `/providers/${id}${suffix}.svg`;
 
@@ -138,21 +89,13 @@ export default function LogoManagePage() {
     return l ? (lang === "zh" ? l.zh : l.en) : suffix;
   };
 
-  const handleCopySvg = async (id: string, suffix: string) => {
+  const handleCopy = async (id: string, suffix: string, idx: number) => {
     try {
       const res = await fetch(getSrc(id, suffix));
       const svg = await res.text();
       await navigator.clipboard.writeText(svg);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch { /* ignore */ }
-  };
-
-  const handleCopyPath = async (id: string, suffix: string) => {
-    try {
-      await navigator.clipboard.writeText(`/providers/${id}${suffix}.svg`);
-      setCopiedPath(true);
-      setTimeout(() => setCopiedPath(false), 2000);
+      setCopiedIdx(idx);
+      setTimeout(() => setCopiedIdx(null), 2000);
     } catch { /* ignore */ }
   };
 
@@ -170,61 +113,14 @@ export default function LogoManagePage() {
     } catch { /* ignore */ }
   };
 
-  // Icon card component
-  const IconCard = ({ icon, size = "normal" }: { icon: IconEntry; size?: "normal" | "small" }) => {
-    const displaySuffix = icon.variants.includes("-color") ? "-color" : icon.variants[0];
-    const isFav = favorites.has(icon.id);
-    const isDark = resolvedTheme === "dark";
-    const isMono = displaySuffix === "";
-
-    return (
-      <div
-        role="button"
-        tabIndex={0}
-        onClick={() => { setSelectedIcon(icon); setSelectedVariant(displaySuffix); setCopied(false); addToRecent(icon.id); }}
-        onKeyDown={(e) => { if (e.key === "Enter") { setSelectedIcon(icon); setSelectedVariant(displaySuffix); setCopied(false); addToRecent(icon.id); } }}
-        className={cn(
-          "group relative flex flex-col items-center gap-2 rounded-xl border transition-all cursor-pointer",
-          size === "small" ? "p-2" : "p-3",
-          "border-border/50 bg-card hover:bg-muted/50 hover:border-primary/30 hover:shadow-md"
-        )}
-      >
-        {/* Favorite button */}
-        <button
-          onClick={(e) => { e.stopPropagation(); toggleFavorite(icon.id); }}
-          className={cn(
-            "absolute top-1.5 right-1.5 p-1 rounded-full transition-all opacity-0 group-hover:opacity-100",
-            isFav ? "text-yellow-500 opacity-100" : "text-muted-foreground hover:text-yellow-500"
-          )}
-          title={isFav ? (lang === "zh" ? "取消收藏" : "Unfavorite") : (lang === "zh" ? "收藏" : "Favorite")}
-        >
-          <Star className={cn("h-3.5 w-3.5", isFav && "fill-current")} />
-        </button>
-
-        {/* Icon */}
-        <div className={cn("flex items-center justify-center", size === "small" ? "w-10 h-10" : "w-12 h-12")}>
-          <img
-            src={getSrc(icon.id, displaySuffix)}
-            alt={icon.id}
-            className={cn("object-contain", size === "small" ? "w-10 h-10" : "w-12 h-12")}
-            loading="lazy"
-            style={isMono && isDark ? { filter: "invert(1)" } : undefined}
-          />
-        </div>
-
-        {/* Label */}
-        <span className="text-xs text-foreground/80 group-hover:text-foreground transition-colors text-center leading-tight truncate w-full font-medium">
-          {icon.id}
-        </span>
-
-        {/* Variant count badge */}
-        {icon.variants.length > 1 && (
-          <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
-            {icon.variants.length}
-          </span>
-        )}
-      </div>
-    );
+  // Check if a variant needs invert in dark mode (mono variants have black fill)
+  const needsInvert = (suffix: string) => {
+    // color, text, brand-color variants have their own colors — no invert
+    if (suffix === "-color" || suffix === "-brand-color") return false;
+    // text variants often have colored text — no invert
+    if (suffix === "-text" || suffix === "-text-cn") return false;
+    // mono and brand variants are black — need invert in dark mode
+    return true;
   };
 
   return (
@@ -257,12 +153,7 @@ export default function LogoManagePage() {
           </button>
           <div className="relative w-56">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-            <Input
-              placeholder={L.logoSearch}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 h-9"
-            />
+            <Input placeholder={L.logoSearch} value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 h-9" />
           </div>
         </div>
       </div>
@@ -285,22 +176,7 @@ export default function LogoManagePage() {
         ))}
       </div>
 
-      {/* Recent icons */}
-      {!loading && recentIcons.length > 0 && !search && category === "all" && !showFavorites && (
-        <div>
-          <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
-            <Clock className="h-3 w-3" />
-            {lang === "zh" ? "最近使用" : "Recent"}
-          </h3>
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-2">
-            {recentIcons.map((icon) => (
-              <IconCard key={icon.id} icon={icon} size="small" />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Main Icon Grid */}
+      {/* Grid */}
       {loading ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
           {Array.from({ length: 18 }).map((_, i) => (
@@ -312,24 +188,58 @@ export default function LogoManagePage() {
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-          {filtered.map((icon) => (
-            <IconCard key={icon.id} icon={icon} />
-          ))}
+          {filtered.map((icon) => {
+            const displaySuffix = icon.variants.includes("-color") ? "-color" : icon.variants[0];
+            const isFav = favorites.has(icon.id);
+            const isDark = resolvedTheme === "dark";
+            const invert = isDark && needsInvert(displaySuffix);
+
+            return (
+              <div
+                key={icon.id}
+                role="button"
+                tabIndex={0}
+                onClick={() => { setSelectedIcon(icon); setSelectedVariant(displaySuffix); }}
+                onKeyDown={(e) => { if (e.key === "Enter") { setSelectedIcon(icon); setSelectedVariant(displaySuffix); } }}
+                className="group relative flex flex-col items-center gap-2 p-3 rounded-xl border border-border/50 bg-card hover:bg-muted/50 hover:border-primary/30 hover:shadow-md transition-all cursor-pointer"
+              >
+                <button
+                  onClick={(e) => { e.stopPropagation(); toggleFavorite(icon.id); }}
+                  className={cn(
+                    "absolute top-1.5 right-1.5 p-1 rounded-full transition-all opacity-0 group-hover:opacity-100",
+                    isFav ? "text-yellow-500 opacity-100" : "text-muted-foreground hover:text-yellow-500"
+                  )}
+                >
+                  <Star className={cn("h-3.5 w-3.5", isFav && "fill-current")} />
+                </button>
+                <div className="w-12 h-12 flex items-center justify-center">
+                  <img
+                    src={getSrc(icon.id, displaySuffix)}
+                    alt={icon.id}
+                    className="w-12 h-12 object-contain"
+                    loading="lazy"
+                    style={invert ? { filter: "invert(1)" } : undefined}
+                  />
+                </div>
+                <span className="text-xs text-foreground/80 group-hover:text-foreground transition-colors text-center leading-tight truncate w-full font-medium">
+                  {icon.id}
+                </span>
+                {icon.variants.length > 1 && (
+                  <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
+                    {icon.variants.length}
+                  </span>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
 
-      {/* Empty state */}
       {!loading && filtered.length === 0 && (
         <div className="text-center py-20">
           <Palette className="h-16 w-16 mx-auto mb-4 text-muted-foreground/20" />
-          <p className="text-lg font-medium text-muted-foreground mb-2">
-            {lang === "zh" ? "未找到匹配的图标" : "No matching icons found"}
-          </p>
-          <p className="text-sm text-muted-foreground">
-            {search
-              ? (lang === "zh" ? "尝试其他搜索词" : "Try a different search term")
-              : (lang === "zh" ? "该分类下暂无图标" : "No icons in this category")}
-          </p>
+          <p className="text-lg font-medium text-muted-foreground mb-2">{lang === "zh" ? "未找到匹配的图标" : "No matching icons found"}</p>
+          <p className="text-sm text-muted-foreground">{search ? (lang === "zh" ? "尝试其他搜索词" : "Try a different search term") : (lang === "zh" ? "该分类下暂无图标" : "No icons in this category")}</p>
         </div>
       )}
 
@@ -340,20 +250,14 @@ export default function LogoManagePage() {
           onClick={() => setSelectedIcon(null)}
           onKeyDown={(e) => e.key === "Escape" && setSelectedIcon(null)}
         >
-          <div
-            className="bg-card border border-border rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="bg-card border border-border rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden" onClick={(e) => e.stopPropagation()}>
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-border">
               <div className="flex items-center gap-3">
                 <h3 className="text-lg font-semibold font-mono">{selectedIcon.id}</h3>
                 <button
                   onClick={() => toggleFavorite(selectedIcon.id)}
-                  className={cn(
-                    "p-1 rounded-full transition-all",
-                    favorites.has(selectedIcon.id) ? "text-yellow-500" : "text-muted-foreground hover:text-yellow-500"
-                  )}
+                  className={cn("p-1 rounded-full transition-all", favorites.has(selectedIcon.id) ? "text-yellow-500" : "text-muted-foreground hover:text-yellow-500")}
                 >
                   <Star className={cn("h-4 w-4", favorites.has(selectedIcon.id) && "fill-current")} />
                 </button>
@@ -369,7 +273,7 @@ export default function LogoManagePage() {
                 {selectedIcon.variants.map((v) => (
                   <button
                     key={v}
-                    onClick={() => { setSelectedVariant(v); setCopied(false); }}
+                    onClick={() => { setSelectedVariant(v); setCopiedIdx(null); }}
                     className={cn(
                       "px-3 py-1.5 rounded-lg text-xs font-medium transition-all border",
                       selectedVariant === v
@@ -383,7 +287,7 @@ export default function LogoManagePage() {
               </div>
             )}
 
-            {/* Preview */}
+            {/* Preview — light and dark */}
             <div className="p-6">
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col items-center gap-3 p-6 rounded-xl bg-white border border-border">
@@ -395,7 +299,7 @@ export default function LogoManagePage() {
                     src={getSrc(selectedIcon.id, selectedVariant)}
                     alt={selectedIcon.id}
                     className="w-24 h-24 object-contain"
-                    style={selectedVariant === "" ? { filter: "invert(1)" } : undefined}
+                    style={needsInvert(selectedVariant) ? { filter: "invert(1)" } : undefined}
                   />
                   <span className="text-xs text-gray-400 flex items-center gap-1.5"><Moon className="h-3.5 w-3.5" /> Dark</span>
                 </div>
@@ -405,38 +309,41 @@ export default function LogoManagePage() {
               <div className="mt-4 text-sm text-muted-foreground space-y-1.5">
                 <p>File: <code className="font-mono bg-muted px-1.5 py-0.5 rounded text-xs">{selectedIcon.id}{selectedVariant}.svg</code></p>
                 <p>Path: <code className="font-mono bg-muted px-1.5 py-0.5 rounded text-xs">/providers/{selectedIcon.id}{selectedVariant}.svg</code></p>
-                <p>{lang === "zh" ? "变体" : "Variants"}: {selectedIcon.variants.map(v => <code key={v} className="font-mono bg-muted px-1.5 py-0.5 rounded text-xs ml-1">{v || "(mono)"}</code>)}</p>
-                <p className="text-[11px] text-muted-foreground/60">
-                  {lang === "zh" ? "下载/复制的是原始 SVG 文件。暗色预览仅是浏览器渲染效果。" : "Download/copy is the original SVG file. Dark preview is browser rendering only."}
-                </p>
               </div>
             </div>
 
-            {/* Actions */}
-            <div className="flex gap-3 px-6 py-4 border-t border-border bg-muted/30">
-              <Button
-                variant="outline"
-                className="flex-1"
-                onClick={() => handleCopySvg(selectedIcon.id, selectedVariant)}
-              >
-                {copied ? <Check className="h-4 w-4 mr-2 text-emerald-500" /> : <Copy className="h-4 w-4 mr-2" />}
-                {copied ? (lang === "zh" ? "已复制" : "Copied!") : L.logoCopySvg}
-              </Button>
-              <Button
-                variant="outline"
-                className="flex-1"
-                onClick={() => handleCopyPath(selectedIcon.id, selectedVariant)}
-              >
-                {copiedPath ? <Check className="h-4 w-4 mr-2 text-emerald-500" /> : <Copy className="h-4 w-4 mr-2" />}
-                {copiedPath ? (lang === "zh" ? "已复制" : "Copied!") : (lang === "zh" ? "复制路径" : "Copy Path")}
-              </Button>
-              <Button
-                className="flex-1"
-                onClick={() => handleDownload(selectedIcon.id, selectedVariant)}
-              >
-                <Download className="h-4 w-4 mr-2" />
-                {L.logoDownload}
-              </Button>
+            {/* Per-variant download/copy table */}
+            <div className="px-6 pb-4">
+              <p className="text-xs font-medium text-muted-foreground mb-2">{lang === "zh" ? "下载/复制单个变体" : "Download / Copy individual variant"}</p>
+              <div className="border border-border rounded-lg overflow-hidden">
+                {selectedIcon.variants.map((v, idx) => (
+                  <div key={v} className={cn("flex items-center justify-between px-3 py-2 text-xs", idx > 0 && "border-t border-border/50")}>
+                    <div className="flex items-center gap-2">
+                      <img
+                        src={getSrc(selectedIcon.id, v)}
+                        alt={`${selectedIcon.id}${v}`}
+                        className="w-5 h-5 object-contain"
+                        style={resolvedTheme === "dark" && needsInvert(v) ? { filter: "invert(1)" } : undefined}
+                      />
+                      <span className="font-mono text-foreground/80">{selectedIcon.id}{v}.svg</span>
+                    </div>
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => handleCopy(selectedIcon.id, v, idx)}
+                        className="px-2 py-1 rounded text-[11px] text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                      >
+                        {copiedIdx === idx ? <Check className="h-3 w-3 text-emerald-500" /> : <Copy className="h-3 w-3" />}
+                      </button>
+                      <button
+                        onClick={() => handleDownload(selectedIcon.id, v)}
+                        className="px-2 py-1 rounded text-[11px] text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                      >
+                        <Download className="h-3 w-3" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
