@@ -82,30 +82,30 @@ export function LogTable({
       );
       return (
         <div className="text-xs space-y-3 font-mono">
-          <p className="font-semibold text-sm">{lang === "zh" ? "额度明细" : "Credits Breakdown"}</p>
+          <p className="font-semibold text-sm">{L.creditsBreakdown}</p>
           <div className="text-muted-foreground space-y-0.5">
-            <p>{lang === "zh" ? "Credit 倍率" : "Credit Rate"}: 1 token = {creditRate} credits</p>
+            <p>{L.creditRate}: 1 token = {creditRate} credits</p>
           </div>
           <div className="space-y-1">
             <div className="flex justify-between gap-4">
-              <span className="text-muted-foreground">{lang === "zh" ? "输入(未命中缓存)Tokens" : "Input(non-cached)Tokens"}: {(log.tokens_in - log.tokens_in_cache).toLocaleString()} × {creditRate}</span>
+              <span className="text-muted-foreground">{L.tokensIn}: {(log.tokens_in - log.tokens_in_cache).toLocaleString()} × {creditRate}</span>
               <span>= {((log.tokens_in - log.tokens_in_cache) * creditRate).toLocaleString()} credits</span>
             </div>
             <div className="flex justify-between gap-4">
-              <span className="text-muted-foreground">{lang === "zh" ? "输入(命中缓存)Tokens" : "Input(cache hit)Tokens"}: {log.tokens_in_cache.toLocaleString()} × {creditRate} × {CACHE_DISCOUNT}</span>
+              <span className="text-muted-foreground">{L.tokensInCache}: {log.tokens_in_cache.toLocaleString()} × {creditRate} × {CACHE_DISCOUNT}</span>
               <span>= {(log.tokens_in_cache * creditRate * CACHE_DISCOUNT).toLocaleString()} credits</span>
             </div>
             <div className="flex justify-between gap-4">
-              <span className="text-muted-foreground">{lang === "zh" ? "输出 Tokens" : "Output Tokens"}: {log.tokens_out.toLocaleString()} × {creditRate}</span>
+              <span className="text-muted-foreground">{L.tokensOut}: {log.tokens_out.toLocaleString()} × {creditRate}</span>
               <span>= {(log.tokens_out * creditRate).toLocaleString()} credits</span>
             </div>
           </div>
           <div className="border-t border-border/30 pt-1">
             <div className="flex justify-between gap-4 font-semibold text-sm">
-              <span>{lang === "zh" ? "总计消耗" : "Total Credits Used"}</span>
+              <span>{L.totalCreditsUsed}</span>
               <span className="text-amber-400">{creditsUsed.toLocaleString()} credits</span>
             </div>
-            <p className="text-emerald-500 text-[11px] mt-1">{lang === "zh" ? "套餐用户，不扣余额" : "Subscription user — no balance charged"}</p>
+            <p className="text-emerald-500 text-[11px] mt-1">{L.subscriptionNoCharge}</p>
           </div>
         </div>
       );
@@ -124,10 +124,10 @@ export function LogTable({
       <div className="text-xs space-y-3 font-mono">
         <p className="font-semibold text-sm">{L.costBreakdown}</p>
         <div className="text-muted-foreground space-y-0.5">
-          <p>{lang === "zh" ? "模型费率" : "Model Rates"}{rateSource}:</p>
-          <p className="pl-3">{lang === "zh" ? "输入(未命中缓存)" : "Input(non-cached)"} = {formatRate(inputRate, symbol, exchangeRate)}</p>
-          <p className="pl-3">{lang === "zh" ? "输入(命中缓存)" : "Input(cache hit)"} = {formatRate(cacheRate, symbol, exchangeRate)}</p>
-          <p className="pl-3">{lang === "zh" ? "输出" : "Output"} = {formatRate(outputRate, symbol, exchangeRate)}</p>
+          <p>{L.modelRates}{rateSource}:</p>
+          <p className="pl-3">{L.tokensInputNonCached} = {formatRate(inputRate, symbol, exchangeRate)}</p>
+          <p className="pl-3">{L.tokensCacheHit} = {formatRate(cacheRate, symbol, exchangeRate)}</p>
+          <p className="pl-3">{L.tokensOutput} = {formatRate(outputRate, symbol, exchangeRate)}</p>
         </div>
         <div className="space-y-1">
           {nonCachedIn > 0 && (
@@ -151,12 +151,12 @@ export function LogTable({
         </div>
         <div className="border-t border-border/30 pt-1 space-y-1">
           <div className="flex justify-between gap-4">
-            <span className="text-muted-foreground">{lang === "zh" ? "小计 (base cost)" : "Subtotal (base cost)"}</span>
+            <span className="text-muted-foreground">{L.subtotalBaseCost}</span>
             <span>= {formatCostDisplay(baseCost)}</span>
           </div>
           {mult !== 1.0 && (
             <div className="flex justify-between gap-4">
-              <span className="text-muted-foreground">× {lang === "zh" ? "倍率" : "Multiplier"}: {mult.toFixed(2)}x</span>
+              <span className="text-muted-foreground">× {L.multiplier}: {mult.toFixed(2)}x</span>
               <span></span>
             </div>
           )}
@@ -178,7 +178,7 @@ export function LogTable({
         {error ? (
           <div className="text-center py-8">
             <p className="text-red-500 text-sm mb-2">{error}</p>
-            <button onClick={onRetry} className="text-xs text-primary hover:underline">{lang === "zh" ? "重试" : "Retry"}</button>
+            <button onClick={onRetry} className="text-xs text-primary hover:underline">{L.retry}</button>
           </div>
         ) : loading && logs.length === 0 ? (
           <div className="animate-pulse space-y-2 p-4">
@@ -198,7 +198,7 @@ export function LogTable({
             ))}
           </div>
         ) : logs.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground text-sm">{hasActiveFilters ? (lang === "zh" ? "无匹配记录，请调整筛选条件" : "No matching records. Adjust your filters.") : L.noLogs}</div>
+          <div className="text-center py-8 text-muted-foreground text-sm">{hasActiveFilters ? L.noMatchingRecords : L.noLogs}</div>
         ) : (
           <>
             {loading && logs.length > 0 && <div className="h-1 bg-primary/20 rounded-full overflow-hidden mb-2"><div className="h-full bg-primary animate-pulse rounded-full" style={{ width: "30%" }} /></div>}
@@ -293,7 +293,7 @@ export function LogTable({
                             <div className="flex justify-end mb-2">
                               <button onClick={() => onToggleExpand(log.id)}
                                 className="text-muted-foreground hover:text-foreground p-1 rounded-md hover:bg-muted transition-colors"
-                                aria-label={lang === "zh" ? "关闭" : "Close"}>
+                                aria-label={t.common.close}>
                                 <X className="h-4 w-4" />
                               </button>
                             </div>
@@ -327,7 +327,7 @@ export function LogTable({
               )}
               <span className="text-xs text-muted-foreground mx-1">|</span>
               <label className="flex items-center gap-1 text-xs text-muted-foreground">
-                {lang === "zh" ? "跳转" : "Go to"}
+                {L.goTo}
                 <input type="number" min={1} max={Math.ceil(total / 50) || 1}
                   onKeyDown={e => {
                     if (e.key === "Enter") {

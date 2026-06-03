@@ -111,9 +111,9 @@ function TokenPlanContent() {
         const data = await res.json();
         setSubscriptions(prev => prev.map(s => s.id === cancelTarget ? { ...s, status: "cancelled" as const, auto_renew: 0 } : s));
         if (data.refund > 0) {
-          showToast(lang === "zh" ? "订阅已取消，剩余金额已退还到余额" : "Cancelled. Remaining balance refunded.", "success");
+          showToast(L.subCancelledRefund, "success");
         } else {
-          showToast(lang === "zh" ? "订阅已取消" : "Subscription cancelled", "success");
+          showToast(L.subscriptionCancelled, "success");
         }
       }
     } catch { showToast(L.networkError, "error"); } finally { setActionLoading(null); setCancelTarget(null); }
@@ -249,8 +249,8 @@ function TokenPlanContent() {
             <p className="text-xs text-muted-foreground mb-3">{L.quickStart}</p>
             {apiKeys.length === 0 ? (
               <p className="text-sm text-muted-foreground">
-                {lang === "zh" ? "暂无 API Key，请先创建。" : "No API Key yet. Create one first."}{" "}
-                <Link href="/dashboard/keys" className="text-primary hover:underline">{lang === "zh" ? "前往管理" : "Go to API Keys"}</Link>
+                {L.noApiKeyYet}{" "}
+                <Link href="/dashboard/keys" className="text-primary hover:underline">{L.goToApiKeys}</Link>
               </p>
             ) : (
               <div className="space-y-2">
@@ -330,10 +330,10 @@ function TokenPlanContent() {
       <ConfirmDialog
         open={cancelTarget !== null}
         onOpenChange={(open) => { if (!open) setCancelTarget(null); }}
-        title={lang === "zh" ? "取消订阅" : "Cancel Subscription"}
-        message={lang === "zh" ? "确定要取消订阅吗？当前周期结束后将不再续费，已使用的额度不受影响。" : "Cancel subscription? It remains active until the end of the current period. Used credits are unaffected."}
+        title={L.cancelSubscriptionTitle}
+        message={L.cancelSubMsg}
         onConfirm={confirmCancel}
-        confirmLabel={lang === "zh" ? "确认取消" : "Confirm Cancel"}
+        confirmLabel={L.confirmCancel}
         variant="danger"
         loading={actionLoading !== null}
       />

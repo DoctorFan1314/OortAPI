@@ -109,7 +109,7 @@ export function FilterBar({
             filterTo ? `to=${filterTo}` : '',
             filterKeyId ? `key_id=${filterKeyId}` : '',
           ].filter(Boolean).join('&');
-          showToast(lang === "zh" ? "正在导出..." : "Exporting...", "info");
+          showToast(L.exporting, "info");
           try {
             const res = await fetch(`/api/v1/billing/usage?${params}`, { credentials: "include" });
             if (!res.ok) throw new Error("Export failed");
@@ -122,9 +122,9 @@ export function FilterBar({
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            showToast(lang === "zh" ? "导出成功" : "Exported successfully", "success");
+            showToast(L.exportSuccess, "success");
           } catch {
-            showToast(lang === "zh" ? "导出失败" : "Export failed", "error");
+            showToast(L.exportFailed, "error");
           }
         }}
           className="h-8 px-3 text-xs border border-border/50 rounded-md hover:bg-muted transition-colors flex items-center gap-1.5">

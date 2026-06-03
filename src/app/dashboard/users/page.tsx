@@ -195,7 +195,7 @@ export default function UsersPage() {
 
   async function handleGiftSubscription() {
     if (!editUser || !giftPlanId) return;
-    setConfirmAction({ type: "gift", label: lang === "zh" ? `赠送套餐给 ${editUser.email}？` : `Gift subscription to ${editUser.email}?` });
+    setConfirmAction({ type: "gift", label: L.giftSubscription.replace("{email}", editUser.email) });
   }
 
   async function confirmGiftSubscription() {
@@ -219,7 +219,7 @@ export default function UsersPage() {
 
   async function handleCancelSubscription() {
     if (!editUser?.subscription) return;
-    setConfirmAction({ type: "cancel", label: lang === "zh" ? `取消 ${editUser.email} 的订阅？` : `Cancel subscription for ${editUser.email}?` });
+    setConfirmAction({ type: "cancel", label: L.cancelSubFor.replace("{email}", editUser.email) });
   }
 
   async function confirmCancelSubscription() {
@@ -243,7 +243,7 @@ export default function UsersPage() {
 
   async function handleAddCredits() {
     if (!editUser?.subscription || !giftCredits) return;
-    setConfirmAction({ type: "credits", label: lang === "zh" ? `为 ${editUser.email} 添加 ${giftCredits} credits？` : `Add ${giftCredits} credits to ${editUser.email}?` });
+    setConfirmAction({ type: "credits", label: L.addCreditsTo.replace("{email}", editUser.email).replace("{count}", giftCredits) });
   }
 
   async function confirmAddCredits() {
@@ -296,7 +296,7 @@ export default function UsersPage() {
       if (action === "grant") {
         const amt = parseFloat(batchGrantAmount);
         if (!amt || amt <= 0) {
-          showToast(lang === "zh" ? "请输入有效金额" : "Enter a valid amount", "error");
+          showToast(L.enterValidAmount, "error");
           setBatchLoading(false);
           return;
         }
@@ -424,8 +424,8 @@ export default function UsersPage() {
           ) : fetchError ? (
             <div className="text-center py-12">
               <AlertTriangle className="h-8 w-8 text-destructive/40 mx-auto mb-2" />
-              <p className="text-sm text-muted-foreground mb-2">{lang === "zh" ? "加载失败" : "Failed to load"}</p>
-              <Button variant="outline" size="sm" onClick={() => mutate()}>{lang === "zh" ? "重试" : "Retry"}</Button>
+              <p className="text-sm text-muted-foreground mb-2">{L.failedToLoad}</p>
+              <Button variant="outline" size="sm" onClick={() => mutate()}>{L.retry}</Button>
             </div>
           ) : users.length === 0 ? (
             <div className="text-center py-12">
@@ -443,7 +443,7 @@ export default function UsersPage() {
                     <th scope="col" className="text-left py-3 px-4 text-muted-foreground font-medium">{L.email}</th>
                     <th scope="col" className="text-left py-3 px-4 text-muted-foreground font-medium hidden md:table-cell">{L.username}</th>
                     <th scope="col" className="text-center py-3 px-4 text-muted-foreground font-medium">{L.role}</th>
-                    <th scope="col" className="text-center py-3 px-4 text-muted-foreground font-medium hidden lg:table-cell">{lang === "zh" ? "订阅" : "Plan"}</th>
+                    <th scope="col" className="text-center py-3 px-4 text-muted-foreground font-medium hidden lg:table-cell">{L.subscription}</th>
                     <th scope="col" className="text-right py-3 px-4 text-muted-foreground font-medium">{L.balance}</th>
                     <th scope="col" className="text-center py-3 px-4 text-muted-foreground font-medium">{L.status}</th>
                     <th scope="col" className="text-right py-3 px-4 text-muted-foreground font-medium hidden lg:table-cell">{L.registered}</th>
@@ -484,7 +484,7 @@ export default function UsersPage() {
                       <td className="py-3 px-4 text-right text-xs text-muted-foreground hidden lg:table-cell">{new Date(u.created_at + "Z").toLocaleDateString()}</td>
                       <td className="py-3 px-4 text-right">
                         <div className="flex justify-end gap-1">
-                          <Link href={`/dashboard/users/${u.id}`} className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors" title={lang === "zh" ? "查看详情" : "View details"} aria-label={lang === "zh" ? "查看详情" : "View details"}>
+                          <Link href={`/dashboard/users/${u.id}`} className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors" title={L.viewDetails} aria-label={L.viewDetails}>
                             <Eye className="h-3.5 w-3.5" />
                           </Link>
                           <button onClick={() => openEdit(u)} className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors" title={L.edit} aria-label={L.edit}>
@@ -508,7 +508,7 @@ export default function UsersPage() {
       {(page > 1 || hasMore) && (
         <div className="flex justify-center gap-2">
           <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage(p => p - 1)}>←</Button>
-          <span className="text-sm text-muted-foreground py-1.5">{lang === "zh" ? `第 ${page} 页` : `Page ${page}`}</span>
+          <span className="text-sm text-muted-foreground py-1.5">{L.pageLabel} {page}</span>
           <Button variant="outline" size="sm" disabled={!hasMore} onClick={() => setPage(p => p + 1)}>→</Button>
         </div>
       )}
@@ -531,27 +531,27 @@ export default function UsersPage() {
                 <div className="h-1.5 bg-muted rounded-full overflow-hidden mb-1">
                   <div className="h-full bg-amber-500 rounded-full" style={{ width: `${editUser.subscription.credits_total > 0 ? ((editUser.subscription.credits_total - editUser.subscription.credits_remaining) / editUser.subscription.credits_total) * 100 : 0}%` }} />
                 </div>
-                <p className="text-[10px] text-muted-foreground mb-2">{lang === "zh" ? "有效期至" : "Valid until"} {new Date(editUser.subscription.current_period_end + "Z").toLocaleDateString()}</p>
+                <p className="text-[10px] text-muted-foreground mb-2">{L.validUntil} {new Date(editUser.subscription.current_period_end + "Z").toLocaleDateString()}</p>
                 <div className="flex items-center gap-2">
-                  <Input type="number" min="0" placeholder={lang === "zh" ? "添加额度" : "Add credits"} value={giftCredits} onChange={e => setGiftCredits(e.target.value)} className="h-8 text-xs bg-secondary border-border" />
+                  <Input type="number" min="0" placeholder={L.addCredits} value={giftCredits} onChange={e => setGiftCredits(e.target.value)} className="h-8 text-xs bg-secondary border-border" />
                   <Button variant="outline" size="sm" className="h-8 text-xs shrink-0" onClick={handleAddCredits} disabled={subActionLoading || !giftCredits}>
-                    {lang === "zh" ? "添加" : "Add"}
+                    {L.addBtn}
                   </Button>
                   <Button variant="outline" size="sm" className="h-8 text-xs text-red-400 hover:text-red-300 shrink-0" onClick={handleCancelSubscription} disabled={subActionLoading}>
-                    {lang === "zh" ? "取消订阅" : "Cancel"}
+                    {L.cancelSub}
                   </Button>
                 </div>
               </div>
             ) : (
               <div className="p-3 rounded-lg bg-muted/50 border border-border">
-                <p className="text-sm text-muted-foreground mb-2">{lang === "zh" ? "该用户暂无订阅" : "No subscription"}</p>
+                <p className="text-sm text-muted-foreground mb-2">{L.noSubscriptionMsg}</p>
                 <div className="flex items-center gap-2">
                   <select className="flex-1 h-8 px-2 rounded-md border border-input bg-background text-xs" value={giftPlanId} onChange={e => setGiftPlanId(+e.target.value)}>
-                    <option value={0}>{lang === "zh" ? "选择套餐" : "Select plan"}</option>
+                    <option value={0}>{L.selectPlan}</option>
                     {plans.map(p => <option key={p.id} value={p.id}>{p.display_name} ({p.monthly_credits.toLocaleString()} credits)</option>)}
                   </select>
                   <Button variant="outline" size="sm" className="h-8 text-xs shrink-0" onClick={handleGiftSubscription} disabled={subActionLoading || !giftPlanId}>
-                    {lang === "zh" ? "赠送" : "Gift"}
+                    {L.giftBtn}
                   </Button>
                 </div>
               </div>
@@ -631,7 +631,7 @@ export default function UsersPage() {
       <Dialog open={!!confirmAction} onOpenChange={(open) => { if (!open) setConfirmAction(null); }}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
-            <DialogTitle>{lang === "zh" ? "确认操作" : "Confirm Action"}</DialogTitle>
+            <DialogTitle>{L.confirmAction}</DialogTitle>
             <DialogDescription>{confirmAction?.label}</DialogDescription>
           </DialogHeader>
           <div className="flex gap-2 justify-end pt-2">

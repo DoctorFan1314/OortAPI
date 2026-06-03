@@ -43,9 +43,9 @@ export function TrendChart({ trendData, metric, onMetricChange, isCreditsUser }:
             return `${p.axisValue}<br/>${label}${typeof p.value === "number" ? p.value.toLocaleString() : p.value}`;
           }
           let html = `<div style="font-size:12px;font-weight:600;white-space:nowrap">${day.date}</div>`;
-          if (day.tokens_in_noncached > 0) html += `<div style="font-size:11px;white-space:nowrap"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#3b82f6;margin-right:4px"></span>${lang === "zh" ? "输入(未命中缓存)" : "Input(non-cached)"}: ${day.tokens_in_noncached.toLocaleString()}</div>`;
-          if (day.tokens_in_cache > 0) html += `<div style="font-size:11px;white-space:nowrap"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#22c55e;margin-right:4px"></span>${lang === "zh" ? "输入(命中缓存)" : "Input(cache hit)"}: ${day.tokens_in_cache.toLocaleString()}</div>`;
-          if (day.tokens_out > 0) html += `<div style="font-size:11px;white-space:nowrap"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#f97316;margin-right:4px"></span>${lang === "zh" ? "输出" : "Output"}: ${day.tokens_out.toLocaleString()}</div>`;
+          if (day.tokens_in_noncached > 0) html += `<div style="font-size:11px;white-space:nowrap"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#3b82f6;margin-right:4px"></span>${L.tokensInputNonCached}: ${day.tokens_in_noncached.toLocaleString()}</div>`;
+          if (day.tokens_in_cache > 0) html += `<div style="font-size:11px;white-space:nowrap"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#22c55e;margin-right:4px"></span>${L.tokensCacheHit}: ${day.tokens_in_cache.toLocaleString()}</div>`;
+          if (day.tokens_out > 0) html += `<div style="font-size:11px;white-space:nowrap"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#f97316;margin-right:4px"></span>${L.tokensOutput}: ${day.tokens_out.toLocaleString()}</div>`;
           return html;
         },
       },

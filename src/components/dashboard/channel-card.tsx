@@ -29,6 +29,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { useToast } from "@/contexts/toast-context";
+import { useI18n } from "@/contexts/i18n-context";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 
 interface Channel {
@@ -127,6 +128,8 @@ const LABELS = {
     noModels: "无模型数据",
     showRouting: "显示路由",
     hideRouting: "隐藏路由",
+    urlMustStart: "URL 必须以 http:// 或 https:// 开头",
+    commaSeparatedEmptyAll: "逗号分隔，为空则全部",
   },
   en: {
     title: "Channel List",
@@ -196,6 +199,8 @@ const LABELS = {
     noModels: "No model data",
     showRouting: "Show Routing",
     hideRouting: "Hide Routing",
+    urlMustStart: "URL must start with http:// or https://",
+    commaSeparatedEmptyAll: "comma-separated, empty for all",
   },
 };
 
@@ -314,7 +319,7 @@ function ChannelFormFields({
   const [selectedModels, setSelectedModels] = useState<Set<string>>(new Set());
 
   const urlError = form.base_url && !form.base_url.startsWith("http://") && !form.base_url.startsWith("https://")
-    ? (lang === "zh" ? "URL 必须以 http:// 或 https:// 开头" : "URL must start with http:// or https://")
+    ? t.urlMustStart
     : null;
 
   const handleFetchModels = async () => {
@@ -461,7 +466,7 @@ function ChannelFormFields({
       <div>
         <label className="text-xs text-muted-foreground">
           {t.models} (
-          {lang === "zh" ? "逗号分隔，留空支持全部" : "comma separated, empty = all"}
+          {t.commaSeparatedEmptyAll}
           )
         </label>
         <div className="flex gap-2 mt-1">
@@ -560,6 +565,8 @@ function ChannelFormFields({
 
 export function ChannelCard({ lang = "zh" }: { lang?: "zh" | "en" }) {
   const { toast: showToast } = useToast();
+  const { t: dict } = useI18n();
+  const L = dict.dashboard;
   const [channels, setChannels] = useState<Channel[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -624,7 +631,7 @@ export function ChannelCard({ lang = "zh" }: { lang?: "zh" | "en" }) {
 
   const createChannel = async () => {
     if (form.base_url && !form.base_url.startsWith("http://") && !form.base_url.startsWith("https://")) {
-      showToast(lang === "zh" ? "URL 必须以 http:// 或 https:// 开头" : "URL must start with http:// or https://", "error");
+      showToast(L.urlMustStart, "error");
       return;
     }
     try {
@@ -638,12 +645,12 @@ export function ChannelCard({ lang = "zh" }: { lang?: "zh" | "en" }) {
           model_mapping: form.model_mapping,
         }),
       });
-      if (!res.ok) { const d = await res.json().catch(() => ({})); showToast(d.error || (lang === "zh" ? "创建失败" : "Create failed"), "error"); return; }
+      if (!res.ok) { const d = await res.json().catch(() => ({})); showToast(d.error || L.createFailed, "error"); return; }
       setShowForm(false);
       setForm({ ...defaultForm });
       fetchChannels();
-      showToast(lang === "zh" ? "渠道已创建" : "Channel created", "success");
-    } catch { showToast(lang === "zh" ? "网络错误" : "Network error", "error"); }
+      showToast(L.channelCreated, "success");
+    } catch { showToast(L.networkError, "error"); }
   };
 
   const startEdit = (ch: Channel) => {
@@ -663,7 +670,7 @@ export function ChannelCard({ lang = "zh" }: { lang?: "zh" | "en" }) {
   const saveEdit = async () => {
     if (!editingId) return;
     if (editForm.base_url && !editForm.base_url.startsWith("http://") && !editForm.base_url.startsWith("https://")) {
-      showToast(lang === "zh" ? "URL 必须以 http:// 或 https:// 开头" : "URL must start with http:// or https://", "error");
+      showToast(L.urlMustStart, "error");
       return;
     }
     const body: Record<string, unknown> = {
@@ -688,11 +695,11 @@ export function ChannelCard({ lang = "zh" }: { lang?: "zh" | "en" }) {
         credentials: "include",
         body: JSON.stringify(body),
       });
-      if (!res.ok) { const d = await res.json().catch(() => ({})); showToast(d.error || (lang === "zh" ? "保存失败" : "Save failed"), "error"); return; }
+      if (!res.ok) { const d = await res.json().catch(() => ({})); showToast(d.error || L.saveFailed, "error"); return; }
       setEditingId(null);
       fetchChannels();
-      showToast(lang === "zh" ? "已保存" : "Saved", "success");
-    } catch { showToast(lang === "zh" ? "网络错误" : "Network error", "error"); }
+      showToast(L.saved, "success");
+    } catch { showToast(L.networkError, "error"); }
   };
 
   const toggleChannel = async (id: number, enabled: boolean) => {
@@ -703,9 +710,9 @@ export function ChannelCard({ lang = "zh" }: { lang?: "zh" | "en" }) {
         credentials: "include",
         body: JSON.stringify({ id, enabled }),
       });
-      if (!res.ok) { showToast(lang === "zh" ? "更新失败" : "Update failed", "error"); return; }
+      if (!res.ok) { showToast(L.updateFailed, "error"); return; }
       fetchChannels();
-    } catch { showToast(lang === "zh" ? "网络错误" : "Network error", "error"); }
+    } catch { showToast(L.networkError, "error"); }
   };
 
   const deleteChannel = async (id: number) => {
@@ -716,11 +723,11 @@ export function ChannelCard({ lang = "zh" }: { lang?: "zh" | "en" }) {
         credentials: "include",
         body: JSON.stringify({ id }),
       });
-      if (!res.ok) { showToast(lang === "zh" ? "删除失败" : "Delete failed", "error"); return; }
+      if (!res.ok) { showToast(L.deleteFailed, "error"); return; }
       setDeleteTarget(null);
       fetchChannels();
-      showToast(lang === "zh" ? "已删除" : "Deleted", "success");
-    } catch { showToast(lang === "zh" ? "网络错误" : "Network error", "error"); }
+      showToast(L.deletedCh, "success");
+    } catch { showToast(L.networkError, "error"); }
   };
 
   const testConnection = async (id: number) => {
@@ -849,7 +856,7 @@ export function ChannelCard({ lang = "zh" }: { lang?: "zh" | "en" }) {
     setBatchAction(null);
     fetchChannels();
     if (failed > 0) {
-      showToast(`${failed} / ${ids.length} ${lang === "zh" ? "操作失败" : "operations failed"}`, "error");
+      showToast(`${failed} / ${ids.length} ${L.operationFailed}`, "error");
     } else {
       showToast(t.batchSuccess, "success");
     }
@@ -1026,7 +1033,7 @@ export function ChannelCard({ lang = "zh" }: { lang?: "zh" | "en" }) {
                                 <>{" · "}{t.avgLatency}: {healthData[ch.id].avg_latency_24h}ms</>
                               )}
                               {healthData[ch.id].total_cost_24h > 0 && (
-                                <>{" · "}{lang === "zh" ? "费用" : "Cost"}: ${healthData[ch.id].total_cost_24h.toFixed(2)}</>
+                                <>{" · "}{L.costLabel}: ${healthData[ch.id].total_cost_24h.toFixed(2)}</>
                               )}
                             </>
                           )}

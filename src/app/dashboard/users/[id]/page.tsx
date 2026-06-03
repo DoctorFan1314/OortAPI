@@ -134,7 +134,8 @@ const LABELS = {
 };
 
 export default function UserDetailPage() {
-  const { lang } = useI18n();
+  const { lang, t: dict } = useI18n();
+  const L = dict.dashboard;
   const { formatPrice } = useCurrency();
   const { resolvedTheme } = useTheme();
   const t = LABELS[lang];
@@ -220,7 +221,7 @@ export default function UserDetailPage() {
         <Link href={`/dashboard/users`}>
           <Button variant="outline" size="sm">
             <Pencil className="h-3.5 w-3.5 mr-1" />
-            {lang === "zh" ? "编辑" : "Edit"}
+            {L.edit}
           </Button>
         </Link>
       </div>

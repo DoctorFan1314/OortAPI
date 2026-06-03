@@ -3,6 +3,7 @@
 import { Plus, Send, Loader2, Wrench, Image, X, Quote } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
+import { useI18n } from "@/contexts/i18n-context";
 import type { ChatMessage } from "./chat-engine";
 import { flatContent } from "./chat-engine";
 
@@ -62,6 +63,9 @@ export function InputArea({
   onOpenToolManager,
   textareaRef,
 }: InputAreaProps) {
+  const { t: dict } = useI18n();
+  const L = dict.dashboard;
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -72,11 +76,11 @@ export function InputArea({
   const sendDisabled = !message.trim() || !hasModel || !hasKey;
 
   const sendTitle = !hasKey
-    ? (lang === "zh" ? "请先在右侧选择 API Key" : "Please select an API Key in the right panel")
+    ? L.selectKeyHint
     : !hasModel
-      ? (lang === "zh" ? "请先选择模型" : "Please select a model")
+      ? L.selectModelHint
       : !message.trim()
-        ? (lang === "zh" ? "请输入消息" : "Type a message")
+        ? L.typeMessageHint
         : "";
 
   return (

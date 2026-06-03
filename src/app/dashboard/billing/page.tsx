@@ -189,7 +189,7 @@ export default function BillingPage() {
                   onClick={handleRefreshBalance}
                   disabled={refreshingBalance}
                   className="p-1 rounded-md hover:bg-muted transition-colors"
-                  aria-label={lang === "zh" ? "刷新余额" : "Refresh balance"}
+                  aria-label={L.refreshBalance}
                 >
                   {refreshingBalance ? (
                     <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
@@ -208,11 +208,11 @@ export default function BillingPage() {
               <div className="relative" onMouseEnter={() => setShowRedeemTooltip(true)} onMouseLeave={() => setShowRedeemTooltip(false)}>
                 <Button className="gap-2" disabled>
                   <Plus className="h-4 w-4" />
-                  {lang === "zh" ? "即将推出" : "Coming Soon"}
+                  {t.common.comingSoon}
                 </Button>
                 {showRedeemTooltip && (
                   <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg bg-popover border border-border text-xs text-muted-foreground whitespace-nowrap shadow-lg z-10">
-                    {lang === "zh" ? "请使用兑换码充值" : "Please use redeem codes to add balance"}
+                    {L.useRedeemCodes}
                   </div>
                 )}
               </div>
@@ -227,12 +227,12 @@ export default function BillingPage() {
           <CardContent className="p-5">
             <div className="flex items-center gap-2 mb-2">
               <TrendingUp className="h-4 w-4 text-primary" />
-              <span className="text-sm text-muted-foreground">{lang === "zh" ? "本月已消费" : "Month-to-Date Spend"}</span>
+              <span className="text-sm text-muted-foreground">{L.monthToDateSpend}</span>
               {costDelta && <DeltaBadge delta={costDelta} reverse />}
             </div>
             <div className="text-2xl font-bold font-mono">{formatPrice(thisMonthCost)}</div>
             <div className="mt-2 text-xs text-muted-foreground">
-              {lang === "zh" ? `上月 ${formatPrice(lastMonthCost)}` : `Last month ${formatPrice(lastMonthCost)}`}
+              {L.lastMonthSpend.replace("{amount}", formatPrice(lastMonthCost))}
             </div>
           </CardContent>
         </Card>
@@ -240,7 +240,7 @@ export default function BillingPage() {
           <CardContent className="p-5">
             <div className="flex items-center gap-2 mb-2">
               <Calendar className="h-4 w-4 text-blue-500" />
-              <span className="text-sm text-muted-foreground">{lang === "zh" ? "预计月消费" : "Projected Monthly Spend"}</span>
+              <span className="text-sm text-muted-foreground">{L.projectedMonthlySpend}</span>
             </div>
             <div className="text-2xl font-bold font-mono">{formatPrice(projectedCost)}</div>
             <div className="mt-2">
@@ -251,9 +251,7 @@ export default function BillingPage() {
                 />
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                {lang === "zh"
-                  ? `基于 ${daysPassed}/${daysInMonth} 天的消耗速率`
-                  : `Based on ${daysPassed}/${daysInMonth} days consumption rate`}
+                {L.consumptionRate.replace("{days}", String(daysPassed)).replace("{total}", String(daysInMonth))}
               </p>
             </div>
           </CardContent>
@@ -266,11 +264,11 @@ export default function BillingPage() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
-              {lang === "zh" ? "最近 30 天消费趋势" : "30-Day Spending Trend"}
+              {L.spendingTrend30}
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
-            <ChartErrorBoundary title={lang === "zh" ? "消费趋势" : "Spending Trend"}>
+            <ChartErrorBoundary title={L.spendingTrend}>
               <ReactECharts option={trendChartOption} style={{ width: "100%" }} className="min-h-[180px] md:min-h-[220px]" opts={{ renderer: "svg" }} />
             </ChartErrorBoundary>
           </CardContent>
@@ -284,7 +282,7 @@ export default function BillingPage() {
           </CardHeader>
           <CardContent className="flex-1 flex flex-col justify-between gap-3">
             <p className="text-sm text-muted-foreground">{L.freeDesc}</p>
-            <Link href="/token-plan"><Button variant="outline" size="sm" className="w-full">{lang === "zh" ? "查看套餐" : "View Plans"}</Button></Link>
+            <Link href="/token-plan"><Button variant="outline" size="sm" className="w-full">{L.viewPlans}</Button></Link>
           </CardContent>
         </Card>
         <Card className="glass-card border-primary/50 flex flex-col">
@@ -293,7 +291,7 @@ export default function BillingPage() {
           </CardHeader>
           <CardContent className="flex-1 flex flex-col justify-between gap-3">
             <p className="text-sm text-muted-foreground">{L.proDesc}</p>
-            <Link href="/token-plan"><Button size="sm" className="w-full">{lang === "zh" ? "订阅套餐" : "Subscribe"}</Button></Link>
+            <Link href="/token-plan"><Button size="sm" className="w-full">{L.subscribeBtn}</Button></Link>
           </CardContent>
         </Card>
         <Card className="glass-card flex flex-col">
@@ -302,7 +300,7 @@ export default function BillingPage() {
           </CardHeader>
           <CardContent className="flex-1 flex flex-col justify-between gap-3">
             <p className="text-sm text-muted-foreground">{L.enterpriseDesc}</p>
-            <a href="mailto:support@oortapi.com"><Button variant="outline" size="sm" className="w-full">{lang === "zh" ? "联系我们" : "Contact Us"}</Button></a>
+            <a href="mailto:support@oortapi.com"><Button variant="outline" size="sm" className="w-full">{L.contactUs}</Button></a>
           </CardContent>
         </Card>
       </div>
@@ -328,7 +326,7 @@ export default function BillingPage() {
               />
             </div>
             {redeemError && <p className="text-sm text-red-400">{redeemError}</p>}
-            <p className="text-[11px] text-muted-foreground">{lang === "zh" ? "兑换码将自动转换为大写" : "Codes are auto-capitalized"}</p>
+            <p className="text-[11px] text-muted-foreground">{L.codesAutoCap}</p>
             <div className="flex gap-2 justify-end">
               <Button variant="outline" onClick={() => { setRedeemOpen(false); setRedeemCode(""); setRedeemError(""); }}>{L.cancel}</Button>
               <Button onClick={handleRedeem} disabled={redeemLoading || !redeemCode.trim()}>

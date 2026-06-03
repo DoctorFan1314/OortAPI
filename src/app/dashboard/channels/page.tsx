@@ -71,11 +71,11 @@ const LABELS = {
 
 /* ---------- model routing card ---------- */
 
-function ModelRoutingCard({ modelRows, modelSearch, setModelSearch, mapExpanded, setMapExpanded, t, lang }: {
+function ModelRoutingCard({ modelRows, modelSearch, setModelSearch, mapExpanded, setMapExpanded, t, lang, L }: {
   modelRows: { modelId: string; provider: string; channels: { name: string; priority: number; weight: number; status: string }[]; channelCount: number }[];
   modelSearch: string; setModelSearch: (v: string) => void;
   mapExpanded: boolean; setMapExpanded: (v: boolean) => void;
-  t: typeof LABELS.zh; lang: string;
+  t: typeof LABELS.zh; lang: string; L: Record<string, string>;
 }) {
   const visibleRows = mapExpanded ? modelRows : modelRows.slice(0, 12);
   return (
@@ -130,8 +130,8 @@ function ModelRoutingCard({ modelRows, modelSearch, setModelSearch, mapExpanded,
               <button onClick={() => setMapExpanded(!mapExpanded)}
                 className="w-full mt-2 py-1.5 text-xs text-primary hover:underline flex items-center justify-center gap-1">
                 {mapExpanded
-                  ? (lang === "zh" ? "收起" : "Show less")
-                  : (lang === "zh" ? `展开全部 ${modelRows.length} 个模型` : `Show all ${modelRows.length} models`)}
+                  ? L.showLess
+                  : L.showAllModels.replace("{count}", String(modelRows.length))}
                 <ArrowRight className={cn("h-3 w-3 transition-transform", mapExpanded && "rotate-90")} />
               </button>
             )}
@@ -145,7 +145,8 @@ function ModelRoutingCard({ modelRows, modelSearch, setModelSearch, mapExpanded,
 /* ---------- page ---------- */
 
 export default function ChannelsPage() {
-  const { lang } = useI18n();
+  const { lang, t: dict } = useI18n();
+  const L = dict.dashboard;
   const t = LABELS[lang];
   const { resolvedTheme } = useTheme();
   const [modelSearch, setModelSearch] = useState("");
@@ -224,7 +225,7 @@ export default function ChannelsPage() {
       tooltip: {
         trigger: "item" as const,
         formatter: (p: { name: string; value: number; percent: number }) =>
-          `${p.name}<br/>${lang === "zh" ? "调用" : "Calls"}: ${p.value.toLocaleString()} (${p.percent}%)`,
+          `${p.name}<br/>${L.calls}: ${p.value.toLocaleString()} (${p.percent}%)`,
       },
       legend: { show: false },
       series: [{
@@ -262,7 +263,7 @@ export default function ChannelsPage() {
     { icon: <Activity className="h-4 w-4" />, color: "text-amber-500", bg: "bg-amber-500/10", label: t.avgLatency, value: avgLatency !== null ? `${avgLatency}ms` : "—", warn: avgLatency !== null && avgLatency > 1000 },
     { icon: <Activity className="h-4 w-4" />, color: "text-purple-500", bg: "bg-purple-500/10", label: t.totalCalls24h, value: totalCalls.toLocaleString() },
     { icon: <Layers className="h-4 w-4" />, color: "text-emerald-500", bg: "bg-emerald-500/10", label: t.cost24h, value: `$${totalCost.toFixed(2)}` },
-    { icon: <GitBranch className="h-4 w-4" />, color: "text-sky-500", bg: "bg-sky-500/10", label: lang === "zh" ? "路由模型" : "Routed Models", value: String(modelChannelMap.size) },
+    { icon: <GitBranch className="h-4 w-4" />, color: "text-sky-500", bg: "bg-sky-500/10", label: L.routedModels, value: String(modelChannelMap.size) },
   ];
 
   /* ─── render ─── */
@@ -291,8 +292,8 @@ export default function ChannelsPage() {
       ) : healthError ? (
         <Card className="glass-card border-destructive/30"><CardContent className="p-4 text-center">
           <AlertTriangle className="h-5 w-5 text-destructive mx-auto mb-1" />
-          <p className="text-sm text-muted-foreground">{lang === "zh" ? "健康数据加载失败" : "Failed to load health data"}</p>
-          <button onClick={() => refreshHealth()} className="text-xs text-primary hover:underline mt-1">{lang === "zh" ? "重试" : "Retry"}</button>
+          <p className="text-sm text-muted-foreground">{L.failedHealthData}</p>
+          <button onClick={() => refreshHealth()} className="text-xs text-primary hover:underline mt-1">{L.retry}</button>
         </CardContent></Card>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
@@ -341,11 +342,11 @@ export default function ChannelsPage() {
             </Card>
           </div>
           <div className="lg:col-span-3">
-            <ModelRoutingCard modelRows={modelRows} modelSearch={modelSearch} setModelSearch={setModelSearch} mapExpanded={mapExpanded} setMapExpanded={setMapExpanded} t={t} lang={lang} />
+            <ModelRoutingCard modelRows={modelRows} modelSearch={modelSearch} setModelSearch={setModelSearch} mapExpanded={mapExpanded} setMapExpanded={setMapExpanded} t={t} lang={lang} L={L} />
           </div>
         </div>
       ) : (
-        <ModelRoutingCard modelRows={modelRows} modelSearch={modelSearch} setModelSearch={setModelSearch} mapExpanded={mapExpanded} setMapExpanded={setMapExpanded} t={t} lang={lang} />
+        <ModelRoutingCard modelRows={modelRows} modelSearch={modelSearch} setModelSearch={setModelSearch} mapExpanded={mapExpanded} setMapExpanded={setMapExpanded} t={t} lang={lang} L={L} />
       )}
     </div>
   );

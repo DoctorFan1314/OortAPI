@@ -39,7 +39,16 @@
       "Bash(awk '/^  dashboard:/{found=1} found && /^  \\\\};/{found=0} found' src/lib/i18n/types.ts)",
       "Bash(grep -n '    __TRACKED_VAR__:' src/lib/i18n/types.ts)",
       "Bash(awk 'NR>=837 && /^  \\\\};/{print NR; exit}' src/lib/i18n/zh.ts)",
-      "Bash(npx next *)"
+      "Bash(npx next *)",
+      "Bash(awk -F: '$2 > 0')",
+      "Bash(sort -t: -k2 -rn)",
+      "Bash(awk '/dashboard/{s=1} s{print NR\": \"$0; if\\(/^  \\\\}/\\)s=0}' \"c:\\\\Users\\\\zhang\\\\Desktop\\\\test\\\\oortapi\\\\src\\\\lib\\\\i18n\\\\en.ts\")",
+      "Bash(awk 'NR>=370 && /^  \\\\}/ {exit} NR>=370 {print NR\": \"$0}' \"c:\\\\Users\\\\zhang\\\\Desktop\\\\test\\\\oortapi\\\\src\\\\lib\\\\i18n\\\\en.ts\")",
+      "Bash(sort -t: -k2)",
+      "Bash(uniq -f1 -d)",
+      "Bash(awk 'NR>=903 && /^  \\\\}/ {print NR; exit}' \"c:\\\\Users\\\\zhang\\\\Desktop\\\\test\\\\oortapi\\\\src\\\\lib\\\\i18n\\\\en.ts\")",
+      "Bash(awk 'NR>=903 && NR<=1507 {print NR\": \"$0}' \"c:\\\\Users\\\\zhang\\\\Desktop\\\\test\\\\oortapi\\\\src\\\\lib\\\\i18n\\\\en.ts\")",
+      "Bash(awk 'NR>=1370 && NR<=1400' \"c:\\\\Users\\\\zhang\\\\Desktop\\\\test\\\\oortapi\\\\src\\\\lib\\\\i18n\\\\en.ts\")"
     ],
     "additionalDirectories": [
       "C:\\Users\\zhang\\Desktop\\test\\oortapi\\src\\app\\resources\\mcp",

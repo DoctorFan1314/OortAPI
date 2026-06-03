@@ -60,7 +60,7 @@ export default function MultiplierPage() {
       body: JSON.stringify({ model_name: newModel.trim(), multiplier: parseFloat(newMultiplier) || 1.0, enabled: true, description: newDesc || null }),
     }).then(res => { if (!res.ok) throw new Error(); return res.json(); })
       .then(() => { setNewModel(''); setNewMultiplier('1.0'); setNewDesc(''); mutate(); })
-      .catch(() => showToast(lang === "zh" ? "添加失败" : "Failed to add rule", "error"));
+      .catch(() => showToast(L.addFailed, "error"));
   };
 
   const handleDeleteRule = (modelName: string) => {
@@ -76,7 +76,7 @@ export default function MultiplierPage() {
       body: JSON.stringify({ model_name: deleteTarget }),
     }).then(res => { if (!res.ok) throw new Error(); return res.json(); })
       .then(() => { setDeleteTarget(null); mutate(); })
-      .catch(() => { showToast(lang === "zh" ? "删除失败" : "Failed to delete rule", "error"); setDeleteTarget(null); });
+      .catch(() => { showToast(L.deleteFailed, "error"); setDeleteTarget(null); });
   };
 
   const handleToggleRule = async (rule: MultiplierRule) => {
@@ -101,7 +101,7 @@ export default function MultiplierPage() {
         { optimisticData, rollbackOnError: true, revalidate: false },
       );
     } catch {
-      showToast(lang === "zh" ? "更新失败" : "Failed to update rule", "error");
+      showToast(L.updateFailed, "error");
     }
   };
 
@@ -113,7 +113,7 @@ export default function MultiplierPage() {
       body: JSON.stringify({ type: 'time_settings', ...timeSettings }),
     }).then(res => { if (!res.ok) throw new Error(); return res.json(); })
       .then(() => showToast(L.saved, "success"))
-      .catch(() => showToast(lang === "zh" ? "保存失败" : "Failed to save", "error"));
+      .catch(() => showToast(L.saveFailed, "error"));
   };
 
   const toggleRuleSelect = (name: string) => {
@@ -140,7 +140,7 @@ export default function MultiplierPage() {
     setShowBatchDialog(false);
     setSelectedRules(new Set());
     mutate();
-    showToast(lang === "zh" ? "批量更新成功" : "Batch update successful", "success");
+    showToast(L.batchUpdateSuccess, "success");
   };
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -163,7 +163,7 @@ export default function MultiplierPage() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    showToast(lang === "zh" ? "导出成功" : "Export successful", "success");
+    showToast(L.exportSuccess, "success");
   };
 
   const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -174,12 +174,12 @@ export default function MultiplierPage() {
       const text = await file.text();
       const imported = JSON.parse(text) as { model_name: string; multiplier: number; enabled?: boolean; description?: string }[];
       if (!Array.isArray(imported) || imported.length === 0) {
-        showToast(lang === "zh" ? "文件格式无效" : "Invalid file format", "error");
+        showToast(L.invalidFileFormat, "error");
         return;
       }
       const valid = imported.filter(r => r.model_name && typeof r.multiplier === "number");
       if (valid.length === 0) {
-        showToast(lang === "zh" ? "未找到有效规则" : "No valid rules found", "error");
+        showToast(L.noValidRules, "error");
         return;
       }
       const promises = valid.map(r =>
@@ -192,12 +192,9 @@ export default function MultiplierPage() {
       );
       await Promise.all(promises);
       mutate();
-      showToast(
-        lang === "zh" ? `成功导入 ${valid.length} 条规则` : `Imported ${valid.length} rules`,
-        "success"
-      );
+      showToast(L.importResult.replace("{count}", String(valid.length)), "success");
     } catch {
-      showToast(lang === "zh" ? "导入失败：文件解析错误" : "Import failed: parse error", "error");
+      showToast(L.importFailed, "error");
     }
   };
 
@@ -322,11 +319,11 @@ export default function MultiplierPage() {
             <div className="flex items-center gap-2">
               <Button variant="outline" size="sm" onClick={handleExport} className="gap-1.5" disabled={rules.length === 0}>
                 <Download className="h-3.5 w-3.5" />
-                {lang === "zh" ? "导出" : "Export"}
+                {L.export}
               </Button>
               <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} className="gap-1.5">
                 <Upload className="h-3.5 w-3.5" />
-                {lang === "zh" ? "导入" : "Import"}
+                {L.importLabel}
               </Button>
             </div>
           </div>
@@ -357,7 +354,7 @@ export default function MultiplierPage() {
               <Input
                 value={newDesc}
                 onChange={e => setNewDesc(e.target.value)}
-                placeholder={lang === "zh" ? "可选" : "Optional"}
+                placeholder={L.optional}
               />
             </div>
             <Button onClick={handleAddRule} className="gap-1.5" aria-label={L.add}>
@@ -421,7 +418,7 @@ export default function MultiplierPage() {
                           onClick={() => handleToggleRule(rule)}
                           className={`text-xs px-2 py-0.5 rounded-full ${rule.enabled ? "bg-green-500/10 text-green-500" : "bg-muted text-muted-foreground"}`}
                         >
-                          {rule.enabled ? (lang === "zh" ? "是" : "Yes") : (lang === "zh" ? "否" : "No")}
+                          {rule.enabled ? L.yesLabel : L.noLabel}
                         </button>
                       </td>
                       <td className="py-2 px-3 text-center">
@@ -447,9 +444,9 @@ export default function MultiplierPage() {
       <Dialog open={deleteTarget !== null} onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
-            <DialogTitle>{lang === "zh" ? "删除倍率规则" : "Delete Multiplier Rule"}</DialogTitle>
+            <DialogTitle>{L.deleteRuleTitle}</DialogTitle>
             <DialogDescription>
-              {lang === "zh" ? `确定要删除 "${deleteTarget}" 的倍率规则吗？` : `Delete multiplier rule for "${deleteTarget}"?`}
+              {L.deleteRuleMsg.replace("{name}", deleteTarget || "")}
             </DialogDescription>
           </DialogHeader>
           <div className="flex gap-2 justify-end pt-2">

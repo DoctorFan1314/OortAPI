@@ -72,7 +72,8 @@ const TARGET_TYPES = ["user", "channel", "plan", "redeem", "key", "model", "sett
 const ACTION_TYPES = ["create", "update", "delete", "toggle", "adjust", "reset", "import", "export"];
 
 export default function AuditPage() {
-  const { lang } = useI18n();
+  const { lang, t: dict } = useI18n();
+  const L = dict.dashboard;
   const t = LABELS[lang];
   const [page, setPage] = useState(1);
   const [filterAction, setFilterAction] = useState("");
@@ -183,7 +184,7 @@ export default function AuditPage() {
           />
         </div>
         {filterFrom && filterTo && filterFrom > filterTo && (
-          <p className="w-full text-xs text-destructive">{lang === "zh" ? "开始日期不能晚于结束日期" : "Start cannot be after end"}</p>
+          <p className="w-full text-xs text-destructive">{L.startAfterEnd}</p>
         )}
         {(searchQuery || filterAction || filterTarget || filterFrom || filterTo) && (
           <button
@@ -260,7 +261,7 @@ export default function AuditPage() {
           {(page > 1 || hasMore) && (
             <div className="flex items-center justify-between pt-3 border-t border-border/20">
               <span className="text-xs text-muted-foreground">
-                {lang === "zh" ? "第" : "Page"} {page} / {Math.max(1, Math.ceil((data?.total || 0) / 50))} ({t.showing} {logs.length} / {data?.total || 0})
+                {L.pageLabel} {page} / {Math.max(1, Math.ceil((data?.total || 0) / 50))} ({t.showing} {logs.length} / {data?.total || 0})
               </span>
               <div className="flex gap-2">
                 {page > 1 && (

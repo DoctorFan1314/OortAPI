@@ -120,7 +120,7 @@ function PlaygroundContent() {
       ...s,
       activeMcpTools: (s.activeMcpTools ?? []).filter(t => t.function.name !== toolName),
     }));
-    toast(lang === "zh" ? `已移除工具「${toolName}」` : `Removed tool "${toolName}"`, "info");
+    toast(L.removedTool.replace("{name}", toolName), "info");
   }, [updateSession, lang, toast]);
 
   // ── Init ──
@@ -224,14 +224,10 @@ function PlaygroundContent() {
 
     if (item.type === "prompt-template" && item.promptContent) {
       newSession.systemPrompt = item.promptContent;
-      toast(lang === "zh"
-        ? `已加载提示词模板「${item.nameZh}」`
-        : `Loaded prompt template "${item.name}"`, "success");
+      toast(L.loadedPrompt.replace("{name}", lang === "zh" ? item.nameZh : item.name), "success");
     } else if (item.type === "mcp" && item.requiredTools) {
       newSession.activeMcpTools = item.requiredTools;
-      toast(lang === "zh"
-        ? `已成功在云端挂载「${item.nameZh}」MCP 工具集`
-        : `Mounted "${item.name}" MCP toolset in cloud`, "success");
+      toast(L.mountedMcp.replace("{name}", lang === "zh" ? item.nameZh : item.name), "success");
     }
 
     setSessions((prev) => [...prev, newSession]);
@@ -672,7 +668,7 @@ function PlaygroundContent() {
           onSwitchSession={switchSession}
           onDeleteSession={deleteSession}
           newSessionLabel={L.newSession}
-          deleteSessionLabel={lang === "zh" ? "删除会话" : "Delete session"}
+          deleteSessionLabel={L.deleteSession}
         />
 
         {/* Column 2: Chat */}
@@ -686,17 +682,17 @@ function PlaygroundContent() {
             <div className="flex items-center gap-2">
               {chatHistory.length > 0 && (
                 <>
-                  <button onClick={exportConversation} className="flex items-center gap-1 px-2 py-1 rounded-md text-[11px] text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" title={lang === "zh" ? "导出对话" : "Export conversation"}>
+                  <button onClick={exportConversation} className="flex items-center gap-1 px-2 py-1 rounded-md text-[11px] text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" title={L.exportChat}>
                     <Download className="h-3 w-3" />
-                    <span className="hidden sm:inline">{lang === "zh" ? "导出" : "Export"}</span>
+                    <span className="hidden sm:inline">{L.export}</span>
                   </button>
-                  <button onClick={() => setShowClearConfirm(true)} className="flex items-center gap-1 px-2 py-1 rounded-md text-[11px] text-muted-foreground hover:text-red-400 hover:bg-red-500/10 transition-colors" title={lang === "zh" ? "清空对话" : "Clear conversation"}>
+                  <button onClick={() => setShowClearConfirm(true)} className="flex items-center gap-1 px-2 py-1 rounded-md text-[11px] text-muted-foreground hover:text-red-400 hover:bg-red-500/10 transition-colors" title={L.clearConversation}>
                     <Trash2 className="h-3 w-3" />
-                    <span className="hidden sm:inline">{lang === "zh" ? "清空" : "Clear"}</span>
+                    <span className="hidden sm:inline">{L.confirmClear}</span>
                   </button>
-                  <button onClick={() => setShowParamsMobile(true)} className="flex items-center gap-1 px-2 py-1 rounded-md text-[11px] text-muted-foreground hover:text-foreground hover:bg-muted transition-colors lg:hidden" title={lang === "zh" ? "参数设置" : "Parameters"}>
+                  <button onClick={() => setShowParamsMobile(true)} className="flex items-center gap-1 px-2 py-1 rounded-md text-[11px] text-muted-foreground hover:text-foreground hover:bg-muted transition-colors lg:hidden" title={L.parameters}>
                     <SlidersHorizontal className="h-3 w-3" />
-                    <span className="hidden sm:inline">{lang === "zh" ? "参数" : "Params"}</span>
+                    <span className="hidden sm:inline">{L.params}</span>
                   </button>
                 </>
               )}
@@ -753,8 +749,8 @@ function PlaygroundContent() {
           />
           {/* Keyboard shortcut hint */}
           <div className="flex items-center justify-center gap-3 pb-2 text-[10px] text-muted-foreground/50 select-none">
-            <span><kbd className="px-1 py-0.5 rounded border border-border/40 bg-muted/30 font-mono">/</kbd> {lang === "zh" ? "聚焦输入" : "focus input"}</span>
-            <span><kbd className="px-1 py-0.5 rounded border border-border/40 bg-muted/30 font-mono">Esc</kbd> {lang === "zh" ? "聚焦输入" : "focus input"}</span>
+            <span><kbd className="px-1 py-0.5 rounded border border-border/40 bg-muted/30 font-mono">/</kbd> {L.focusInput}</span>
+            <span><kbd className="px-1 py-0.5 rounded border border-border/40 bg-muted/30 font-mono">Esc</kbd> {L.focusInput}</span>
           </div>
         </div>
 
@@ -815,7 +811,7 @@ function PlaygroundContent() {
                 }}
                 className="text-sm font-mono rounded-xl" />
               <p className="text-xs text-muted-foreground">
-                {lang === "zh" ? "联网搜索工具需要。获取免费 Key：tavily.com" : "Required for web search. Get a free key at tavily.com"}
+                {L.tavilyHint}
               </p>
             </div>
 
@@ -894,7 +890,7 @@ function PlaygroundContent() {
           <SheetHeader>
             <SheetTitle className="flex items-center gap-2">
               <SlidersHorizontal className="h-4 w-4" />
-              {lang === "zh" ? "参数设置" : "Parameters"}
+              {L.parameters}
             </SheetTitle>
           </SheetHeader>
           <div className="mt-4 overflow-y-auto flex-1">
@@ -928,10 +924,10 @@ function PlaygroundContent() {
       <ConfirmDialog
         open={showClearConfirm}
         onOpenChange={setShowClearConfirm}
-        title={lang === "zh" ? "清空对话" : "Clear Conversation"}
-        message={lang === "zh" ? "确定要清空当前会话的所有消息吗？此操作不可撤销。" : "Clear all messages in this session? This cannot be undone."}
+        title={L.clearConversation}
+        message={L.clearConfirmMsg}
         onConfirm={handleClear}
-        confirmLabel={lang === "zh" ? "确认清空" : "Clear"}
+        confirmLabel={L.confirmClear}
         variant="danger"
       />
 

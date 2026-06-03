@@ -66,7 +66,8 @@ export default function AdminPlansPage() {
 }
 
 function AdminPlansContent() {
-  const { lang } = useI18n();
+  const { lang, t } = useI18n();
+  const L = t.dashboard;
   const { user } = useAuth();
   const { toast: showToast } = useToast();
   const [plans, setPlans] = useState<Plan[]>([]);
@@ -171,18 +172,18 @@ function AdminPlansContent() {
         method: "PATCH", headers: { "Content-Type": "application/json" },
         credentials: "include", body: JSON.stringify(editPlan),
       });
-      if (res.ok) { setEditPlan(null); await fetchPlans(); showToast(lang === "zh" ? "已保存" : "Saved", "success"); }
-      else { const data = await res.json().catch(() => ({})); showToast(data.error || (lang === "zh" ? "保存失败" : "Save failed"), "error"); }
-    } catch { showToast(lang === "zh" ? "网络错误" : "Network error", "error"); } finally { setEditSaving(false); }
+      if (res.ok) { setEditPlan(null); await fetchPlans(); showToast(L.saved, "success"); }
+      else { const data = await res.json().catch(() => ({})); showToast(data.error || L.saveFailed, "error"); }
+    } catch { showToast(L.networkError, "error"); } finally { setEditSaving(false); }
   }
 
   async function handleDelete() {
     if (!deletePlan) return; setDeleteLoading(true);
     try {
       const res = await fetch(`/api/dashboard/admin/plans?id=${deletePlan.id}`, { method: "DELETE", credentials: "include" });
-      if (res.ok) { setDeletePlan(null); await fetchPlans(); showToast(lang === "zh" ? "已删除" : "Deleted", "success"); }
-      else { showToast(lang === "zh" ? "删除失败" : "Delete failed", "error"); }
-    } catch { showToast(lang === "zh" ? "网络错误" : "Network error", "error"); } finally { setDeleteLoading(false); }
+      if (res.ok) { setDeletePlan(null); await fetchPlans(); showToast(L.deleted, "success"); }
+      else { showToast(L.deleteFailed, "error"); }
+    } catch { showToast(L.networkError, "error"); } finally { setDeleteLoading(false); }
   }
 
   async function handleAddModel() {
@@ -193,8 +194,8 @@ function AdminPlansContent() {
         credentials: "include", body: JSON.stringify({ model_name: newModel.trim() }),
       });
       if (res.ok) { setNewModel(""); await fetchPlanModels(modelDialogPlan.id); }
-      else { showToast(lang === "zh" ? "添加失败" : "Failed to add model", "error"); }
-    } catch { showToast(lang === "zh" ? "网络错误" : "Network error", "error"); } finally { setModelLoading(false); }
+      else { showToast(L.addModelFailed, "error"); }
+    } catch { showToast(L.networkError, "error"); } finally { setModelLoading(false); }
   }
 
   async function handleRemoveModel(modelName: string) {
@@ -202,8 +203,8 @@ function AdminPlansContent() {
     try {
       const res = await fetch(`/api/dashboard/admin/plans/${modelDialogPlan.id}/models?model=${encodeURIComponent(modelName)}`, { method: "DELETE", credentials: "include" });
       if (res.ok) await fetchPlanModels(modelDialogPlan.id);
-      else showToast(lang === "zh" ? "删除失败" : "Failed to remove model", "error");
-    } catch { showToast(lang === "zh" ? "网络错误" : "Network error", "error"); } finally { setModelLoading(false); }
+      else showToast(L.removeModelFailed, "error");
+    } catch { showToast(L.networkError, "error"); } finally { setModelLoading(false); }
   }
 
   async function handleCreate() {
@@ -222,12 +223,12 @@ function AdminPlansContent() {
           max_concurrency: 10, route_priority: "standard", currency: "CNY",
         });
         await fetchPlans();
-        showToast(lang === "zh" ? "套餐已创建" : "Plan created", "success");
+        showToast(L.planCreated, "success");
       } else {
         const data = await res.json().catch(() => ({}));
-        showToast(data.error || (lang === "zh" ? "创建失败" : "Create failed"), "error");
+        showToast(data.error || L.createFailed, "error");
       }
-    } catch { showToast(lang === "zh" ? "网络错误" : "Network error", "error"); } finally { setCreateSaving(false); }
+    } catch { showToast(L.networkError, "error"); } finally { setCreateSaving(false); }
   }
 
   const arpu = totalSubs > 0 ? totalRevenue / totalSubs : 0;
@@ -235,7 +236,7 @@ function AdminPlansContent() {
   if (user?.role !== "admin") {
     return (
       <div className="mx-auto max-w-5xl px-4 py-20 text-center">
-        <p className="text-muted-foreground">{lang === "zh" ? "需要管理员权限" : "Admin access required"}</p>
+        <p className="text-muted-foreground">{L.adminAccessRequired}</p>
       </div>
     );
   }
@@ -246,18 +247,18 @@ function AdminPlansContent() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-xl font-bold text-foreground">
-            {lang === "zh" ? "套餐管理" : "Plan Management"}
+            {L.planManage}
           </h1>
           <p className="text-sm text-muted-foreground">
-            {lang === "zh" ? "管理订阅套餐方案" : "Manage subscription plans"}
+            {L.manageSubPlans}
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Button size="sm" onClick={() => setCreateOpen(true)} disabled={plans.length >= 4}>
             <Plus className="h-4 w-4 mr-1" />
             {plans.length >= 4
-              ? (lang === "zh" ? "最多 4 个套餐" : "Max 4 plans")
-              : (lang === "zh" ? "创建套餐" : "Create Plan")}
+              ? L.maxPlans
+              : L.createPlan}
           </Button>
           <div className="flex items-center gap-1 p-1 bg-muted rounded-full">
             <button
@@ -266,7 +267,7 @@ function AdminPlansContent() {
                 "px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer",
                 displayCurrency === "USD" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
               )}
-              aria-label={lang === "zh" ? "切换为美元显示" : "Switch to USD display"}
+              aria-label={L.switchToUsd}
             >
               $ USD
             </button>
@@ -276,7 +277,7 @@ function AdminPlansContent() {
                 "px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer",
                 displayCurrency === "CNY" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
               )}
-              aria-label={lang === "zh" ? "切换为人民币显示" : "Switch to CNY display"}
+              aria-label={L.switchToCny}
             >
               {"¥"} CNY
             </button>
@@ -293,7 +294,7 @@ function AdminPlansContent() {
                 <Users className="h-4 w-4 text-blue-500" />
               </div>
               <div>
-                <p className="text-[10px] text-muted-foreground">{lang === "zh" ? "活跃订阅" : "Active Subs"}</p>
+                <p className="text-[10px] text-muted-foreground">{L.activeSubs}</p>
                 <p className="text-lg font-bold font-mono">{totalSubs}</p>
               </div>
             </CardContent>
@@ -304,7 +305,7 @@ function AdminPlansContent() {
                 <DollarSign className="h-4 w-4 text-green-500" />
               </div>
               <div>
-                <p className="text-[10px] text-muted-foreground">{lang === "zh" ? "月收入" : "Monthly Revenue"}</p>
+                <p className="text-[10px] text-muted-foreground">{L.monthlyRevenue}</p>
                 <p className="text-lg font-bold font-mono">{fmtDisplay(totalRevenue, "CNY")}</p>
               </div>
             </CardContent>
@@ -315,7 +316,7 @@ function AdminPlansContent() {
                 <TrendingUp className="h-4 w-4 text-violet-500" />
               </div>
               <div>
-                <p className="text-[10px] text-muted-foreground">{lang === "zh" ? "套餐数" : "Plans"}</p>
+                <p className="text-[10px] text-muted-foreground">{L.planCount}</p>
                 <p className="text-lg font-bold font-mono">{plans.length}</p>
               </div>
             </CardContent>
@@ -326,7 +327,7 @@ function AdminPlansContent() {
                 <Crown className="h-4 w-4 text-amber-500" />
               </div>
               <div>
-                <p className="text-[10px] text-muted-foreground">{lang === "zh" ? "平均 ARPU" : "Avg ARPU"}</p>
+                <p className="text-[10px] text-muted-foreground">{L.avgArpu}</p>
                 <p className="text-lg font-bold font-mono">{fmtDisplay(arpu, "CNY")}</p>
               </div>
             </CardContent>
@@ -343,7 +344,7 @@ function AdminPlansContent() {
         </div>
       ) : plans.length === 0 ? (
         <Card><CardContent className="p-10 text-center">
-          <p className="text-muted-foreground">{lang === "zh" ? "暂无套餐" : "No plans"}</p>
+          <p className="text-muted-foreground">{L.noPlans}</p>
         </CardContent></Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -382,7 +383,7 @@ function AdminPlansContent() {
                           <h3 className="text-base font-bold text-foreground">{plan.display_name}</h3>
                           {isPopular && (
                             <span className="text-[10px] px-1.5 py-0.5 rounded font-medium" style={{ backgroundColor: `color-mix(in srgb, ${tier.accent} 15%, transparent)`, color: tier.accent }}>
-                              {lang === "zh" ? "最受欢迎" : "Popular"}
+                              {L.mostPopular}
                             </span>
                           )}
                           {!plan.enabled && (
@@ -397,10 +398,10 @@ function AdminPlansContent() {
                     <div className="text-right">
                       <p className="text-xl font-bold" style={{ color: tier.accent }}>
                         {fmtDisplay(plan.monthly_price, plan.currency)}
-                        <span className="text-xs font-normal text-muted-foreground">{lang === "zh" ? "/月" : "/mo"}</span>
+                        <span className="text-xs font-normal text-muted-foreground">{L.pricePerMonth}</span>
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {fmtDisplay(plan.yearly_price, plan.currency)}{lang === "zh" ? "/年" : "/yr"}
+                        {fmtDisplay(plan.yearly_price, plan.currency)}{L.pricePerYear}
                       </p>
                     </div>
                   </div>
@@ -410,7 +411,7 @@ function AdminPlansContent() {
                     <span className="text-sm font-semibold" style={{ color: tier.accent }}>
                       {plan.monthly_credits.toLocaleString()}
                     </span>
-                    <span className="text-xs text-muted-foreground">Credits / {lang === "zh" ? "月" : "mo"}</span>
+                    <span className="text-xs text-muted-foreground">Credits / {L.monthShort}</span>
                   </div>
 
                   {/* Stats row */}
@@ -419,9 +420,9 @@ function AdminPlansContent() {
                       <div className="flex items-center justify-between text-xs text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <Users className="h-3 w-3" />
-                          {stat.active_subs} {lang === "zh" ? "订阅" : "subs"}
+                          {stat.active_subs} {L.subs}
                         </span>
-                        <span>{lang === "zh" ? "使用率" : "Usage"} {usageRate}%</span>
+                        <span>{L.usageRate} {usageRate}%</span>
                         <span className="flex items-center gap-1">
                           <DollarSign className="h-3 w-3" />
                           {fmtDisplay(stat.monthly_revenue, plan.currency)}
@@ -436,9 +437,9 @@ function AdminPlansContent() {
                   {/* Details grid */}
                   <div className="grid grid-cols-3 gap-2 text-center">
                     {[
-                      { label: lang === "zh" ? "并发" : "Concurrency", value: plan.max_concurrency },
-                      { label: lang === "zh" ? "路由" : "Route", value: ROUTE_LABELS[plan.route_priority]?.[lang] || plan.route_priority },
-                      { label: lang === "zh" ? "支持" : "Support", value: SUPPORT_LABELS[plan.support_level]?.[lang] || plan.support_level },
+                      { label: L.concurrency, value: plan.max_concurrency },
+                      { label: L.route, value: ROUTE_LABELS[plan.route_priority]?.[lang] || plan.route_priority },
+                      { label: L.support, value: SUPPORT_LABELS[plan.support_level]?.[lang] || plan.support_level },
                     ].map(item => (
                       <div key={item.label} className="p-2 rounded-lg bg-muted/30">
                         <p className="text-[10px] text-muted-foreground">{item.label}</p>
@@ -450,12 +451,12 @@ function AdminPlansContent() {
                   {/* Actions */}
                   <div className="flex items-center gap-2">
                     <Button variant="outline" size="sm" className="flex-1" onClick={() => { setModelDialogPlan(plan); setNewModel(""); fetchPlanModels(plan.id); }}>
-                      <LinkIcon className="h-3.5 w-3.5 mr-1" />{lang === "zh" ? "模型" : "Models"}
+                      <LinkIcon className="h-3.5 w-3.5 mr-1" />{L.models}
                     </Button>
                     <Button variant="outline" size="sm" className="flex-1" onClick={() => { setEditPlan({ ...plan }); setEditTab("basic"); }}>
-                      <Pencil className="h-3.5 w-3.5 mr-1" />{lang === "zh" ? "编辑" : "Edit"}
+                      <Pencil className="h-3.5 w-3.5 mr-1" />{L.edit}
                     </Button>
-                    <Button variant="outline" size="sm" className="text-red-400 hover:text-red-300" onClick={() => setDeletePlan(plan)} aria-label={lang === "zh" ? `删除 ${plan.display_name}` : `Delete ${plan.display_name}`}>
+                    <Button variant="outline" size="sm" className="text-red-400 hover:text-red-300" onClick={() => setDeletePlan(plan)} aria-label={L.deletePlanItem.replace("{name}", plan.display_name)}>
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>
                   </div>
@@ -470,53 +471,53 @@ function AdminPlansContent() {
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>{lang === "zh" ? "创建套餐" : "Create Plan"}</DialogTitle>
-            <DialogDescription>{lang === "zh" ? "填写新套餐信息" : "Enter new plan details"}</DialogDescription>
+            <DialogTitle>{L.createPlan}</DialogTitle>
+            <DialogDescription>{L.enterPlanDetails}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm text-muted-foreground mb-1.5 block">{lang === "zh" ? "名称" : "Name"}</label>
+                <label className="text-sm text-muted-foreground mb-1.5 block">{L.planName}</label>
                 <Input value={createForm.name} onChange={e => setCreateForm({ ...createForm, name: e.target.value })} placeholder="spark" className="h-10" autoFocus />
               </div>
               <div>
-                <label className="text-sm text-muted-foreground mb-1.5 block">{lang === "zh" ? "显示名称" : "Display Name"}</label>
+                <label className="text-sm text-muted-foreground mb-1.5 block">{L.displayName}</label>
                 <Input value={createForm.display_name} onChange={e => setCreateForm({ ...createForm, display_name: e.target.value })} placeholder="Lite" className="h-10" />
               </div>
             </div>
             <div>
-              <label className="text-sm text-muted-foreground mb-1.5 block">{lang === "zh" ? "标语" : "Tagline"}</label>
-              <Input value={createForm.tagline} onChange={e => setCreateForm({ ...createForm, tagline: e.target.value })} placeholder={lang === "zh" ? "尝鲜入门" : "Great for getting started"} className="h-10" />
+              <label className="text-sm text-muted-foreground mb-1.5 block">{L.tagline}</label>
+              <Input value={createForm.tagline} onChange={e => setCreateForm({ ...createForm, tagline: e.target.value })} placeholder={L.taglinePlaceholder} className="h-10" />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm text-muted-foreground mb-1.5 block">{lang === "zh" ? "月付价格" : "Monthly Price"}</label>
+                <label className="text-sm text-muted-foreground mb-1.5 block">{L.monthlyPrice}</label>
                 <Input type="number" step="0.01" value={createForm.monthly_price} onChange={e => setCreateForm({ ...createForm, monthly_price: Math.max(0, +e.target.value || 0) })} className="h-10" />
               </div>
               <div>
-                <label className="text-sm text-muted-foreground mb-1.5 block">{lang === "zh" ? "年付价格" : "Yearly Price"}</label>
+                <label className="text-sm text-muted-foreground mb-1.5 block">{L.yearlyPrice}</label>
                 <Input type="number" step="0.01" value={createForm.yearly_price} onChange={e => setCreateForm({ ...createForm, yearly_price: Math.max(0, +e.target.value || 0) })} className="h-10" />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm text-muted-foreground mb-1.5 block">{lang === "zh" ? "月 Credits" : "Monthly Credits"}</label>
+                <label className="text-sm text-muted-foreground mb-1.5 block">{L.monthlyCredits}</label>
                 <Input type="number" value={createForm.monthly_credits} onChange={e => setCreateForm({ ...createForm, monthly_credits: Math.max(0, +e.target.value || 0) })} className="h-10" />
               </div>
               <div>
-                <label className="text-sm text-muted-foreground mb-1.5 block">{lang === "zh" ? "最大并发" : "Max Concurrency"}</label>
+                <label className="text-sm text-muted-foreground mb-1.5 block">{L.maxConcurrency}</label>
                 <Input type="number" value={createForm.max_concurrency} onChange={e => setCreateForm({ ...createForm, max_concurrency: +e.target.value || 10 })} className="h-10" />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm text-muted-foreground mb-1.5 block">{lang === "zh" ? "路由优先级" : "Route Priority"}</label>
+                <label className="text-sm text-muted-foreground mb-1.5 block">{L.routePriority}</label>
                 <select className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm" value={createForm.route_priority} onChange={e => setCreateForm({ ...createForm, route_priority: e.target.value })}>
                   {Object.entries(ROUTE_LABELS).map(([k, v]) => <option key={k} value={k}>{v[lang]}</option>)}
                 </select>
               </div>
               <div>
-                <label className="text-sm text-muted-foreground mb-1.5 block">{lang === "zh" ? "货币" : "Currency"}</label>
+                <label className="text-sm text-muted-foreground mb-1.5 block">{L.currency}</label>
                 <select className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm" value={createForm.currency} onChange={e => setCreateForm({ ...createForm, currency: e.target.value })}>
                   <option value="CNY">CNY (&#165;)</option>
                   <option value="USD">USD ($)</option>
@@ -524,10 +525,10 @@ function AdminPlansContent() {
               </div>
             </div>
             <div className="flex justify-end gap-2 pt-2">
-              <Button variant="outline" onClick={() => setCreateOpen(false)}>{lang === "zh" ? "取消" : "Cancel"}</Button>
+              <Button variant="outline" onClick={() => setCreateOpen(false)}>{L.cancel}</Button>
               <Button onClick={handleCreate} disabled={createSaving || !createForm.name || !createForm.display_name}>
                 {createSaving ? <Loader2 className="h-4 w-4 animate-spin mr-1.5" /> : <Plus className="h-4 w-4 mr-1.5" />}
-                {lang === "zh" ? "创建" : "Create"}
+                {L.create}
               </Button>
             </div>
           </div>
@@ -538,7 +539,7 @@ function AdminPlansContent() {
       <Dialog open={!!editPlan} onOpenChange={() => setEditPlan(null)}>
         <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{lang === "zh" ? "编辑套餐" : "Edit Plan"}</DialogTitle>
+            <DialogTitle>{L.editPlan}</DialogTitle>
             <DialogDescription>{editPlan?.display_name}</DialogDescription>
           </DialogHeader>
           {editPlan && (
@@ -546,16 +547,16 @@ function AdminPlansContent() {
               <Tabs value={editTab} onValueChange={setEditTab}>
                 <TabsList className="w-full">
                   <TabsTrigger value="basic" className="flex-1">
-                    {lang === "zh" ? "基本信息" : "Basic"}
+                    {L.basicInfo}
                   </TabsTrigger>
                   <TabsTrigger value="pricing" className="flex-1">
-                    {lang === "zh" ? "价格" : "Pricing"}
+                    {L.pricingTab}
                   </TabsTrigger>
                   <TabsTrigger value="limits" className="flex-1">
-                    {lang === "zh" ? "费率限制" : "Limits"}
+                    {L.limitsTab}
                   </TabsTrigger>
                   <TabsTrigger value="routing" className="flex-1">
-                    {lang === "zh" ? "路由支持" : "Routing"}
+                    {L.routingTab}
                   </TabsTrigger>
                 </TabsList>
 
@@ -563,11 +564,11 @@ function AdminPlansContent() {
                 <TabsContent value="basic" className="pt-4 space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="text-sm text-muted-foreground mb-1.5 block">{lang === "zh" ? "显示名称" : "Display Name"}</label>
+                      <label className="text-sm text-muted-foreground mb-1.5 block">{L.displayName}</label>
                       <Input value={editPlan.display_name} onChange={e => setEditPlan({ ...editPlan, display_name: e.target.value })} className="h-10" />
                     </div>
                     <div>
-                      <label className="text-sm text-muted-foreground mb-1.5 block">{lang === "zh" ? "宣传语" : "Tagline"}</label>
+                      <label className="text-sm text-muted-foreground mb-1.5 block">{L.tagline}</label>
                       <Input value={editPlan.tagline || ""} onChange={e => setEditPlan({ ...editPlan, tagline: e.target.value })} className="h-10" />
                     </div>
                   </div>
@@ -589,39 +590,39 @@ function AdminPlansContent() {
                 <TabsContent value="pricing" className="pt-4 space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="text-sm text-muted-foreground mb-1.5 block">{lang === "zh" ? "货币" : "Currency"}</label>
+                      <label className="text-sm text-muted-foreground mb-1.5 block">{L.currency}</label>
                       <select className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm" value={editPlan.currency} onChange={e => setEditPlan({ ...editPlan, currency: e.target.value })}>
                         <option value="CNY">CNY (&#165;)</option>
                         <option value="USD">USD ($)</option>
                       </select>
                     </div>
                     <div>
-                      <label className="text-sm text-muted-foreground mb-1.5 block">{lang === "zh" ? "月 Credits" : "Monthly Credits"}</label>
+                      <label className="text-sm text-muted-foreground mb-1.5 block">{L.monthlyCredits}</label>
                       <Input type="number" value={editPlan.monthly_credits} onChange={e => setEditPlan({ ...editPlan, monthly_credits: Math.max(0, +e.target.value || 0) })} className="h-10" />
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="text-sm text-muted-foreground mb-1.5 block">
-                        {lang === "zh" ? `月付价格 (${sym(editPlan.currency)})` : `Monthly (${sym(editPlan.currency)})`}
+                        {L.monthlyPriceLabel.replace("{currency}", sym(editPlan.currency))}
                       </label>
                       <Input type="number" step="0.01" value={editPlan.monthly_price} onChange={e => setEditPlan({ ...editPlan, monthly_price: Math.max(0, +e.target.value || 0) })} className="h-10" />
                     </div>
                     <div>
                       <label className="text-sm text-muted-foreground mb-1.5 block">
-                        {lang === "zh" ? `年付价格 (${sym(editPlan.currency)})` : `Yearly (${sym(editPlan.currency)})`}
+                        {L.yearlyPriceLabel.replace("{currency}", sym(editPlan.currency))}
                       </label>
                       <Input type="number" step="0.01" value={editPlan.yearly_price} onChange={e => setEditPlan({ ...editPlan, yearly_price: Math.max(0, +e.target.value || 0) })} className="h-10" />
                     </div>
                   </div>
                   <div className="p-3 rounded-lg bg-muted/50 text-sm text-muted-foreground">
-                    {lang === "zh" ? "预览：" : "Preview: "}
-                    {sym(editPlan.currency)}{editPlan.monthly_price || "0"}{lang === "zh" ? "/月" : "/mo"}{" "}
-                    {"·"} {sym(editPlan.currency)}{editPlan.yearly_price || "0"}{lang === "zh" ? "/年" : "/yr"}
+                    {L.previewLabel}
+                    {sym(editPlan.currency)}{editPlan.monthly_price || "0"}{L.pricePerMonth}{" "}
+                    {"·"} {sym(editPlan.currency)}{editPlan.yearly_price || "0"}{L.pricePerYear}
                     {editPlan.currency !== displayCurrency && (
                       <span className="ml-2">
-                        ({fmtDisplay(editPlan.monthly_price, editPlan.currency)}{lang === "zh" ? "/月" : "/mo"}{" "}
-                        {"·"} {fmtDisplay(editPlan.yearly_price, editPlan.currency)}{lang === "zh" ? "/年" : "/yr"})
+                        ({fmtDisplay(editPlan.monthly_price, editPlan.currency)}{L.pricePerMonth}{" "}
+                        {"·"} {fmtDisplay(editPlan.yearly_price, editPlan.currency)}{L.pricePerYear})
                       </span>
                     )}
                   </div>
@@ -631,15 +632,15 @@ function AdminPlansContent() {
                 <TabsContent value="limits" className="pt-4 space-y-4">
                   <div className="grid grid-cols-3 gap-4">
                     <div>
-                      <label className="text-sm text-muted-foreground mb-1.5 block">{lang === "zh" ? "首购折扣" : "First Purchase"}</label>
+                      <label className="text-sm text-muted-foreground mb-1.5 block">{L.firstPurchase}</label>
                       <Input type="number" step="0.01" value={editPlan.first_purchase_discount} onChange={e => setEditPlan({ ...editPlan, first_purchase_discount: +e.target.value || 0 })} className="h-10" />
                     </div>
                     <div>
-                      <label className="text-sm text-muted-foreground mb-1.5 block">{lang === "zh" ? "超出费率" : "Overage Rate"}</label>
+                      <label className="text-sm text-muted-foreground mb-1.5 block">{L.overageRate}</label>
                       <Input type="number" step="0.01" value={editPlan.overage_rate_multiplier} onChange={e => setEditPlan({ ...editPlan, overage_rate_multiplier: +e.target.value || 0 })} className="h-10" />
                     </div>
                     <div>
-                      <label className="text-sm text-muted-foreground mb-1.5 block">{lang === "zh" ? "最大并发" : "Concurrency"}</label>
+                      <label className="text-sm text-muted-foreground mb-1.5 block">{L.maxConcurrency}</label>
                       <Input type="number" value={editPlan.max_concurrency} onChange={e => setEditPlan({ ...editPlan, max_concurrency: +e.target.value || 0 })} className="h-10" />
                     </div>
                   </div>
@@ -649,17 +650,17 @@ function AdminPlansContent() {
                 <TabsContent value="routing" className="pt-4 space-y-4">
                   <div className="grid grid-cols-3 gap-4">
                     <div>
-                      <label className="text-sm text-muted-foreground mb-1.5 block">{lang === "zh" ? "路由优先级" : "Route"}</label>
+                      <label className="text-sm text-muted-foreground mb-1.5 block">{L.routePriority}</label>
                       <select className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm" value={editPlan.route_priority} onChange={e => setEditPlan({ ...editPlan, route_priority: e.target.value })}>
                         {Object.entries(ROUTE_LABELS).map(([k, v]) => <option key={k} value={k}>{v[lang]}</option>)}
                       </select>
                     </div>
                     <div>
-                      <label className="text-sm text-muted-foreground mb-1.5 block">{lang === "zh" ? "非高峰折扣" : "Off-Peak"}</label>
+                      <label className="text-sm text-muted-foreground mb-1.5 block">{L.offPeakDiscount}</label>
                       <Input type="number" step="0.05" value={editPlan.off_peak_discount} onChange={e => setEditPlan({ ...editPlan, off_peak_discount: +e.target.value || 0 })} className="h-10" />
                     </div>
                     <div>
-                      <label className="text-sm text-muted-foreground mb-1.5 block">{lang === "zh" ? "技术支持" : "Support"}</label>
+                      <label className="text-sm text-muted-foreground mb-1.5 block">{L.supportLevel}</label>
                       <select className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm" value={editPlan.support_level} onChange={e => setEditPlan({ ...editPlan, support_level: e.target.value })}>
                         {Object.entries(SUPPORT_LABELS).map(([k, v]) => <option key={k} value={k}>{v[lang]}</option>)}
                       </select>
@@ -669,10 +670,10 @@ function AdminPlansContent() {
               </Tabs>
 
               <div className="flex justify-end gap-2 pt-2">
-                <Button variant="outline" onClick={() => setEditPlan(null)}>{lang === "zh" ? "取消" : "Cancel"}</Button>
+                <Button variant="outline" onClick={() => setEditPlan(null)}>{L.cancel}</Button>
                 <Button onClick={handleSave} disabled={editSaving}>
                   {editSaving ? <Loader2 className="h-4 w-4 animate-spin mr-1.5" /> : <Save className="h-4 w-4 mr-1.5" />}
-                  {lang === "zh" ? "保存" : "Save"}
+                  {L.save}
                 </Button>
               </div>
             </div>
@@ -683,10 +684,10 @@ function AdminPlansContent() {
       <ConfirmDialog
         open={!!deletePlan}
         onOpenChange={() => setDeletePlan(null)}
-        title={lang === "zh" ? "删除套餐" : "Delete Plan"}
-        message={deletePlan ? (lang === "zh" ? `确定要删除「${deletePlan.display_name}」吗？` : `Delete "${deletePlan.display_name}"?`) : ""}
+        title={L.deletePlan}
+        message={deletePlan ? L.deletePlanConfirm.replace("{name}", deletePlan.display_name) : ""}
         onConfirm={handleDelete}
-        confirmLabel={lang === "zh" ? "确认删除" : "Delete"}
+        confirmLabel={L.confirmDelete}
         variant="danger"
         loading={deleteLoading}
       />
@@ -696,7 +697,7 @@ function AdminPlansContent() {
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>
-              {lang === "zh" ? "管理模型" : "Manage Models"}
+              {L.manageModels}
               {planModels.length > 0 && (
                 <Badge variant="outline" className="ml-2 text-[10px]">
                   {planModels.length}
@@ -709,7 +710,7 @@ function AdminPlansContent() {
             <div className="flex gap-2">
               <div className="relative flex-1">
                 <Input
-                  placeholder={lang === "zh" ? "模型名称" : "Model name"}
+                  placeholder={L.modelNamePH}
                   value={newModel}
                   onChange={e => setNewModel(e.target.value)}
                   onKeyDown={e => e.key === "Enter" && handleAddModel()}
@@ -723,14 +724,14 @@ function AdminPlansContent() {
                     .map(m => <option key={m} value={m} />)}
                 </datalist>
               </div>
-              <Button onClick={handleAddModel} disabled={modelLoading || !newModel.trim()} className="h-10" aria-label={lang === "zh" ? "添加模型" : "Add model"}>
+              <Button onClick={handleAddModel} disabled={modelLoading || !newModel.trim()} className="h-10" aria-label={L.addModel}>
                 {modelLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
               </Button>
             </div>
             <div className="space-y-1.5 max-h-60 overflow-y-auto">
               {planModels.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-3">
-                  {lang === "zh" ? "暂无绑定模型" : "No models bound"}
+                  {L.noModelsBound}
                 </p>
               ) : planModels.map(pm => (
                 <div key={pm.id} className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
@@ -743,7 +744,7 @@ function AdminPlansContent() {
                     disabled={modelLoading}
                   >
                     <Unlink className="h-3.5 w-3.5 mr-1" />
-                    {lang === "zh" ? "移除" : "Remove"}
+                    {L.remove}
                   </Button>
                 </div>
               ))}

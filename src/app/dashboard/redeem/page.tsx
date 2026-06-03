@@ -87,11 +87,11 @@ export default function RedeemPage() {
 
   async function handleGenerate() {
     if (genCodeType === "balance" && (!genAmount || parseFloat(genAmount) <= 0)) {
-      showToast(lang === "zh" ? "请输入有效金额" : "Please enter a valid amount", "error");
+      showToast(L.pleaseEnterAmount, "error");
       return;
     }
     if (genCodeType === "subscription" && !genPlanId) {
-      showToast(lang === "zh" ? "请选择套餐" : "Please select a plan", "error");
+      showToast(L.pleaseSelectPlan, "error");
       return;
     }
     setGenLoading(true);
@@ -296,8 +296,8 @@ export default function RedeemPage() {
           ) : fetchError ? (
             <div className="text-center py-12">
               <AlertTriangle className="h-8 w-8 text-destructive/40 mx-auto mb-2" />
-              <p className="text-sm text-muted-foreground mb-2">{lang === "zh" ? "加载失败" : "Failed to load"}</p>
-              <Button variant="outline" size="sm" onClick={() => mutate()}>{lang === "zh" ? "重试" : "Retry"}</Button>
+              <p className="text-sm text-muted-foreground mb-2">{L.failedToLoad}</p>
+              <Button variant="outline" size="sm" onClick={() => mutate()}>{L.retry}</Button>
             </div>
           ) : codes.length === 0 ? (
             <div className="text-center py-12">
@@ -343,7 +343,7 @@ export default function RedeemPage() {
                         </td>
                         <td className="py-3 px-4 text-right font-mono">
                           {c.code_type === 'subscription' ? (
-                            <span className="text-xs">{c.duration_months}{lang === "zh" ? "个月" : "mo"} / {(c.plan_monthly_credits || 0).toLocaleString()} credits</span>
+                            <span className="text-xs">{c.duration_months}{L.monthUnit} / {(c.plan_monthly_credits || 0).toLocaleString()} credits</span>
                           ) : (
                             `$${c.amount.toFixed(2)}`
                           )}
@@ -381,7 +381,7 @@ export default function RedeemPage() {
       {(page > 1 || hasMore) && (
         <div className="flex justify-center gap-2">
           <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage(p => p - 1)}>←</Button>
-          <span className="text-sm text-muted-foreground py-1.5">{lang === "zh" ? `第 ${page} 页` : `Page ${page}`}</span>
+          <span className="text-sm text-muted-foreground py-1.5">{L.pageLabel} {page}</span>
           <Button variant="outline" size="sm" disabled={!hasMore} onClick={() => setPage(p => p + 1)}>→</Button>
         </div>
       )}
@@ -419,7 +419,7 @@ export default function RedeemPage() {
                   <div>
                     <label className="text-sm text-foreground mb-1.5 block">{L.selectPlan}</label>
                     <select className="w-full h-9 px-3 rounded-md border border-input bg-background text-sm" value={genPlanId} onChange={e => setGenPlanId(+e.target.value)}>
-                      <option value={0}>{lang === "zh" ? "选择套餐" : "Select plan"}</option>
+                      <option value={0}>{L.selectPlan}</option>
                       {plans.map(p => <option key={p.id} value={p.id}>{p.display_name} ({p.monthly_credits.toLocaleString()} credits)</option>)}
                     </select>
                   </div>

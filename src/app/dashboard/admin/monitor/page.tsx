@@ -137,7 +137,8 @@ function latencyBgColor(ms: number): string {
 }
 
 export default function MonitorPage() {
-  const { lang } = useI18n();
+  const { lang, t: dict } = useI18n();
+  const L = dict.dashboard;
   const { formatPrice } = useCurrency();
   const t = LABELS[lang];
   const [trendMetric, setTrendMetric] = useState<"calls" | "error" | "latency">("calls");
@@ -393,7 +394,7 @@ export default function MonitorPage() {
               type="text"
               value={providerSearch}
               onChange={e => setProviderSearch(e.target.value)}
-              placeholder={lang === "zh" ? "搜索渠道..." : "Search providers..."}
+              placeholder={L.searchProviders}
               className="w-full h-8 pl-8 pr-3 rounded-md border border-input bg-background text-xs focus:border-primary focus:outline-none"
             />
           </div>

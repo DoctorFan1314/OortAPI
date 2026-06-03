@@ -70,7 +70,8 @@ function extractProvider(modelId: string, ownedBy: string): string {
 /* ------------------------------------------------------------------ */
 
 export default function AdminModelsPage() {
-  const { lang } = useI18n();
+  const { lang, t } = useI18n();
+  const L = t.dashboard;
   const { toast: showToast } = useToast();
 
   const { data, error, isLoading, mutate } = useSWR<ModelsResponse>(
@@ -194,19 +195,14 @@ export default function AdminModelsPage() {
         const data = await res.json().catch(() => ({}));
         // Rollback on error
         setEnabledMap((prev) => ({ ...prev, [modelId]: currentEnabled }));
-        showToast(data.error || (lang === "zh" ? "操作失败" : "Operation failed"), "error");
+        showToast(data.error || L.operationFailed, "error");
       } else {
-        showToast(
-          lang === "zh"
-            ? `${modelId} 已${nextEnabled ? "启用" : "禁用"}`
-            : `${modelId} ${nextEnabled ? "enabled" : "disabled"}`,
-          "success",
-        );
+        showToast(`${modelId} ${nextEnabled ? L.enabled : L.disabled}`, "success");
       }
     } catch {
       // Rollback on error
       setEnabledMap((prev) => ({ ...prev, [modelId]: currentEnabled }));
-      showToast(lang === "zh" ? "网络错误" : "Network error", "error");
+      showToast(L.networkError, "error");
     }
     setTogglingId(null);
   }
@@ -237,9 +233,7 @@ export default function AdminModelsPage() {
     }
     const successCount = succeeded.length;
     showToast(
-      lang === "zh"
-        ? `${successCount} 个模型已${nextEnabled ? "启用" : "禁用"}`
-        : `${successCount} model(s) ${nextEnabled ? "enabled" : "disabled"}`,
+      `${successCount} ${nextEnabled ? L.enabled : L.disabled}`,
       successCount > 0 ? "success" : "error",
     );
     setSelectedIds(new Set());
@@ -260,7 +254,7 @@ export default function AdminModelsPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <Cpu className="h-6 w-6" />
-          {lang === "zh" ? "模型管理" : "Model Management"}
+          {L.modelManage}
         </h1>
         <Badge variant="secondary">{filtered.length}</Badge>
       </div>
@@ -270,7 +264,7 @@ export default function AdminModelsPage() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder={lang === "zh" ? "搜索模型名称或提供商" : "Search model name or provider"}
+            placeholder={L.searchModelPlaceholder}
             value={search}
             onChange={(e) => {
               handleSearchChange(e.target.value);
@@ -292,7 +286,7 @@ export default function AdminModelsPage() {
                 : "bg-secondary text-muted-foreground border-border hover:text-foreground",
             )}
           >
-            {lang === "zh" ? "全部" : "All"}
+            {L.all}
           </button>
           {providers.map((p) => (
             <button
@@ -321,7 +315,7 @@ export default function AdminModelsPage() {
           {selectedIds.size > 0 && (
             <div className="flex items-center gap-3 px-4 py-2.5 border-b border-border/50 bg-primary/5">
               <span className="text-sm text-muted-foreground">
-                {lang === "zh" ? "已选择" : "Selected"}:{" "}
+                {L.selected}:{" "}
                 <strong className="text-foreground">{selectedIds.size}</strong>
               </span>
               <div className="flex gap-1.5 ml-auto">
@@ -336,7 +330,7 @@ export default function AdminModelsPage() {
                   ) : (
                     <Power className="h-3.5 w-3.5 mr-1" />
                   )}
-                  {lang === "zh" ? "批量启用" : "Batch Enable"}
+                  {L.batchEnable}
                 </Button>
                 <Button
                   variant="outline"
@@ -349,7 +343,7 @@ export default function AdminModelsPage() {
                   ) : (
                     <PowerOff className="h-3.5 w-3.5 mr-1" />
                   )}
-                  {lang === "zh" ? "批量禁用" : "Batch Disable"}
+                  {L.batchDisable}
                 </Button>
               </div>
             </div>
@@ -359,11 +353,11 @@ export default function AdminModelsPage() {
             <div className="h-48 animate-pulse bg-muted rounded-lg m-6" />
           ) : error ? (
             <div className="text-center py-12 text-muted-foreground text-sm">
-              {lang === "zh" ? "加载失败" : "Failed to load models"}
+              {L.failedToLoadModels}
             </div>
           ) : filtered.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground text-sm">
-              {lang === "zh" ? "暂无模型" : "No models found"}
+              {L.noModelsFound}
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -379,19 +373,19 @@ export default function AdminModelsPage() {
                       />
                     </th>
                     <th className="text-left py-3 px-4 text-muted-foreground font-medium">
-                      {lang === "zh" ? "模型 ID" : "Model ID"}
+                      {L.modelId}
                     </th>
                     <th className="text-left py-3 px-4 text-muted-foreground font-medium">
-                      {lang === "zh" ? "提供商" : "Provider"}
+                      {L.provider}
                     </th>
                     <th className="text-center py-3 px-4 text-muted-foreground font-medium">
-                      {lang === "zh" ? "上下文长度" : "Context Length"}
+                      {L.contextLength}
                     </th>
                     <th className="text-center py-3 px-4 text-muted-foreground font-medium">
-                      {lang === "zh" ? "状态" : "Status"}
+                      {L.status}
                     </th>
                     <th className="text-right py-3 px-4 text-muted-foreground font-medium">
-                      {lang === "zh" ? "操作" : "Actions"}
+                      {L.actions}
                     </th>
                   </tr>
                 </thead>
@@ -439,13 +433,7 @@ export default function AdminModelsPage() {
                                 : "bg-red-500/10 text-red-500",
                             )}
                           >
-                            {enabled
-                              ? lang === "zh"
-                                ? "已启用"
-                                : "Enabled"
-                              : lang === "zh"
-                                ? "已禁用"
-                                : "Disabled"}
+                            {enabled ? L.enabled : L.disabled}
                           </span>
                         </td>
                         <td className="py-3 px-4 text-right">
@@ -458,24 +446,8 @@ export default function AdminModelsPage() {
                                 ? "hover:bg-red-500/10 text-muted-foreground hover:text-red-500"
                                 : "hover:bg-green-500/10 text-muted-foreground hover:text-green-500",
                             )}
-                            title={
-                              enabled
-                                ? lang === "zh"
-                                  ? "禁用"
-                                  : "Disable"
-                                : lang === "zh"
-                                  ? "启用"
-                                  : "Enable"
-                            }
-                            aria-label={
-                              enabled
-                                ? lang === "zh"
-                                  ? "禁用"
-                                  : "Disable"
-                                : lang === "zh"
-                                  ? "启用"
-                                  : "Enable"
-                            }
+                            title={enabled ? L.disable : L.enable}
+                            aria-label={enabled ? L.disable : L.enable}
                           >
                             {togglingId === m.id ? (
                               <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -508,7 +480,7 @@ export default function AdminModelsPage() {
             {"←"}
           </Button>
           <span className="text-sm text-muted-foreground py-1.5">
-            {lang === "zh" ? `第 ${page} / ${totalPages} 页` : `Page ${page} of ${totalPages}`}
+            {L.pageOfTotal.replace("{page}", String(page)).replace("{total}", String(totalPages))}
           </span>
           <Button
             variant="outline"

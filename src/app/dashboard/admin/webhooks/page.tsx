@@ -111,7 +111,8 @@ const LABELS = {
 };
 
 export default function WebhooksPage() {
-  const { lang } = useI18n();
+  const { lang, t: dict } = useI18n();
+  const L = dict.dashboard;
   const t = LABELS[lang];
   const { toast: showToast } = useToast();
   const { data, isLoading, mutate } = useSWR<{ webhooks: WebhookItem[] }>("/api/dashboard/webhooks", dashboardSWRConfig);
@@ -377,7 +378,7 @@ export default function WebhooksPage() {
                   className="flex-1"
                 >
                   <Send className="h-3 w-3 mr-1" />
-                  {testing === logTarget.id ? (lang === "zh" ? "发送中..." : "Sending...") : t.test}
+                  {testing === logTarget.id ? L.sending : t.test}
                 </Button>
                 <Button
                   size="sm"
