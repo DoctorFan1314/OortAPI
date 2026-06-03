@@ -41,6 +41,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@lobehub/icons-static-png": "^1.75.0",
     "@lobehub/icons-static-svg": "^1.91.0",
     "@tailwindcss/postcss": "^4",
     "@types/better-sqlite3": "^7.6.13",

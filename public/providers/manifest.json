@@ -4,7 +4,15 @@
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "adobe",
@@ -12,7 +20,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "adobefirefly",
@@ -20,7 +45,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "agentvoice",
@@ -28,14 +70,37 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "agui",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "ai2",
@@ -43,7 +108,16 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "ai21",
@@ -52,7 +126,27 @@
       "-text",
       "-brand",
       "-brand-color"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text",
+        "-brand",
+        "-brand-color"
+      ],
+      "png_light": [
+        "",
+        "-text",
+        "-brand",
+        "-brand-color"
+      ],
+      "png_dark": [
+        "",
+        "-text",
+        "-brand",
+        "-brand-color"
+      ]
+    }
   },
   {
     "id": "ai302",
@@ -60,7 +154,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "ai360",
@@ -68,7 +179,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "aihubmix",
@@ -76,7 +204,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "aimass",
@@ -84,7 +229,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "aionlabs",
@@ -92,7 +254,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "airjelly",
@@ -100,14 +279,37 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "aistudio",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "akashchat",
@@ -115,14 +317,45 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "alephalpha",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "alibaba",
@@ -133,7 +366,33 @@
       "-text-cn",
       "-brand",
       "-brand-color"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text",
+        "-text-cn",
+        "-brand",
+        "-brand-color"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text",
+        "-text-cn",
+        "-brand",
+        "-brand-color"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text",
+        "-text-cn",
+        "-brand",
+        "-brand-color"
+      ]
+    }
   },
   {
     "id": "alibabacloud",
@@ -142,7 +401,27 @@
       "-color",
       "-text",
       "-text-cn"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text",
+        "-text-cn"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text",
+        "-text-cn"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text",
+        "-text-cn"
+      ]
+    }
   },
   {
     "id": "amp",
@@ -150,7 +429,16 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "antgroup",
@@ -161,14 +449,54 @@
       "-text-cn",
       "-brand",
       "-brand-color"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text",
+        "-text-cn",
+        "-brand",
+        "-brand-color"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text",
+        "-text-cn",
+        "-brand",
+        "-brand-color"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text",
+        "-text-cn",
+        "-brand",
+        "-brand-color"
+      ]
+    }
   },
   {
     "id": "anthropic",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "antigravity",
@@ -176,7 +504,16 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "anyscale",
@@ -184,7 +521,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "apertis",
@@ -192,14 +546,37 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "apple",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "arcee",
@@ -207,7 +584,16 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "askverdict",
@@ -215,7 +601,16 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "assemblyai",
@@ -223,14 +618,39 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "atlascloud",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "automatic",
@@ -238,7 +658,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "aws",
@@ -248,7 +685,30 @@
       "-text",
       "-brand",
       "-brand-color"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text",
+        "-brand",
+        "-brand-color"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text",
+        "-brand",
+        "-brand-color"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text",
+        "-brand",
+        "-brand-color"
+      ]
+    }
   },
   {
     "id": "aya",
@@ -256,7 +716,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "azure",
@@ -264,7 +741,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "azureai",
@@ -272,14 +766,45 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "baai",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "baichuan",
@@ -287,7 +812,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "baidu",
@@ -298,7 +840,33 @@
       "-text-cn",
       "-brand",
       "-brand-color"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text",
+        "-text-cn",
+        "-brand",
+        "-brand-color"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text",
+        "-text-cn",
+        "-brand",
+        "-brand-color"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text",
+        "-text-cn",
+        "-brand",
+        "-brand-color"
+      ]
+    }
   },
   {
     "id": "baiducloud",
@@ -306,7 +874,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "bailian",
@@ -314,14 +899,45 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "baseten",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "bedrock",
@@ -329,14 +945,45 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "bfl",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "bilibili",
@@ -344,14 +991,45 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "bilibiliindex",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "bing",
@@ -359,7 +1037,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "briaai",
@@ -367,7 +1062,16 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "burncloud",
@@ -375,7 +1079,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "bytedance",
@@ -386,14 +1107,54 @@
       "-text-cn",
       "-brand",
       "-brand-color"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text",
+        "-text-cn",
+        "-brand",
+        "-brand-color"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text",
+        "-text-cn",
+        "-brand",
+        "-brand-color"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text",
+        "-text-cn",
+        "-brand",
+        "-brand-color"
+      ]
+    }
   },
   {
     "id": "capcut",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "centml",
@@ -403,7 +1164,30 @@
       "-text",
       "-brand",
       "-brand-color"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text",
+        "-brand",
+        "-brand-color"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text",
+        "-brand",
+        "-brand-color"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text",
+        "-brand",
+        "-brand-color"
+      ]
+    }
   },
   {
     "id": "cerebras",
@@ -413,7 +1197,30 @@
       "-text",
       "-brand",
       "-brand-color"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text",
+        "-brand",
+        "-brand-color"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text",
+        "-brand",
+        "-brand-color"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text",
+        "-brand",
+        "-brand-color"
+      ]
+    }
   },
   {
     "id": "chatglm",
@@ -421,7 +1228,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "cherrystudio",
@@ -429,7 +1253,16 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "civitai",
@@ -437,13 +1270,41 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "civitai-text",
     "variants": [
       "-color"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "-color"
+      ],
+      "png_light": [
+        "-color"
+      ],
+      "png_dark": [
+        "-color"
+      ]
+    }
   },
   {
     "id": "claude",
@@ -451,7 +1312,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "claudecode",
@@ -459,21 +1337,58 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "cline",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "clipdrop",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "cloudflare",
@@ -481,7 +1396,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "codebuddy",
@@ -489,7 +1421,16 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "codeflicker",
@@ -497,7 +1438,16 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "codegeex",
@@ -505,7 +1455,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "codex",
@@ -513,7 +1480,16 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "cogvideo",
@@ -521,7 +1497,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "cogview",
@@ -529,7 +1522,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "cohere",
@@ -537,7 +1547,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "colab",
@@ -545,7 +1572,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "cometapi",
@@ -553,7 +1597,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "comfyui",
@@ -561,7 +1622,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "commanda",
@@ -569,7 +1647,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "copilot",
@@ -577,7 +1672,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "copilotkit",
@@ -585,7 +1697,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "coqui",
@@ -593,14 +1722,45 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "coze",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "crewai",
@@ -610,7 +1770,30 @@
       "-text",
       "-brand",
       "-brand-color"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text",
+        "-brand",
+        "-brand-color"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text",
+        "-brand",
+        "-brand-color"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text",
+        "-brand",
+        "-brand-color"
+      ]
+    }
   },
   {
     "id": "crusoe",
@@ -618,21 +1801,60 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "cursor",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "cybercut",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "dalle",
@@ -640,7 +1862,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "dbrx",
@@ -650,14 +1889,51 @@
       "-text",
       "-brand",
       "-brand-color"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text",
+        "-brand",
+        "-brand-color"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text",
+        "-brand",
+        "-brand-color"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text",
+        "-brand",
+        "-brand-color"
+      ]
+    }
   },
   {
     "id": "deepai",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "deepcogito",
@@ -665,7 +1941,16 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "deepinfra",
@@ -673,7 +1958,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "deepl",
@@ -681,7 +1983,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "deepmind",
@@ -689,7 +2008,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "deepseek",
@@ -697,7 +2033,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "devin",
@@ -705,7 +2058,16 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "dify",
@@ -713,7 +2075,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "doc2x",
@@ -721,7 +2100,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "docsearch",
@@ -729,14 +2125,45 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "dolphin",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "doubao",
@@ -744,28 +2171,87 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "dreammachine",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "elevenlabs",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "elevenx",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "essentialai",
@@ -773,7 +2259,16 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "exa",
@@ -781,7 +2276,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "fal",
@@ -789,7 +2301,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "fastgpt",
@@ -797,7 +2326,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "featherless",
@@ -805,7 +2351,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "figma",
@@ -813,7 +2376,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "fireworks",
@@ -821,42 +2401,129 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "fishaudio",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "flora",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "flowith",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "flux",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "friendli",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "gemini",
@@ -864,7 +2531,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "geminicli",
@@ -872,7 +2556,16 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "gemma",
@@ -880,42 +2573,129 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "giteeai",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "github",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "githubcopilot",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "glama",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "glif",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "glmv",
@@ -923,7 +2703,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "google",
@@ -932,7 +2729,27 @@
       "-color",
       "-brand",
       "-brand-color"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-brand",
+        "-brand-color"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-brand",
+        "-brand-color"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-brand",
+        "-brand-color"
+      ]
+    }
   },
   {
     "id": "googlecloud",
@@ -941,14 +2758,48 @@
       "-color",
       "-brand",
       "-brand-color"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-brand",
+        "-brand-color"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-brand",
+        "-brand-color"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-brand",
+        "-brand-color"
+      ]
+    }
   },
   {
     "id": "goose",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "gradio",
@@ -956,7 +2807,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "greptile",
@@ -964,21 +2832,66 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "grok",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "groq",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "hailuo",
@@ -986,28 +2899,81 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "haiper",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "hedra",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "hermesagent",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "higress",
@@ -1015,7 +2981,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "huawei",
@@ -1024,7 +3007,27 @@
       "-color",
       "-text",
       "-text-cn"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text",
+        "-text-cn"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text",
+        "-text-cn"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text",
+        "-text-cn"
+      ]
+    }
   },
   {
     "id": "huaweicloud",
@@ -1033,7 +3036,27 @@
       "-color",
       "-text",
       "-text-cn"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text",
+        "-text-cn"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text",
+        "-text-cn"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text",
+        "-text-cn"
+      ]
+    }
   },
   {
     "id": "huggingface",
@@ -1041,7 +3064,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "hunyuan",
@@ -1049,7 +3089,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "hyperbolic",
@@ -1057,21 +3114,66 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "ibm",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "ideogram",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "iflytekcloud",
@@ -1079,21 +3181,60 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "inception",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "inference",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "infermatic",
@@ -1101,7 +3242,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "infinigence",
@@ -1110,14 +3268,48 @@
       "-color",
       "-text",
       "-text-cn"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text",
+        "-text-cn"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text",
+        "-text-cn"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text",
+        "-text-cn"
+      ]
+    }
   },
   {
     "id": "inflection",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "internlm",
@@ -1125,7 +3317,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "jimeng",
@@ -1133,14 +3342,45 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "jina",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "junie",
@@ -1148,14 +3388,31 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "kilocode",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "kimi",
@@ -1163,7 +3420,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "kiro",
@@ -1171,7 +3445,16 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "kling",
@@ -1179,7 +3462,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "kluster",
@@ -1187,7 +3487,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "kolors",
@@ -1195,27 +3512,73 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "krea",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "kwaikat",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "kwaikat-text",
     "variants": [
       "-color"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "-color"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "kwaipilot",
@@ -1223,14 +3586,45 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "lambda",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "langchain",
@@ -1238,7 +3632,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "langfuse",
@@ -1246,7 +3657,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "langgraph",
@@ -1254,7 +3682,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "langsmith",
@@ -1262,7 +3707,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "leptonai",
@@ -1270,7 +3732,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "lg",
@@ -1278,21 +3757,66 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "lightricks",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "liquid",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "livekit",
@@ -1300,7 +3824,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "llamaindex",
@@ -1308,7 +3849,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "llava",
@@ -1316,7 +3874,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "llmapi",
@@ -1324,14 +3899,37 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "lmstudio",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "lobehub",
@@ -1339,7 +3937,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "longcat",
@@ -1347,7 +3962,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "lovable",
@@ -1355,14 +3987,39 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "lovart",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "luma",
@@ -1370,14 +4027,45 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "magic",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "make",
@@ -1385,28 +4073,87 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "manus",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "mastra",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "mcp",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "mcpso",
@@ -1414,7 +4161,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "menlo",
@@ -1422,7 +4186,22 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "meshy",
@@ -1430,7 +4209,16 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "meta",
@@ -1440,7 +4228,30 @@
       "-text",
       "-brand",
       "-brand-color"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text",
+        "-brand",
+        "-brand-color"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text",
+        "-brand",
+        "-brand-color"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text",
+        "-brand",
+        "-brand-color"
+      ]
+    }
   },
   {
     "id": "metaai",
@@ -1448,14 +4259,45 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "metagpt",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "microsoft",
@@ -1463,14 +4305,45 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "midjourney",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "minimax",
@@ -1478,7 +4351,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "mistral",
@@ -1486,7 +4376,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "modelscope",
@@ -1494,7 +4401,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "monica",
@@ -1502,14 +4426,45 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "moonshot",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "morph",
@@ -1517,7 +4472,16 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "moxt",
@@ -1525,7 +4489,16 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "myshell",
@@ -1533,7 +4506,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "n8n",
@@ -1541,7 +4531,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "nanobanana",
@@ -1549,14 +4556,37 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "nebius",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "newapi",
@@ -1564,28 +4594,87 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "notebooklm",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "notion",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "nousresearch",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "nova",
@@ -1593,14 +4682,45 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "novelai",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "novita",
@@ -1608,7 +4728,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "nplcloud",
@@ -1616,7 +4753,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "nvidia",
@@ -1624,7 +4778,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "obsidian",
@@ -1632,21 +4803,58 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "ollama",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "openai",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "openchat",
@@ -1654,7 +4862,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "openclaw",
@@ -1662,14 +4887,31 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "opencode",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "openhands",
@@ -1677,28 +4919,73 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "openhuman",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "openrouter",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "openwebui",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "palm",
@@ -1706,14 +4993,45 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "parasail",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "perplexity",
@@ -1721,7 +5039,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "phidata",
@@ -1729,21 +5064,66 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "phind",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "pika",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "pixverse",
@@ -1751,7 +5131,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "player2",
@@ -1759,7 +5156,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "poe",
@@ -1767,14 +5181,45 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "pollinations",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "ppio",
@@ -1783,7 +5228,27 @@
       "-color",
       "-text",
       "-text-cn"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text",
+        "-text-cn"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text",
+        "-text-cn"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text",
+        "-text-cn"
+      ]
+    }
   },
   {
     "id": "prunaai",
@@ -1791,7 +5256,16 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "pydanticai",
@@ -1799,7 +5273,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "qingyan",
@@ -1807,7 +5298,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "qiniu",
@@ -1815,7 +5323,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "qoder",
@@ -1823,7 +5348,16 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "qwen",
@@ -1831,28 +5365,81 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "railway",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "recraft",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "relace",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "replicate",
@@ -1860,7 +5447,22 @@
       "",
       "-text",
       "-brand"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text",
+        "-brand"
+      ],
+      "png_light": [
+        "",
+        "-brand"
+      ],
+      "png_dark": [
+        "",
+        "-brand"
+      ]
+    }
   },
   {
     "id": "replit",
@@ -1868,21 +5470,54 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "reve",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "roocode",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "rsshub",
@@ -1890,14 +5525,45 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "runway",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "rwkv",
@@ -1905,7 +5571,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "sambanova",
@@ -1913,7 +5596,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "search1api",
@@ -1921,14 +5621,45 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "searchapi",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "sensenova",
@@ -1938,7 +5669,30 @@
       "-text",
       "-brand",
       "-brand-color"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text",
+        "-brand",
+        "-brand-color"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text",
+        "-brand",
+        "-brand-color"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text",
+        "-brand",
+        "-brand-color"
+      ]
+    }
   },
   {
     "id": "siliconcloud",
@@ -1946,7 +5700,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "sillytavern",
@@ -1954,7 +5725,16 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "skywork",
@@ -1962,14 +5742,39 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "slock",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "smithery",
@@ -1977,7 +5782,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "snowflake",
@@ -1985,7 +5807,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "sophnet",
@@ -1993,7 +5832,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "sora",
@@ -2001,7 +5857,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "spark",
@@ -2009,7 +5882,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "speedai",
@@ -2017,7 +5907,16 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "stability",
@@ -2027,7 +5926,30 @@
       "-text",
       "-brand",
       "-brand-color"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text",
+        "-brand",
+        "-brand-color"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text",
+        "-brand",
+        "-brand-color"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text",
+        "-brand",
+        "-brand-color"
+      ]
+    }
   },
   {
     "id": "statecloud",
@@ -2035,7 +5957,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "stepfun",
@@ -2043,7 +5982,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "straico",
@@ -2051,7 +6007,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "streamlake",
@@ -2059,7 +6032,16 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "submodel",
@@ -2067,21 +6049,66 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "suno",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "sync",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "targon",
@@ -2089,7 +6116,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "tavily",
@@ -2097,7 +6141,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "tencent",
@@ -2108,7 +6169,33 @@
       "-text-cn",
       "-brand",
       "-brand-color"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text",
+        "-text-cn",
+        "-brand",
+        "-brand-color"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text",
+        "-text-cn",
+        "-brand",
+        "-brand-color"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text",
+        "-text-cn",
+        "-brand",
+        "-brand-color"
+      ]
+    }
   },
   {
     "id": "tencentcloud",
@@ -2116,7 +6203,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "tiangong",
@@ -2124,7 +6228,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "tii",
@@ -2132,7 +6253,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "together",
@@ -2142,14 +6280,51 @@
       "-text",
       "-brand",
       "-brand-color"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text",
+        "-brand",
+        "-brand-color"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text",
+        "-brand",
+        "-brand-color"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text",
+        "-brand",
+        "-brand-color"
+      ]
+    }
   },
   {
     "id": "topazlabs",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "trae",
@@ -2157,7 +6332,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "tripo",
@@ -2165,14 +6357,45 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "turix",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "udio",
@@ -2180,7 +6403,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "unstructured",
@@ -2188,7 +6428,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "upstage",
@@ -2196,20 +6453,62 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "v0",
     "variants": [
       ""
-    ]
+    ],
+    "formats": {
+      "svg": [
+        ""
+      ],
+      "png_light": [
+        ""
+      ],
+      "png_dark": [
+        ""
+      ]
+    }
   },
   {
     "id": "vectorizerai",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "venice",
@@ -2217,14 +6516,37 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "vercel",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "vertexai",
@@ -2232,7 +6554,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "vidu",
@@ -2240,14 +6579,45 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "viggle",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "vllm",
@@ -2255,7 +6625,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "volcengine",
@@ -2263,7 +6650,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "voyage",
@@ -2271,7 +6675,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "wenxin",
@@ -2279,14 +6700,45 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "windsurf",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "workersai",
@@ -2294,28 +6746,75 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "worldrouter",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "xai",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "xiaomimimo",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "xinference",
@@ -2323,7 +6822,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "xpay",
@@ -2331,7 +6847,16 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "xuanyuan",
@@ -2339,14 +6864,45 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "yandex",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "yi",
@@ -2354,14 +6910,45 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "youmind",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "yuanbao",
@@ -2369,14 +6956,45 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "zai",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "zapier",
@@ -2384,7 +7002,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "zeabur",
@@ -2392,7 +7027,24 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   },
   {
     "id": "zencoder",
@@ -2400,14 +7052,37 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [],
+      "png_dark": []
+    }
   },
   {
     "id": "zenmux",
     "variants": [
       "",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "zeroone",
@@ -2415,7 +7090,22 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-text"
+      ]
+    }
   },
   {
     "id": "zhipu",
@@ -2423,6 +7113,23 @@
       "",
       "-color",
       "-text"
-    ]
+    ],
+    "formats": {
+      "svg": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_light": [
+        "",
+        "-color",
+        "-text"
+      ],
+      "png_dark": [
+        "",
+        "-color",
+        "-text"
+      ]
+    }
   }
 ]

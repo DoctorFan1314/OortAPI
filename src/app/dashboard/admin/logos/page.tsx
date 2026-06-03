@@ -6,12 +6,19 @@ import { Input } from "@/components/ui/input";
 import { useI18n } from "@/contexts/i18n-context";
 import { useTheme } from "@/contexts/theme-context";
 import { cn } from "@/lib/utils";
-import { Search, Download, Copy, Check, X, Palette, Sun, Moon, Star } from "lucide-react";
+import { Search, Download, Copy, Check, X, Palette, Star, Image as ImageIcon } from "lucide-react";
 
 interface IconEntry {
   id: string;
   variants: string[];
+  formats: {
+    svg: string[];
+    png_light: string[];
+    png_dark: string[];
+  };
 }
+
+type FormatType = "svg" | "png_light" | "png_dark";
 
 const CATEGORIES = [
   { key: "all", zh: "全部", en: "All" },
@@ -24,6 +31,12 @@ const CATEGORIES = [
 
 const STORAGE_KEY = "oortapi-logo-favorites";
 
+const FORMAT_LABELS: Record<FormatType, { zh: string; en: string }> = {
+  svg: { zh: "SVG", en: "SVG" },
+  png_light: { zh: "PNG 亮色", en: "PNG Light" },
+  png_dark: { zh: "PNG 暗色", en: "PNG Dark" },
+};
+
 export default function LogoManagePage() {
   const { t, lang } = useI18n();
   const { resolvedTheme } = useTheme();
@@ -33,7 +46,8 @@ export default function LogoManagePage() {
   const [category, setCategory] = useState("all");
   const [selectedIcon, setSelectedIcon] = useState<IconEntry | null>(null);
   const [selectedVariant, setSelectedVariant] = useState("");
-  const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
+  const [selectedFormat, setSelectedFormat] = useState<FormatType>("svg");
+  const [copied, setCopied] = useState(false);
   const [allIcons, setAllIcons] = useState<IconEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
@@ -74,7 +88,11 @@ export default function LogoManagePage() {
     return result;
   }, [allIcons, search, category, showFavorites, favorites]);
 
-  const getSrc = (id: string, suffix: string) => `/providers/${id}${suffix}.svg`;
+  const getSrc = (id: string, suffix: string, format: FormatType) => {
+    if (format === "svg") return `/providers/${id}${suffix}.svg`;
+    if (format === "png_light") return `/providers/light/${id}${suffix}.png`;
+    return `/providers/dark/${id}${suffix}.png`;
+  };
 
   const getVariantLabel = (suffix: string) => {
     const labels: Record<string, { zh: string; en: string }> = {
@@ -89,38 +107,54 @@ export default function LogoManagePage() {
     return l ? (lang === "zh" ? l.zh : l.en) : suffix;
   };
 
-  const handleCopy = async (id: string, suffix: string, idx: number) => {
+  const handleCopy = async (id: string, suffix: string) => {
     try {
-      const res = await fetch(getSrc(id, suffix));
-      const svg = await res.text();
-      await navigator.clipboard.writeText(svg);
-      setCopiedIdx(idx);
-      setTimeout(() => setCopiedIdx(null), 2000);
+      const res = await fetch(getSrc(id, suffix, selectedFormat));
+      if (selectedFormat === "svg") {
+        const svg = await res.text();
+        await navigator.clipboard.writeText(svg);
+      } else {
+        const blob = await res.blob();
+        await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+      }
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch { /* ignore */ }
+  };
+
+  const handleCopyPath = async (id: string, suffix: string) => {
+    try {
+      const path = selectedFormat === "svg"
+        ? `/providers/${id}${suffix}.svg`
+        : `/providers/${selectedFormat === "png_light" ? "light" : "dark"}/${id}${suffix}.png`;
+      await navigator.clipboard.writeText(path);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     } catch { /* ignore */ }
   };
 
   const handleDownload = async (id: string, suffix: string) => {
     try {
-      const res = await fetch(getSrc(id, suffix));
-      const svg = await res.text();
-      const blob = new Blob([svg], { type: "image/svg+xml" });
+      const res = await fetch(getSrc(id, suffix, selectedFormat));
+      const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${id}${suffix}.svg`;
+      const ext = selectedFormat === "svg" ? "svg" : "png";
+      a.download = `${id}${suffix}.${ext}`;
       a.click();
       URL.revokeObjectURL(url);
     } catch { /* ignore */ }
   };
 
-  // Check if a variant needs invert in dark mode (mono variants have black fill)
   const needsInvert = (suffix: string) => {
-    // color, text, brand-color variants have their own colors — no invert
     if (suffix === "-color" || suffix === "-brand-color") return false;
-    // text variants often have colored text — no invert
     if (suffix === "-text" || suffix === "-text-cn") return false;
-    // mono and brand variants are black — need invert in dark mode
     return true;
+  };
+
+  const hasFormat = (icon: IconEntry, format: FormatType) => {
+    return icon.formats[format]?.length > 0;
   };
 
   return (
@@ -199,8 +233,8 @@ export default function LogoManagePage() {
                 key={icon.id}
                 role="button"
                 tabIndex={0}
-                onClick={() => { setSelectedIcon(icon); setSelectedVariant(displaySuffix); }}
-                onKeyDown={(e) => { if (e.key === "Enter") { setSelectedIcon(icon); setSelectedVariant(displaySuffix); } }}
+                onClick={() => { setSelectedIcon(icon); setSelectedVariant(displaySuffix); setSelectedFormat("svg"); }}
+                onKeyDown={(e) => { if (e.key === "Enter") { setSelectedIcon(icon); setSelectedVariant(displaySuffix); setSelectedFormat("svg"); } }}
                 className="group relative flex flex-col items-center gap-2 p-3 rounded-xl border border-border/50 bg-card hover:bg-muted/50 hover:border-primary/30 hover:shadow-md transition-all cursor-pointer"
               >
                 <button
@@ -214,7 +248,7 @@ export default function LogoManagePage() {
                 </button>
                 <div className="w-12 h-12 flex items-center justify-center">
                   <img
-                    src={getSrc(icon.id, displaySuffix)}
+                    src={getSrc(icon.id, displaySuffix, "svg")}
                     alt={icon.id}
                     className="w-12 h-12 object-contain"
                     loading="lazy"
@@ -268,13 +302,13 @@ export default function LogoManagePage() {
             </div>
 
             {/* Body: variant tabs (left) + preview (right) */}
-            <div className="flex min-h-[320px]">
+            <div className="flex min-h-[360px]">
               {/* Left: variant tabs */}
               <div className="w-36 border-r border-border bg-muted/30 p-3 space-y-1 shrink-0">
                 {selectedIcon.variants.map((v) => (
                   <button
                     key={v}
-                    onClick={() => { setSelectedVariant(v); setCopiedIdx(null); }}
+                    onClick={() => { setSelectedVariant(v); setCopied(false); }}
                     className={cn(
                       "w-full text-left px-3 py-2 rounded-lg text-xs font-medium transition-all",
                       selectedVariant === v
@@ -287,40 +321,81 @@ export default function LogoManagePage() {
                 ))}
               </div>
 
-              {/* Right: preview + actions */}
+              {/* Right: format tabs + preview + actions */}
               <div className="flex-1 p-6 flex flex-col">
-                {/* Light/Dark preview */}
-                <div className="grid grid-cols-2 gap-4 flex-1">
-                  <div className="flex flex-col items-center justify-center gap-3 p-4 rounded-xl bg-white border border-border">
-                    <img src={getSrc(selectedIcon.id, selectedVariant)} alt={selectedIcon.id} className="w-20 h-20 object-contain" />
-                    <span className="text-xs text-gray-500 flex items-center gap-1"><Sun className="h-3 w-3" /> Light</span>
-                  </div>
-                  <div className="flex flex-col items-center justify-center gap-3 p-4 rounded-xl bg-gray-900 border border-gray-700">
+                {/* Format tabs */}
+                <div className="flex gap-1 mb-4">
+                  {(["svg", "png_light", "png_dark"] as FormatType[]).map((fmt) => {
+                    const available = hasFormat(selectedIcon, fmt);
+                    return (
+                      <button
+                        key={fmt}
+                        onClick={() => { if (available) { setSelectedFormat(fmt); setCopied(false); } }}
+                        disabled={!available}
+                        className={cn(
+                          "px-3 py-1.5 rounded-lg text-xs font-medium transition-all border",
+                          selectedFormat === fmt
+                            ? "bg-primary/10 text-primary border-primary/30"
+                            : available
+                              ? "bg-transparent text-muted-foreground border-border hover:text-foreground"
+                              : "bg-transparent text-muted-foreground/30 border-border/30 cursor-not-allowed"
+                        )}
+                      >
+                        {lang === "zh" ? FORMAT_LABELS[fmt].zh : FORMAT_LABELS[fmt].en}
+                        {!available && " (-)"}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Preview */}
+                <div className="flex-1 flex items-center justify-center">
+                  <div className={cn(
+                    "rounded-xl border p-8 flex items-center justify-center",
+                    selectedFormat === "png_dark" ? "bg-gray-900 border-gray-700" : "bg-white border-border"
+                  )}>
                     <img
-                      src={getSrc(selectedIcon.id, selectedVariant)}
+                      src={getSrc(selectedIcon.id, selectedVariant, selectedFormat)}
                       alt={selectedIcon.id}
-                      className="w-20 h-20 object-contain"
-                      style={needsInvert(selectedVariant) ? { filter: "invert(1)" } : undefined}
+                      className="w-24 h-24 object-contain"
+                      style={selectedFormat === "svg" && needsInvert(selectedVariant) && resolvedTheme === "dark" ? { filter: "invert(1)" } : undefined}
                     />
-                    <span className="text-xs text-gray-400 flex items-center gap-1"><Moon className="h-3 w-3" /> Dark</span>
                   </div>
                 </div>
 
                 {/* File info */}
-                <p className="mt-3 text-xs text-muted-foreground font-mono">
-                  {selectedIcon.id}{selectedVariant}.svg
-                </p>
+                <div className="mt-3 text-xs text-muted-foreground">
+                  <p className="font-mono">
+                    {selectedIcon.id}{selectedVariant}.{selectedFormat === "svg" ? "svg" : "png"}
+                  </p>
+                  <p className="mt-1">
+                    {lang === "zh" ? "路径" : "Path"}: <code className="font-mono bg-muted px-1 py-0.5 rounded">
+                      {selectedFormat === "svg"
+                        ? `/providers/${selectedIcon.id}${selectedVariant}.svg`
+                        : `/providers/${selectedFormat === "png_light" ? "light" : "dark"}/${selectedIcon.id}${selectedVariant}.png`}
+                    </code>
+                  </p>
+                </div>
 
-                {/* Actions: copy + download for current variant */}
+                {/* Actions */}
                 <div className="flex gap-2 mt-3">
                   <Button
                     variant="outline"
                     size="sm"
                     className="flex-1"
-                    onClick={() => handleCopy(selectedIcon.id, selectedVariant, 0)}
+                    onClick={() => handleCopy(selectedIcon.id, selectedVariant)}
                   >
-                    {copiedIdx === 0 ? <Check className="h-3.5 w-3.5 mr-1.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5 mr-1.5" />}
-                    {copiedIdx === 0 ? (lang === "zh" ? "已复制" : "Copied!") : L.logoCopySvg}
+                    {copied ? <Check className="h-3.5 w-3.5 mr-1.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5 mr-1.5" />}
+                    {copied ? (lang === "zh" ? "已复制" : "Copied!") : L.logoCopySvg}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => handleCopyPath(selectedIcon.id, selectedVariant)}
+                  >
+                    <Copy className="h-3.5 w-3.5 mr-1.5" />
+                    {lang === "zh" ? "复制路径" : "Copy Path"}
                   </Button>
                   <Button
                     size="sm"

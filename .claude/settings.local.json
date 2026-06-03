@@ -57,11 +57,14 @@
       "Bash(curl -sL \"https://unpkg.com/@lobehub/icons-static-svg@latest/icons/deepseek-color.svg\" -o public/providers/deepseek.svg)",
       "Bash(curl -sL \"https://unpkg.com/@lobehub/icons-static-svg@latest/icons/meta-color.svg\" -o public/providers/meta.svg)",
       "Bash(curl -sL \"https://unpkg.com/@lobehub/icons-static-svg@latest/icons/openai.svg\" -o /tmp/openai.svg)",
-      "Read(//tmp/**)"
+      "Read(//tmp/**)",
+      "Bash(# Copy PNG Light files *)"
     ],
     "additionalDirectories": [
       "C:\\Users\\zhang\\Desktop\\test\\oortapi\\src\\app\\resources\\mcp",
-      "C:\\Users\\zhang\\.claude\\plans"
+      "C:\\Users\\zhang\\.claude\\plans",
+      "C:\\Users\\zhang\\Desktop\\test\\oortapi\\node_modules\\@lobehub\\icons-static-png\\light",
+      "C:\\Users\\zhang\\Desktop\\test\\oortapi\\node_modules\\@lobehub\\icons-static-png\\dark"
     ]
   }
 }
