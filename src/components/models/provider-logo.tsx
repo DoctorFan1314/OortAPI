@@ -1,9 +1,8 @@
 "use client";
 
-import { useTheme } from "@/contexts/theme-context";
+import { useState } from "react";
 
 // Map provider names to logo file IDs
-// The logo files follow lobehub naming: {id}.svg (mono) and {id}-color.svg (color)
 const PROVIDER_ID_MAP: Record<string, string> = {
   openai: "openai",
   anthropic: "anthropic",
@@ -37,7 +36,6 @@ const PROVIDER_ID_MAP: Record<string, string> = {
   lmstudio: "lmstudio",
   vllm: "vllm",
   nvidia: "nvidia",
-  intel: "intel",
   huawei: "huawei",
   tencent: "tencent",
   baiducloud: "baiducloud",
@@ -46,6 +44,13 @@ const PROVIDER_ID_MAP: Record<string, string> = {
   cloudflare: "cloudflare",
 };
 
+// Providers that only have mono SVGs (no color variant)
+const MONO_ONLY = new Set([
+  "openai", "anthropic", "groq", "xai", "moonshot", "ollama",
+  "lmstudio", "vllm", "nvidia", "vercel", "huawei", "tencent",
+  "baiducloud", "alibabacloud", "googlecloud", "cloudflare",
+]);
+
 interface ProviderLogoProps {
   provider: string;
   size?: number;
@@ -53,11 +58,15 @@ interface ProviderLogoProps {
 }
 
 export function ProviderLogo({ provider, size = 16, className = "" }: ProviderLogoProps) {
-  const { resolvedTheme } = useTheme();
+  const [errored, setErrored] = useState(false);
   const providerId = PROVIDER_ID_MAP[provider.toLowerCase()] || provider.toLowerCase();
+  const useMono = MONO_ONLY.has(providerId) || errored;
+  const src = useMono ? `/providers/${providerId}.svg` : `/providers/${providerId}-color.svg`;
 
-  // Use color variant for both themes (color logos look good in both)
-  const src = `/providers/${providerId}-color.svg`;
+  if (errored && !MONO_ONLY.has(providerId)) {
+    // Both color and mono failed, don't render
+    return null;
+  }
 
   return (
     <img
@@ -67,13 +76,12 @@ export function ProviderLogo({ provider, size = 16, className = "" }: ProviderLo
       height={size}
       className={`inline-block shrink-0 ${className}`}
       loading="lazy"
-      onError={(e) => {
-        // Fallback to mono variant if color doesn't exist
-        const target = e.target as HTMLImageElement;
-        if (target.src.includes("-color")) {
-          target.src = `/providers/${providerId}.svg`;
+      onError={() => {
+        if (!useMono) {
+          setErrored(true);
         }
       }}
+      style={useMono ? { filter: "brightness(0) invert(0.5)" } : undefined}
     />
   );
 }

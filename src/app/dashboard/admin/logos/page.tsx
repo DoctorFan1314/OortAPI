@@ -110,7 +110,7 @@ export default function LogoManagePage() {
       </div>
 
       {/* Logo Grid */}
-      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3">
         {filtered.map((p) => (
           <button
             key={p.id}

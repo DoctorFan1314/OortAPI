@@ -13,7 +13,7 @@ export default function Loading() {
           <div key={i} className="h-8 w-20 bg-muted rounded-lg" />
         ))}
       </div>
-      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3">
         {Array.from({ length: 30 }).map((_, i) => (
           <div key={i} className="flex flex-col items-center gap-2 p-3 rounded-xl border border-border/50">
             <div className="w-10 h-10 bg-muted rounded-lg" />
