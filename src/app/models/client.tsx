@@ -172,6 +172,9 @@ export default function ModelsPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [syncing, setSyncing] = useState(false);
   const [visibleCount, setVisibleCount] = useState(20);
+  const [logoPickerFor, setLogoPickerFor] = useState<string | null>(null);
+  const [logoManifest, setLogoManifest] = useState<{ id: string; variants: string[] }[]>([]);
+  const [logoSearch, setLogoSearch] = useState("");
 
   const fetchModels = () => {
     fetch("/api/dashboard/models?source=channels", { credentials: "include" })
@@ -181,6 +184,16 @@ export default function ModelsPage() {
   };
 
   useEffect(() => { fetchModels(); }, []);
+
+  // Load logo manifest when picker opens
+  useEffect(() => {
+    if (logoPickerFor && logoManifest.length === 0) {
+      fetch("/providers/manifest.json")
+        .then(r => r.json())
+        .then((data: { id: string; variants: string[] }[]) => setLogoManifest(data))
+        .catch(() => {});
+    }
+  }, [logoPickerFor, logoManifest.length]);
 
   const syncAllChannels = async () => {
     setSyncing(true);
@@ -464,20 +477,16 @@ export default function ModelsPage() {
                          />
                         </div>
                         <div>
-                          <label className="text-xs text-muted-foreground mb-1 block">{lang === "zh" ? "Logo ID (留空使用供应商默认)" : "Logo ID (empty for provider default)"}</label>
-                          <div className="flex gap-2">
-                            <Input
-                              value={editForm.logo_id}
-                              onChange={(e) => setEditForm((f) => ({ ...f, logo_id: e.target.value }))}
-                              placeholder={m.provider}
-                              className="h-8 text-xs flex-1"
-                            />
-                            {editForm.logo_id && (
-                              <div className="w-8 h-8 rounded bg-muted flex items-center justify-center">
-                                <ProviderLogo provider={m.provider} logoId={editForm.logo_id} size={20} />
-                              </div>
-                            )}
-                          </div>
+                          <label className="text-xs text-muted-foreground mb-1 block">{lang === "zh" ? "Logo" : "Logo"}</label>
+                          <button
+                            type="button"
+                            onClick={() => setLogoPickerFor(m.model_name)}
+                            className="w-full flex items-center gap-2 h-8 px-3 rounded-md border border-input bg-background text-xs hover:bg-muted transition-colors text-left"
+                          >
+                            <ProviderLogo provider={m.provider} logoId={editForm.logo_id} size={16} />
+                            <span className="flex-1 truncate">{editForm.logo_id || m.provider}</span>
+                            <span className="text-muted-foreground text-[10px]">{lang === "zh" ? "点击选择" : "Click to select"}</span>
+                          </button>
                         </div>
                         <div className="grid grid-cols-2 gap-2">
                           {[
@@ -713,6 +722,98 @@ export default function ModelsPage() {
           </>
         )}
       </div>
+
+      {/* Logo Picker Dialog */}
+      {logoPickerFor && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+          onClick={() => { setLogoPickerFor(null); setLogoSearch(""); }}
+        >
+          <div
+            className="bg-card border border-border rounded-2xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 py-3 border-b border-border shrink-0">
+              <h3 className="font-semibold text-sm">{lang === "zh" ? "选择 Logo" : "Select Logo"}</h3>
+              <button onClick={() => { setLogoPickerFor(null); setLogoSearch(""); }} className="text-muted-foreground hover:text-foreground p-1">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            {/* Search */}
+            <div className="px-5 py-3 border-b border-border shrink-0">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                <Input
+                  placeholder={lang === "zh" ? "搜索 Logo..." : "Search logos..."}
+                  value={logoSearch}
+                  onChange={(e) => setLogoSearch(e.target.value)}
+                  className="pl-9 h-8 text-xs"
+                  autoFocus
+                />
+              </div>
+            </div>
+
+            {/* Logo Grid */}
+            <div className="flex-1 overflow-y-auto p-4">
+              <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-2">
+                {/* Default option */}
+                <button
+                  onClick={() => {
+                    setEditForm((f) => ({ ...f, logo_id: "" }));
+                    setLogoPickerFor(null);
+                    setLogoSearch("");
+                  }}
+                  className="flex flex-col items-center gap-1.5 p-2 rounded-lg border border-border/50 hover:border-primary/30 hover:bg-muted/50 transition-all cursor-pointer"
+                >
+                  <div className="w-8 h-8 flex items-center justify-center text-muted-foreground">
+                    <span className="text-[10px]">AUTO</span>
+                  </div>
+                  <span className="text-[10px] text-muted-foreground truncate w-full text-center">
+                    {lang === "zh" ? "默认" : "Default"}
+                  </span>
+                </button>
+
+                {logoManifest
+                  .filter(icon => {
+                    if (!logoSearch) return true;
+                    const q = logoSearch.toLowerCase();
+                    return icon.id.toLowerCase().includes(q);
+                  })
+                  .slice(0, 60)
+                  .map((icon) => {
+                    const displaySuffix = icon.variants.includes("-color") ? "-color" : icon.variants[0];
+                    return (
+                      <button
+                        key={icon.id}
+                        onClick={() => {
+                          setEditForm((f) => ({ ...f, logo_id: icon.id }));
+                          setLogoPickerFor(null);
+                          setLogoSearch("");
+                        }}
+                        className="flex flex-col items-center gap-1.5 p-2 rounded-lg border border-border/50 hover:border-primary/30 hover:bg-muted/50 transition-all cursor-pointer"
+                      >
+                        <div className="w-8 h-8 flex items-center justify-center">
+                          <img
+                            src={`/providers/${icon.id}${displaySuffix}.svg`}
+                            alt={icon.id}
+                            className="w-8 h-8 object-contain"
+                            loading="lazy"
+                          />
+                        </div>
+                        <span className="text-[10px] text-foreground/80 truncate w-full text-center">
+                          {icon.id}
+                        </span>
+                      </button>
+                    );
+                  })
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
